@@ -16,8 +16,8 @@
 
 // Wedensday, October 18, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_H
-#define COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_H
+#ifndef KUSH_COMPILER_LEXER_LEXER_H
+#define KUSH_COMPILER_LEXER_LEXER_H
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/queue/ArrayQueue.h>
@@ -31,10 +31,10 @@
 #include <kush/lexer/Token.h>
 #include <kush/lexer/TokenChannel.h>
 
-#define ZEN_LEXER_DEFAULT_CHANNEL 0
-#define ZEN_LEXER_HIDDEN_CHANNEL 1
+#define KUSH_LEXER_DEFAULT_CHANNEL 0
+#define KUSH_LEXER_HIDDEN_CHANNEL 1
 
-#define ZEN_END_OF_STREAM -1
+#define KUSH_END_OF_STREAM -1
 
 /* Forward Reference */
 
@@ -47,10 +47,10 @@ typedef struct k_ErrorHandler_t k_ErrorHandler_t;
 /**
  * Generates a stream of tokens from an input character stream.
  * The tokens are recognized based on fixed lexical patterns
- * as described by Zen.
+ * as described by KUSH.
  *
  * @author Samuel Rowe
- * @since  zen 1.0
+ * @since  KUSH 1.0
  */
 struct k_Lexer_t {
 
@@ -335,4 +335,4 @@ bool k_Lexer_isOctalDigitOrUnderscore(int32_t codePoint);
  */
 bool k_Lexer_isIntegerSuffix(int32_t codePoint);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_H */
+#endif /* KUSH_COMPILER_LEXER_LEXER_H */

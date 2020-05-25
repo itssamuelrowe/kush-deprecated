@@ -16,8 +16,8 @@
 
 // Friday, November 04, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_ERROR_H
-#define COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_ERROR_H
+#ifndef KUSH_COMPILER_LEXER_LEXER_ERROR_H
+#define KUSH_COMPILER_LEXER_LEXER_ERROR_H
 
 #include <kush/Configuration.h>
 
@@ -29,7 +29,7 @@
  * @class LexerError
  * @ingroup k_compiler_lexer
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_LexerError_t {
     char* m_message;
@@ -58,4 +58,4 @@ k_LexerError_t* k_LexerError_new(const char* message, const char* path,
  */
 void k_LexerError_delete(k_LexerError_t* error);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_ERROR_H */
+#endif /* KUSH_COMPILER_LEXER_LEXER_ERROR_H */
