@@ -10,7 +10,7 @@ componentDeclarations
 ;
 
 importDeclarations
-:   'import' qualifiedName NEWLINE
+:   'import' qualifiedName SEMICOLON
 ;
 
 qualifiedName
@@ -52,7 +52,7 @@ statement
 ;
 
 simpleStatement
-:   unterminatedSimpleStatement NEWLINE
+:   unterminatedSimpleStatement SEMICOLON
 ;
 
 unterminatedSimpleStatement
@@ -135,11 +135,11 @@ tryStatement
 ;
 
 tryClause
-:     'try' blockStatement
+:    'try' blockStatement
 ;
 
 catchClause
-:	'catch' IDENTIFIER blockStatement
+:    catch' (IDENTIFIER | STRING_LITERAL)? IDENTIFIER blockStatement
 ;
 
 finallyClause
@@ -155,11 +155,11 @@ structureBody
 ;
 
 structureMembers
-:   type IDENTIFIER (NEWLINE type IDENTIFIER)*
+:   type IDENTIFIER (SEMICOLON type IDENTIFIER)*
 ;
 
 structureMember
-:   type IDENTIFIER NEWLINE
+:   type IDENTIFIER SEMICOLON
 ;
 
 type
@@ -183,7 +183,7 @@ returnType
 ;
 
 expressions
-:     expression (',' expression)*
+:    expression (',' expression)*
 ;
 
 expression
@@ -195,18 +195,18 @@ assignmentExpression
 ;
 
 assignmentOperator
-:     '='
-|     '*='
-|     '/='
-|     '%='
-|     '+='
-|     '-='
-|     '<<='
-|     '>>='
-|     '>>>='
-|     '&='
-|     '^='
-|     '|='
+:    '='
+|    '*='
+|    '/='
+|    '%='
+|    '+='
+|    '-='
+|    '<<='
+|    '>>='
+|    '>>>='
+|    '&='
+|    '^='
+|    '|='
 ;
 
 conditionalExpression
@@ -287,10 +287,10 @@ unaryExpression
 ;
 
 unaryOperator
-:     '+'
-|     '-'
-|     '~'
-|     '!'
+:    '+'
+|    '-'
+|    '~'
+|    '!'
 ;
 
 postfixExpression
@@ -298,9 +298,9 @@ postfixExpression
 ;
 
 postfixPart
-:     subscript
-|     functionArguments
-|     memberAccess
+:    subscript
+|    functionArguments
+|    memberAccess
 ;
 
 subscript
@@ -347,7 +347,7 @@ literal
 ;
 
 listExpression
-:     '[' expressions ']'
+:    '[' expressions ']'
 ;
 
 newExpression
