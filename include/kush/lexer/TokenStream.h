@@ -16,8 +16,8 @@
 
 // Sunday, November 05, 2017
 
-#ifndef ZEN_TOKEN_STREAM_H
-#define ZEN_TOKEN_STREAM_H
+#ifndef KUSH_TOKEN_STREAM_H
+#define KUSH_TOKEN_STREAM_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -98,4 +98,4 @@ k_Lexer_t* k_TokenStream_getLexer(k_TokenStream_t* stream);
 uint8_t* k_TokenStream_getText(k_TokenStream_t* stream, int32_t startIndex, int32_t stopIndex, int32_t* size);
 int32_t k_TokenStream_getNumberOfTokens(k_TokenStream_t* stream, k_TokenChannel_t channel);
 
-#endif /* ZEN_TOKEN_STREAM_H */
+#endif /* KUSH_TOKEN_STREAM_H */

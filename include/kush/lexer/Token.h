@@ -16,8 +16,8 @@
 
 // Wedensday, October 18, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_LEXER_TOKEN_H
-#define COM_ONECUBE_ZEN_COMPILER_LEXER_TOKEN_H
+#ifndef KUSH_COMPILER_LEXER_TOKEN_H
+#define KUSH_COMPILER_LEXER_TOKEN_H
 
 #include <kush/Configuration.h>
 #include <kush/lexer/TokenType.h>
@@ -34,7 +34,7 @@
  * with it.
  *
  * @author Samuel Rowe
- * @since  zen 1.0
+ * @since  KUSH 1.0
  */
 struct k_Token_t {
     k_TokenChannel_t m_channel;
@@ -188,4 +188,4 @@ int32_t k_Token_getIndex(k_Token_t* token);
  */
 void k_Token_setIndex(k_Token_t* token, int32_t index);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_LEXER_TOKEN_H */
+#endif /* KUSH_COMPILER_LEXER_TOKEN_H */
