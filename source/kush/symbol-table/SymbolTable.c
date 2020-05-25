@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 #include <jtk/collection/stack/LinkedStack.h>
 
-#include <com/onecube/zen/compiler/Compiler.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolTable.h>
+#include <kush/Compiler.h>
+#include <kush/symbol-table/SymbolTable.h>
 
 zen_SymbolTable_t* zen_SymbolTable_new(zen_Compiler_t* compiler) {
     zen_SymbolTable_t* symbolTable = zen_Memory_allocate(zen_SymbolTable_t, 1);

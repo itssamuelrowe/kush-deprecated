@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@
 #include <com/onecube/zen/virtual-machine/feb/constant-pool/ConstantPoolTag.h>
 #include <com/onecube/zen/virtual-machine/feb/constant-pool/ConstantPoolUtf8.h>
 
-#include <com/onecube/zen/compiler/symbol-table/SymbolLoader.h>
-#include <com/onecube/zen/compiler/Compiler.h>
+#include <kush/symbol-table/SymbolLoader.h>
+#include <kush/Compiler.h>
 
 /*******************************************************************************
  * SymbolLoader                                                                *

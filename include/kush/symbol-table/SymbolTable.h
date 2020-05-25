@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_TABLE_H
 #define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_TABLE_H
 
-#include <com/onecube/zen/compiler/symbol-table/Scope.h>
-#include <com/onecube/zen/compiler/symbol-table/Symbol.h>
+#include <kush/symbol-table/Scope.h>
+#include <kush/symbol-table/Symbol.h>
 
 struct zen_Compiler_t;
 typedef struct zen_Compiler_t zen_Compiler_t;

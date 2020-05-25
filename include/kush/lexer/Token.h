@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
 #ifndef COM_ONECUBE_ZEN_COMPILER_LEXER_TOKEN_H
 #define COM_ONECUBE_ZEN_COMPILER_LEXER_TOKEN_H
 
-#include <com/onecube/zen/Configuration.h>
-#include <com/onecube/zen/compiler/lexer/TokenType.h>
-#include <com/onecube/zen/compiler/lexer/TokenChannel.h>
+#include <kush/Configuration.h>
+#include <kush/lexer/TokenType.h>
+#include <kush/lexer/TokenChannel.h>
 
 /*******************************************************************************
  * Token                                                                       *

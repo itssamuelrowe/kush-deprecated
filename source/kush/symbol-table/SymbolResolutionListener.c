@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@
 #include <jtk/collection/array/Arrays.h>
 #include <jtk/core/StringBuilder.h>
 
-#include <com/onecube/zen/compiler/lexer/Token.h>
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
-#include <com/onecube/zen/compiler/ast/ASTWalker.h>
-#include <com/onecube/zen/compiler/ast/context/Context.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolResolutionListener.h>
-#include <com/onecube/zen/compiler/symbol-table/Symbol.h>
+#include <kush/lexer/Token.h>
+#include <kush/ast/ASTNode.h>
+#include <kush/ast/ASTWalker.h>
+#include <kush/ast/context/Context.h>
+#include <kush/symbol-table/SymbolResolutionListener.h>
+#include <kush/symbol-table/Symbol.h>
 
 /*
  * The following text describes a naive algorithm that I developed to analyze

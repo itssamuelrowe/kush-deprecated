@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 #include <stdio.h>
 #include <jtk/core/StringBuilder.h>
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
-#include <com/onecube/zen/compiler/parser/Parser.h>
+#include <kush/ast/ASTNode.h>
+#include <kush/parser/Parser.h>
 
 /******************************************************************************
  * ASTNode																	  *

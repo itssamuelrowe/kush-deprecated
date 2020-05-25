@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <jtk/core/Float.h>
 #include <jtk/core/VariableArguments.h>
 
-#include <com/onecube/zen/compiler/generator/BinaryEntityBuilder.h>
+#include <kush/generator/BinaryEntityBuilder.h>
 #include <com/onecube/zen/virtual-machine/feb/ByteCode.h>
 #include <com/onecube/zen/virtual-machine/feb/EntityType.h>
 #include <com/onecube/zen/virtual-machine/feb/Instruction.h>

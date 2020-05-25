@@ -19,13 +19,13 @@
 #ifndef COM_ONECUBE_ZEN_COMPILER_COMPILER_H
 #define COM_ONECUBE_ZEN_COMPILER_COMPILER_H
 
-#include <com/onecube/zen/Configuration.h>
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
-#include <com/onecube/zen/compiler/ast/ASTAnnotations.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolTable.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolLoader.h>
-#include <com/onecube/zen/compiler/support/ErrorHandler.h>
-#include <com/onecube/zen/disassembler/BinaryEntityDisassembler.h>
+#include <kush/Configuration.h>
+#include <kush/ast/ASTNode.h>
+#include <kush/ast/ASTAnnotations.h>
+#include <kush/symbol-table/SymbolTable.h>
+#include <kush/symbol-table/SymbolLoader.h>
+#include <kush/support/ErrorHandler.h>
+#include <kush/disassembler/BinaryEntityDisassembler.h>
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>

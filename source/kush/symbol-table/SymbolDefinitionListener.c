@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
 #include <jtk/core/CString.h>
 #include <jtk/collection/stack/LinkedStack.h>
 
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
-#include <com/onecube/zen/compiler/lexer/Token.h>
-#include <com/onecube/zen/compiler/symbol-table/FunctionSignature.h>
-#include <com/onecube/zen/compiler/symbol-table/FunctionSymbol.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolDefinitionListener.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolTable.h>
+#include <kush/ast/ASTNode.h>
+#include <kush/lexer/Token.h>
+#include <kush/symbol-table/FunctionSignature.h>
+#include <kush/symbol-table/FunctionSymbol.h>
+#include <kush/symbol-table/SymbolDefinitionListener.h>
+#include <kush/symbol-table/SymbolTable.h>
 
 /*
  * As new features are implemented, the source code of a project grows in

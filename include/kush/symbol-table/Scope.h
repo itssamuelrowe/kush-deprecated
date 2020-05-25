@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
 
-#include <com/onecube/zen/compiler/symbol-table/ScopeType.h>
+#include <kush/symbol-table/ScopeType.h>
 
 typedef struct zen_Symbol_t zen_Symbol_t;
 

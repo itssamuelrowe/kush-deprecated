@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 // Saturday, April 28, 2018
 
-#include <com/onecube/zen/compiler/generator/DataChannel.h>
+#include <kush/generator/DataChannel.h>
 
 /*******************************************************************************
  * DataChannel                                                                 *

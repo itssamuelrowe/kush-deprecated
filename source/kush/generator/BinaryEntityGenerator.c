@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,18 @@
 #include <jtk/collection/Pair.h>
 #include <jtk/collection/array/Arrays.h>
 
-#include <com/onecube/zen/compiler/ast/ASTWalker.h>
-#include <com/onecube/zen/compiler/ast/context/Context.h>
-#include <com/onecube/zen/compiler/ast/ASTAnnotation.h>
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
-#include <com/onecube/zen/compiler/ast/ASTHelper.h>
-#include <com/onecube/zen/compiler/lexer/Token.h>
-#include <com/onecube/zen/compiler/lexer/TokenType.h>
-#include <com/onecube/zen/compiler/generator/BinaryEntityBuilder.h>
-#include <com/onecube/zen/compiler/generator/DataChannel.h>
-#include <com/onecube/zen/compiler/symbol-table/Symbol.h>
-#include <com/onecube/zen/compiler/symbol-table/Scope.h>
-#include <com/onecube/zen/compiler/generator/BinaryEntityGenerator.h>
+#include <kush/ast/ASTWalker.h>
+#include <kush/ast/context/Context.h>
+#include <kush/ast/ASTAnnotation.h>
+#include <kush/ast/ASTNode.h>
+#include <kush/ast/ASTHelper.h>
+#include <kush/lexer/Token.h>
+#include <kush/lexer/TokenType.h>
+#include <kush/generator/BinaryEntityBuilder.h>
+#include <kush/generator/DataChannel.h>
+#include <kush/symbol-table/Symbol.h>
+#include <kush/symbol-table/Scope.h>
+#include <kush/generator/BinaryEntityGenerator.h>
 #include <com/onecube/zen/virtual-machine/feb/EntityType.h>
 #include <com/onecube/zen/virtual-machine/feb/attribute/InstructionAttribute.h>
 #include <com/onecube/zen/virtual-machine/feb/attribute/PredefinedAttribute.h>

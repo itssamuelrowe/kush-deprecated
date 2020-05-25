@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <com/onecube/zen/compiler/Compiler.h>
+#include <kush/Compiler.h>
 
 int32_t main(int32_t length, char** arguments) {
     // jtk_Assert_assertTrue(zen_Instruction_verify(), "The instruction set is invalid.");

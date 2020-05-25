@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
  * SymbolLoader                                                                *
  *******************************************************************************/
 
-#include <com/onecube/zen/Configuration.h>
-#include <com/onecube/zen/compiler/symbol-table/Symbol.h>
-#include <com/onecube/zen/virtual-machine/feb/constant-pool/ConstantPool.h>
+#include <kush/Configuration.h>
+#include <kush/symbol-table/Symbol.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPool.h>
 
 #include <jtk/collection/Iterator.h>
 #include <jtk/collection/map/HashMap.h>

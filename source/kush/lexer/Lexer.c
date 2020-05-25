@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@
 #include <jtk/core/StringBuilder.h>
 #include <jtk/core/CString.h>
 
-#include <com/onecube/zen/compiler/lexer/Lexer.h>
-#include <com/onecube/zen/compiler/lexer/Token.h>
-#include <com/onecube/zen/compiler/lexer/TokenType.h>
-#include <com/onecube/zen/compiler/support/ErrorHandler.h>
+#include <kush/lexer/Lexer.h>
+#include <kush/lexer/Token.h>
+#include <kush/lexer/TokenType.h>
+#include <kush/support/ErrorHandler.h>
 
 #warning "Lexer does not recognize decimal values!"
 

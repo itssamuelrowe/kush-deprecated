@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 
 #include <jtk/collection/list/ArrayList.h>
-#include <com/onecube/zen/compiler/ast/ASTWalker.h>
-#include <com/onecube/zen/compiler/parser/Parser.h>
+#include <kush/ast/ASTWalker.h>
+#include <kush/parser/Parser.h>
 
 void zen_ASTWalker_walk(zen_ASTListener_t* listener, zen_ASTNode_t* node) {
     jtk_Assert_assertObject(listener, "The specified listener is null.");

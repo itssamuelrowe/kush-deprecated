@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 // Saturday, February 24, 2018
 
-#include <com/onecube/zen/compiler/symbol-table/MemberConstantSymbol.h>
+#include <kush/symbol-table/MemberConstantSymbol.h>
 
 zen_MemberConstantSymbol_t* zen_MemberConstantSymbol_new(zen_ASTNode_t* identifier,
     jtk_ArrayList_t* modifiers) {

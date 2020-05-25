@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@
 
 #include <jtk/collection/list/ArrayList.h>
 
-#include <com/onecube/zen/Configuration.h>
-#include <com/onecube/zen/compiler/generator/DataChannel.h>
+#include <kush/Configuration.h>
+#include <kush/generator/DataChannel.h>
 
-#include <com/onecube/zen/virtual-machine/feb/ByteCode.h>
-#include <com/onecube/zen/virtual-machine/feb/attribute/ExceptionTable.h>
-#include <com/onecube/zen/virtual-machine/feb/constant-pool/ConstantPoolEntry.h>
+#include <kush/virtual-machine/feb/ByteCode.h>
+#include <kush/virtual-machine/feb/attribute/ExceptionTable.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolEntry.h>
 
 /*******************************************************************************
  * BinaryEntityBuilder                                                         *

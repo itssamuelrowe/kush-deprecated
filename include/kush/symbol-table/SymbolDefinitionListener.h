@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,14 @@
 #ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H
 #define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H
 
-#include <com/onecube/zen/Configuration.h>
-#include <com/onecube/zen/compiler/Compiler.h>
-#include <com/onecube/zen/compiler/ast/ASTListener.h>
-#include <com/onecube/zen/compiler/ast/context/Context.h>
-#include <com/onecube/zen/compiler/symbol-table/Scope.h>
-#include <com/onecube/zen/compiler/symbol-table/ScopeType.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolTable.h>
-#include <com/onecube/zen/compiler/ast/ASTAnnotations.h>
+#include <kush/Configuration.h>
+#include <kush/Compiler.h>
+#include <kush/ast/ASTListener.h>
+#include <kush/ast/context/Context.h>
+#include <kush/symbol-table/Scope.h>
+#include <kush/symbol-table/ScopeType.h>
+#include <kush/symbol-table/SymbolTable.h>
+#include <kush/ast/ASTAnnotations.h>
 
 /*******************************************************************************
  * SymbolDefinitionListener                                                    *

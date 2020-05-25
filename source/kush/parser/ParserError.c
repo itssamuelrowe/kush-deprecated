@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 // Sunday, December 03, 2017
 
 #include <jtk/core/CString.h>
-#include <com/onecube/zen/compiler/parser/ParserError.h>
+#include <kush/parser/ParserError.h>
 
 zen_ParserError_t* zen_ParserError_new() {
     zen_ParserError_t* error = zen_Memory_allocate(zen_ParserError_t, 1);

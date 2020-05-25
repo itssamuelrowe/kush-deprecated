@@ -1,7 +1,7 @@
 // Sunday, November 24, 2019
 
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use thhas file except in compliance with the License.
@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include <com/onecube/zen/compiler/symbol-table/Modifier.h>
+#include <kush/symbol-table/Modifier.h>
 
 /*******************************************************************************
  * Modifier                                                                    *

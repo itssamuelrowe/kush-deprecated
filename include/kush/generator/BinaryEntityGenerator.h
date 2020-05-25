@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +23,18 @@
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/io/OutputStream.h>
 
-#include <com/onecube/zen/Configuration.h>
+#include <kush/Configuration.h>
 
-#include <com/onecube/zen/compiler/Compiler.h>
-#include <com/onecube/zen/compiler/ast/ASTListener.h>
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
-#include <com/onecube/zen/compiler/ast/ASTAnnotations.h>
-#include <com/onecube/zen/compiler/ast/ExpressionAnnotation.h>
-#include <com/onecube/zen/compiler/generator/ConstantPoolBuilder.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolTable.h>
+#include <kush/Compiler.h>
+#include <kush/ast/ASTListener.h>
+#include <kush/ast/ASTNode.h>
+#include <kush/ast/ASTAnnotations.h>
+#include <kush/ast/ExpressionAnnotation.h>
+#include <kush/generator/ConstantPoolBuilder.h>
+#include <kush/symbol-table/SymbolTable.h>
 
-#include <com/onecube/zen/virtual-machine/feb/ByteCode.h>
-#include <com/onecube/zen/virtual-machine/feb/EntityFile.h>
+#include <kush/virtual-machine/feb/ByteCode.h>
+#include <kush/virtual-machine/feb/EntityFile.h>
 
 /*******************************************************************************
  * BinaryEntityGenerator                                                       *

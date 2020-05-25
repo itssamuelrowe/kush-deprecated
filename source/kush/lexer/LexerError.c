@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 #include <jtk/core/CString.h>
-#include <com/onecube/zen/compiler/lexer/LexerError.h>
+#include <kush/lexer/LexerError.h>
 
 zen_LexerError_t* zen_LexerError_new(const char* message, const char* path, int32_t line, int32_t column) {
     zen_LexerError_t* error = jtk_Memory_allocate(zen_LexerError_t, 1);

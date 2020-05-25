@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 
 #include <jtk/collection/list/ArrayList.h>
 
-#include <com/onecube/zen/Configuration.h>
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
+#include <kush/Configuration.h>
+#include <kush/ast/ASTNode.h>
 
 /*******************************************************************************
  * FunctionParametersContext                                                   *

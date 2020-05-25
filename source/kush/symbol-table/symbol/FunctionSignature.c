@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 // Saturday, February 24, 2018
 
 #include <jtk/core/StringBuilder.h>
-#include <com/onecube/zen/compiler/symbol-table/FunctionSignature.h>
+#include <kush/symbol-table/FunctionSignature.h>
 #include <jtk/core/CString.h>
 
 // TODO: Constructors require v for their return type!

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
 #ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_H
 #define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_H
 
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
-#include <com/onecube/zen/compiler/symbol-table/Scope.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolCategory.h>
-#include <com/onecube/zen/compiler/symbol-table/ClassSymbol.h>
-#include <com/onecube/zen/compiler/symbol-table/FunctionSymbol.h>
-#include <com/onecube/zen/compiler/symbol-table/Modifier.h>
+#include <kush/ast/ASTNode.h>
+#include <kush/symbol-table/Scope.h>
+#include <kush/symbol-table/SymbolCategory.h>
+#include <kush/symbol-table/ClassSymbol.h>
+#include <kush/symbol-table/FunctionSymbol.h>
+#include <kush/symbol-table/Modifier.h>
 
 enum zen_SymbolFlag_t {
     ZEN_SYMBOL_FLAG_EXTERNAL = (1 << 0)

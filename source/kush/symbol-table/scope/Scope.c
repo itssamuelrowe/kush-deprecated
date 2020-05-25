@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 #include <jtk/collection/stack/LinkedStack.h>
 #include <jtk/core/CStringObjectAdapter.h>
 
-#include <com/onecube/zen/compiler/symbol-table/Scope.h>
-#include <com/onecube/zen/compiler/symbol-table/Symbol.h>
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
-#include <com/onecube/zen/compiler/lexer/Token.h>
+#include <kush/symbol-table/Scope.h>
+#include <kush/symbol-table/Symbol.h>
+#include <kush/ast/ASTNode.h>
+#include <kush/lexer/Token.h>
 
 zen_Scope_t* zen_Scope_new(const uint8_t* name, int32_t nameSize,
     zen_ScopeType_t type, zen_Scope_t* enclosingScope, zen_Symbol_t* symbol) {

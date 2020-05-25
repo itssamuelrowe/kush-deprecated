@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #ifndef COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_ERROR_H
 #define COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_ERROR_H
 
-#include <com/onecube/zen/Configuration.h>
+#include <kush/Configuration.h>
 
 /*******************************************************************************
  * LexerError                                                                  *

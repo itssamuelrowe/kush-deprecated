@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 // Sunday, March 11, 2018
 
-#include <com/onecube/zen/compiler/ast/ASTPrinter.h>
-#include <com/onecube/zen/compiler/parser/Parser.h>
+#include <kush/ast/ASTPrinter.h>
+#include <kush/parser/Parser.h>
 
 zen_ASTPrinter_t* zen_ASTPrinter_new() {
     zen_ASTPrinter_t* listener = zen_Memory_allocate(zen_ASTPrinter_t, 1);

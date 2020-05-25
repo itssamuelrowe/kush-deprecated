@@ -3,7 +3,7 @@
 #ifndef COM_ONECUBE_ZEN_COMPILER_AST_EXPRESSION_ANNOTATION_H
 #define COM_ONECUBE_ZEN_COMPILER_AST_EXPRESSION_ANNOTATION_H
 
-#include <com/onecube/zen/Configuration.h>
+#include <kush/Configuration.h>
 
 /*******************************************************************************
  * ExpressionAnnotation                                                        *

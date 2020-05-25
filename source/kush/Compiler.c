@@ -35,26 +35,26 @@
 #include <jtk/core/CStringObjectAdapter.h>
 #include <jtk/core/CString.h>
 
-#include <com/onecube/zen/compiler/Compiler.h>
-#include <com/onecube/zen/compiler/lexer/Lexer.h>
-#include <com/onecube/zen/compiler/lexer/LexerError.h>
-#include <com/onecube/zen/compiler/lexer/TokenStream.h>
-#include <com/onecube/zen/compiler/parser/Parser.h>
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
-#include <com/onecube/zen/compiler/ast/ASTListener.h>
-#include <com/onecube/zen/compiler/ast/ASTWalker.h>
-#include <com/onecube/zen/compiler/ast/ASTAnnotations.h>
-#include <com/onecube/zen/compiler/ast/ASTPrinter.h>
-#include <com/onecube/zen/compiler/generator/BinaryEntityBuilder.h>
-#include <com/onecube/zen/compiler/generator/BinaryEntityGenerator.h>
+#include <kush/Compiler.h>
+#include <kush/lexer/Lexer.h>
+#include <kush/lexer/LexerError.h>
+#include <kush/lexer/TokenStream.h>
+#include <kush/parser/Parser.h>
+#include <kush/ast/ASTNode.h>
+#include <kush/ast/ASTListener.h>
+#include <kush/ast/ASTWalker.h>
+#include <kush/ast/ASTAnnotations.h>
+#include <kush/ast/ASTPrinter.h>
+#include <kush/generator/BinaryEntityBuilder.h>
+#include <kush/generator/BinaryEntityGenerator.h>
 
 
-#include <com/onecube/zen/compiler/symbol-table/SymbolResolutionListener.h>
-#include <com/onecube/zen/compiler/symbol-table/FunctionSymbol.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolDefinitionListener.h>
-#include <com/onecube/zen/compiler/symbol-table/SymbolTable.h>
+#include <kush/symbol-table/SymbolResolutionListener.h>
+#include <kush/symbol-table/FunctionSymbol.h>
+#include <kush/symbol-table/SymbolDefinitionListener.h>
+#include <kush/symbol-table/SymbolTable.h>
 
-#include <com/onecube/zen/compiler/support/ErrorHandler.h>
+#include <kush/support/ErrorHandler.h>
 
 #include <com/onecube/zen/virtual-machine/feb/Instruction.h>
 

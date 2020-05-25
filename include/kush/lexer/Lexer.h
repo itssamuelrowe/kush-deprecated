@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@
 #include <jtk/core/StringBuilder.h>
 #include <jtk/io/InputStream.h>
 
-#include <com/onecube/zen/Configuration.h>
-#include <com/onecube/zen/compiler/Compiler.h>
-#include <com/onecube/zen/compiler/lexer/LexerError.h>
-#include <com/onecube/zen/compiler/lexer/Token.h>
-#include <com/onecube/zen/compiler/lexer/TokenChannel.h>
+#include <kush/Configuration.h>
+#include <kush/Compiler.h>
+#include <kush/lexer/LexerError.h>
+#include <kush/lexer/Token.h>
+#include <kush/lexer/TokenChannel.h>
 
 #define ZEN_LEXER_DEFAULT_CHANNEL 0
 #define ZEN_LEXER_HIDDEN_CHANNEL 1

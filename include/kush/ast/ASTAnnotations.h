@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Samuel Rowe
+ * Copyright 2017-2020 Samuel Rowe, Joel E. Rego
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #define COM_ONECUBE_COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_ANNOTATIONS_H
 
 #include <jtk/collection/map/HashMap.h>
-#include <com/onecube/zen/compiler/ast/ASTNode.h>
+#include <kush/ast/ASTNode.h>
 
 /*******************************************************************************
  * ASTAnnotations                                                             *
