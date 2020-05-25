@@ -30,39 +30,39 @@
 
 /**
  * @class TypeNameContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_TypeNameContext_t {
-    zen_ASTNode_t* m_node;
+struct k_TypeNameContext_t {
+    k_ASTNode_t* m_node;
     jtk_ArrayList_t* m_identifiers;
 };
 
 /**
  * @memberof TypeNameContext
  */
-typedef struct zen_TypeNameContext_t zen_TypeNameContext_t;
+typedef struct k_TypeNameContext_t k_TypeNameContext_t;
 
 // Constructor
 
 /**
  * @memberof TypeNameContext
  */
-zen_TypeNameContext_t* zen_TypeNameContext_new(zen_ASTNode_t* node);
+k_TypeNameContext_t* k_TypeNameContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof TypeNameContext
  */
-void zen_TypeNameContext_delete(zen_TypeNameContext_t* context);
+void k_TypeNameContext_delete(k_TypeNameContext_t* context);
 
 // Children
 
 /**
  * @memberof TypeNameContext
  */
-void zen_TypeNameContext_getChildren(zen_TypeNameContext_t* context, jtk_ArrayList_t* children);
+void k_TypeNameContext_getChildren(k_TypeNameContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_TYPE_NAME_CONTEXT_H */

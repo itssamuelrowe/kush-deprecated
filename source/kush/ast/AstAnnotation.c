@@ -22,21 +22,21 @@
  * ASTAnnotation                                                               *
  *******************************************************************************/
 
-zen_ASTAnnotation_t* zen_ASTAnnotation_new(zen_ASTAnnotationType_t type, void* bundle) {
-    zen_ASTAnnotation_t* annotation = zen_Memory_allocate(zen_ASTAnnotation_t, 1);
+k_ASTAnnotation_t* k_ASTAnnotation_new(k_ASTAnnotationType_t type, void* bundle) {
+    k_ASTAnnotation_t* annotation = k_Memory_allocate(k_ASTAnnotation_t, 1);
     annotation->m_type = type;
     annotation->m_bundle = bundle;
 
     return annotation;
 }
 
-void zen_ASTAnnotation_delete(zen_ASTAnnotation_t* annotation) {
+void k_ASTAnnotation_delete(k_ASTAnnotation_t* annotation) {
     jtk_Assert_assertObject(annotation, "The specified annotation is null.");
 
     jtk_Memory_deallocate(annotation);
 }
 
-zen_ASTAnnotationType_t zen_ASTAnnotation_getType(zen_ASTAnnotation_t* annotation) {
+k_ASTAnnotationType_t k_ASTAnnotation_getType(k_ASTAnnotation_t* annotation) {
     jtk_Assert_assertObject(annotation, "The specified annotation is null.");
 
     return annotation->m_type;

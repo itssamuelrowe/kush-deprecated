@@ -28,41 +28,41 @@
 
 /**
  * @class EnumerationDeclarationContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_EnumerationDeclarationContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_identifier;
-    zen_ASTNode_t* m_enumerationBaseClause;
-    zen_ASTNode_t* m_enumerationSuite;
+struct k_EnumerationDeclarationContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_identifier;
+    k_ASTNode_t* m_enumerationBaseClause;
+    k_ASTNode_t* m_enumerationSuite;
 };
 
 /**
  * @memberof EnumerationDeclarationContext
  */
-typedef struct zen_EnumerationDeclarationContext_t zen_EnumerationDeclarationContext_t;
+typedef struct k_EnumerationDeclarationContext_t k_EnumerationDeclarationContext_t;
 
 // Constructor
 
 /**
  * @memberof EnumerationDeclarationContext
  */
-zen_EnumerationDeclarationContext_t* zen_EnumerationDeclarationContext_new(zen_ASTNode_t* node);
+k_EnumerationDeclarationContext_t* k_EnumerationDeclarationContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof EnumerationDeclarationContext
  */
-void zen_EnumerationDeclarationContext_delete(zen_EnumerationDeclarationContext_t* context);
+void k_EnumerationDeclarationContext_delete(k_EnumerationDeclarationContext_t* context);
 
 // Children
 
 /**
  * @memberof EnumerationDeclarationContext
  */
-void zen_EnumerationDeclarationContext_getChildren(zen_EnumerationDeclarationContext_t* context, jtk_ArrayList_t* children);
+void k_EnumerationDeclarationContext_getChildren(k_EnumerationDeclarationContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ENUMERATION_DECLARATION_CONTEXT_H */

@@ -30,40 +30,40 @@
 
 /**
  * @class AdditiveExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_AdditiveExpressionContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_multiplicativeExpression;
+struct k_AdditiveExpressionContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_multiplicativeExpression;
     jtk_ArrayList_t* m_multiplicativeExpressions;
 };
 
 /**
  * @memberof AdditiveExpressionContext
  */
-typedef struct zen_AdditiveExpressionContext_t zen_AdditiveExpressionContext_t;
+typedef struct k_AdditiveExpressionContext_t k_AdditiveExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof AdditiveExpressionContext
  */
-zen_AdditiveExpressionContext_t* zen_AdditiveExpressionContext_new(zen_ASTNode_t* node);
+k_AdditiveExpressionContext_t* k_AdditiveExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof AdditiveExpressionContext
  */
-void zen_AdditiveExpressionContext_delete(zen_AdditiveExpressionContext_t* context);
+void k_AdditiveExpressionContext_delete(k_AdditiveExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof AdditiveExpressionContext
  */
-void zen_AdditiveExpressionContext_getChildren(zen_AdditiveExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_AdditiveExpressionContext_getChildren(k_AdditiveExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ADDITIVE_EXPRESSION_CONTEXT_H */

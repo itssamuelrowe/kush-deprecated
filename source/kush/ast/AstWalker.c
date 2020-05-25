@@ -18,33 +18,33 @@
 #include <kush/ast/ASTWalker.h>
 #include <kush/parser/Parser.h>
 
-void zen_ASTWalker_walk(zen_ASTListener_t* listener, zen_ASTNode_t* node) {
+void k_ASTWalker_walk(k_ASTListener_t* listener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(listener, "The specified listener is null.");
     // jtk_Assert_assertObject(node, "The specified root is null.");
 
-    /*printf("[node enter] %s\n", zen_Parser_getRuleName(node->m_type));
+    /*printf("[node enter] %s\n", k_Parser_getRuleName(node->m_type));
     fflush(stdout);
     */
 
     if (node != NULL) {
-        if (zen_ASTNode_isErroneous(node)) {
+        if (k_ASTNode_isErroneous(node)) {
             listener->m_onVisitErrorNode(listener, node);
         }
-        else if (zen_ASTNode_isTerminal(node)) {
+        else if (k_ASTNode_isTerminal(node)) {
             listener->m_onVisitTerminal(listener, node);
         }
         else {
-            zen_ASTWalker_enterRule(listener, node);
+            k_ASTWalker_enterRule(listener, node);
 
-            jtk_ArrayList_t* children = zen_ASTNode_getChildren(node);
+            jtk_ArrayList_t* children = k_ASTNode_getChildren(node);
             int32_t size = jtk_ArrayList_getSize(children);
             switch (listener->m_walkerState) {
                 case ZEN_AST_WALKER_STATE_VISIT_CHILDREN: {
                     // TODO: Use a stack based traversal.
                     int32_t i;
                     for (i = 0; i < size; i++) {
-                        zen_ASTNode_t* child = (zen_ASTNode_t*)jtk_ArrayList_getValue(children, i);
-                        zen_ASTWalker_walk(listener, child);
+                        k_ASTNode_t* child = (k_ASTNode_t*)jtk_ArrayList_getValue(children, i);
+                        k_ASTWalker_walk(listener, child);
                     }
 
                     break;
@@ -58,8 +58,8 @@ void zen_ASTWalker_walk(zen_ASTListener_t* listener, zen_ASTNode_t* node) {
 
                 case ZEN_AST_WALKER_STATE_VISIT_FIRST_CHILD: {
                     if (size > 0) {
-                        zen_ASTNode_t* firstChild = (zen_ASTNode_t*)jtk_ArrayList_getValue(children, 0);
-                        zen_ASTWalker_walk(listener, firstChild);
+                        k_ASTNode_t* firstChild = (k_ASTNode_t*)jtk_ArrayList_getValue(children, 0);
+                        k_ASTWalker_walk(listener, firstChild);
                     }
 
                     break;
@@ -67,9 +67,9 @@ void zen_ASTWalker_walk(zen_ASTListener_t* listener, zen_ASTNode_t* node) {
 
                 case ZEN_AST_WALKER_STATE_VISIT_LAST_CHILD: {
                     if (size > 0) {
-                        zen_ASTNode_t* lastChild = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+                        k_ASTNode_t* lastChild = (k_ASTNode_t*)jtk_ArrayList_getValue(
                             children, size - 1);
-                        zen_ASTWalker_walk(listener, lastChild);
+                        k_ASTWalker_walk(listener, lastChild);
                     }
 
                     break;
@@ -83,17 +83,17 @@ void zen_ASTWalker_walk(zen_ASTListener_t* listener, zen_ASTNode_t* node) {
             // TODO: If the walker allows a node to prevent its siblings from being visited
             // please process it here. Further, do not reset to ZEN_AST_WALKER_STATE_VISIT_CHILDREN.
 
-            zen_ASTListener_visitChildren(listener);
+            k_ASTListener_visitChildren(listener);
 
-            zen_ASTWalker_exitRule(listener, node);
+            k_ASTWalker_exitRule(listener, node);
         }
     }
 
-    // printf("[node exit] %s\n", zen_Parser_getRuleName(node->m_type));
+    // printf("[node exit] %s\n", k_Parser_getRuleName(node->m_type));
 }
 
-void zen_ASTWalker_enterRule(zen_ASTListener_t* listener, zen_ASTNode_t* node) {
-    // printf("[enter node]: %s\n", zen_Parser_getRuleName(node->m_type));
+void k_ASTWalker_enterRule(k_ASTListener_t* listener, k_ASTNode_t* node) {
+    // printf("[enter node]: %s\n", k_Parser_getRuleName(node->m_type));
 
     listener->m_onEnterEveryRule(listener, node);
 
@@ -491,8 +491,8 @@ void zen_ASTWalker_enterRule(zen_ASTListener_t* listener, zen_ASTNode_t* node) {
     }
 }
 
-void zen_ASTWalker_exitRule(zen_ASTListener_t* listener, zen_ASTNode_t* node) {
-    // printf("[exit node]: %s\n", zen_Parser_getRuleName(node->m_type));
+void k_ASTWalker_exitRule(k_ASTListener_t* listener, k_ASTNode_t* node) {
+    // printf("[exit node]: %s\n", k_Parser_getRuleName(node->m_type));
 
     switch (node->m_type) {
         case ZEN_AST_NODE_TYPE_COMPILATION_UNIT: {

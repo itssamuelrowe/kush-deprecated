@@ -28,40 +28,40 @@
 
 /**
  * @class ElseIfClauseContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ElseIfClauseContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_expression;
-    zen_ASTNode_t* m_statementSuite;
+struct k_ElseIfClauseContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_expression;
+    k_ASTNode_t* m_statementSuite;
 };
 
 /**
  * @memberof ElseIfClauseContext
  */
-typedef struct zen_ElseIfClauseContext_t zen_ElseIfClauseContext_t;
+typedef struct k_ElseIfClauseContext_t k_ElseIfClauseContext_t;
 
 // Constructor
 
 /**
  * @memberof ElseIfClauseContext
  */
-zen_ElseIfClauseContext_t* zen_ElseIfClauseContext_new(zen_ASTNode_t* node);
+k_ElseIfClauseContext_t* k_ElseIfClauseContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ElseIfClauseContext
  */
-void zen_ElseIfClauseContext_delete(zen_ElseIfClauseContext_t* context);
+void k_ElseIfClauseContext_delete(k_ElseIfClauseContext_t* context);
 
 // Children
 
 /**
  * @memberof ElseIfClauseContext
  */
-void zen_ElseIfClauseContext_getChildren(zen_ElseIfClauseContext_t* context, jtk_ArrayList_t* children);
+void k_ElseIfClauseContext_getChildren(k_ElseIfClauseContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ELSE_IF_CLAUSE_CONTEXT_H */

@@ -21,67 +21,67 @@
 #include <kush/Compiler.h>
 #include <kush/symbol-table/SymbolTable.h>
 
-zen_SymbolTable_t* zen_SymbolTable_new(zen_Compiler_t* compiler) {
-    zen_SymbolTable_t* symbolTable = zen_Memory_allocate(zen_SymbolTable_t, 1);
+k_SymbolTable_t* k_SymbolTable_new(k_Compiler_t* compiler) {
+    k_SymbolTable_t* symbolTable = k_Memory_allocate(k_SymbolTable_t, 1);
     symbolTable->m_currentScope = NULL;
     symbolTable->m_compiler = compiler;
 
     return symbolTable;
 }
 
-void zen_SymbolTable_delete(zen_SymbolTable_t* symbolTable) {
+void k_SymbolTable_delete(k_SymbolTable_t* symbolTable) {
     jtk_Assert_assertObject(symbolTable, "The specified symbol table is null.");
 
     jtk_Memory_deallocate(symbolTable);
 }
 
-void zen_SymbolTable_setCurrentScope(zen_SymbolTable_t* symbolTable, zen_Scope_t* currentScope) {
+void k_SymbolTable_setCurrentScope(k_SymbolTable_t* symbolTable, k_Scope_t* currentScope) {
     jtk_Assert_assertObject(symbolTable, "The specified symbol table is null.");
 
     jtk_Logger_t* logger = symbolTable->m_compiler->m_logger;
-    jtk_Logger_debug(logger, "<enter> %s", zen_Scope_getName(currentScope));
+    jtk_Logger_debug(logger, "<enter> %s", k_Scope_getName(currentScope));
     symbolTable->m_currentScope = currentScope;
 }
 
-zen_Scope_t* zen_SymbolTable_getCurrentScope(zen_SymbolTable_t* symbolTable) {
+k_Scope_t* k_SymbolTable_getCurrentScope(k_SymbolTable_t* symbolTable) {
     jtk_Assert_assertObject(symbolTable, "The specified symbol table is null.");
     return symbolTable->m_currentScope;
 }
 
-void zen_SymbolTable_invalidateCurrentScope(zen_SymbolTable_t* symbolTable) {
+void k_SymbolTable_invalidateCurrentScope(k_SymbolTable_t* symbolTable) {
     jtk_Assert_assertObject(symbolTable, "The specified symbol table is null.");
 
     jtk_Logger_t* logger = symbolTable->m_compiler->m_logger;
-    jtk_Logger_debug(logger, "<exit> %s", zen_Scope_getName(symbolTable->m_currentScope));
-    symbolTable->m_currentScope = zen_Scope_getEnclosingScope(symbolTable->m_currentScope);
+    jtk_Logger_debug(logger, "<exit> %s", k_Scope_getName(symbolTable->m_currentScope));
+    symbolTable->m_currentScope = k_Scope_getEnclosingScope(symbolTable->m_currentScope);
 }
 
-void zen_SymbolTable_define(zen_SymbolTable_t* symbolTable, zen_Symbol_t* symbol) {
+void k_SymbolTable_define(k_SymbolTable_t* symbolTable, k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbolTable, "The specified symbol table is null.");
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
-    zen_Scope_define(symbolTable->m_currentScope, symbol);
+    k_Scope_define(symbolTable->m_currentScope, symbol);
 }
 
 /* Resolve */
 
-zen_Symbol_t* zen_SymbolTable_resolve(zen_SymbolTable_t* symbolTable, const uint8_t* identifier) {
+k_Symbol_t* k_SymbolTable_resolve(k_SymbolTable_t* symbolTable, const uint8_t* identifier) {
     jtk_Assert_assertObject(symbolTable, "The specified symbol table is null.");
     jtk_Assert_assertObject(identifier, "The specified identifier is null.");
 
-    zen_Scope_t* scope = symbolTable->m_currentScope;
-    zen_Symbol_t* symbol = NULL;
+    k_Scope_t* scope = symbolTable->m_currentScope;
+    k_Symbol_t* symbol = NULL;
     while (scope != NULL) {
-        symbol = zen_Scope_resolve(scope, identifier);
+        symbol = k_Scope_resolve(scope, identifier);
         if (symbol != NULL) {
             break;
         }
         else {
-            scope = zen_Scope_getEnclosingScope(scope);
+            scope = k_Scope_getEnclosingScope(scope);
         }
     }
 
-    if ((symbol != NULL) && zen_Symbol_isExternal(symbol)) {
+    if ((symbol != NULL) && k_Symbol_isExternal(symbol)) {
         symbol = symbol->m_context.m_asExternal;
     }
 

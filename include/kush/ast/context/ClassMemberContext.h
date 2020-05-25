@@ -30,41 +30,41 @@
 
 /**
  * @class ClassMemberContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ClassMemberContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_annotations;
-    jtk_ArrayList_t* m_modifiers; /* <zen_ASTNode_t*> */
-    zen_ASTNode_t* m_declaration;
+struct k_ClassMemberContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_annotations;
+    jtk_ArrayList_t* m_modifiers; /* <k_ASTNode_t*> */
+    k_ASTNode_t* m_declaration;
 };
 
 /**
  * @memberof ClassMemberContext
  */
-typedef struct zen_ClassMemberContext_t zen_ClassMemberContext_t;
+typedef struct k_ClassMemberContext_t k_ClassMemberContext_t;
 
 // Constructor
 
 /**
  * @memberof ClassMemberContext
  */
-zen_ClassMemberContext_t* zen_ClassMemberContext_new(zen_ASTNode_t* node);
+k_ClassMemberContext_t* k_ClassMemberContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ClassMemberContext
  */
-void zen_ClassMemberContext_delete(zen_ClassMemberContext_t* context);
+void k_ClassMemberContext_delete(k_ClassMemberContext_t* context);
 
 // Children
 
 /**
  * @memberof ClassMemberContext
  */
-void zen_ClassMemberContext_getChildren(zen_ClassMemberContext_t* context, jtk_ArrayList_t* children);
+void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_CLASS_MEMBER_CONTEXT_H */

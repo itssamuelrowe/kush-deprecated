@@ -28,40 +28,40 @@
 
 /**
  * @class MapEntryContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_MapEntryContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_keyExpression;
-    zen_ASTNode_t* m_valueExpression;
+struct k_MapEntryContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_keyExpression;
+    k_ASTNode_t* m_valueExpression;
 };
 
 /**
  * @memberof MapEntryContext
  */
-typedef struct zen_MapEntryContext_t zen_MapEntryContext_t;
+typedef struct k_MapEntryContext_t k_MapEntryContext_t;
 
 // Constructor
 
 /**
  * @memberof MapEntryContext
  */
-zen_MapEntryContext_t* zen_MapEntryContext_new(zen_ASTNode_t* node);
+k_MapEntryContext_t* k_MapEntryContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof MapEntryContext
  */
-void zen_MapEntryContext_delete(zen_MapEntryContext_t* context);
+void k_MapEntryContext_delete(k_MapEntryContext_t* context);
 
 // Children
 
 /**
  * @memberof MapEntryContext
  */
-void zen_MapEntryContext_getChildren(zen_MapEntryContext_t* context, jtk_ArrayList_t* children);
+void k_MapEntryContext_getChildren(k_MapEntryContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_MAP_ENTRY_CONTEXT_H */

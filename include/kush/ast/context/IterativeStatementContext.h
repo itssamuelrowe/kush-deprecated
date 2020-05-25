@@ -28,40 +28,40 @@
 
 /**
  * @class IterativeStatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_IterativeStatementContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_labelClause;
-    zen_ASTNode_t* m_statement;
+struct k_IterativeStatementContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_labelClause;
+    k_ASTNode_t* m_statement;
 };
 
 /**
  * @memberof IterativeStatementContext
  */
-typedef struct zen_IterativeStatementContext_t zen_IterativeStatementContext_t;
+typedef struct k_IterativeStatementContext_t k_IterativeStatementContext_t;
 
 // Constructor
 
 /**
  * @memberof IterativeStatementContext
  */
-zen_IterativeStatementContext_t* zen_IterativeStatementContext_new(zen_ASTNode_t* node);
+k_IterativeStatementContext_t* k_IterativeStatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof IterativeStatementContext
  */
-void zen_IterativeStatementContext_delete(zen_IterativeStatementContext_t* context);
+void k_IterativeStatementContext_delete(k_IterativeStatementContext_t* context);
 
 // Children
 
 /**
  * @memberof IterativeStatementContext
  */
-void zen_IterativeStatementContext_getChildren(zen_IterativeStatementContext_t* context, jtk_ArrayList_t* children);
+void k_IterativeStatementContext_getChildren(k_IterativeStatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ITERATIVE_STATEMENT_CONTEXT_H */

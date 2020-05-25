@@ -28,38 +28,38 @@
 
 /**
  * @class EmptyStatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_EmptyStatementContext_t {
-    zen_ASTNode_t* m_node;
+struct k_EmptyStatementContext_t {
+    k_ASTNode_t* m_node;
 };
 
 /**
  * @memberof EmptyStatementContext
  */
-typedef struct zen_EmptyStatementContext_t zen_EmptyStatementContext_t;
+typedef struct k_EmptyStatementContext_t k_EmptyStatementContext_t;
 
 // Constructor
 
 /**
  * @memberof EmptyStatementContext
  */
-zen_EmptyStatementContext_t* zen_EmptyStatementContext_new(zen_ASTNode_t* node);
+k_EmptyStatementContext_t* k_EmptyStatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof EmptyStatementContext
  */
-void zen_EmptyStatementContext_delete(zen_EmptyStatementContext_t* context);
+void k_EmptyStatementContext_delete(k_EmptyStatementContext_t* context);
 
 // Children
 
 /**
  * @memberof EmptyStatementContext
  */
-void zen_EmptyStatementContext_getChildren(zen_EmptyStatementContext_t* context, jtk_ArrayList_t* children);
+void k_EmptyStatementContext_getChildren(k_EmptyStatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_EMPTY_STATEMENT_CONTEXT_H */

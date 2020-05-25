@@ -25,20 +25,20 @@
  * ClassSymbol                                                                 *
  *******************************************************************************/
 
-typedef struct zen_Scope_t zen_Scope_t;
+typedef struct k_Scope_t k_Scope_t;
 
 /**
  * @class ClassSymbol
- * @ingroup zen_compiler_symbolTable
+ * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ClassSymbol_t {
+struct k_ClassSymbol_t {
     /* The superclasses are added in the resolution phase. */
-    jtk_ArrayList_t* m_superClasses; /* <zen_Symbol_t*> */
+    jtk_ArrayList_t* m_superClasses; /* <k_Symbol_t*> */
     uint8_t* m_qualifiedName;
     int32_t m_qualifiedNameSize;
-    zen_Scope_t* m_classScope;
+    k_Scope_t* m_classScope;
 
     uint8_t* m_descriptor;
     int32_t m_descriptorSize;
@@ -47,10 +47,10 @@ struct zen_ClassSymbol_t {
 /**
  * @memberof ClassSymbol
  */
-typedef struct zen_ClassSymbol_t zen_ClassSymbol_t;
+typedef struct k_ClassSymbol_t k_ClassSymbol_t;
 
-void zen_ClassSymbol_initialize(zen_ClassSymbol_t* symbol);
+void k_ClassSymbol_initialize(k_ClassSymbol_t* symbol);
 
-void zen_ClassSymbol_destroy(zen_ClassSymbol_t* symbol);
+void k_ClassSymbol_destroy(k_ClassSymbol_t* symbol);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_CLASS_SYMBOL_H */

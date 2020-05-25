@@ -23,28 +23,28 @@
  * ASTAnnotations                                                              *
  *******************************************************************************/
 
-zen_ASTAnnotations_t* zen_ASTAnnotations_new() {
-    zen_ASTAnnotations_t* annotations = zen_Memory_allocate(zen_ASTAnnotations_t, 1);
+k_ASTAnnotations_t* k_ASTAnnotations_new() {
+    k_ASTAnnotations_t* annotations = k_Memory_allocate(k_ASTAnnotations_t, 1);
     jtk_ObjectAdapter_t* keyAdapter = jtk_PointerObjectAdapter_getInstance();
     annotations->m_map = jtk_HashMap_new(keyAdapter, NULL);
 
     return annotations;
 }
 
-void zen_ASTAnnotations_delete(zen_ASTAnnotations_t* annotations) {
+void k_ASTAnnotations_delete(k_ASTAnnotations_t* annotations) {
     jtk_Assert_assertObject(annotations, "The specified annotations is null.");
 
     jtk_HashMap_delete(annotations->m_map);
     jtk_Memory_deallocate(annotations);
 }
 
-void* zen_ASTAnnotations_get(zen_ASTAnnotations_t* annotations, zen_ASTNode_t* node) {
+void* k_ASTAnnotations_get(k_ASTAnnotations_t* annotations, k_ASTNode_t* node) {
     jtk_Assert_assertObject(annotations, "The specified annotations is null.");
 
     return jtk_HashMap_getValue(annotations->m_map, node);
 }
 
-void zen_ASTAnnotations_put(zen_ASTAnnotations_t* annotations, zen_ASTNode_t* node, void* value) {
+void k_ASTAnnotations_put(k_ASTAnnotations_t* annotations, k_ASTNode_t* node, void* value) {
     jtk_Assert_assertObject(annotations, "The specified annotations is null.");
 
     if (!jtk_HashMap_putStrictly(annotations->m_map, (void*)node, value)) {
@@ -52,7 +52,7 @@ void zen_ASTAnnotations_put(zen_ASTAnnotations_t* annotations, zen_ASTNode_t* no
     }
 }
 
-void zen_ASTAnnotations_remove(zen_ASTAnnotations_t* annotations, zen_ASTNode_t* node) {
+void k_ASTAnnotations_remove(k_ASTAnnotations_t* annotations, k_ASTNode_t* node) {
     jtk_Assert_assertObject(annotations, "The specified annotations is null.");
 
     jtk_HashMap_removeKey(annotations->m_map, node);

@@ -30,43 +30,43 @@
 
 /**
  * @class CompilationUnitContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_CompilationUnitContext_t {
+struct k_CompilationUnitContext_t {
     /**
      * The node which represents this rule context within the AST.
      */
-    zen_ASTNode_t* m_node;
-	jtk_ArrayList_t* m_importDeclarations; /* <zen_ASTNode_t*> */
-	jtk_ArrayList_t* m_annotatedComponentDeclarations; /* <zen_ASTNode_t*> */
+    k_ASTNode_t* m_node;
+	jtk_ArrayList_t* m_importDeclarations; /* <k_ASTNode_t*> */
+	jtk_ArrayList_t* m_annotatedComponentDeclarations; /* <k_ASTNode_t*> */
 };
 
 /**
  * @memberof CompilationUnitContext
  */
-typedef struct zen_CompilationUnitContext_t zen_CompilationUnitContext_t;
+typedef struct k_CompilationUnitContext_t k_CompilationUnitContext_t;
 
 // Constructor
 
 /**
  * @memberof CompilationUnitContext
  */
-zen_CompilationUnitContext_t* zen_CompilationUnitContext_new(zen_ASTNode_t* node);
+k_CompilationUnitContext_t* k_CompilationUnitContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof CompilationUnitContext
  */
-void zen_CompilationUnitContext_delete(zen_CompilationUnitContext_t* context);
+void k_CompilationUnitContext_delete(k_CompilationUnitContext_t* context);
 
 // Children
 
 /**
  * @memberof CompilationUnitContext
  */
-void zen_CompilationUnitContext_getChildren(zen_CompilationUnitContext_t* context, jtk_ArrayList_t* children);
+void k_CompilationUnitContext_getChildren(k_CompilationUnitContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_COMPILATION_UNIT_CONTEXT_H */

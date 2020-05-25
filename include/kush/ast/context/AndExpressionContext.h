@@ -30,40 +30,40 @@
 
 /**
  * @class AndExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_AndExpressionContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_equalityExpression;
+struct k_AndExpressionContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_equalityExpression;
     jtk_ArrayList_t* m_equalityExpressions;
 };
 
 /**
  * @memberof AndExpressionContext
  */
-typedef struct zen_AndExpressionContext_t zen_AndExpressionContext_t;
+typedef struct k_AndExpressionContext_t k_AndExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof AndExpressionContext
  */
-zen_AndExpressionContext_t* zen_AndExpressionContext_new(zen_ASTNode_t* node);
+k_AndExpressionContext_t* k_AndExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof AndExpressionContext
  */
-void zen_AndExpressionContext_delete(zen_AndExpressionContext_t* context);
+void k_AndExpressionContext_delete(k_AndExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof AndExpressionContext
  */
-void zen_AndExpressionContext_getChildren(zen_AndExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_AndExpressionContext_getChildren(k_AndExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_AND_EXPRESSION_CONTEXT_H */

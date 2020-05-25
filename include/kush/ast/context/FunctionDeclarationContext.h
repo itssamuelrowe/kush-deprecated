@@ -28,41 +28,41 @@
 
 /**
  * @class FunctionDeclarationContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_FunctionDeclarationContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_identifier;
-    zen_ASTNode_t* m_functionParameters;
-    zen_ASTNode_t* m_functionBody;
+struct k_FunctionDeclarationContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_identifier;
+    k_ASTNode_t* m_functionParameters;
+    k_ASTNode_t* m_functionBody;
 };
 
 /**
  * @memberof FunctionDeclarationContext
  */
-typedef struct zen_FunctionDeclarationContext_t zen_FunctionDeclarationContext_t;
+typedef struct k_FunctionDeclarationContext_t k_FunctionDeclarationContext_t;
 
 // Constructor
 
 /**
  * @memberof FunctionDeclarationContext
  */
-zen_FunctionDeclarationContext_t* zen_FunctionDeclarationContext_new(zen_ASTNode_t* node);
+k_FunctionDeclarationContext_t* k_FunctionDeclarationContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof FunctionDeclarationContext
  */
-void zen_FunctionDeclarationContext_delete(zen_FunctionDeclarationContext_t* context);
+void k_FunctionDeclarationContext_delete(k_FunctionDeclarationContext_t* context);
 
 // Children
 
 /**
  * @memberof FunctionDeclarationContext
  */
-void zen_FunctionDeclarationContext_getChildren(zen_FunctionDeclarationContext_t* context, jtk_ArrayList_t* children);
+void k_FunctionDeclarationContext_getChildren(k_FunctionDeclarationContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_FUNCTION_DECLARATION_CONTEXT_H */

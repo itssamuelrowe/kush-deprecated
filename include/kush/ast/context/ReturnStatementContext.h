@@ -28,39 +28,39 @@
 
 /**
  * @class ReturnStatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ReturnStatementContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_expression;
+struct k_ReturnStatementContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_expression;
 };
 
 /**
  * @memberof ReturnStatementContext
  */
-typedef struct zen_ReturnStatementContext_t zen_ReturnStatementContext_t;
+typedef struct k_ReturnStatementContext_t k_ReturnStatementContext_t;
 
 // Constructor
 
 /**
  * @memberof ReturnStatementContext
  */
-zen_ReturnStatementContext_t* zen_ReturnStatementContext_new(zen_ASTNode_t* node);
+k_ReturnStatementContext_t* k_ReturnStatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ReturnStatementContext
  */
-void zen_ReturnStatementContext_delete(zen_ReturnStatementContext_t* context);
+void k_ReturnStatementContext_delete(k_ReturnStatementContext_t* context);
 
 // Children
 
 /**
  * @memberof ReturnStatementContext
  */
-void zen_ReturnStatementContext_getChildren(zen_ReturnStatementContext_t* context, jtk_ArrayList_t* children);
+void k_ReturnStatementContext_getChildren(k_ReturnStatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_RETURN_STATEMENT_CONTEXT_H */

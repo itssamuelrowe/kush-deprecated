@@ -28,40 +28,40 @@
 
 /**
  * @class StatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_StatementContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_simpleStatement;
-    zen_ASTNode_t* m_compoundStatement;
+struct k_StatementContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_simpleStatement;
+    k_ASTNode_t* m_compoundStatement;
 };
 
 /**
  * @memberof StatementContext
  */
-typedef struct zen_StatementContext_t zen_StatementContext_t;
+typedef struct k_StatementContext_t k_StatementContext_t;
 
 // Constructor
 
 /**
  * @memberof StatementContext
  */
-zen_StatementContext_t* zen_StatementContext_new(zen_ASTNode_t* node);
+k_StatementContext_t* k_StatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof StatementContext
  */
-void zen_StatementContext_delete(zen_StatementContext_t* context);
+void k_StatementContext_delete(k_StatementContext_t* context);
 
 // Children
 
 /**
  * @memberof StatementContext
  */
-void zen_StatementContext_getChildren(zen_StatementContext_t* context, jtk_ArrayList_t* children);
+void k_StatementContext_getChildren(k_StatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_STATEMENT_CONTEXT_H */

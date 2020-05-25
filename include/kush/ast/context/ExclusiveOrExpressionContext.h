@@ -29,40 +29,40 @@
 
 /**
  * @class ExclusiveOrExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ExclusiveOrExpressionContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_andExpression;
+struct k_ExclusiveOrExpressionContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_andExpression;
     jtk_ArrayList_t* m_andExpressions;
 };
 
 /**
  * @memberof ExclusiveOrExpressionContext
  */
-typedef struct zen_ExclusiveOrExpressionContext_t zen_ExclusiveOrExpressionContext_t;
+typedef struct k_ExclusiveOrExpressionContext_t k_ExclusiveOrExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof ExclusiveOrExpressionContext
  */
-zen_ExclusiveOrExpressionContext_t* zen_ExclusiveOrExpressionContext_new(zen_ASTNode_t* node);
+k_ExclusiveOrExpressionContext_t* k_ExclusiveOrExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ExclusiveOrExpressionContext
  */
-void zen_ExclusiveOrExpressionContext_delete(zen_ExclusiveOrExpressionContext_t* context);
+void k_ExclusiveOrExpressionContext_delete(k_ExclusiveOrExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof ExclusiveOrExpressionContext
  */
-void zen_ExclusiveOrExpressionContext_getChildren(zen_ExclusiveOrExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_ExclusiveOrExpressionContext_getChildren(k_ExclusiveOrExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_EXCLUSIVE_OR_EXPRESSION_CONTEXT_H */

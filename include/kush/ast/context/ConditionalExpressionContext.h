@@ -28,41 +28,41 @@
 
 /**
  * @class ConditionalExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ConditionalExpressionContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_logicalOrExpression;
-    zen_ASTNode_t* m_thenExpression;
-    zen_ASTNode_t* m_elseExpression;
+struct k_ConditionalExpressionContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_logicalOrExpression;
+    k_ASTNode_t* m_thenExpression;
+    k_ASTNode_t* m_elseExpression;
 };
 
 /**
  * @memberof ConditionalExpressionContext
  */
-typedef struct zen_ConditionalExpressionContext_t zen_ConditionalExpressionContext_t;
+typedef struct k_ConditionalExpressionContext_t k_ConditionalExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof ConditionalExpressionContext
  */
-zen_ConditionalExpressionContext_t* zen_ConditionalExpressionContext_new(zen_ASTNode_t* node);
+k_ConditionalExpressionContext_t* k_ConditionalExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ConditionalExpressionContext
  */
-void zen_ConditionalExpressionContext_delete(zen_ConditionalExpressionContext_t* context);
+void k_ConditionalExpressionContext_delete(k_ConditionalExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof ConditionalExpressionContext
  */
-void zen_ConditionalExpressionContext_getChildren(zen_ConditionalExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_ConditionalExpressionContext_getChildren(k_ConditionalExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_CONDITIONAL_EXPRESSION_CONTEXT_H */

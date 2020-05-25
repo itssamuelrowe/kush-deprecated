@@ -26,13 +26,13 @@
  * ContextDestructorFunction                                                  *
  ******************************************************************************/
 
-typedef void (*zen_ContextDestructorFunction_t)(void* context);
+typedef void (*k_ContextDestructorFunction_t)(void* context);
 
 /*******************************************************************************
  * EnumerateContextChildrenFunction                                            *
  ******************************************************************************/
 
-typedef void (*zen_EnumerateContextChildrenFunction_t)(void* context, jtk_ArrayList_t* children);
+typedef void (*k_EnumerateContextChildrenFunction_t)(void* context, jtk_ArrayList_t* children);
 
 /******************************************************************************
  * ASTNode																	  *
@@ -43,104 +43,104 @@ typedef void (*zen_EnumerateContextChildrenFunction_t)(void* context, jtk_ArrayL
  * A node may be a terminal or a rule. This is identified by
  * the node's type. Moreover, type specific data is abstracted
  * away as payload. For terminals, the payload may be cast to
- * zen_Token_t*. For rules, the payload may be cast to
- * zen_RuleNode_t*.
+ * k_Token_t*. For rules, the payload may be cast to
+ * their specific contexts, such as k_ReturnStatementContext_t*.
  *
  * Every node, except the root node, has a parent. The root nodes
  * parent is always NULL. Parent nodes are guaranteed to be rules.
  * Because a terminal always represents a leaf.
  *
  * @class ASTNode
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ASTNode_t {
-    zen_ASTNodeType_t m_type;
+struct k_ASTNode_t {
+    k_ASTNodeType_t m_type;
     void* m_context;
-    struct zen_ASTNode_t* m_parent;
+    struct k_ASTNode_t* m_parent;
     jtk_ArrayList_t* m_children;
-    zen_ContextDestructorFunction_t m_contextDestructor;
-    zen_EnumerateContextChildrenFunction_t m_enumerateContextChildren;
+    k_ContextDestructorFunction_t m_contextDestructor;
+    k_EnumerateContextChildrenFunction_t m_enumerateContextChildren;
 };
 
 /**
  * @memberof ASTNode
  */
-typedef struct zen_ASTNode_t zen_ASTNode_t;
+typedef struct k_ASTNode_t k_ASTNode_t;
 
 // Constructor
 
 /**
  * @memberof ASTNode
  */
-zen_ASTNode_t* zen_ASTNode_new(zen_ASTNode_t* parent);
+k_ASTNode_t* k_ASTNode_new(k_ASTNode_t* parent);
 
 // Destructor
 
 /**
  * @memberof ASTNode
  */
-void zen_ASTNode_delete(zen_ASTNode_t* node);
+void k_ASTNode_delete(k_ASTNode_t* node);
 
 // Children
 
 /**
  * @memberof ASTNode
  */
-jtk_ArrayList_t* zen_ASTNode_getChildren(zen_ASTNode_t* node);
+jtk_ArrayList_t* k_ASTNode_getChildren(k_ASTNode_t* node);
 
 // Context
 
 /**
  * @memberof ASTNode
  */
-void* zen_ASTNode_getContext(zen_ASTNode_t* node);
+void* k_ASTNode_getContext(k_ASTNode_t* node);
 
 // Depth
 
 /**
  * @memberof ASTNode
  */
-int32_t zen_ASTNode_getDepth(zen_ASTNode_t* node);
+int32_t k_ASTNode_getDepth(k_ASTNode_t* node);
 
 // Error
 
 /**
  * @memberof ASTNode
  */
-bool zen_ASTNode_isErroneous(zen_ASTNode_t* node);
+bool k_ASTNode_isErroneous(k_ASTNode_t* node);
 
 // Parent
 
 /**
  * @memberof ASTNode
  */
-zen_ASTNode_t* zen_ASTNode_getParent(zen_ASTNode_t* node);
+k_ASTNode_t* k_ASTNode_getParent(k_ASTNode_t* node);
 
 // Rule
 
 /**
  * @memberof ASTNode
  */
-bool zen_ASTNode_isRule(zen_ASTNode_t* node);
+bool k_ASTNode_isRule(k_ASTNode_t* node);
 
 // Terminal
 
 /**
  * @memberof ASTNode
  */
-bool zen_ASTNode_isTerminal(zen_ASTNode_t* node);
+bool k_ASTNode_isTerminal(k_ASTNode_t* node);
 
 // Type
 
 /**
  * @memberof ASTNode
  */
-zen_ASTNodeType_t zen_ASTNode_getType(zen_ASTNode_t* node);
+k_ASTNodeType_t k_ASTNode_getType(k_ASTNode_t* node);
 
 // String
 
-uint8_t* zen_ASTNode_toCString(zen_ASTNode_t* node, int32_t* size);
+uint8_t* k_ASTNode_toCString(k_ASTNode_t* node, int32_t* size);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_NODE_H */

@@ -30,39 +30,39 @@
 
 /**
  * @class ConstantDeclarationContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ConstantDeclarationContext_t {
-    zen_ASTNode_t* m_node;
+struct k_ConstantDeclarationContext_t {
+    k_ASTNode_t* m_node;
     jtk_ArrayList_t* m_constantDeclarators;
 };
 
 /**
  * @membeof ConstantDeclarationContext
  */
-typedef struct zen_ConstantDeclarationContext_t zen_ConstantDeclarationContext_t;
+typedef struct k_ConstantDeclarationContext_t k_ConstantDeclarationContext_t;
 
 // Constructor
 
 /**
  * @membeof ConstantDeclarationContext
  */
-zen_ConstantDeclarationContext_t* zen_ConstantDeclarationContext_new(zen_ASTNode_t* node);
+k_ConstantDeclarationContext_t* k_ConstantDeclarationContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @membeof ConstantDeclarationContext
  */
-void zen_ConstantDeclarationContext_delete(zen_ConstantDeclarationContext_t* context);
+void k_ConstantDeclarationContext_delete(k_ConstantDeclarationContext_t* context);
 
 // Children
 
 /**
  * @membeof ConstantDeclarationContext
  */
-void zen_ConstantDeclarationContext_getChildren(zen_ConstantDeclarationContext_t* context, jtk_ArrayList_t* children);
+void k_ConstantDeclarationContext_getChildren(k_ConstantDeclarationContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_CONSTANT_DECLARATION_CONTEXT_H */

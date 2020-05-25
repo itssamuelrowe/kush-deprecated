@@ -18,10 +18,10 @@
 
 #include <kush/symbol-table/MemberVariableSymbol.h>
 
-zen_MemberVariableSymbol_t* zen_AttributeVariableSymbol_new(zen_ASTNode_t* identifier,
+k_MemberVariableSymbol_t* k_AttributeVariableSymbol_new(k_ASTNode_t* identifier,
     jtk_ArrayList_t* m_modifiers) {
 }
-void zen_AttributeVariableSymbol_delete(zen_MemberVariableSymbol_t* symbol) {
+void k_AttributeVariableSymbol_delete(k_MemberVariableSymbol_t* symbol) {
 }
-zen_Symbol_t* zen_MemberVariableSymbol_getSymbol(zen_MemberVariableSymbol_t* symbol) {
+k_Symbol_t* k_MemberVariableSymbol_getSymbol(k_MemberVariableSymbol_t* symbol) {
 }

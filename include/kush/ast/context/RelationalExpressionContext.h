@@ -29,40 +29,40 @@
 
 /**
  * @class RelationalExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_RelationalExpressionContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_shiftExpression;
+struct k_RelationalExpressionContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_shiftExpression;
     jtk_ArrayList_t* m_shiftExpressions;
 };
 
 /**
  * @memberof RelationalExpressionContext
  */
-typedef struct zen_RelationalExpressionContext_t zen_RelationalExpressionContext_t;
+typedef struct k_RelationalExpressionContext_t k_RelationalExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof RelationalExpressionContext
  */
-zen_RelationalExpressionContext_t* zen_RelationalExpressionContext_new(zen_ASTNode_t* node);
+k_RelationalExpressionContext_t* k_RelationalExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof RelationalExpressionContext
  */
-void zen_RelationalExpressionContext_delete(zen_RelationalExpressionContext_t* context);
+void k_RelationalExpressionContext_delete(k_RelationalExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof RelationalExpressionContext
  */
-void zen_RelationalExpressionContext_getChildren(zen_RelationalExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_RelationalExpressionContext_getChildren(k_RelationalExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_RELATIONAL_EXPRESSION_CONTEXT_H */

@@ -17,13 +17,13 @@
 #include <kush/Compiler.h>
 
 int32_t main(int32_t length, char** arguments) {
-    // jtk_Assert_assertTrue(zen_Instruction_verify(), "The instruction set is invalid.");
+    // jtk_Assert_assertTrue(k_Instruction_verify(), "The instruction set is invalid.");
 
     jtk_System_initialize();
 
-    zen_Compiler_t* compiler = zen_Compiler_new();
-    bool result = zen_Compiler_compileEx(compiler, arguments, length);
-    zen_Compiler_delete(compiler);
+    k_Compiler_t* compiler = k_Compiler_new();
+    bool result = k_Compiler_compileEx(compiler, arguments, length);
+    k_Compiler_delete(compiler);
 
     return result? 0 : 1;
 }

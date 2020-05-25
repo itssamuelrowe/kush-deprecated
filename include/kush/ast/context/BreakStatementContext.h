@@ -28,39 +28,39 @@
 
 /**
  * @class BreakStatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_BreakStatementContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_identifier;
+struct k_BreakStatementContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_identifier;
 };
 
 /**
  * @memberof BreakStatementContext
  */
-typedef struct zen_BreakStatementContext_t zen_BreakStatementContext_t;
+typedef struct k_BreakStatementContext_t k_BreakStatementContext_t;
 
 // Constructor
 
 /**
  * @memberof BreakStatementContext
  */
-zen_BreakStatementContext_t* zen_BreakStatementContext_new(zen_ASTNode_t* node);
+k_BreakStatementContext_t* k_BreakStatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof BreakStatementContext
  */
-void zen_BreakStatementContext_delete(zen_BreakStatementContext_t* context);
+void k_BreakStatementContext_delete(k_BreakStatementContext_t* context);
 
 // Children
 
 /**
  * @memberof BreakStatementContext
  */
-void zen_BreakStatementContext_getChildren(zen_BreakStatementContext_t* context, jtk_ArrayList_t* children);
+void k_BreakStatementContext_getChildren(k_BreakStatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_BREAK_STATEMENT_CONTEXT_H */

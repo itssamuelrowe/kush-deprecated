@@ -30,39 +30,39 @@
 
 /**
  * @class ClassExtendsClauseContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ClassExtendsClauseContext_t {
-    zen_ASTNode_t* m_node;
-    jtk_ArrayList_t* m_typeNames; /* <zen_ASTNode_t*> */
+struct k_ClassExtendsClauseContext_t {
+    k_ASTNode_t* m_node;
+    jtk_ArrayList_t* m_typeNames; /* <k_ASTNode_t*> */
 };
 
 /**
  * @memberof ClassExtendsClauseContext
  */
-typedef struct zen_ClassExtendsClauseContext_t zen_ClassExtendsClauseContext_t;
+typedef struct k_ClassExtendsClauseContext_t k_ClassExtendsClauseContext_t;
 
 // Constructor
 
 /**
  * @memberof ClassExtendsClauseContext
  */
-zen_ClassExtendsClauseContext_t* zen_ClassExtendsClauseContext_new(zen_ASTNode_t* node);
+k_ClassExtendsClauseContext_t* k_ClassExtendsClauseContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ClassExtendsClauseContext
  */
-void zen_ClassExtendsClauseContext_delete(zen_ClassExtendsClauseContext_t* context);
+void k_ClassExtendsClauseContext_delete(k_ClassExtendsClauseContext_t* context);
 
 // Children
 
 /**
  * @memberof ClassExtendsClauseContext
  */
-void zen_ClassExtendsClauseContext_getChildren(zen_ClassExtendsClauseContext_t* context, jtk_ArrayList_t* children);
+void k_ClassExtendsClauseContext_getChildren(k_ClassExtendsClauseContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_CLASS_EXTENDS_CLAUSE_CONTEXT_H */

@@ -25,11 +25,11 @@
 
 /**
  * @class ScopeType
- * @ingroup zen_compiler_symbolTable
+ * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
  * @since zen 1.0
  */
-enum zen_ScopeType_t {
+enum k_ScopeType_t {
     ZEN_SCOPE_COMPILATION_UNIT,
     ZEN_SCOPE_ANNOTATION,
     ZEN_SCOPE_CLASS,
@@ -41,6 +41,6 @@ enum zen_ScopeType_t {
 /**
  * @memberof ScopeType
  */
-typedef enum zen_ScopeType_t zen_ScopeType_t;
+typedef enum k_ScopeType_t k_ScopeType_t;
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SCOPE_TYPE_H */

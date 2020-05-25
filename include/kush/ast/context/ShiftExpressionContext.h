@@ -30,40 +30,40 @@
 
 /**
  * @class ShiftExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ShiftExpressionContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_additiveExpression;
+struct k_ShiftExpressionContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_additiveExpression;
     jtk_ArrayList_t* m_additiveExpressions;
 };
 
 /**
  * @memberof ShiftExpressionContext
  */
-typedef struct zen_ShiftExpressionContext_t zen_ShiftExpressionContext_t;
+typedef struct k_ShiftExpressionContext_t k_ShiftExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof ShiftExpressionContext
  */
-zen_ShiftExpressionContext_t* zen_ShiftExpressionContext_new(zen_ASTNode_t* node);
+k_ShiftExpressionContext_t* k_ShiftExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ShiftExpressionContext
  */
-void zen_ShiftExpressionContext_delete(zen_ShiftExpressionContext_t* context);
+void k_ShiftExpressionContext_delete(k_ShiftExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof ShiftExpressionContext
  */
-void zen_ShiftExpressionContext_getChildren(zen_ShiftExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_ShiftExpressionContext_getChildren(k_ShiftExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_SHIFT_EXPRESSION_CONTEXT_H */

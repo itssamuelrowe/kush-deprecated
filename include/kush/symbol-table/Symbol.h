@@ -26,7 +26,7 @@
 #include <kush/symbol-table/FunctionSymbol.h>
 #include <kush/symbol-table/Modifier.h>
 
-enum zen_SymbolFlag_t {
+enum k_SymbolFlag_t {
     ZEN_SYMBOL_FLAG_EXTERNAL = (1 << 0)
 };
 
@@ -36,18 +36,18 @@ enum zen_SymbolFlag_t {
 
 /**
  * @class Symbol
- * @ingroup zen_compiler_symbolTable
+ * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_Symbol_t {
-    zen_SymbolCategory_t m_category;
-    zen_ASTNode_t* m_identifier;
-    zen_Scope_t* m_enclosingScope;
+struct k_Symbol_t {
+    k_SymbolCategory_t m_category;
+    k_ASTNode_t* m_identifier;
+    k_Scope_t* m_enclosingScope;
     union {
-        zen_ClassSymbol_t m_asClass;
-        zen_FunctionSymbol_t m_asFunction;
-        zen_Symbol_t* m_asExternal;
+        k_ClassSymbol_t m_asClass;
+        k_FunctionSymbol_t m_asFunction;
+        k_Symbol_t* m_asExternal;
     } m_context;
     uint32_t m_modifiers;
     int32_t m_ticket;
@@ -61,118 +61,118 @@ struct zen_Symbol_t {
 /**
  * @memberof Symbol
  */
-typedef struct zen_Symbol_t zen_Symbol_t;
+typedef struct k_Symbol_t k_Symbol_t;
 
 // Constructor
 
 /**
  * @memberof Symbol
  */
-zen_Symbol_t* zen_Symbol_new(zen_SymbolCategory_t category,
-    zen_ASTNode_t* identifier, zen_Scope_t* enclosingScope);
+k_Symbol_t* k_Symbol_new(k_SymbolCategory_t category,
+    k_ASTNode_t* identifier, k_Scope_t* enclosingScope);
 
-zen_Symbol_t* zen_Symbol_forConstant(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope);
+k_Symbol_t* k_Symbol_forConstant(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope);
 
-zen_Symbol_t* zen_Symbol_forVariable(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope);
+k_Symbol_t* k_Symbol_forVariable(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope);
 
-zen_Symbol_t* zen_Symbol_forFunction(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope);
+k_Symbol_t* k_Symbol_forFunction(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope);
 
 /**
  * This function is used for class declarations in compilation units.
  */
-zen_Symbol_t* zen_Symbol_forClass(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope, zen_Scope_t* classScope, const uint8_t* name,
+k_Symbol_t* k_Symbol_forClass(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope, k_Scope_t* classScope, const uint8_t* name,
     int32_t nameSize, const uint8_t* package, int32_t packageSize);
 
 /**
  * This function is used by the symbol loader.
  */
-zen_Symbol_t* zen_Symbol_forClassAlt(zen_Scope_t* classScope, const uint8_t* descriptor,
+k_Symbol_t* k_Symbol_forClassAlt(k_Scope_t* classScope, const uint8_t* descriptor,
     int32_t descriptorSize);
 
-zen_Symbol_t* zen_Symbol_forLabel(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope);
+k_Symbol_t* k_Symbol_forLabel(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope);
 
-zen_Symbol_t* zen_Symbol_forExternal(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope, zen_Symbol_t* other);
+k_Symbol_t* k_Symbol_forExternal(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope, k_Symbol_t* other);
 
 // Destructor
 
 /**
  * @memberof Symbol
  */
-void zen_Symbol_delete(zen_Symbol_t* symbol);
+void k_Symbol_delete(k_Symbol_t* symbol);
 
 // Category
 
-zen_SymbolCategory_t zen_Symbol_getCategory(zen_Symbol_t* symbol);
+k_SymbolCategory_t k_Symbol_getCategory(k_Symbol_t* symbol);
 
 // Function
 
 /**
  * @memberof Symbol
  */
-bool zen_Symbol_isFunction(zen_Symbol_t* symbol);
+bool k_Symbol_isFunction(k_Symbol_t* symbol);
 
 // Constant
 
 /**
  * @memberof Symbol
  */
-bool zen_Symbol_isConstant(zen_Symbol_t* symbol);
+bool k_Symbol_isConstant(k_Symbol_t* symbol);
 
 // Enumerate
 
 /**
  * @memberof Symbol
  */
-bool zen_Symbol_isEnumerate(zen_Symbol_t* symbol);
+bool k_Symbol_isEnumerate(k_Symbol_t* symbol);
 
 // Variable
 
 /**
  * @memberof Symbol
  */
-bool zen_Symbol_isVariable(zen_Symbol_t* symbol);
+bool k_Symbol_isVariable(k_Symbol_t* symbol);
 
 // Enumeration
 
 /**
  * @memberof Symbol
  */
-bool zen_Symbol_isEnumeration(zen_Symbol_t* symbol);
+bool k_Symbol_isEnumeration(k_Symbol_t* symbol);
 
 // External
 
 /**
  * @memberof Symbol
  */
-bool zen_Symbol_isExternal(zen_Symbol_t* symbol);
+bool k_Symbol_isExternal(k_Symbol_t* symbol);
 
-bool zen_Symbol_isStatic(zen_Symbol_t* symbol);
+bool k_Symbol_isStatic(k_Symbol_t* symbol);
 
 // Enclosing Scope
 
 /**
  * @memberof Symbol
  */
-zen_Scope_t* zen_Symbol_getEnclosingScope(zen_Symbol_t* symbol);
+k_Scope_t* k_Symbol_getEnclosingScope(k_Symbol_t* symbol);
 
 // Identifier
 
 /**
  * @memberof Symbol
  */
-zen_ASTNode_t* zen_Symbol_getIdentifier(zen_Symbol_t* symbol);
+k_ASTNode_t* k_Symbol_getIdentifier(k_Symbol_t* symbol);
 
-void zen_Symbol_addModifiers(zen_Symbol_t* symbol, uint32_t modifiers);
+void k_Symbol_addModifiers(k_Symbol_t* symbol, uint32_t modifiers);
 
-zen_FunctionSignature_t* zen_Symbol_getFunctionSignatureEx(zen_Symbol_t* symbol,
+k_FunctionSignature_t* k_Symbol_getFunctionSignatureEx(k_Symbol_t* symbol,
     const uint8_t* descriptor, int32_t descriptorSize);
-zen_FunctionSignature_t* zen_Symbol_getFunctionSignature(zen_Symbol_t* symbol,
+k_FunctionSignature_t* k_Symbol_getFunctionSignature(k_Symbol_t* symbol,
     int32_t argumentCount);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_H */

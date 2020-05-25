@@ -30,40 +30,40 @@
 
 /**
  * @class WithParametersContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_WithParametersContext_t {
-    zen_ASTNode_t* m_node;
+struct k_WithParametersContext_t {
+    k_ASTNode_t* m_node;
     jtk_ArrayList_t* m_withParameters;
 };
 
 /**
  * @memberof WithParametersContext
  */
-typedef struct zen_WithParametersContext_t zen_WithParametersContext_t;
+typedef struct k_WithParametersContext_t k_WithParametersContext_t;
 
 // Constructor
 
 /**
  * @memberof WithParametersContext
  */
-zen_WithParametersContext_t* zen_WithParametersContext_new(zen_ASTNode_t* node);
+k_WithParametersContext_t* k_WithParametersContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof WithParametersContext
  */
-void zen_WithParametersContext_delete(zen_WithParametersContext_t* context);
+void k_WithParametersContext_delete(k_WithParametersContext_t* context);
 
 // Children
 
 /**
  * @memberof WithParametersContext
  */
-void zen_WithParametersContext_getChildren(zen_WithParametersContext_t* context,
+void k_WithParametersContext_getChildren(k_WithParametersContext_t* context,
     jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_WITH_PARAMETERS_CONTEXT_H */

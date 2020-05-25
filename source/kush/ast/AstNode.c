@@ -23,8 +23,8 @@
  * ASTNode																	  *
  ******************************************************************************/
 
-zen_ASTNode_t* zen_ASTNode_new(zen_ASTNode_t* parent) {
-    zen_ASTNode_t* node = zen_Memory_allocate(zen_ASTNode_t, 1);
+k_ASTNode_t* k_ASTNode_new(k_ASTNode_t* parent) {
+    k_ASTNode_t* node = k_Memory_allocate(k_ASTNode_t, 1);
     node->m_type = ZEN_AST_NODE_TYPE_UNKNOWN;
     node->m_context = NULL;
     node->m_parent = parent;
@@ -35,15 +35,15 @@ zen_ASTNode_t* zen_ASTNode_new(zen_ASTNode_t* parent) {
     return node;
 }
 
-void zen_ASTNode_delete(zen_ASTNode_t* node) {
-    if (zen_ASTNode_isRule(node)) {
-        jtk_ArrayList_t* children = zen_ASTNode_getChildren(node);
+void k_ASTNode_delete(k_ASTNode_t* node) {
+    if (k_ASTNode_isRule(node)) {
+        jtk_ArrayList_t* children = k_ASTNode_getChildren(node);
         int32_t size = jtk_ArrayList_getSize(children);
         int32_t i;
         for (i = 0; i < size; i++) {
-            zen_ASTNode_t* child = (zen_ASTNode_t*)jtk_ArrayList_getValue(children, i);
+            k_ASTNode_t* child = (k_ASTNode_t*)jtk_ArrayList_getValue(children, i);
             if (child != NULL) {
-                zen_ASTNode_delete(child);
+                k_ASTNode_delete(child);
             }
         }
         node->m_contextDestructor(node->m_context);
@@ -54,44 +54,44 @@ void zen_ASTNode_delete(zen_ASTNode_t* node) {
     jtk_Memory_deallocate(node);
 }
 
-zen_ASTNodeType_t zen_ASTNode_getType(zen_ASTNode_t* node) {
+k_ASTNodeType_t k_ASTNode_getType(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
     return node->m_type;
 }
 
-zen_ASTNode_t* zen_ASTNode_getParent(zen_ASTNode_t* node) {
+k_ASTNode_t* k_ASTNode_getParent(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
     return node->m_parent;
 }
 
-void* zen_ASTNode_getContext(zen_ASTNode_t* node) {
+void* k_ASTNode_getContext(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
     return node->m_context;
 }
 
-bool zen_ASTNode_isErroneous(zen_ASTNode_t* node) {
+bool k_ASTNode_isErroneous(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
-#warning "[TODO] zen_ASTNode_isErroneous() is not implemented."
+#warning "[TODO] k_ASTNode_isErroneous() is not implemented."
     fflush(stdout);
     return false;
     // return node->m_erroneous;
 }
 
-bool zen_ASTNode_isTerminal(zen_ASTNode_t* node) {
+bool k_ASTNode_isTerminal(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
     return node->m_type == ZEN_AST_NODE_TYPE_TERMINAL;
 }
 
-bool zen_ASTNode_isRule(zen_ASTNode_t* node) {
+bool k_ASTNode_isRule(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
     return /* !node->m_erroneous && */ (node->m_type != ZEN_AST_NODE_TYPE_TERMINAL);
 }
 
-int32_t zen_ASTNode_getDepth(zen_ASTNode_t* node) {
+int32_t k_ASTNode_getDepth(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
 
     int32_t depth = 0;
-    zen_ASTNode_t* currentNode = node;
+    k_ASTNode_t* currentNode = node;
     while (currentNode != NULL) {
         depth++;
         currentNode = currentNode->m_parent;
@@ -100,7 +100,7 @@ int32_t zen_ASTNode_getDepth(zen_ASTNode_t* node) {
 }
 
 /* The returned array list should not be modified externally. */
-jtk_ArrayList_t* zen_ASTNode_getChildren(zen_ASTNode_t* node) {
+jtk_ArrayList_t* k_ASTNode_getChildren(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
 
     if (node->m_children == NULL) {
@@ -110,21 +110,21 @@ jtk_ArrayList_t* zen_ASTNode_getChildren(zen_ASTNode_t* node) {
     return node->m_children;
 }
 
-void zen_ASTNode_toString0(zen_ASTNode_t* node, jtk_StringBuilder_t* builder) {
+void k_ASTNode_toString0(k_ASTNode_t* node, jtk_StringBuilder_t* builder) {
     jtk_Assert_assertObject(node, "The specified node is null.");
 
     if (node->m_type == ZEN_AST_NODE_TYPE_TERMINAL) {
-        zen_Token_t* token = (zen_Token_t*)node->m_context;
+        k_Token_t* token = (k_Token_t*)node->m_context;
         jtk_StringBuilder_appendEx_z(builder, token->m_text, token->m_length);
     }
     else {
-        jtk_ArrayList_t* nodes = zen_ASTNode_getChildren(node);
+        jtk_ArrayList_t* nodes = k_ASTNode_getChildren(node);
         int32_t size = jtk_ArrayList_getSize(nodes);
         int32_t i;
         for (i = 0; i < size; i++) {
-            zen_ASTNode_t* child = jtk_ArrayList_getValue(nodes, i);
+            k_ASTNode_t* child = jtk_ArrayList_getValue(nodes, i);
             if (child->m_type == ZEN_AST_NODE_TYPE_TERMINAL) {
-                zen_Token_t* token = (zen_Token_t*)child->m_context;
+                k_Token_t* token = (k_Token_t*)child->m_context;
                 jtk_StringBuilder_appendEx_z(builder, token->m_text, token->m_length);
             }
             else if (child->m_type == ZEN_AST_NODE_TYPE_UNKNOWN) {
@@ -132,13 +132,13 @@ void zen_ASTNode_toString0(zen_ASTNode_t* node, jtk_StringBuilder_t* builder) {
             }
             else {
                 // TODO: I am not sure what happens when the child is erroneous.
-                zen_ASTNode_toString0(child, builder);
+                k_ASTNode_toString0(child, builder);
             }
         }
     }
 }
 
-uint8_t* zen_ASTNode_toCString(zen_ASTNode_t* node, int32_t* size) {
+uint8_t* k_ASTNode_toCString(k_ASTNode_t* node, int32_t* size) {
     jtk_Assert_assertObject(node, "The specified node is null.");
 
     /* Create a string builder to create the string equivalent of the given
@@ -147,7 +147,7 @@ uint8_t* zen_ASTNode_toCString(zen_ASTNode_t* node, int32_t* size) {
     jtk_StringBuilder_t* builder = jtk_StringBuilder_new();
 
     /* Recursively construct the string equivalent of the given node. */
-    zen_ASTNode_toString0(node, builder);
+    k_ASTNode_toString0(node, builder);
 
     /* Build and retrieve the string. */
     uint8_t* result = jtk_StringBuilder_toCString(builder, size);

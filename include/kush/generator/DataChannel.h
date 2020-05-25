@@ -27,11 +27,11 @@
 
 /**
  * @class DataChannel
- * @ingroup zen_compiler_generator
+ * @ingroup k_compiler_generator
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_DataChannel_t {
+struct k_DataChannel_t {
     uint8_t* m_bytes;
     int32_t m_index;
     int32_t m_capacity;
@@ -41,33 +41,33 @@ struct zen_DataChannel_t {
 /**
  * @memberof DataChannel
  */
-typedef struct zen_DataChannel_t zen_DataChannel_t;
+typedef struct k_DataChannel_t k_DataChannel_t;
 
 // Constructor
 
-zen_DataChannel_t* zen_DataChannel_new(int32_t identifier);
+k_DataChannel_t* k_DataChannel_new(int32_t identifier);
 
 // Destructor
 
-void zen_DataChannel_delete(zen_DataChannel_t* channel);
+void k_DataChannel_delete(k_DataChannel_t* channel);
 
 // Append
 
-void zen_DataChannel_appendChannel(zen_DataChannel_t* channel, zen_DataChannel_t* other);
-void zen_DataChannel_appendByte(zen_DataChannel_t* channel, uint8_t byte);
-void zen_DataChannel_appendBytes(zen_DataChannel_t* channel, uint8_t* bytes, int32_t size);
-void zen_DataChannel_appendBytesRange(zen_DataChannel_t* channel, uint8_t* bytes, int32_t size, int32_t startIndex, int32_t stopIndex);
+void k_DataChannel_appendChannel(k_DataChannel_t* channel, k_DataChannel_t* other);
+void k_DataChannel_appendByte(k_DataChannel_t* channel, uint8_t byte);
+void k_DataChannel_appendBytes(k_DataChannel_t* channel, uint8_t* bytes, int32_t size);
+void k_DataChannel_appendBytesRange(k_DataChannel_t* channel, uint8_t* bytes, int32_t size, int32_t startIndex, int32_t stopIndex);
 
 // Bytes
 
-uint8_t* zen_DataChannel_getBytes(zen_DataChannel_t* channel);
+uint8_t* k_DataChannel_getBytes(k_DataChannel_t* channel);
 
 // Capacity
 
-void zen_DataChannel_requestCapacity(zen_DataChannel_t* channel, int32_t capacity);
+void k_DataChannel_requestCapacity(k_DataChannel_t* channel, int32_t capacity);
 
 // Size
 
-int32_t zen_DataChannel_getSize(zen_DataChannel_t* channel);
+int32_t k_DataChannel_getSize(k_DataChannel_t* channel);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_GENERATOR_DATA_CHANNEL_H */

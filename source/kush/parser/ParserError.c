@@ -19,13 +19,13 @@
 #include <jtk/core/CString.h>
 #include <kush/parser/ParserError.h>
 
-zen_ParserError_t* zen_ParserError_new() {
-    zen_ParserError_t* error = zen_Memory_allocate(zen_ParserError_t, 1);
+k_ParserError_t* k_ParserError_new() {
+    k_ParserError_t* error = k_Memory_allocate(k_ParserError_t, 1);
     error->m_message = NULL;
     return error;
 }
 
-void zen_ParserError_delete(zen_ParserError_t* error) {
+void k_ParserError_delete(k_ParserError_t* error) {
     jtk_Assert_assertObject(error, "The specified error is null.");
 
     if (error->m_message != NULL) {

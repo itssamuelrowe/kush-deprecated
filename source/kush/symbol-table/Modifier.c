@@ -24,66 +24,66 @@
 
 // Public
 
-bool zen_Modifier_hasPublic(uint32_t modifiers) {
+bool k_Modifier_hasPublic(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_PUBLIC) != 0;
 }
 
 // Private
 
-bool zen_Modifier_hasPrivate(uint32_t modifiers) {
+bool k_Modifier_hasPrivate(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_PRIVATE) != 0;
 }
 
 // Secret
 
-bool zen_Modifier_hasSecret(uint32_t modifiers) {
+bool k_Modifier_hasSecret(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_SECRET) != 0;
 }
 
 // Synthetic
 
-bool zen_Modifier_hasSynthetic(uint32_t modifiers) {
+bool k_Modifier_hasSynthetic(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_SYNTHETIC) != 0;
 }
 
 // Abstract
 
-bool zen_Modifier_hasAbstract(uint32_t modifiers) {
+bool k_Modifier_hasAbstract(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_ABSTRACT) != 0;
 }
 
 // Final
 
-bool zen_Modifier_hasFinal(uint32_t modifiers) {
+bool k_Modifier_hasFinal(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_FINAL) != 0;
 }
 
 // Static
 
-bool zen_Modifier_hasStatic(uint32_t modifiers) {
+bool k_Modifier_hasStatic(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_STATIC) != 0;
 }
 
 // Native
 
-bool zen_Modifier_hasNative(uint32_t modifiers) {
+bool k_Modifier_hasNative(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_NATIVE) != 0;
 }
 
 // Annotation
 
-bool zen_Modifier_hasAnnotation(uint32_t modifiers) {
+bool k_Modifier_hasAnnotation(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_ANNOTATION) != 0;
 }
 
 // Enumeration
 
-bool zen_Modifier_hasEnumeration(uint32_t modifiers) {
+bool k_Modifier_hasEnumeration(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_ENUMERATION) != 0;
 }
 
 // Variable Parameter
 
-bool zen_Modifier_hasVariableParameter(uint32_t modifiers) {
+bool k_Modifier_hasVariableParameter(uint32_t modifiers) {
     return (modifiers & ZEN_MODIFIER_VARIABLE_PARAMETER) != 0;
 }

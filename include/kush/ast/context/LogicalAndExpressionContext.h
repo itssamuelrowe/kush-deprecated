@@ -30,17 +30,17 @@
 
 /**
  * @class LogicalAndExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_LogicalAndExpressionContext_t {
-    zen_ASTNode_t* m_node;
+struct k_LogicalAndExpressionContext_t {
+    k_ASTNode_t* m_node;
 
     /**
      * The inclusiveOrExpression node on the left side of the operator.
      */
-    zen_ASTNode_t* m_inclusiveOrExpression;
+    k_ASTNode_t* m_inclusiveOrExpression;
 
     /**
      * The inclusiveOrExpression nodes on the right side of the operator.
@@ -51,27 +51,27 @@ struct zen_LogicalAndExpressionContext_t {
 /**
  * @memberof LogicalAndExpressionContext
  */
-typedef struct zen_LogicalAndExpressionContext_t zen_LogicalAndExpressionContext_t;
+typedef struct k_LogicalAndExpressionContext_t k_LogicalAndExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof LogicalAndExpressionContext
  */
-zen_LogicalAndExpressionContext_t* zen_LogicalAndExpressionContext_new(zen_ASTNode_t* node);
+k_LogicalAndExpressionContext_t* k_LogicalAndExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof LogicalAndExpressionContext
  */
-void zen_LogicalAndExpressionContext_delete(zen_LogicalAndExpressionContext_t* context);
+void k_LogicalAndExpressionContext_delete(k_LogicalAndExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof LogicalAndExpressionContext
  */
-void zen_LogicalAndExpressionContext_getChildren(zen_LogicalAndExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_LogicalAndExpressionContext_getChildren(k_LogicalAndExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_LOGICAL_AND_EXPRESSION_CONTEXT_H */

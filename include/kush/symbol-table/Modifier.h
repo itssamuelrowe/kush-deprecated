@@ -27,11 +27,11 @@
 
 /**
  * @class Modifier
- * @ingroup zen_compiler_symbolTable
+ * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
  * @since zen 1.0
  */
-enum zen_Modifier_t {
+enum k_Modifier_t {
 
     ZEN_MODIFIER_PUBLIC = 1 << 0,
 
@@ -59,7 +59,7 @@ enum zen_Modifier_t {
 /**
  * @memberof Modifier
  */
-typedef enum zen_Modifier_t zen_Modifier_t;
+typedef enum k_Modifier_t k_Modifier_t;
 
 
 

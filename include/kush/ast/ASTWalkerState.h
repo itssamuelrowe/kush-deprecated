@@ -23,11 +23,11 @@
 
 /**
  * @class ASTWalker
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe <samuelrowe1999@gmail.com>
  * @since zen 1.0
  */
-enum zen_ASTWalkerState_t {
+enum k_ASTWalkerState_t {
     ZEN_AST_WALKER_STATE_INVALID,
 
     ZEN_AST_WALKER_STATE_SKIP_CHILDREN,
@@ -52,6 +52,6 @@ enum zen_ASTWalkerState_t {
 /**
  * @memberof ASTWalker
  */
-typedef enum zen_ASTWalkerState_t zen_ASTWalkerState_t;
+typedef enum k_ASTWalkerState_t k_ASTWalkerState_t;
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_AST_WALKER_STATE_H */

@@ -30,18 +30,18 @@
 
 /**
  * @class StatementSuiteContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_StatementSuiteContext_t {
-    zen_ASTNode_t* m_node;
+struct k_StatementSuiteContext_t {
+    k_ASTNode_t* m_node;
     /* In order to help the users read code easily, the simple statements were
      * removed from statement suites. Previously, a statement suite was either
      * a simple statement or a block consisting of a newline at the begining,
      * indentation and dedentation.
      */
-    // zen_ASTNode_t* m_simpleStatement;
+    // k_ASTNode_t* m_simpleStatement;
     jtk_ArrayList_t* m_statements;
     int32_t m_scope;
 };
@@ -49,27 +49,27 @@ struct zen_StatementSuiteContext_t {
 /**
  * @memberof StatementSuiteContext
  */
-typedef struct zen_StatementSuiteContext_t zen_StatementSuiteContext_t;
+typedef struct k_StatementSuiteContext_t k_StatementSuiteContext_t;
 
 // Constructor
 
 /**
  * @memberof StatementSuiteContext
  */
-zen_StatementSuiteContext_t* zen_StatementSuiteContext_new(zen_ASTNode_t* node);
+k_StatementSuiteContext_t* k_StatementSuiteContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof StatementSuiteContext
  */
-void zen_StatementSuiteContext_delete(zen_StatementSuiteContext_t* context);
+void k_StatementSuiteContext_delete(k_StatementSuiteContext_t* context);
 
 // Children
 
 /**
  * @memberof StatementSuiteContext
  */
-void zen_StatementSuiteContext_getChildren(zen_StatementSuiteContext_t* context, jtk_ArrayList_t* children);
+void k_StatementSuiteContext_getChildren(k_StatementSuiteContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_STATEMENT_SUITE_CONTEXT_H */

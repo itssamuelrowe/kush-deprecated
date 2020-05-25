@@ -21,11 +21,11 @@
 #include <jtk/core/CString.h>
 
 // TODO: Constructors require v for their return type!
-zen_FunctionSignature_t* zen_FunctionSignature_new(jtk_ArrayList_t* fixedParameters,
-    zen_ASTNode_t* variableParameter, uint16_t modifiers) {
+k_FunctionSignature_t* k_FunctionSignature_new(jtk_ArrayList_t* fixedParameters,
+    k_ASTNode_t* variableParameter, uint16_t modifiers) {
     int32_t parameterCount = jtk_ArrayList_getSize(fixedParameters);
 
-    zen_FunctionSignature_t* signature = zen_Memory_allocate(zen_FunctionSignature_t, 1);
+    k_FunctionSignature_t* signature = k_Memory_allocate(k_FunctionSignature_t, 1);
     signature->m_fixedParameters = fixedParameters;
     signature->m_variableParameter = variableParameter;
     signature->m_modifiers = modifiers;
@@ -51,7 +51,7 @@ zen_FunctionSignature_t* zen_FunctionSignature_new(jtk_ArrayList_t* fixedParamet
     return signature;
 }
 
-int32_t zen_FunctionSignature_countParameters(const uint8_t* descriptor,
+int32_t k_FunctionSignature_countParameters(const uint8_t* descriptor,
     int32_t size) {
     int32_t afterColon = -1;
     int32_t parameterCount = 0;
@@ -173,9 +173,9 @@ int32_t zen_FunctionSignature_countParameters(const uint8_t* descriptor,
     return parameterCount;
 }
 
-zen_FunctionSignature_t* zen_FunctionSignature_newEx(const uint8_t* descriptor,
+k_FunctionSignature_t* k_FunctionSignature_newEx(const uint8_t* descriptor,
     int32_t descriptorSize, uint16_t modifiers, uint16_t tableIndex) {
-    zen_FunctionSignature_t* signature = zen_Memory_allocate(zen_FunctionSignature_t, 1);
+    k_FunctionSignature_t* signature = k_Memory_allocate(k_FunctionSignature_t, 1);
     signature->m_fixedParameters = NULL;
     signature->m_variableParameter = NULL;
     signature->m_descriptor = jtk_CString_make(descriptor, &descriptorSize);
@@ -183,12 +183,12 @@ zen_FunctionSignature_t* zen_FunctionSignature_newEx(const uint8_t* descriptor,
     signature->m_tableIndex = tableIndex;
     signature->m_modifiers = modifiers;
     signature->m_variableParameter = false; // TODO
-    signature->m_fixedParameterCount = zen_FunctionSignature_countParameters(descriptor, descriptorSize);
+    signature->m_fixedParameterCount = k_FunctionSignature_countParameters(descriptor, descriptorSize);
 
     return signature;
 }
 
-void zen_FunctionSignature_delete(zen_FunctionSignature_t* signature) {
+void k_FunctionSignature_delete(k_FunctionSignature_t* signature) {
     jtk_Assert_assertObject(signature, "The specified signature is null.");
 
     jtk_CString_delete(signature->m_descriptor);

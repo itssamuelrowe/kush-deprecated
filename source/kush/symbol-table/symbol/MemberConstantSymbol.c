@@ -18,10 +18,10 @@
 
 #include <kush/symbol-table/MemberConstantSymbol.h>
 
-zen_MemberConstantSymbol_t* zen_MemberConstantSymbol_new(zen_ASTNode_t* identifier,
+k_MemberConstantSymbol_t* k_MemberConstantSymbol_new(k_ASTNode_t* identifier,
     jtk_ArrayList_t* modifiers) {
 }
-void zen_MemberConstantSymbol_delete(zen_MemberConstantSymbol_t* symbol) {
+void k_MemberConstantSymbol_delete(k_MemberConstantSymbol_t* symbol) {
 }
-zen_Symbol_t* zen_MemberConstantSymbol_getSymbol(zen_MemberConstantSymbol_t* symbol) {
+k_Symbol_t* k_MemberConstantSymbol_getSymbol(k_MemberConstantSymbol_t* symbol) {
 }

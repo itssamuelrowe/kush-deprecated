@@ -27,11 +27,11 @@
 
 /**
  * @class LexerError
- * @ingroup zen_compiler_lexer
+ * @ingroup k_compiler_lexer
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_LexerError_t {
+struct k_LexerError_t {
     char* m_message;
     char* m_path;
     int32_t m_line;
@@ -41,14 +41,14 @@ struct zen_LexerError_t {
 /**
  * @memberof LexerError
  */
-typedef struct zen_LexerError_t zen_LexerError_t;
+typedef struct k_LexerError_t k_LexerError_t;
 
 // Constructor
 
 /**
  * @memberof LexerError
  */
-zen_LexerError_t* zen_LexerError_new(const char* message, const char* path,
+k_LexerError_t* k_LexerError_new(const char* message, const char* path,
     int32_t line, int32_t column);
 
 // Destructor
@@ -56,6 +56,6 @@ zen_LexerError_t* zen_LexerError_new(const char* message, const char* path,
 /**
  * @memberof LexerError
  */
-void zen_LexerError_delete(zen_LexerError_t* error);
+void k_LexerError_delete(k_LexerError_t* error);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_ERROR_H */

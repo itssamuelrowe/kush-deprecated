@@ -30,13 +30,13 @@
 
 /**
  * @class FunctionSignature
- * @ingroup zen_compiler_symbolTable
+ * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_FunctionSignature_t {
+struct k_FunctionSignature_t {
     jtk_ArrayList_t* m_fixedParameters;
-    zen_ASTNode_t* m_variableParameter;
+    k_ASTNode_t* m_variableParameter;
     uint8_t* m_descriptor;
     int32_t m_descriptorSize;
     uint16_t m_modifiers;
@@ -48,17 +48,17 @@ struct zen_FunctionSignature_t {
 /**
  * @memberof FunctionSignature
  */
-typedef struct zen_FunctionSignature_t zen_FunctionSignature_t;
+typedef struct k_FunctionSignature_t k_FunctionSignature_t;
 
 // Constructor
 
 /**
  * @memberof FunctionSignature
  */
-zen_FunctionSignature_t* zen_FunctionSignature_new(jtk_ArrayList_t* fixedParameters,
-    zen_ASTNode_t* variableParameter, uint16_t modifiers);
+k_FunctionSignature_t* k_FunctionSignature_new(jtk_ArrayList_t* fixedParameters,
+    k_ASTNode_t* variableParameter, uint16_t modifiers);
 
-zen_FunctionSignature_t* zen_FunctionSignature_newEx(const uint8_t* descriptor,
+k_FunctionSignature_t* k_FunctionSignature_newEx(const uint8_t* descriptor,
     int32_t descriptorSize, uint16_t modifiers, uint16_t tableIndex);
 
 // Destructor
@@ -66,6 +66,6 @@ zen_FunctionSignature_t* zen_FunctionSignature_newEx(const uint8_t* descriptor,
 /**
  * @memberof FunctionSignature
  */
-void zen_FunctionSignature_delete(zen_FunctionSignature_t* signature);
+void k_FunctionSignature_delete(k_FunctionSignature_t* signature);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_FUNCTION_SIGNATURE_H */

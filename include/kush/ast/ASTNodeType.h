@@ -27,11 +27,11 @@
 
 /**
  * @class ASTNodeType
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-enum zen_ASTNodeType_t {
+enum k_ASTNodeType_t {
 
     ZEN_AST_NODE_TYPE_UNKNOWN,
 
@@ -199,6 +199,6 @@ enum zen_ASTNodeType_t {
 /**
  * @memberof ASTNodeType
  */
-typedef enum zen_ASTNodeType_t zen_ASTNodeType_t;
+typedef enum k_ASTNodeType_t k_ASTNodeType_t;
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_NODE_TYPE_H */

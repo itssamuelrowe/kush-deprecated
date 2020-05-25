@@ -23,15 +23,15 @@
  * StackTrace                                                                  *
  *******************************************************************************/
 
-void zen_StackTrace_enter0(const char* file, const char* name);
-void zen_StackTrace_exit0(const char* file, const char* name);
+void k_StackTrace_enter0(const char* file, const char* name);
+void k_StackTrace_exit0(const char* file, const char* name);
 
 #ifdef ZEN_STACK_TRACE_ENABLE
-    #define zen_StackTrace_enter() zen_StackTrace_enter0(__FILE__, __FUNCTION__)
-    #define zen_StackTrace_exit() zen_StackTrace_exit0(__FILE__, __FUNCTION__)
+    #define k_StackTrace_enter() k_StackTrace_enter0(__FILE__, __FUNCTION__)
+    #define k_StackTrace_exit() k_StackTrace_exit0(__FILE__, __FUNCTION__)
 #else
-    #define zen_StackTrace_enter()
-    #define zen_StackTrace_exit()
+    #define k_StackTrace_enter()
+    #define k_StackTrace_exit()
 #endif
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SUPPORT_STACK_TRACE_H */

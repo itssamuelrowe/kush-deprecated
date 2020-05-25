@@ -30,16 +30,16 @@
 /**
  * @memberof ASTWalker
  */
-void zen_ASTWalker_walk(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTWalker_walk(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTWalker
  */
-void zen_ASTWalker_enterRule(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTWalker_enterRule(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTWalker
  */
-void zen_ASTWalker_exitRule(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTWalker_exitRule(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_WALKER_H */

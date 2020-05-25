@@ -28,40 +28,40 @@
 
 /**
  * @class AssertStatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_AssertStatementContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_conditionExpression;
-    zen_ASTNode_t* m_messageExpression;
+struct k_AssertStatementContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_conditionExpression;
+    k_ASTNode_t* m_messageExpression;
 };
 
 /**
  * @memberof AssertStatementContext
  */
-typedef struct zen_AssertStatementContext_t zen_AssertStatementContext_t;
+typedef struct k_AssertStatementContext_t k_AssertStatementContext_t;
 
 // Constructor
 
 /**
  * @memberof AssertStatementContext
  */
-zen_AssertStatementContext_t* zen_AssertStatementContext_new(zen_ASTNode_t* node);
+k_AssertStatementContext_t* k_AssertStatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof AssertStatementContext
  */
-void zen_AssertStatementContext_delete(zen_AssertStatementContext_t* context);
+void k_AssertStatementContext_delete(k_AssertStatementContext_t* context);
 
 // Children
 
 /**
  * @memberof AssertStatementContext
  */
-void zen_AssertStatementContext_getChildren(zen_AssertStatementContext_t* context, jtk_ArrayList_t* children);
+void k_AssertStatementContext_getChildren(k_AssertStatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ASSERT_STATEMENT_CONTEXT_H */

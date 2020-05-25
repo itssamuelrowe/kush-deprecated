@@ -26,28 +26,28 @@
 
 /**
  * @class Error
- * @ingroup zen_compiler_support
+ * @ingroup k_compiler_support
  * @author Samuel Rowe
  * @since Zen 1.0
  */
-struct zen_Error_t {
-    zen_ErrorCode_t m_code;
-    zen_Token_t* m_token;
-    zen_TokenType_t m_expected;
+struct k_Error_t {
+    k_ErrorCode_t m_code;
+    k_Token_t* m_token;
+    k_TokenType_t m_expected;
 };
 
 /**
  * @memberof Error
  */
-typedef struct zen_Error_t zen_Error_t;
+typedef struct k_Error_t k_Error_t;
 
 // Constructor
 
-zen_Error_t* zen_Error_new(zen_ErrorCode_t errorCode, zen_Token_t* token);
-zen_Error_t* zen_Error_newEx(zen_ErrorCode_t errorCode, zen_Token_t* token, zen_TokenType_t expected);
+k_Error_t* k_Error_new(k_ErrorCode_t errorCode, k_Token_t* token);
+k_Error_t* k_Error_newEx(k_ErrorCode_t errorCode, k_Token_t* token, k_TokenType_t expected);
 
 // Destructor
 
-void zen_Error_delete(zen_Error_t* error);
+void k_Error_delete(k_Error_t* error);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SUPPORT_ERROR_H */

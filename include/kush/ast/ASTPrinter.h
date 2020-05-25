@@ -28,48 +28,48 @@
 
 /**
  * @class ASTPrinter
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ASTPrinter_t {
-    zen_ASTListener_t* m_astListener;
+struct k_ASTPrinter_t {
+    k_ASTListener_t* m_astListener;
     int32_t m_depth;
 };
 
 /**
  * @memberof ASTPrinter
  */
-typedef struct zen_ASTPrinter_t zen_ASTPrinter_t;
+typedef struct k_ASTPrinter_t k_ASTPrinter_t;
 
 /**
  * @memberof ASTPrinter
  */
-zen_ASTPrinter_t* zen_ASTPrinter_new();
+k_ASTPrinter_t* k_ASTPrinter_new();
 
 /**
  * @memberof ASTPrinter
  */
-void zen_ASTPrinter_delete(zen_ASTPrinter_t* listener);
+void k_ASTPrinter_delete(k_ASTPrinter_t* listener);
 
 /**
  * @memberof ASTPrinter
  */
-zen_ASTListener_t* zen_ASTPrinter_getASTListener(zen_ASTPrinter_t* listener);
+k_ASTListener_t* k_ASTPrinter_getASTListener(k_ASTPrinter_t* listener);
 
 /**
  * @memberof ASTPrinter
  */
-void zen_ASTPrinter_onEnterEveryRule(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTPrinter_onEnterEveryRule(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTPrinter
  */
-void zen_ASTPrinter_onExitEveryRule(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTPrinter_onExitEveryRule(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTPrinter
  */
-void zen_ASTPrinter_onVisitTerminal(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTPrinter_onVisitTerminal(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_PRINTER_H */

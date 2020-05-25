@@ -29,37 +29,37 @@
 
 /**
  * @class MultiplicativeExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_MultiplicativeExpressionContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_unaryExpression;
+struct k_MultiplicativeExpressionContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_unaryExpression;
     jtk_ArrayList_t* m_unaryExpressions;
 };
 
 /**
  * @memberof MultiplicativeExpressionContext
  */
-typedef struct zen_MultiplicativeExpressionContext_t zen_MultiplicativeExpressionContext_t;
+typedef struct k_MultiplicativeExpressionContext_t k_MultiplicativeExpressionContext_t;
 
 // Constructor
 
-zen_MultiplicativeExpressionContext_t* zen_MultiplicativeExpressionContext_new(zen_ASTNode_t* node);
+k_MultiplicativeExpressionContext_t* k_MultiplicativeExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof MultiplicativeExpressionContext
  */
-void zen_MultiplicativeExpressionContext_delete(zen_MultiplicativeExpressionContext_t* context);
+void k_MultiplicativeExpressionContext_delete(k_MultiplicativeExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof MultiplicativeExpressionContext
  */
-void zen_MultiplicativeExpressionContext_getChildren(zen_MultiplicativeExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_MultiplicativeExpressionContext_getChildren(k_MultiplicativeExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_MULTIPLICATIVE_EXPRESSION_CONTEXT_H */

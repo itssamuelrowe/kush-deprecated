@@ -28,16 +28,16 @@
 
 /**
  * @class InclusiveOrExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_InclusiveOrExpressionContext_t {
-    zen_ASTNode_t* m_node;
+struct k_InclusiveOrExpressionContext_t {
+    k_ASTNode_t* m_node;
     /**
      * The expression on the left of the operator.
      */
-    zen_ASTNode_t* m_exclusiveOrExpression;
+    k_ASTNode_t* m_exclusiveOrExpression;
 
     /**
      * The list of exclusiveOrExpressions on the right of the operator.
@@ -48,27 +48,27 @@ struct zen_InclusiveOrExpressionContext_t {
 /**
  * @memberof InclusiveOrExpressionContext
  */
-typedef struct zen_InclusiveOrExpressionContext_t zen_InclusiveOrExpressionContext_t;
+typedef struct k_InclusiveOrExpressionContext_t k_InclusiveOrExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof InclusiveOrExpressionContext
  */
-zen_InclusiveOrExpressionContext_t* zen_InclusiveOrExpressionContext_new(zen_ASTNode_t* node);
+k_InclusiveOrExpressionContext_t* k_InclusiveOrExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof InclusiveOrExpressionContext
  */
-void zen_InclusiveOrExpressionContext_delete(zen_InclusiveOrExpressionContext_t* context);
+void k_InclusiveOrExpressionContext_delete(k_InclusiveOrExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof InclusiveOrExpressionContext
  */
-void zen_InclusiveOrExpressionContext_getChildren(zen_InclusiveOrExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_InclusiveOrExpressionContext_getChildren(k_InclusiveOrExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_INCLUSIVE_OR_EXPRESSION_CONTEXT_H */

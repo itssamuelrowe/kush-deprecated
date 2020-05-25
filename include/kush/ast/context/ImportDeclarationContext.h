@@ -30,40 +30,40 @@
 
 /**
  * @class ImportDeclarationContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ImportDeclarationContext_t {
-    zen_ASTNode_t* m_node;
-    jtk_ArrayList_t* m_identifiers; /* <zen_ASTNode_t*> */
+struct k_ImportDeclarationContext_t {
+    k_ASTNode_t* m_node;
+    jtk_ArrayList_t* m_identifiers; /* <k_ASTNode_t*> */
     bool m_wildcard;
 };
 
 /**
  * @memberof ImportDeclarationContext
  */
-typedef struct zen_ImportDeclarationContext_t zen_ImportDeclarationContext_t;
+typedef struct k_ImportDeclarationContext_t k_ImportDeclarationContext_t;
 
 // Constructor
 
 /**
  * @memberof ImportDeclarationContext
  */
-zen_ImportDeclarationContext_t* zen_ImportDeclarationContext_new(zen_ASTNode_t* node);
+k_ImportDeclarationContext_t* k_ImportDeclarationContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ImportDeclarationContext
  */
-void zen_ImportDeclarationContext_delete(zen_ImportDeclarationContext_t* context);
+void k_ImportDeclarationContext_delete(k_ImportDeclarationContext_t* context);
 
 // Children
 
 /**
  * @memberof ImportDeclarationContext
  */
-void zen_ImportDeclarationContext_getChildren(zen_ImportDeclarationContext_t* context, jtk_ArrayList_t* children);
+void k_ImportDeclarationContext_getChildren(k_ImportDeclarationContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_IMPORT_DECLARATION_CONTEXT_H */

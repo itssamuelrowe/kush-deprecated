@@ -30,41 +30,41 @@
 
 /**
  * @class IfStatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_IfStatementContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_ifClause;
-    jtk_ArrayList_t* m_elseIfClauses; /* <zen_ASTNode_t*> */
-    zen_ASTNode_t* m_elseClause;
+struct k_IfStatementContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_ifClause;
+    jtk_ArrayList_t* m_elseIfClauses; /* <k_ASTNode_t*> */
+    k_ASTNode_t* m_elseClause;
 };
 
 /**
  * @memberof IfStatementContext
  */
-typedef struct zen_IfStatementContext_t zen_IfStatementContext_t;
+typedef struct k_IfStatementContext_t k_IfStatementContext_t;
 
 // Constructor
 
 /**
  * @memberof IfStatementContext
  */
-zen_IfStatementContext_t* zen_IfStatementContext_new(zen_ASTNode_t* node);
+k_IfStatementContext_t* k_IfStatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof IfStatementContext
  */
-void zen_IfStatementContext_delete(zen_IfStatementContext_t* context);
+void k_IfStatementContext_delete(k_IfStatementContext_t* context);
 
 // Children
 
 /**
  * @memberof IfStatementContext
  */
-void zen_IfStatementContext_getChildren(zen_IfStatementContext_t* context, jtk_ArrayList_t* children);
+void k_IfStatementContext_getChildren(k_IfStatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_IF_STATEMENT_CONTEXT_H */

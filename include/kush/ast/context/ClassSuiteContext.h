@@ -30,39 +30,39 @@
 
 /**
  * @class ClassSuiteContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ClassSuiteContext_t {
-    zen_ASTNode_t* m_node;
-    jtk_ArrayList_t* m_classMembers; /* <zen_ASTNode_t*> */
+struct k_ClassSuiteContext_t {
+    k_ASTNode_t* m_node;
+    jtk_ArrayList_t* m_classMembers; /* <k_ASTNode_t*> */
 };
 
 /**
  * @memberof ClassSuiteContext
  */
-typedef struct zen_ClassSuiteContext_t zen_ClassSuiteContext_t;
+typedef struct k_ClassSuiteContext_t k_ClassSuiteContext_t;
 
 // Constructor
 
 /**
  * @memberof ClassSuiteContext
  */
-zen_ClassSuiteContext_t* zen_ClassSuiteContext_new(zen_ASTNode_t* node);
+k_ClassSuiteContext_t* k_ClassSuiteContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ClassSuiteContext
  */
-void zen_ClassSuiteContext_delete(zen_ClassSuiteContext_t* context);
+void k_ClassSuiteContext_delete(k_ClassSuiteContext_t* context);
 
 // Children
 
 /**
  * @memberof ClassSuiteContext
  */
-void zen_ClassSuiteContext_getChildren(zen_ClassSuiteContext_t* context, jtk_ArrayList_t* children);
+void k_ClassSuiteContext_getChildren(k_ClassSuiteContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_CLASS_SUITE_CONTEXT_H */

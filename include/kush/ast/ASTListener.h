@@ -30,1865 +30,1865 @@
 /**
  * @memberof ASTListener
  */
-typedef struct zen_ASTListener_t zen_ASTListener_t;
+typedef struct k_ASTListener_t k_ASTListener_t;
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnVisitErrorNodeFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnVisitErrorNodeFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnVisitTerminalFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnVisitTerminalFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterEveryRuleFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterEveryRuleFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitEveryRuleFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitEveryRuleFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterCompilationUnitFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterCompilationUnitFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitCompilationUnitFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitCompilationUnitFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterImportDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterImportDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitImportDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitImportDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterAnnotatedComponentDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterAnnotatedComponentDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitAnnotatedComponentDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitAnnotatedComponentDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterAnnotationsFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterAnnotationsFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitAnnotationsFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitAnnotationsFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterAnnotationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterAnnotationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitAnnotationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitAnnotationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterAnnotationTypeFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterAnnotationTypeFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitAnnotationTypeFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitAnnotationTypeFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterAnnotationAttributeFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterAnnotationAttributeFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitAnnotationAttributeFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitAnnotationAttributeFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterComponentDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterComponentDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitComponentDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitComponentDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterFunctionDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterFunctionDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitFunctionDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitFunctionDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterFunctionParametersFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterFunctionParametersFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitFunctionParametersFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitFunctionParametersFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterFunctionBodyFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterFunctionBodyFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitFunctionBodyFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitFunctionBodyFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterStatementSuiteFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterStatementSuiteFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitStatementSuiteFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitStatementSuiteFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterSimpleStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterSimpleStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitSimpleStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitSimpleStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterEmptyStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterEmptyStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitEmptyStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitEmptyStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterVariableDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterVariableDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitVariableDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitVariableDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterVariableDeclaratorFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterVariableDeclaratorFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitVariableDeclaratorFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitVariableDeclaratorFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterConstantDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterConstantDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitConstantDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitConstantDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterConstantDeclaratorFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterConstantDeclaratorFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitConstantDeclaratorFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitConstantDeclaratorFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterAssertStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterAssertStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitAssertStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitAssertStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterBreakStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterBreakStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitBreakStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitBreakStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterContinueStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterContinueStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitContinueStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitContinueStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterReturnStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterReturnStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitReturnStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitReturnStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterThrowStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterThrowStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitThrowStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitThrowStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterCompoundStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterCompoundStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitCompoundStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitCompoundStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterIfStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterIfStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitIfStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitIfStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterIfClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterIfClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitIfClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitIfClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterElseIfClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterElseIfClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitElseIfClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitElseIfClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterElseClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterElseClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitElseClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitElseClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterIterativeStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterIterativeStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitIterativeStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitIterativeStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterLabelClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterLabelClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitLabelClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitLabelClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterWhileStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterWhileStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitWhileStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitWhileStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterForStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterForStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitForStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitForStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterForParametersFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterForParametersFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitForParametersFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitForParametersFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterTryStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterTryStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitTryStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitTryStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterTryClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterTryClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitTryClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitTryClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterCatchClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterCatchClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitCatchClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitCatchClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterCatchFilterFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterCatchFilterFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitCatchFilterFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitCatchFilterFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterFinallyClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterFinallyClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitFinallyClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitFinallyClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterSynchronizeStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterSynchronizeStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitSynchronizeStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitSynchronizeStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterWithStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterWithStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitWithStatementFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitWithStatementFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterWithParametersFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterWithParametersFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitWithParametersFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitWithParametersFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterWithParameterFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterWithParameterFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitWithParameterFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitWithParameterFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterClassDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterClassDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitClassDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitClassDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterClassExtendsClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterClassExtendsClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitClassExtendsClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitClassExtendsClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterClassSuiteFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterClassSuiteFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitClassSuiteFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitClassSuiteFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterClassMemberFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterClassMemberFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitClassMemberFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitClassMemberFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
-// typedef void (*zen_OnEnterConstructorDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
-// typedef void (*zen_OnExitConstructorDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+// typedef void (*k_OnEnterConstructorDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
+// typedef void (*k_OnExitConstructorDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterEnumerationDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterEnumerationDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitEnumerationDeclarationFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitEnumerationDeclarationFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterEnumerationBaseClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterEnumerationBaseClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitEnumerationBaseClauseFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitEnumerationBaseClauseFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterEnumerationSuiteFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterEnumerationSuiteFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitEnumerationSuiteFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitEnumerationSuiteFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterEnumerateFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterEnumerateFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitEnumerateFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitEnumerateFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterExpressionsFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterExpressionsFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitExpressionsFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitExpressionsFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterAssignmentExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterAssignmentExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitAssignmentExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitAssignmentExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterConditionalExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterConditionalExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitConditionalExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitConditionalExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterLogicalOrExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterLogicalOrExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitLogicalOrExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitLogicalOrExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterLogialAndExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterLogialAndExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitLogicalAndExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitLogicalAndExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterInclusiveOrExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterInclusiveOrExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitInclusiveOrExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitInclusiveOrExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterExclusiveOrExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterExclusiveOrExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitExclusiveOrExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitExclusiveOrExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterAndExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterAndExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitAndExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitAndExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterEqualityExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterEqualityExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitEqualityExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitEqualityExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterRelationalExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterRelationalExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitRelationalExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitRelationalExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterShiftExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterShiftExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitShiftExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitShiftExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterAdditiveExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterAdditiveExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitAdditiveExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitAdditiveExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterMultiplicativeExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterMultiplicativeExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitMultiplicativeExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitMultiplicativeExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterUnaryExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterUnaryExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitUnaryExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitUnaryExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterPostfixExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterPostfixExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitPostfixExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitPostfixExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterSubscriptFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterSubscriptFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitSubscriptFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitSubscriptFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterFunctionArgumentsFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterFunctionArgumentsFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitFunctionArgumentsFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitFunctionArgumentsFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterMemberAccessFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterMemberAccessFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitMemberAccessFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitMemberAccessFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterPostfixOperatorFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterPostfixOperatorFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitPostfixOperatorFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitPostfixOperatorFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterPrimaryExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterPrimaryExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitPrimaryExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitPrimaryExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterMapExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterMapExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitMapExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitMapExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterMapEntriesFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterMapEntriesFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitMapEntriesFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitMapEntriesFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterMapEntryFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterMapEntryFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitMapEntryFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitMapEntryFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterListExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterListExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitListExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitListExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnEnterNewExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnEnterNewExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-typedef void (*zen_OnExitNewExpressionFunction_t)(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+typedef void (*k_OnExitNewExpressionFunction_t)(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @class ASTListener
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ASTListener_t {
-    zen_OnVisitErrorNodeFunction_t m_onVisitErrorNode;
-    zen_OnVisitTerminalFunction_t m_onVisitTerminal;
+struct k_ASTListener_t {
+    k_OnVisitErrorNodeFunction_t m_onVisitErrorNode;
+    k_OnVisitTerminalFunction_t m_onVisitTerminal;
 
-    zen_OnEnterEveryRuleFunction_t m_onEnterEveryRule;
-    zen_OnExitEveryRuleFunction_t m_onExitEveryRule;
+    k_OnEnterEveryRuleFunction_t m_onEnterEveryRule;
+    k_OnExitEveryRuleFunction_t m_onExitEveryRule;
 
-    zen_OnEnterCompilationUnitFunction_t m_onEnterCompilationUnit;
-    zen_OnExitCompilationUnitFunction_t m_onExitCompilationUnit;
+    k_OnEnterCompilationUnitFunction_t m_onEnterCompilationUnit;
+    k_OnExitCompilationUnitFunction_t m_onExitCompilationUnit;
 
-    zen_OnEnterImportDeclarationFunction_t m_onEnterImportDeclaration;
-    zen_OnExitImportDeclarationFunction_t m_onExitImportDeclaration;
+    k_OnEnterImportDeclarationFunction_t m_onEnterImportDeclaration;
+    k_OnExitImportDeclarationFunction_t m_onExitImportDeclaration;
 
-    zen_OnEnterAnnotatedComponentDeclarationFunction_t m_onEnterAnnotatedComponentDeclaration;
-    zen_OnExitAnnotatedComponentDeclarationFunction_t m_onExitAnnotatedComponentDeclaration;
+    k_OnEnterAnnotatedComponentDeclarationFunction_t m_onEnterAnnotatedComponentDeclaration;
+    k_OnExitAnnotatedComponentDeclarationFunction_t m_onExitAnnotatedComponentDeclaration;
 
-    zen_OnEnterAnnotationsFunction_t m_onEnterAnnotations;
-    zen_OnExitAnnotationsFunction_t m_onExitAnnotations;
+    k_OnEnterAnnotationsFunction_t m_onEnterAnnotations;
+    k_OnExitAnnotationsFunction_t m_onExitAnnotations;
 
-    zen_OnEnterAnnotationFunction_t m_onEnterAnnotation;
-    zen_OnExitAnnotationFunction_t m_onExitAnnotation;
+    k_OnEnterAnnotationFunction_t m_onEnterAnnotation;
+    k_OnExitAnnotationFunction_t m_onExitAnnotation;
 
-    zen_OnEnterAnnotationTypeFunction_t m_onEnterAnnotationType;
-    zen_OnExitAnnotationTypeFunction_t m_onExitAnnotationType;
+    k_OnEnterAnnotationTypeFunction_t m_onEnterAnnotationType;
+    k_OnExitAnnotationTypeFunction_t m_onExitAnnotationType;
 
-    zen_OnEnterAnnotationAttributeFunction_t m_onEnterAnnotationAttribute;
-    zen_OnExitAnnotationAttributeFunction_t m_onExitAnnotationAttribute;
+    k_OnEnterAnnotationAttributeFunction_t m_onEnterAnnotationAttribute;
+    k_OnExitAnnotationAttributeFunction_t m_onExitAnnotationAttribute;
 
-    zen_OnEnterComponentDeclarationFunction_t m_onEnterComponentDeclaration;
-    zen_OnExitComponentDeclarationFunction_t m_onExitComponentDeclaration;
+    k_OnEnterComponentDeclarationFunction_t m_onEnterComponentDeclaration;
+    k_OnExitComponentDeclarationFunction_t m_onExitComponentDeclaration;
 
-    zen_OnEnterFunctionDeclarationFunction_t m_onEnterFunctionDeclaration;
-    zen_OnExitFunctionDeclarationFunction_t m_onExitFunctionDeclaration;
+    k_OnEnterFunctionDeclarationFunction_t m_onEnterFunctionDeclaration;
+    k_OnExitFunctionDeclarationFunction_t m_onExitFunctionDeclaration;
 
-    zen_OnEnterFunctionParametersFunction_t m_onEnterFunctionParameters;
-    zen_OnExitFunctionParametersFunction_t m_onExitFunctionParameters;
+    k_OnEnterFunctionParametersFunction_t m_onEnterFunctionParameters;
+    k_OnExitFunctionParametersFunction_t m_onExitFunctionParameters;
 
-    zen_OnEnterFunctionBodyFunction_t m_onEnterFunctionBody;
-    zen_OnExitFunctionBodyFunction_t m_onExitFunctionBody;
+    k_OnEnterFunctionBodyFunction_t m_onEnterFunctionBody;
+    k_OnExitFunctionBodyFunction_t m_onExitFunctionBody;
 
-    zen_OnEnterStatementSuiteFunction_t m_onEnterStatementSuite;
-    zen_OnExitStatementSuiteFunction_t m_onExitStatementSuite;
+    k_OnEnterStatementSuiteFunction_t m_onEnterStatementSuite;
+    k_OnExitStatementSuiteFunction_t m_onExitStatementSuite;
 
-    zen_OnEnterSimpleStatementFunction_t m_onEnterSimpleStatement;
-    zen_OnExitSimpleStatementFunction_t m_onExitSimpleStatement;
+    k_OnEnterSimpleStatementFunction_t m_onEnterSimpleStatement;
+    k_OnExitSimpleStatementFunction_t m_onExitSimpleStatement;
 
-    zen_OnEnterStatementFunction_t m_onEnterStatement;
-    zen_OnExitStatementFunction_t m_onExitStatement;
+    k_OnEnterStatementFunction_t m_onEnterStatement;
+    k_OnExitStatementFunction_t m_onExitStatement;
 
-    zen_OnEnterEmptyStatementFunction_t m_onEnterEmptyStatement;
-    zen_OnExitEmptyStatementFunction_t m_onExitEmptyStatement;
+    k_OnEnterEmptyStatementFunction_t m_onEnterEmptyStatement;
+    k_OnExitEmptyStatementFunction_t m_onExitEmptyStatement;
 
-    zen_OnEnterVariableDeclarationFunction_t m_onEnterVariableDeclaration;
-    zen_OnExitVariableDeclarationFunction_t m_onExitVariableDeclaration;
+    k_OnEnterVariableDeclarationFunction_t m_onEnterVariableDeclaration;
+    k_OnExitVariableDeclarationFunction_t m_onExitVariableDeclaration;
 
-    zen_OnEnterVariableDeclaratorFunction_t m_onEnterVariableDeclarator;
-    zen_OnExitVariableDeclaratorFunction_t m_onExitVariableDeclarator;
+    k_OnEnterVariableDeclaratorFunction_t m_onEnterVariableDeclarator;
+    k_OnExitVariableDeclaratorFunction_t m_onExitVariableDeclarator;
 
-    zen_OnEnterConstantDeclarationFunction_t m_onEnterConstantDeclaration;
-    zen_OnExitConstantDeclarationFunction_t m_onExitConstantDeclaration;
+    k_OnEnterConstantDeclarationFunction_t m_onEnterConstantDeclaration;
+    k_OnExitConstantDeclarationFunction_t m_onExitConstantDeclaration;
 
-    zen_OnEnterConstantDeclaratorFunction_t m_onEnterConstantDeclarator;
-    zen_OnExitConstantDeclaratorFunction_t m_onExitConstantDeclarator;
+    k_OnEnterConstantDeclaratorFunction_t m_onEnterConstantDeclarator;
+    k_OnExitConstantDeclaratorFunction_t m_onExitConstantDeclarator;
 
-    zen_OnEnterAssertStatementFunction_t m_onEnterAssertStatement;
-    zen_OnExitAssertStatementFunction_t m_onExitAssertStatement;
+    k_OnEnterAssertStatementFunction_t m_onEnterAssertStatement;
+    k_OnExitAssertStatementFunction_t m_onExitAssertStatement;
 
-    zen_OnEnterBreakStatementFunction_t m_onEnterBreakStatement;
-    zen_OnExitBreakStatementFunction_t m_onExitBreakStatement;
+    k_OnEnterBreakStatementFunction_t m_onEnterBreakStatement;
+    k_OnExitBreakStatementFunction_t m_onExitBreakStatement;
 
-    zen_OnEnterContinueStatementFunction_t m_onEnterContinueStatement;
-    zen_OnExitContinueStatementFunction_t m_onExitContinueStatement;
+    k_OnEnterContinueStatementFunction_t m_onEnterContinueStatement;
+    k_OnExitContinueStatementFunction_t m_onExitContinueStatement;
 
-    zen_OnEnterReturnStatementFunction_t m_onEnterReturnStatement;
-    zen_OnExitReturnStatementFunction_t m_onExitReturnStatement;
+    k_OnEnterReturnStatementFunction_t m_onEnterReturnStatement;
+    k_OnExitReturnStatementFunction_t m_onExitReturnStatement;
 
-    zen_OnEnterThrowStatementFunction_t m_onEnterThrowStatement;
-    zen_OnExitThrowStatementFunction_t m_onExitThrowStatement;
+    k_OnEnterThrowStatementFunction_t m_onEnterThrowStatement;
+    k_OnExitThrowStatementFunction_t m_onExitThrowStatement;
 
-    zen_OnEnterCompoundStatementFunction_t m_onEnterCompoundStatement;
-    zen_OnExitCompoundStatementFunction_t m_onExitCompoundStatement;
+    k_OnEnterCompoundStatementFunction_t m_onEnterCompoundStatement;
+    k_OnExitCompoundStatementFunction_t m_onExitCompoundStatement;
 
-    zen_OnEnterIfStatementFunction_t m_onEnterIfStatement;
-    zen_OnExitIfStatementFunction_t m_onExitIfStatement;
+    k_OnEnterIfStatementFunction_t m_onEnterIfStatement;
+    k_OnExitIfStatementFunction_t m_onExitIfStatement;
 
-    zen_OnEnterIfClauseFunction_t m_onEnterIfClause;
-    zen_OnExitIfClauseFunction_t m_onExitIfClause;
+    k_OnEnterIfClauseFunction_t m_onEnterIfClause;
+    k_OnExitIfClauseFunction_t m_onExitIfClause;
 
-    zen_OnEnterElseIfClauseFunction_t m_onEnterElseIfClause;
-    zen_OnExitElseIfClauseFunction_t m_onExitElseIfClause;
+    k_OnEnterElseIfClauseFunction_t m_onEnterElseIfClause;
+    k_OnExitElseIfClauseFunction_t m_onExitElseIfClause;
 
-    zen_OnEnterElseClauseFunction_t m_onEnterElseClause;
-    zen_OnExitElseClauseFunction_t m_onExitElseClause;
+    k_OnEnterElseClauseFunction_t m_onEnterElseClause;
+    k_OnExitElseClauseFunction_t m_onExitElseClause;
 
-    zen_OnEnterIterativeStatementFunction_t m_onEnterIterativeStatement;
-    zen_OnExitIterativeStatementFunction_t m_onExitIterativeStatement;
+    k_OnEnterIterativeStatementFunction_t m_onEnterIterativeStatement;
+    k_OnExitIterativeStatementFunction_t m_onExitIterativeStatement;
 
-    zen_OnEnterLabelClauseFunction_t m_onEnterLabelClause;
-    zen_OnExitLabelClauseFunction_t m_onExitLabelClause;
+    k_OnEnterLabelClauseFunction_t m_onEnterLabelClause;
+    k_OnExitLabelClauseFunction_t m_onExitLabelClause;
 
-    zen_OnEnterWhileStatementFunction_t m_onEnterWhileStatement;
-    zen_OnExitWhileStatementFunction_t m_onExitWhileStatement;
+    k_OnEnterWhileStatementFunction_t m_onEnterWhileStatement;
+    k_OnExitWhileStatementFunction_t m_onExitWhileStatement;
 
-    zen_OnEnterForStatementFunction_t m_onEnterForStatement;
-    zen_OnExitForStatementFunction_t m_onExitForStatement;
+    k_OnEnterForStatementFunction_t m_onEnterForStatement;
+    k_OnExitForStatementFunction_t m_onExitForStatement;
 
-    zen_OnEnterForParametersFunction_t m_onEnterForParameter;
-    zen_OnExitForParametersFunction_t m_onExitForParameter;
+    k_OnEnterForParametersFunction_t m_onEnterForParameter;
+    k_OnExitForParametersFunction_t m_onExitForParameter;
 
-    zen_OnEnterTryStatementFunction_t m_onEnterTryStatement;
-    zen_OnExitTryStatementFunction_t m_onExitTryStatement;
+    k_OnEnterTryStatementFunction_t m_onEnterTryStatement;
+    k_OnExitTryStatementFunction_t m_onExitTryStatement;
 
-    zen_OnEnterTryClauseFunction_t m_onEnterTryClause;
-    zen_OnExitTryClauseFunction_t m_onExitTryClause;
+    k_OnEnterTryClauseFunction_t m_onEnterTryClause;
+    k_OnExitTryClauseFunction_t m_onExitTryClause;
 
-    zen_OnEnterCatchClauseFunction_t m_onEnterCatchClause;
-    zen_OnExitCatchClauseFunction_t m_onExitCatchClause;
+    k_OnEnterCatchClauseFunction_t m_onEnterCatchClause;
+    k_OnExitCatchClauseFunction_t m_onExitCatchClause;
 
-    zen_OnEnterCatchFilterFunction_t m_onEnterCatchFilter;
-    zen_OnExitCatchFilterFunction_t m_onExitCatchFilter;
+    k_OnEnterCatchFilterFunction_t m_onEnterCatchFilter;
+    k_OnExitCatchFilterFunction_t m_onExitCatchFilter;
 
-    zen_OnEnterFinallyClauseFunction_t m_onEnterFinallyClause;
-    zen_OnExitFinallyClauseFunction_t m_onExitFinallyClause;
+    k_OnEnterFinallyClauseFunction_t m_onEnterFinallyClause;
+    k_OnExitFinallyClauseFunction_t m_onExitFinallyClause;
 
-    zen_OnEnterSynchronizeStatementFunction_t m_onEnterSynchronizeStatement;
-    zen_OnExitSynchronizeStatementFunction_t m_onExitSynchronizeStatement;
+    k_OnEnterSynchronizeStatementFunction_t m_onEnterSynchronizeStatement;
+    k_OnExitSynchronizeStatementFunction_t m_onExitSynchronizeStatement;
 
-    zen_OnEnterWithStatementFunction_t m_onEnterWithStatement;
-    zen_OnExitWithStatementFunction_t m_onExitWithStatement;
+    k_OnEnterWithStatementFunction_t m_onEnterWithStatement;
+    k_OnExitWithStatementFunction_t m_onExitWithStatement;
 
-    zen_OnEnterWithParametersFunction_t m_onEnterWithParameters;
-    zen_OnExitWithParametersFunction_t m_onExitWithParameters;
+    k_OnEnterWithParametersFunction_t m_onEnterWithParameters;
+    k_OnExitWithParametersFunction_t m_onExitWithParameters;
 
-    zen_OnEnterWithParameterFunction_t m_onEnterWithParameter;
-    zen_OnExitWithParameterFunction_t m_onExitWithParameter;
+    k_OnEnterWithParameterFunction_t m_onEnterWithParameter;
+    k_OnExitWithParameterFunction_t m_onExitWithParameter;
 
-    zen_OnEnterClassDeclarationFunction_t m_onEnterClassDeclaration;
-    zen_OnExitClassDeclarationFunction_t m_onExitClassDeclaration;
+    k_OnEnterClassDeclarationFunction_t m_onEnterClassDeclaration;
+    k_OnExitClassDeclarationFunction_t m_onExitClassDeclaration;
 
-    zen_OnEnterClassExtendsClauseFunction_t m_onEnterClassExtendsClause;
-    zen_OnExitClassExtendsClauseFunction_t m_onExitClassExtendsClause;
+    k_OnEnterClassExtendsClauseFunction_t m_onEnterClassExtendsClause;
+    k_OnExitClassExtendsClauseFunction_t m_onExitClassExtendsClause;
 
-    zen_OnEnterClassSuiteFunction_t m_onEnterClassSuite;
-    zen_OnExitClassSuiteFunction_t m_onExitClassSuite;
+    k_OnEnterClassSuiteFunction_t m_onEnterClassSuite;
+    k_OnExitClassSuiteFunction_t m_onExitClassSuite;
 
-    zen_OnEnterClassMemberFunction_t m_onEnterClassMember;
-    zen_OnExitClassMemberFunction_t m_onExitClassMember;
+    k_OnEnterClassMemberFunction_t m_onEnterClassMember;
+    k_OnExitClassMemberFunction_t m_onExitClassMember;
 
-//     zen_OnEnterConstructorDeclarationFunction_t m_onEnterConstructorDeclaration;
-//     zen_OnExitConstructorDeclarationFunction_t m_onExitConstructorDeclaration;
+//     k_OnEnterConstructorDeclarationFunction_t m_onEnterConstructorDeclaration;
+//     k_OnExitConstructorDeclarationFunction_t m_onExitConstructorDeclaration;
 
-    zen_OnEnterEnumerationDeclarationFunction_t m_onEnterEnumerationDeclaration;
-    zen_OnExitEnumerationDeclarationFunction_t m_onExitEnumerationDeclaration;
+    k_OnEnterEnumerationDeclarationFunction_t m_onEnterEnumerationDeclaration;
+    k_OnExitEnumerationDeclarationFunction_t m_onExitEnumerationDeclaration;
 
-    zen_OnEnterEnumerationBaseClauseFunction_t m_onEnterEnumerationBaseClause;
-    zen_OnExitEnumerationBaseClauseFunction_t m_onExitEnumerationBaseClause;
+    k_OnEnterEnumerationBaseClauseFunction_t m_onEnterEnumerationBaseClause;
+    k_OnExitEnumerationBaseClauseFunction_t m_onExitEnumerationBaseClause;
 
-    zen_OnEnterEnumerationSuiteFunction_t m_onEnterEnumerationSuite;
-    zen_OnExitEnumerationSuiteFunction_t m_onExitEnumerationSuite;
+    k_OnEnterEnumerationSuiteFunction_t m_onEnterEnumerationSuite;
+    k_OnExitEnumerationSuiteFunction_t m_onExitEnumerationSuite;
 
-    zen_OnEnterEnumerateFunction_t m_onEnterEnumerate;
-    zen_OnExitEnumerateFunction_t m_onExitEnumerate;
+    k_OnEnterEnumerateFunction_t m_onEnterEnumerate;
+    k_OnExitEnumerateFunction_t m_onExitEnumerate;
 
-    zen_OnEnterExpressionsFunction_t m_onEnterExpressions;
-    zen_OnExitExpressionsFunction_t m_onExitExpressions;
+    k_OnEnterExpressionsFunction_t m_onEnterExpressions;
+    k_OnExitExpressionsFunction_t m_onExitExpressions;
 
-    zen_OnEnterExpressionFunction_t m_onEnterExpression;
-    zen_OnExitExpressionFunction_t m_onExitExpression;
+    k_OnEnterExpressionFunction_t m_onEnterExpression;
+    k_OnExitExpressionFunction_t m_onExitExpression;
 
-    zen_OnEnterAssignmentExpressionFunction_t m_onEnterAssignmentExpression;
-    zen_OnExitAssignmentExpressionFunction_t m_onExitAssignmentExpression;
+    k_OnEnterAssignmentExpressionFunction_t m_onEnterAssignmentExpression;
+    k_OnExitAssignmentExpressionFunction_t m_onExitAssignmentExpression;
 
-    zen_OnEnterConditionalExpressionFunction_t m_onEnterConditionalExpression;
-    zen_OnExitConditionalExpressionFunction_t m_onExitConditionalExpression;
+    k_OnEnterConditionalExpressionFunction_t m_onEnterConditionalExpression;
+    k_OnExitConditionalExpressionFunction_t m_onExitConditionalExpression;
 
-    zen_OnEnterLogicalOrExpressionFunction_t m_onEnterLogicalOrExpression;
-    zen_OnExitLogicalOrExpressionFunction_t m_onExitLogicalOrExpression;
+    k_OnEnterLogicalOrExpressionFunction_t m_onEnterLogicalOrExpression;
+    k_OnExitLogicalOrExpressionFunction_t m_onExitLogicalOrExpression;
 
-    zen_OnEnterLogialAndExpressionFunction_t m_onEnterLogicalAndExpression;
-    zen_OnExitLogicalAndExpressionFunction_t m_onExitLogicalAndExpression;
+    k_OnEnterLogialAndExpressionFunction_t m_onEnterLogicalAndExpression;
+    k_OnExitLogicalAndExpressionFunction_t m_onExitLogicalAndExpression;
 
-    zen_OnEnterInclusiveOrExpressionFunction_t m_onEnterInclusiveOrExpression;
-    zen_OnExitInclusiveOrExpressionFunction_t m_onExitInclusiveOrExpression;
+    k_OnEnterInclusiveOrExpressionFunction_t m_onEnterInclusiveOrExpression;
+    k_OnExitInclusiveOrExpressionFunction_t m_onExitInclusiveOrExpression;
 
-    zen_OnEnterExclusiveOrExpressionFunction_t m_onEnterExclusiveOrExpression;
-    zen_OnExitExclusiveOrExpressionFunction_t m_onExitExclusiveOrExpression;
+    k_OnEnterExclusiveOrExpressionFunction_t m_onEnterExclusiveOrExpression;
+    k_OnExitExclusiveOrExpressionFunction_t m_onExitExclusiveOrExpression;
 
-    zen_OnEnterAndExpressionFunction_t m_onEnterAndExpression;
-    zen_OnExitAndExpressionFunction_t m_onExitAndExpression;
+    k_OnEnterAndExpressionFunction_t m_onEnterAndExpression;
+    k_OnExitAndExpressionFunction_t m_onExitAndExpression;
 
-    zen_OnEnterEqualityExpressionFunction_t m_onEnterEqualityExpression;
-    zen_OnExitEqualityExpressionFunction_t m_onExitEqualityExpression;
+    k_OnEnterEqualityExpressionFunction_t m_onEnterEqualityExpression;
+    k_OnExitEqualityExpressionFunction_t m_onExitEqualityExpression;
 
-    zen_OnEnterRelationalExpressionFunction_t m_onEnterRelationalExpression;
-    zen_OnExitRelationalExpressionFunction_t m_onExitRelationalExpression;
+    k_OnEnterRelationalExpressionFunction_t m_onEnterRelationalExpression;
+    k_OnExitRelationalExpressionFunction_t m_onExitRelationalExpression;
 
-    zen_OnEnterShiftExpressionFunction_t m_onEnterShiftExpression;
-    zen_OnExitShiftExpressionFunction_t m_onExitShiftExpression;
+    k_OnEnterShiftExpressionFunction_t m_onEnterShiftExpression;
+    k_OnExitShiftExpressionFunction_t m_onExitShiftExpression;
 
-    zen_OnEnterAdditiveExpressionFunction_t m_onEnterAdditiveExpression;
-    zen_OnExitAdditiveExpressionFunction_t m_onExitAdditiveExpression;
+    k_OnEnterAdditiveExpressionFunction_t m_onEnterAdditiveExpression;
+    k_OnExitAdditiveExpressionFunction_t m_onExitAdditiveExpression;
 
-    zen_OnEnterMultiplicativeExpressionFunction_t m_onEnterMultiplicativeExpression;
-    zen_OnExitMultiplicativeExpressionFunction_t m_onExitMultiplicativeExpression;
+    k_OnEnterMultiplicativeExpressionFunction_t m_onEnterMultiplicativeExpression;
+    k_OnExitMultiplicativeExpressionFunction_t m_onExitMultiplicativeExpression;
 
-    zen_OnEnterUnaryExpressionFunction_t m_onEnterUnaryExpression;
-    zen_OnExitUnaryExpressionFunction_t m_onExitUnaryExpression;
+    k_OnEnterUnaryExpressionFunction_t m_onEnterUnaryExpression;
+    k_OnExitUnaryExpressionFunction_t m_onExitUnaryExpression;
 
-    zen_OnEnterPostfixExpressionFunction_t m_onEnterPostfixExpression;
-    zen_OnExitPostfixExpressionFunction_t m_onExitPostfixExpression;
+    k_OnEnterPostfixExpressionFunction_t m_onEnterPostfixExpression;
+    k_OnExitPostfixExpressionFunction_t m_onExitPostfixExpression;
 
-    zen_OnEnterSubscriptFunction_t m_onEnterSubscript;
-    zen_OnExitSubscriptFunction_t m_onExitSubscript;
+    k_OnEnterSubscriptFunction_t m_onEnterSubscript;
+    k_OnExitSubscriptFunction_t m_onExitSubscript;
 
-    zen_OnEnterFunctionArgumentsFunction_t m_onEnterFunctionArguments;
-    zen_OnExitFunctionArgumentsFunction_t m_onExitFunctionArguments;
+    k_OnEnterFunctionArgumentsFunction_t m_onEnterFunctionArguments;
+    k_OnExitFunctionArgumentsFunction_t m_onExitFunctionArguments;
 
-    zen_OnEnterMemberAccessFunction_t m_onEnterMemberAccess;
-    zen_OnExitMemberAccessFunction_t m_onExitMemberAccess;
+    k_OnEnterMemberAccessFunction_t m_onEnterMemberAccess;
+    k_OnExitMemberAccessFunction_t m_onExitMemberAccess;
 
-    zen_OnEnterPostfixOperatorFunction_t m_onEnterPostfixOperator;
-    zen_OnExitPostfixOperatorFunction_t m_onExitPostfixOperator;
+    k_OnEnterPostfixOperatorFunction_t m_onEnterPostfixOperator;
+    k_OnExitPostfixOperatorFunction_t m_onExitPostfixOperator;
 
-    zen_OnEnterPrimaryExpressionFunction_t m_onEnterPrimaryExpression;
-    zen_OnExitPrimaryExpressionFunction_t m_onExitPrimaryExpression;
+    k_OnEnterPrimaryExpressionFunction_t m_onEnterPrimaryExpression;
+    k_OnExitPrimaryExpressionFunction_t m_onExitPrimaryExpression;
 
-    zen_OnEnterMapExpressionFunction_t m_onEnterMapExpression;
-    zen_OnExitMapExpressionFunction_t m_onExitMapExpression;
+    k_OnEnterMapExpressionFunction_t m_onEnterMapExpression;
+    k_OnExitMapExpressionFunction_t m_onExitMapExpression;
 
-    zen_OnEnterMapEntriesFunction_t m_onEnterMapEntries;
-    zen_OnExitMapEntriesFunction_t m_onExitMapEntries;
+    k_OnEnterMapEntriesFunction_t m_onEnterMapEntries;
+    k_OnExitMapEntriesFunction_t m_onExitMapEntries;
 
-    zen_OnEnterMapEntryFunction_t m_onEnterMapEntry;
-    zen_OnExitMapEntryFunction_t m_onExitMapEntry;
+    k_OnEnterMapEntryFunction_t m_onEnterMapEntry;
+    k_OnExitMapEntryFunction_t m_onExitMapEntry;
 
-    zen_OnEnterListExpressionFunction_t m_onEnterListExpression;
-    zen_OnExitListExpressionFunction_t m_onExitListExpression;
+    k_OnEnterListExpressionFunction_t m_onEnterListExpression;
+    k_OnExitListExpressionFunction_t m_onExitListExpression;
 
-    zen_OnEnterNewExpressionFunction_t m_onEnterNewExpression;
-    zen_OnExitNewExpressionFunction_t m_onExitNewExpression;
+    k_OnEnterNewExpressionFunction_t m_onEnterNewExpression;
+    k_OnExitNewExpressionFunction_t m_onExitNewExpression;
 
-    zen_ASTWalkerState_t m_walkerState;
+    k_ASTWalkerState_t m_walkerState;
     void* m_context;
 };
 
 /**
  * @memberof ASTListener
  */
-typedef struct zen_ASTListener_t zen_ASTListener_t;
+typedef struct k_ASTListener_t k_ASTListener_t;
 
 /**
  * @memberof ASTListener
  */
-zen_ASTListener_t* zen_ASTListener_newWithContext(void* context);
+k_ASTListener_t* k_ASTListener_newWithContext(void* context);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_delete(zen_ASTListener_t* listener);
+void k_ASTListener_delete(k_ASTListener_t* listener);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onVisitErrorNode(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onVisitErrorNode(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onVisitTerminal(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onVisitTerminal(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterEveryRule(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterEveryRule(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitEveryRule(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitEveryRule(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterCompilationUnit(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterCompilationUnit(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitCompilationUnit(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitCompilationUnit(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterImportDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterImportDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitImportDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitImportDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterAnnotatedComponentDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterAnnotatedComponentDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitAnnotatedComponentDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitAnnotatedComponentDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterAnnotations(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterAnnotations(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitAnnotations(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitAnnotations(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterAnnotation(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterAnnotation(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitAnnotation(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitAnnotation(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterAnnotationType(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterAnnotationType(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitAnnotationType(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitAnnotationType(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterAnnotationAttribute(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterAnnotationAttribute(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitAnnotationAttribute(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitAnnotationAttribute(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterComponentDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterComponentDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitComponentDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitComponentDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterFunctionDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterFunctionDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitFunctionDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitFunctionDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterFunctionParameters(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterFunctionParameters(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitFunctionParameters(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitFunctionParameters(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterFunctionBody(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterFunctionBody(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitFunctionBody(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitFunctionBody(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterStatementSuite(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterStatementSuite(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitStatementSuite(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitStatementSuite(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterSimpleStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterSimpleStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitSimpleStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitSimpleStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterEmptyStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterEmptyStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitEmptyStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitEmptyStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterVariableDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterVariableDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitVariableDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitVariableDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterVariableDeclarator(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterVariableDeclarator(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitVariableDeclarator(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitVariableDeclarator(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterConstantDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterConstantDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitConstantDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitConstantDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterConstantDeclarator(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterConstantDeclarator(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitConstantDeclarator(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitConstantDeclarator(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterAssertStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterAssertStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitAssertStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitAssertStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterBreakStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterBreakStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitBreakStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitBreakStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterContinueStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterContinueStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitContinueStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitContinueStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterReturnStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterReturnStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitReturnStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitReturnStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterThrowStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterThrowStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitThrowStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitThrowStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterCompoundStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterCompoundStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitCompoundStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitCompoundStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterIfStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterIfStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitIfStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitIfStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterIfClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterIfClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitIfClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitIfClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterElseIfClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterElseIfClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitElseIfClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitElseIfClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterElseClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterElseClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitElseClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitElseClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterIterativeStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterIterativeStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitIterativeStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitIterativeStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterLabel(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterLabel(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitLabel(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitLabel(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterWhileStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterWhileStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitWhileStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitWhileStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterForStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterForStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitForStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitForStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterForParameters(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterForParameters(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitForParameters(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitForParameters(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterTryStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterTryStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitTryStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitTryStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterTryClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterTryClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitTryClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitTryClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterCatchClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterCatchClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitCatchClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitCatchClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterCatchFilter(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterCatchFilter(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitCatchFilter(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitCatchFilter(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterFinallyClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterFinallyClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitFinallyClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitFinallyClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterSynchronizeStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterSynchronizeStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitSynchronizeStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitSynchronizeStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterWithStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterWithStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitWithStatement(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitWithStatement(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterWithParameters(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterWithParameters(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitWithParameters(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitWithParameters(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterWithParameter(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterWithParameter(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitWithParameter(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitWithParameter(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterClassDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterClassDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitClassDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitClassDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterClassExtendsClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterClassExtendsClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitClassExtendsClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitClassExtendsClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterClassSuite(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterClassSuite(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitClassSuite(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitClassSuite(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterClassMember(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterClassMember(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitClassMember(zen_ASTListener_t* listener, zen_ASTNode_t* node);
-// void zen_ASTListener_onEnterConstructorDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
-// void zen_ASTListener_onExitConstructorDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitClassMember(k_ASTListener_t* listener, k_ASTNode_t* node);
+// void k_ASTListener_onEnterConstructorDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
+// void k_ASTListener_onExitConstructorDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterEnumerationDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterEnumerationDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitEnumerationDeclaration(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitEnumerationDeclaration(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterEnumrationBaseClass(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterEnumrationBaseClass(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitEnumerationBaseClause(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitEnumerationBaseClause(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterEnumerationSuite(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterEnumerationSuite(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitEnumerationSuite(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitEnumerationSuite(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterEnumerate(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterEnumerate(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitEnumerate(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitEnumerate(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterExpressions(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterExpressions(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitExpressions(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitExpressions(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterAssignmentExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterAssignmentExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitAssignmentExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitAssignmentExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterConditionalExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterConditionalExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitConditionalExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitConditionalExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterLogicalOrExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterLogicalOrExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitLogicalOrExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitLogicalOrExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterLogicalAndExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterLogicalAndExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitLogicalAndExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitLogicalAndExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterInclusiveOrExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterInclusiveOrExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitInclusiveOrExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitInclusiveOrExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterExclusiveOrExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterExclusiveOrExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitExclusiveOrExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitExclusiveOrExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterAndExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterAndExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitAndExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitAndExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterEqualityExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterEqualityExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitEqualityExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitEqualityExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterRelationalExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterRelationalExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitRelationalExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitRelationalExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterShiftExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterShiftExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitShiftExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitShiftExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterAdditiveExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterAdditiveExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitAdditiveExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitAdditiveExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterMultiplicativeExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterMultiplicativeExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitMultiplicativeExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitMultiplicativeExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterUnaryExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterUnaryExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitUnaryExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitUnaryExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterPostfixExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterPostfixExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitPostfixExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitPostfixExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterSubscript(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterSubscript(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitSubscript(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitSubscript(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterFunctionArguments(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterFunctionArguments(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitFunctionArguments(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitFunctionArguments(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterMemberAccess(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterMemberAccess(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitMemberAccess(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitMemberAccess(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterPostfixOperator(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterPostfixOperator(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitPostfixOperator(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitPostfixOperator(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterPrimaryExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterPrimaryExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitPrimaryExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitPrimaryExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterMapExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterMapExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitMapExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitMapExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterMapEntries(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterMapEntries(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitMapEntries(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitMapEntries(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterMapEntry(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterMapEntry(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitMapEntry(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitMapEntry(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterListExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterListExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitListExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitListExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onEnterNewExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onEnterNewExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 /**
  * @memberof ASTListener
  */
-void zen_ASTListener_onExitNewExpression(zen_ASTListener_t* listener, zen_ASTNode_t* node);
+void k_ASTListener_onExitNewExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
 // Skip Children
 
-void zen_ASTListener_skipChildren(zen_ASTListener_t* listener);
+void k_ASTListener_skipChildren(k_ASTListener_t* listener);
 
 // Vist Children
 
-void zen_ASTListener_visitChildren(zen_ASTListener_t* listener);
+void k_ASTListener_visitChildren(k_ASTListener_t* listener);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_LISTENER_H */

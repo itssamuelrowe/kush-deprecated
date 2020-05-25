@@ -29,10 +29,10 @@
  * ErrorHandler                                                                *
  *******************************************************************************/
 
-struct zen_Lexer_t;
-struct zen_Parser_t;
-typedef struct zen_Lexer_t zen_Lexer_t;
-typedef struct zen_Parser_t zen_Parser_t;
+struct k_Lexer_t;
+struct k_Parser_t;
+typedef struct k_Lexer_t k_Lexer_t;
+typedef struct k_Parser_t k_Parser_t;
 
 /* NOTE: The handlers should not maintain any reference to the origin
  * object that they receive. Because errors may persist beyond the lifetime
@@ -42,53 +42,53 @@ typedef struct zen_Parser_t zen_Parser_t;
 /**
  * @memberof ErrorHandler
  */
-typedef void (*zen_ErrorHandler_HandleLexicalErrorFunction_t)(void* context, zen_Lexer_t* lexer, zen_Error_t* error);
+typedef void (*k_ErrorHandler_HandleLexicalErrorFunction_t)(void* context, k_Lexer_t* lexer, k_Error_t* error);
 
 /**
  * @memberof ErrorHandler
  */
-typedef void (*zen_ErrorHandler_HandleSyntacticalErrorFunction_t)(void* context, zen_Parser_t* parser, zen_Error_t* error);
+typedef void (*k_ErrorHandler_HandleSyntacticalErrorFunction_t)(void* context, k_Parser_t* parser, k_Error_t* error);
 
 /**
  * @memberof ErrorHandler
  */
-typedef void (*zen_ErrorHandler_HandleSemanticalErrorFunction_t)(void* context, void* origin, zen_Error_t* error);
+typedef void (*k_ErrorHandler_HandleSemanticalErrorFunction_t)(void* context, void* origin, k_Error_t* error);
 
 /**
  * @memberof ErrorHandler
  */
-typedef void (*zen_ErrorHandler_OnLexicalErrorFunction_t)(void* context, zen_Lexer_t* lexer, zen_Error_t* error);
+typedef void (*k_ErrorHandler_OnLexicalErrorFunction_t)(void* context, k_Lexer_t* lexer, k_Error_t* error);
 
 /**
  * @memberof ErrorHandler
  */
-typedef void (*zen_ErrorHandler_OnSyntacticalErrorFunction_t)(void* context, zen_Parser_t* parser, zen_Error_t* error, zen_TokenType_t expected);
+typedef void (*k_ErrorHandler_OnSyntacticalErrorFunction_t)(void* context, k_Parser_t* parser, k_Error_t* error, k_TokenType_t expected);
 
 /**
  * @memberof ErrorHandler
  */
-typedef void (*zen_ErrorHandler_OnSemanticalErrorFunction_t)(void* context, void* origin, zen_Error_t* error);
+typedef void (*k_ErrorHandler_OnSemanticalErrorFunction_t)(void* context, void* origin, k_Error_t* error);
 
 /**
  * @memberof ErrorHandler
  */
-typedef void (*zen_ErrorHandler_OnGeneralErrorFunction_t)(void* context, void* origin, zen_Error_t* error);
+typedef void (*k_ErrorHandler_OnGeneralErrorFunction_t)(void* context, void* origin, k_Error_t* error);
 
 /**
  * @class ErrorHandler
  * @author Samuel Rowe
- * @ingroup zen_compiler
+ * @ingroup k_compiler
  * @since zen 1.0
  */
-struct zen_ErrorHandler_t {
-    zen_ErrorHandler_HandleLexicalErrorFunction_t m_handleLexicalError;
-    zen_ErrorHandler_HandleSyntacticalErrorFunction_t m_handleSyntacticalError;
-    zen_ErrorHandler_HandleSemanticalErrorFunction_t m_handleSemanticalError;
+struct k_ErrorHandler_t {
+    k_ErrorHandler_HandleLexicalErrorFunction_t m_handleLexicalError;
+    k_ErrorHandler_HandleSyntacticalErrorFunction_t m_handleSyntacticalError;
+    k_ErrorHandler_HandleSemanticalErrorFunction_t m_handleSemanticalError;
 
-    zen_ErrorHandler_OnLexicalErrorFunction_t m_onLexicalError;
-    zen_ErrorHandler_OnSyntacticalErrorFunction_t m_onSyntacticalError;
-    zen_ErrorHandler_OnSemanticalErrorFunction_t m_onSemanticalError;
-    zen_ErrorHandler_OnGeneralErrorFunction_t m_onGeneralError;
+    k_ErrorHandler_OnLexicalErrorFunction_t m_onLexicalError;
+    k_ErrorHandler_OnSyntacticalErrorFunction_t m_onSyntacticalError;
+    k_ErrorHandler_OnSemanticalErrorFunction_t m_onSemanticalError;
+    k_ErrorHandler_OnGeneralErrorFunction_t m_onGeneralError;
 
     jtk_ArrayList_t* m_errors;
     bool m_active;
@@ -98,110 +98,110 @@ struct zen_ErrorHandler_t {
 /**
  * @memberof ErrorHandler
  */
-typedef struct zen_ErrorHandler_t zen_ErrorHandler_t;
+typedef struct k_ErrorHandler_t k_ErrorHandler_t;
 
 // Constructor
 
 /**
  * @memberof ErrorHandler
  */
-zen_ErrorHandler_t* zen_ErrorHandler_new();
+k_ErrorHandler_t* k_ErrorHandler_new();
 
 // Destructor
 
 /**
  * @memberof ErrorHandler
  */
-void zen_ErrorHandler_delete(zen_ErrorHandler_t* handler);
+void k_ErrorHandler_delete(k_ErrorHandler_t* handler);
 
 // Active
 
 /**
  * @memberof ErrorHandler
  */
-void zen_ErrorHandler_setActive(zen_ErrorHandler_t* handler, bool active);
+void k_ErrorHandler_setActive(k_ErrorHandler_t* handler, bool active);
 
 /**
  * @memberof ErrorHandler
  */
-bool zen_ErrorHandler_isActive(zen_ErrorHandler_t* handler);
+bool k_ErrorHandler_isActive(k_ErrorHandler_t* handler);
 
 // Syntactical Error
 
 /**
  * @memberof ErrorHandler
  */
-void zen_ErrorHandler_setOnSyntacticalError(zen_ErrorHandler_t* handler,
-    zen_ErrorHandler_OnSyntacticalErrorFunction_t onSyntacticalError);
+void k_ErrorHandler_setOnSyntacticalError(k_ErrorHandler_t* handler,
+    k_ErrorHandler_OnSyntacticalErrorFunction_t onSyntacticalError);
 
 /**
  * @memberof ErrorHandler
  */
-zen_ErrorHandler_OnSyntacticalErrorFunction_t zen_ErrorHandler_getOnSyntacticalError(
-    zen_ErrorHandler_t* handler);
+k_ErrorHandler_OnSyntacticalErrorFunction_t k_ErrorHandler_getOnSyntacticalError(
+    k_ErrorHandler_t* handler);
 
 /**
  * @memberof ErrorHandler
  */
-void zen_ErrorHandler_handleSyntacticalError(zen_ErrorHandler_t* handler,
-    zen_Parser_t* parser, zen_ErrorCode_t errorCode, zen_Token_t* token,
-    zen_TokenType_t expected);
+void k_ErrorHandler_handleSyntacticalError(k_ErrorHandler_t* handler,
+    k_Parser_t* parser, k_ErrorCode_t errorCode, k_Token_t* token,
+    k_TokenType_t expected);
 
 // Lexical Error
 
 /**
  * @memberof ErrorHandler
  */
-void zen_ErrorHandler_setOnLexicalError(zen_ErrorHandler_t* handler,
-    zen_ErrorHandler_OnLexicalErrorFunction_t onLexicalError);
+void k_ErrorHandler_setOnLexicalError(k_ErrorHandler_t* handler,
+    k_ErrorHandler_OnLexicalErrorFunction_t onLexicalError);
 
 /**
  * @memberof ErrorHandler
  */
-zen_ErrorHandler_OnLexicalErrorFunction_t zen_ErrorHandler_getOnLexicalError(
-    zen_ErrorHandler_t* handler);
+k_ErrorHandler_OnLexicalErrorFunction_t k_ErrorHandler_getOnLexicalError(
+    k_ErrorHandler_t* handler);
 
 /**
  * @memberof ErrorHandler
  */
-void zen_ErrorHandler_handleLexicalError(zen_ErrorHandler_t* handler,
-    zen_Lexer_t* lexer, zen_ErrorCode_t errorCode, zen_Token_t* token);
+void k_ErrorHandler_handleLexicalError(k_ErrorHandler_t* handler,
+    k_Lexer_t* lexer, k_ErrorCode_t errorCode, k_Token_t* token);
 
 // Semantic Error
 
 /**
  * @memberof ErrorHandler
  */
-void zen_ErrorHandler_setOnSemanticalError(zen_ErrorHandler_t* handler,
-    zen_ErrorHandler_OnSemanticalErrorFunction_t onSemanticalError);
+void k_ErrorHandler_setOnSemanticalError(k_ErrorHandler_t* handler,
+    k_ErrorHandler_OnSemanticalErrorFunction_t onSemanticalError);
 
 /**
  * @memberof ErrorHandler
  */
-zen_ErrorHandler_OnSemanticalErrorFunction_t zen_ErrorHandler_getOnSemanticalError(
-    zen_ErrorHandler_t* handler);
+k_ErrorHandler_OnSemanticalErrorFunction_t k_ErrorHandler_getOnSemanticalError(
+    k_ErrorHandler_t* handler);
 
 /**
  * @memberof ErrorHandler
  */
-void zen_ErrorHandler_handleSemanticalError(zen_ErrorHandler_t* handler,
-    void* origin, zen_ErrorCode_t errorCode, zen_Token_t* token);
+void k_ErrorHandler_handleSemanticalError(k_ErrorHandler_t* handler,
+    void* origin, k_ErrorCode_t errorCode, k_Token_t* token);
 
 /**
  * @memberof ErrorHandler
  */
-void zen_ErrorHandler_handleGeneralError(zen_ErrorHandler_t* handler,
-    void* origin, zen_ErrorCode_t errorCode);
+void k_ErrorHandler_handleGeneralError(k_ErrorHandler_t* handler,
+    void* origin, k_ErrorCode_t errorCode);
 
 // Errors
 
 /**
  * @memberof ErrorHandler
  */
-jtk_ArrayList_t* zen_ErrorHandler_getErrors(zen_ErrorHandler_t* handler);
+jtk_ArrayList_t* k_ErrorHandler_getErrors(k_ErrorHandler_t* handler);
 
-int32_t zen_ErrorHandler_getErrorCount(zen_ErrorHandler_t* handler);
+int32_t k_ErrorHandler_getErrorCount(k_ErrorHandler_t* handler);
 
-bool zen_ErrorHandler_hasErrors(zen_ErrorHandler_t* handler);
+bool k_ErrorHandler_hasErrors(k_ErrorHandler_t* handler);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SUPPORT_ERROR_HANDLER_H */

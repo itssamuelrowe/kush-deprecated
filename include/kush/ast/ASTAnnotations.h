@@ -26,16 +26,16 @@
  * ASTAnnotations                                                             *
  *******************************************************************************/
 
-struct zen_ASTAnnotations_t {
+struct k_ASTAnnotations_t {
     jtk_HashMap_t* m_map;
 };
 
-typedef struct zen_ASTAnnotations_t zen_ASTAnnotations_t;
+typedef struct k_ASTAnnotations_t k_ASTAnnotations_t;
 
-zen_ASTAnnotations_t* zen_ASTAnnotations_new();
-void zen_ASTAnnotations_delete(zen_ASTAnnotations_t* annotations);
-void* zen_ASTAnnotations_get(zen_ASTAnnotations_t* annotations, zen_ASTNode_t* node);
-void zen_ASTAnnotations_put(zen_ASTAnnotations_t* annotations, zen_ASTNode_t* node, void* value);
-void zen_ASTAnnotations_remove(zen_ASTAnnotations_t* annotations, zen_ASTNode_t* node);
+k_ASTAnnotations_t* k_ASTAnnotations_new();
+void k_ASTAnnotations_delete(k_ASTAnnotations_t* annotations);
+void* k_ASTAnnotations_get(k_ASTAnnotations_t* annotations, k_ASTNode_t* node);
+void k_ASTAnnotations_put(k_ASTAnnotations_t* annotations, k_ASTNode_t* node, void* value);
+void k_ASTAnnotations_remove(k_ASTAnnotations_t* annotations, k_ASTNode_t* node);
 
 #endif /* COM_ONECUBE_COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_ANNOTATIONS_H */

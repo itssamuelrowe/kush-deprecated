@@ -17,8 +17,8 @@
 #include <jtk/core/CString.h>
 #include <kush/lexer/LexerError.h>
 
-zen_LexerError_t* zen_LexerError_new(const char* message, const char* path, int32_t line, int32_t column) {
-    zen_LexerError_t* error = jtk_Memory_allocate(zen_LexerError_t, 1);
+k_LexerError_t* k_LexerError_new(const char* message, const char* path, int32_t line, int32_t column) {
+    k_LexerError_t* error = jtk_Memory_allocate(k_LexerError_t, 1);
     error->m_message = (message == NULL)? jtk_CString_new("No error message") : jtk_CString_new(message);
     error->m_path = jtk_CString_new(path);
     error->m_line = line;
@@ -27,7 +27,7 @@ zen_LexerError_t* zen_LexerError_new(const char* message, const char* path, int3
     return error;
 }
 
-void zen_LexerError_delete(zen_LexerError_t* error) {
+void k_LexerError_delete(k_LexerError_t* error) {
     jtk_Assert_assertObject(error, "The specified lexer error is null.");
     jtk_Memory_deallocate(error->m_message);
     jtk_Memory_deallocate(error);

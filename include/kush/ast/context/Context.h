@@ -131,15 +131,15 @@
  * ConstructorDeclarationContext                                               *
  *******************************************************************************/
 
-// struct zen_ConstructorDeclarationContext_t {
-//     zen_ASTNode_t* m_node;
-//     zen_ASTNode_t* m_identifier;
-//     zen_ASTNode_t* m_functionParameters;
-//     zen_ASTNode_t* m_statementSuite;
+// struct k_ConstructorDeclarationContext_t {
+//     k_ASTNode_t* m_node;
+//     k_ASTNode_t* m_identifier;
+//     k_ASTNode_t* m_functionParameters;
+//     k_ASTNode_t* m_statementSuite;
 // };
 
-// typedef struct zen_ConstructorDeclarationContext_t zen_ConstructorDeclarationContext_t;
+// typedef struct k_ConstructorDeclarationContext_t k_ConstructorDeclarationContext_t;
 
-// zen_ConstructorDeclarationContext_t* zen_ConstructorDeclarationContext_new(zen_ASTNode_t* node);
-// void zen_ConstructorDeclarationContext_delete(zen_ConstructorDeclarationContext_t* context);
-// void zen_ConstructorDeclarationContext_getChildren(zen_ConstructorDeclarationContext_t* context, jtk_ArrayList_t* children);
+// k_ConstructorDeclarationContext_t* k_ConstructorDeclarationContext_new(k_ASTNode_t* node);
+// void k_ConstructorDeclarationContext_delete(k_ConstructorDeclarationContext_t* context);
+// void k_ConstructorDeclarationContext_getChildren(k_ConstructorDeclarationContext_t* context, jtk_ArrayList_t* children);

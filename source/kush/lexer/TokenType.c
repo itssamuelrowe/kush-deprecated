@@ -25,7 +25,7 @@
 
 // Modifiers
 
-uint32_t zen_TokenType_toModifiers(zen_TokenType_t type) {
+uint32_t k_TokenType_toModifiers(k_TokenType_t type) {
     uint32_t modifiers = 0;
     switch (type) {
         case ZEN_TOKEN_KEYWORD_PUBLIC: {
@@ -73,7 +73,7 @@ uint32_t zen_TokenType_toModifiers(zen_TokenType_t type) {
 
 // Assignment Operator
 
-bool zen_TokenType_isAssignmentOperator(zen_TokenType_t type) {
+bool k_TokenType_isAssignmentOperator(k_TokenType_t type) {
     return (type == ZEN_TOKEN_EQUAL) ||
            (type == ZEN_TOKEN_MODULUS_EQUAL) ||
            (type == ZEN_TOKEN_AMPERSAND_EQUAL) ||

@@ -30,39 +30,39 @@
 
 /**
  * @class CatchFilterContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_CatchFilterContext_t {
-    zen_ASTNode_t* m_node;
-    jtk_ArrayList_t* m_typeNames; /* <zen_ASTNode_t*> */
+struct k_CatchFilterContext_t {
+    k_ASTNode_t* m_node;
+    jtk_ArrayList_t* m_typeNames; /* <k_ASTNode_t*> */
 };
 
 /**
  * @memberof CatchFilterContext
  */
-typedef struct zen_CatchFilterContext_t zen_CatchFilterContext_t;
+typedef struct k_CatchFilterContext_t k_CatchFilterContext_t;
 
 // Constructor
 
 /**
  * @memberof CatchFilterContext
  */
-zen_CatchFilterContext_t* zen_CatchFilterContext_new(zen_ASTNode_t* node);
+k_CatchFilterContext_t* k_CatchFilterContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof CatchFilterContext
  */
-void zen_CatchFilterContext_delete(zen_CatchFilterContext_t* context);
+void k_CatchFilterContext_delete(k_CatchFilterContext_t* context);
 
 // Children
 
 /**
  * @memberof CatchFilterContext
  */
-void zen_CatchFilterContext_getChildren(zen_CatchFilterContext_t* context, jtk_ArrayList_t* children);
+void k_CatchFilterContext_getChildren(k_CatchFilterContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_CATCH_FILTER_CONTEXT_H */

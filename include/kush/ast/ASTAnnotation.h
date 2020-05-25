@@ -30,14 +30,14 @@
  * @author Samuel Rowe
  * @since  zen 1.0
  */
-struct zen_ASTAnnotation_t {
-    zen_ASTAnnotationType_t m_type;
+struct k_ASTAnnotation_t {
+    k_ASTAnnotationType_t m_type;
     void* m_bundle;
 };
 
-typedef struct zen_ASTAnnotation_t zen_ASTAnnotation_t;
+typedef struct k_ASTAnnotation_t k_ASTAnnotation_t;
 
-zen_ASTAnnotation_t* zen_ASTAnnotation_new(zen_ASTAnnotationType_t type, void* bundle);
-void zen_ASTAnnotation_delete(zen_ASTAnnotation_t* annotation);
+k_ASTAnnotation_t* k_ASTAnnotation_new(k_ASTAnnotationType_t type, void* bundle);
+void k_ASTAnnotation_delete(k_ASTAnnotation_t* annotation);
 
 #endif /* COM_ONECUBE_COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_ANNOTATION_H */

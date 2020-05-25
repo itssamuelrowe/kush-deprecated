@@ -28,39 +28,39 @@
 
 /**
  * @class MemberAccessContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_MemberAccessContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_identifier;
+struct k_MemberAccessContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_identifier;
 };
 
 /**
  * @memberof MemberAccessContext
  */
-typedef struct zen_MemberAccessContext_t zen_MemberAccessContext_t;
+typedef struct k_MemberAccessContext_t k_MemberAccessContext_t;
 
 // Constructor
 
 /**
  * @memberof MemberAccessContext
  */
-zen_MemberAccessContext_t* zen_MemberAccessContext_new(zen_ASTNode_t* node);
+k_MemberAccessContext_t* k_MemberAccessContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof MemberAccessContext
  */
-void zen_MemberAccessContext_delete(zen_MemberAccessContext_t* context);
+void k_MemberAccessContext_delete(k_MemberAccessContext_t* context);
 
 // Children
 
 /**
  * @memberof MemberAccessContext
  */
-void zen_MemberAccessContext_getChildren(zen_MemberAccessContext_t* context, jtk_ArrayList_t* children);
+void k_MemberAccessContext_getChildren(k_MemberAccessContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_MEMBER_ACCESS_CONTEXT_H */

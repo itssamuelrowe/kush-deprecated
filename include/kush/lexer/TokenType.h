@@ -27,11 +27,11 @@
 
 /**
  * @class TokenType
- * @ingroup zen_compiler_lexer
+ * @ingroup k_compiler_lexer
  * @author Samuel Rowe
  * @since zen 1.0
  */
-enum zen_TokenType_t {
+enum k_TokenType_t {
     ZEN_TOKEN_UNKNOWN,
 
     ZEN_TOKEN_INDENTATION,
@@ -182,6 +182,6 @@ enum zen_TokenType_t {
 /**
  * @memberof TokenType
  */
-typedef enum zen_TokenType_t zen_TokenType_t;
+typedef enum k_TokenType_t k_TokenType_t;
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_LEXER_TOKEN_TYPE_H */

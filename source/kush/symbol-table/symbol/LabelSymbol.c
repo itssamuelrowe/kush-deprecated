@@ -22,11 +22,11 @@
  * LabelSymbol                                                                 *
  *******************************************************************************/
 
-zen_LabelSymbol_t* zen_LabelSymbol_new(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope) {
-    zen_LabelSymbol_t* labelSymbol = zen_Memory_allocate(zen_LabelSymbol_t, 1);
+k_LabelSymbol_t* k_LabelSymbol_new(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope) {
+    k_LabelSymbol_t* labelSymbol = k_Memory_allocate(k_LabelSymbol_t, 1);
 
-    zen_Symbol_t* symbol = zen_Symbol_new(ZEN_SYMBOL_CATEGORY_LABEL, identifier, enclosingScope, labelSymbol);
+    k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_LABEL, identifier, enclosingScope, labelSymbol);
 
     labelSymbol->m_symbol = symbol;
     labelSymbol->m_loopIdentifier = -1;
@@ -34,14 +34,14 @@ zen_LabelSymbol_t* zen_LabelSymbol_new(zen_ASTNode_t* identifier,
     return labelSymbol;
 }
 
-void zen_LabelSymbol_delete(zen_LabelSymbol_t* symbol) {
+void k_LabelSymbol_delete(k_LabelSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
-    zen_Symbol_delete(symbol->m_symbol);
+    k_Symbol_delete(symbol->m_symbol);
     jtk_Memory_deallocate(symbol);
 }
 
-zen_Symbol_t* zen_LabelSymbol_getSymbol(zen_LabelSymbol_t* symbol) {
+k_Symbol_t* k_LabelSymbol_getSymbol(k_LabelSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     return symbol->m_symbol;

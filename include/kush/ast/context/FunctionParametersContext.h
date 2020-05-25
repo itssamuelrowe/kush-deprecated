@@ -30,40 +30,40 @@
 
 /**
  * @class FunctionParametersContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_FunctionParametersContext_t {
-    zen_ASTNode_t* m_node;
-    jtk_ArrayList_t* m_fixedParameters; /* <zen_ASTNode_t*> */
-    zen_ASTNode_t* m_variableParameter;
+struct k_FunctionParametersContext_t {
+    k_ASTNode_t* m_node;
+    jtk_ArrayList_t* m_fixedParameters; /* <k_ASTNode_t*> */
+    k_ASTNode_t* m_variableParameter;
 };
 
 /**
  * @memberof FunctionParametersContext
  */
-typedef struct zen_FunctionParametersContext_t zen_FunctionParametersContext_t;
+typedef struct k_FunctionParametersContext_t k_FunctionParametersContext_t;
 
 // Constructor
 
 /**
  * @memberof FunctionParametersContext
  */
-zen_FunctionParametersContext_t* zen_FunctionParametersContext_new(zen_ASTNode_t* node);
+k_FunctionParametersContext_t* k_FunctionParametersContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof FunctionParametersContext
  */
-void zen_FunctionParametersContext_delete(zen_FunctionParametersContext_t* context);
+void k_FunctionParametersContext_delete(k_FunctionParametersContext_t* context);
 
 // Children
 
 /**
  * @memberof FunctionParametersContext
  */
-void zen_FunctionParametersContext_getChildren(zen_FunctionParametersContext_t* context, jtk_ArrayList_t* children);
+void k_FunctionParametersContext_getChildren(k_FunctionParametersContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_FUNCTION_PARAMETERS_CONTEXT_H */

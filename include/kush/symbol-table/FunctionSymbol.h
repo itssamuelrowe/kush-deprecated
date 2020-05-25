@@ -29,51 +29,51 @@
 
 /**
  * @class FunctionSymbol
- * @ingroup zen_compiler_symbolTable
+ * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_FunctionSymbol_t {
+struct k_FunctionSymbol_t {
     /* Signatures are destroyed by the destructor. */
-    jtk_ArrayList_t* m_signatures; /* <zen_FunctionSignature_t*> */
+    jtk_ArrayList_t* m_signatures; /* <k_FunctionSignature_t*> */
     int32_t m_parameterThreshold;
 };
 
 /**
  * @memberof FunctionSymbol
  */
-typedef struct zen_FunctionSymbol_t zen_FunctionSymbol_t;
+typedef struct k_FunctionSymbol_t k_FunctionSymbol_t;
 
 // Initializer
 
-void zen_FunctionSymbol_initialize(zen_FunctionSymbol_t* symbol);
+void k_FunctionSymbol_initialize(k_FunctionSymbol_t* symbol);
 
 // Destructor
 
-void zen_FunctionSymbol_destroy(zen_FunctionSymbol_t* symbol);
+void k_FunctionSymbol_destroy(k_FunctionSymbol_t* symbol);
 
 // Signature
 
 /**
  * @memberof FunctionSymbol
  */
-jtk_ArrayList_t* zen_FunctionSymbol_getSignatures(zen_FunctionSymbol_t* symbol);
+jtk_ArrayList_t* k_FunctionSymbol_getSignatures(k_FunctionSymbol_t* symbol);
 
 /**
  * @memberof FunctionSymbol
  */
-void zen_FunctionSymbol_addSignature(zen_FunctionSymbol_t* symbol, zen_FunctionSignature_t* signature);
+void k_FunctionSymbol_addSignature(k_FunctionSymbol_t* symbol, k_FunctionSignature_t* signature);
 
 // Parameter Threshold
 
 /**
  * @memberof FunctionSymbol
  */
-int32_t zen_FunctionSymbol_getParameterThreshold(zen_FunctionSymbol_t* symbol);
+int32_t k_FunctionSymbol_getParameterThreshold(k_FunctionSymbol_t* symbol);
 
 /**
  * @memberof FunctionSymbol
  */
-void zen_FunctionSymbol_setParameterThreshold(zen_FunctionSymbol_t* symbol, int32_t parameterThreshold);
+void k_FunctionSymbol_setParameterThreshold(k_FunctionSymbol_t* symbol, int32_t parameterThreshold);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_MEMBER_FUNCTION_SYMBOL_H */

@@ -22,11 +22,11 @@
  * EnumerationSymbol                                                                 *
  *******************************************************************************/
 
-zen_EnumerationSymbol_t* zen_EnumerationSymbol_new(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope, zen_Scope_t* enumerationScope) {
-    zen_EnumerationSymbol_t* enumerationSymbol = zen_Memory_allocate(zen_EnumerationSymbol_t, 1);
+k_EnumerationSymbol_t* k_EnumerationSymbol_new(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope, k_Scope_t* enumerationScope) {
+    k_EnumerationSymbol_t* enumerationSymbol = k_Memory_allocate(k_EnumerationSymbol_t, 1);
 
-    zen_Symbol_t* symbol = zen_Symbol_new(ZEN_SYMBOL_CATEGORY_ENUMERATION, identifier, enclosingScope, enumerationSymbol);
+    k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_ENUMERATION, identifier, enclosingScope, enumerationSymbol);
 
     enumerationSymbol->m_symbol = symbol;
     enumerationSymbol->m_superclass = NULL;
@@ -35,26 +35,26 @@ zen_EnumerationSymbol_t* zen_EnumerationSymbol_new(zen_ASTNode_t* identifier,
     return enumerationSymbol;
 }
 
-void zen_EnumerationSymbol_delete(zen_EnumerationSymbol_t* symbol) {
+void k_EnumerationSymbol_delete(k_EnumerationSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
-    zen_Symbol_delete(symbol->m_symbol);
+    k_Symbol_delete(symbol->m_symbol);
     jtk_Memory_deallocate(symbol);
 }
 
-zen_Scope_t* zen_EnumerationSymbol_getEnumerationScope(zen_EnumerationSymbol_t* symbol) {
+k_Scope_t* k_EnumerationSymbol_getEnumerationScope(k_EnumerationSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     return symbol->m_enumerationScope;
 }
 
-zen_ClassSymbol_t* zen_EnumerationSymbol_getSuperclass(zen_EnumerationSymbol_t* symbol) {
+k_ClassSymbol_t* k_EnumerationSymbol_getSuperclass(k_EnumerationSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     return symbol->m_superclass;
 }
 
-zen_Symbol_t* zen_EnumerationSymbol_getSymbol(zen_EnumerationSymbol_t* symbol) {
+k_Symbol_t* k_EnumerationSymbol_getSymbol(k_EnumerationSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     return symbol->m_symbol;

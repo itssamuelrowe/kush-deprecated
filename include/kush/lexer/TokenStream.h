@@ -35,17 +35,17 @@
  * destroyed as soon as it returns. Therefore, do not maintain a reference to
  * it.
  */
-// typedef void (*zen_OnLexicalError_t)(zen_LexicalError_t* error);
+// typedef void (*k_OnLexicalError_t)(k_LexicalError_t* error);
 
-struct zen_TokenStream_t {
+struct k_TokenStream_t {
 
-    zen_Compiler_t* m_compiler;
+    k_Compiler_t* m_compiler;
 
     /**
      * The lexer which recognizes and produces tokens on this
      * stream.
      */
-    zen_Lexer_t* m_lexer;
+    k_Lexer_t* m_lexer;
 
     /**
      * The list of all the tokens recognized by the lexer so
@@ -69,33 +69,33 @@ struct zen_TokenStream_t {
      * The channel on which the token stream filters tokens
      * from.
      */
-    zen_TokenChannel_t m_channel;
+    k_TokenChannel_t m_channel;
 
     jtk_ArrayList_t* m_trash;
 };
 
-typedef struct zen_TokenStream_t zen_TokenStream_t;
+typedef struct k_TokenStream_t k_TokenStream_t;
 
-zen_TokenStream_t* zen_TokenStream_new(zen_Compiler_t* compiler, zen_Lexer_t* lexer,
-    zen_TokenChannel_t channel);
-void zen_TokenStream_delete(zen_TokenStream_t* stream);
-void zen_TokenStream_reset(zen_TokenStream_t* stream);
-int32_t zen_TokenStream_getIndex(zen_TokenStream_t* stream);
-int32_t zen_TokenStream_getSize(zen_TokenStream_t* stream);
-void zen_TokenStream_consume(zen_TokenStream_t* stream);
-bool zen_TokenStream_synchronize(zen_TokenStream_t* stream, int32_t i);
-int32_t zen_TokenStream_fetch(zen_TokenStream_t* stream, int32_t n);
-zen_Token_t* zen_TokenStream_getToken(zen_TokenStream_t* stream, int32_t index);
-jtk_ArrayList_t* zen_TokenStream_getTokens(zen_TokenStream_t* stream, int32_t startIndex, int32_t stopIndex);
-zen_TokenType_t zen_TokenStream_la(zen_TokenStream_t* stream, int32_t i);
-zen_Token_t* zen_TokenStream_lt(zen_TokenStream_t* stream, int32_t k);
-void zen_TokenStream_initialize(zen_TokenStream_t* stream);
-int32_t zen_TokenStream_getNextTokenOnChannel(zen_TokenStream_t* stream, int32_t i, zen_TokenChannel_t channel);
-int32_t zen_TokenStream_getPreviousTokenOnChannel(zen_TokenStream_t* stream, int32_t i, zen_TokenChannel_t channel);
-void zen_TokenStream_fill(zen_TokenStream_t* stream);
-uint8_t* zen_TokenStream_getSourceName(zen_TokenStream_t* stream, int32_t* size);
-zen_Lexer_t* zen_TokenStream_getLexer(zen_TokenStream_t* stream);
-uint8_t* zen_TokenStream_getText(zen_TokenStream_t* stream, int32_t startIndex, int32_t stopIndex, int32_t* size);
-int32_t zen_TokenStream_getNumberOfTokens(zen_TokenStream_t* stream, zen_TokenChannel_t channel);
+k_TokenStream_t* k_TokenStream_new(k_Compiler_t* compiler, k_Lexer_t* lexer,
+    k_TokenChannel_t channel);
+void k_TokenStream_delete(k_TokenStream_t* stream);
+void k_TokenStream_reset(k_TokenStream_t* stream);
+int32_t k_TokenStream_getIndex(k_TokenStream_t* stream);
+int32_t k_TokenStream_getSize(k_TokenStream_t* stream);
+void k_TokenStream_consume(k_TokenStream_t* stream);
+bool k_TokenStream_synchronize(k_TokenStream_t* stream, int32_t i);
+int32_t k_TokenStream_fetch(k_TokenStream_t* stream, int32_t n);
+k_Token_t* k_TokenStream_getToken(k_TokenStream_t* stream, int32_t index);
+jtk_ArrayList_t* k_TokenStream_getTokens(k_TokenStream_t* stream, int32_t startIndex, int32_t stopIndex);
+k_TokenType_t k_TokenStream_la(k_TokenStream_t* stream, int32_t i);
+k_Token_t* k_TokenStream_lt(k_TokenStream_t* stream, int32_t k);
+void k_TokenStream_initialize(k_TokenStream_t* stream);
+int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream, int32_t i, k_TokenChannel_t channel);
+int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream, int32_t i, k_TokenChannel_t channel);
+void k_TokenStream_fill(k_TokenStream_t* stream);
+uint8_t* k_TokenStream_getSourceName(k_TokenStream_t* stream, int32_t* size);
+k_Lexer_t* k_TokenStream_getLexer(k_TokenStream_t* stream);
+uint8_t* k_TokenStream_getText(k_TokenStream_t* stream, int32_t startIndex, int32_t stopIndex, int32_t* size);
+int32_t k_TokenStream_getNumberOfTokens(k_TokenStream_t* stream, k_TokenChannel_t channel);
 
 #endif /* ZEN_TOKEN_STREAM_H */

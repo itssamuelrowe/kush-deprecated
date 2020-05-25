@@ -28,39 +28,39 @@
 
 /**
  * @class ContinueStatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ContinueStatementContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_identifier;
+struct k_ContinueStatementContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_identifier;
 };
 
 /**
  * @memberof ContinueStatementContext
  */
-typedef struct zen_ContinueStatementContext_t zen_ContinueStatementContext_t;
+typedef struct k_ContinueStatementContext_t k_ContinueStatementContext_t;
 
 // Constructor
 
 /**
  * @memberof ContinueStatementContext
  */
-zen_ContinueStatementContext_t* zen_ContinueStatementContext_new(zen_ASTNode_t* node);
+k_ContinueStatementContext_t* k_ContinueStatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ContinueStatementContext
  */
-void zen_ContinueStatementContext_delete(zen_ContinueStatementContext_t* context);
+void k_ContinueStatementContext_delete(k_ContinueStatementContext_t* context);
 
 // Children
 
 /**
  * @memberof ContinueStatementContext
  */
-void zen_ContinueStatementContext_getChildren(zen_ContinueStatementContext_t* context, jtk_ArrayList_t* children);
+void k_ContinueStatementContext_getChildren(k_ContinueStatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_CONTINUE_STATEMENT_CONTEXT_H */

@@ -30,36 +30,36 @@
 
 /**
  * @class VariableDeclarationContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_VariableDeclarationContext_t {
-    zen_ASTNode_t* m_node;
+struct k_VariableDeclarationContext_t {
+    k_ASTNode_t* m_node;
     jtk_ArrayList_t* m_variableDeclarators;
 };
 
 /**
  * @memberof VariableDeclarationContext
  */
-typedef struct zen_VariableDeclarationContext_t zen_VariableDeclarationContext_t;
+typedef struct k_VariableDeclarationContext_t k_VariableDeclarationContext_t;
 
 // Constructor
 
-zen_VariableDeclarationContext_t* zen_VariableDeclarationContext_new(zen_ASTNode_t* node);
+k_VariableDeclarationContext_t* k_VariableDeclarationContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof VariableDeclarationContext
  */
-void zen_VariableDeclarationContext_delete(zen_VariableDeclarationContext_t* context);
+void k_VariableDeclarationContext_delete(k_VariableDeclarationContext_t* context);
 
 // Children
 
 /**
  * @memberof VariableDeclarationContext
  */
-void zen_VariableDeclarationContext_getChildren(zen_VariableDeclarationContext_t* context, jtk_ArrayList_t* children);
+void k_VariableDeclarationContext_getChildren(k_VariableDeclarationContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_VARIABLE_DECLARATION_CONTEXT_H */

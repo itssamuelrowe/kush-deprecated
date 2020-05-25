@@ -50,11 +50,11 @@
  * algorithms.
  *
  * @class BinaryEntityBuilder
- * @ingroup zen_compiler_generator
+ * @ingroup k_compiler_generator
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_BinaryEntityBuilder_t {
+struct k_BinaryEntityBuilder_t {
     jtk_ArrayList_t* m_channels;
     uint16_t m_constantPoolIndex;
     int32_t m_identifier;
@@ -64,68 +64,68 @@ struct zen_BinaryEntityBuilder_t {
 /**
  * @memberof BinaryEntityBuilder
  */
-typedef struct zen_BinaryEntityBuilder_t zen_BinaryEntityBuilder_t;
+typedef struct k_BinaryEntityBuilder_t k_BinaryEntityBuilder_t;
 
 // Constructor
 
 /**
  * @memberof BinaryEntityBuilder
  */
-zen_BinaryEntityBuilder_t* zen_BinaryEntityBuilder_new();
+k_BinaryEntityBuilder_t* k_BinaryEntityBuilder_new();
 
 // Destructor
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_delete(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_delete(k_BinaryEntityBuilder_t* builder);
 
 // Channel
 
-zen_DataChannel_t* zen_BinaryEntityBuilder_getChannel(zen_BinaryEntityBuilder_t* builder,
+k_DataChannel_t* k_BinaryEntityBuilder_getChannel(k_BinaryEntityBuilder_t* builder,
     int32_t index);
 
-int32_t zen_BinaryEntityBuilder_pushChannel(zen_BinaryEntityBuilder_t* builder);
+int32_t k_BinaryEntityBuilder_pushChannel(k_BinaryEntityBuilder_t* builder);
 
-void zen_BinaryEntityBuilder_popChannel(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_popChannel(k_BinaryEntityBuilder_t* builder);
 
-zen_DataChannel_t* zen_BinaryEntityBuilder_getActiveChannel(zen_BinaryEntityBuilder_t* builder);
+k_DataChannel_t* k_BinaryEntityBuilder_getActiveChannel(k_BinaryEntityBuilder_t* builder);
 
-void zen_BinaryEntityBuilder_setActiveChannelIndex(zen_BinaryEntityBuilder_t* builder,
+void k_BinaryEntityBuilder_setActiveChannelIndex(k_BinaryEntityBuilder_t* builder,
     int32_t activeChannelIndex);
 
-int32_t zen_BinaryEntityBuilder_getActiveChannelIndex(zen_BinaryEntityBuilder_t* builder);
+int32_t k_BinaryEntityBuilder_getActiveChannelIndex(k_BinaryEntityBuilder_t* builder);
 
 // Emit
 
-void zen_BinaryEntityBuilder_emitByteCode(zen_BinaryEntityBuilder_t* builder,
-    zen_ByteCode_t byteCode, ...);
+void k_BinaryEntityBuilder_emitByteCode(k_BinaryEntityBuilder_t* builder,
+    k_ByteCode_t byteCode, ...);
 
 // Print
 
-void zen_BinaryEntityBuilder_printChannel(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_printChannel(k_BinaryEntityBuilder_t* builder);
 
-void zen_BinaryEntityBuilder_printChannels(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_printChannels(k_BinaryEntityBuilder_t* builder);
 
 // Magic Number
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeMagicNumber(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_writeMagicNumber(k_BinaryEntityBuilder_t* builder);
 
 // Version
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeMajorVersion(zen_BinaryEntityBuilder_t* builder,
+void k_BinaryEntityBuilder_writeMajorVersion(k_BinaryEntityBuilder_t* builder,
     uint16_t majorVersion);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeMinorVersion(zen_BinaryEntityBuilder_t* builder,
+void k_BinaryEntityBuilder_writeMinorVersion(k_BinaryEntityBuilder_t* builder,
     uint16_t minorVersion);
 
 // Stream
@@ -133,13 +133,13 @@ void zen_BinaryEntityBuilder_writeMinorVersion(zen_BinaryEntityBuilder_t* builde
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeStreamSize(zen_BinaryEntityBuilder_t* builder,
+void k_BinaryEntityBuilder_writeStreamSize(k_BinaryEntityBuilder_t* builder,
     uint32_t streamSize);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeStreamFlags(zen_BinaryEntityBuilder_t* builder,
+void k_BinaryEntityBuilder_writeStreamFlags(k_BinaryEntityBuilder_t* builder,
     uint16_t streamFlags);
 
 // Constant Pool
@@ -147,67 +147,67 @@ void zen_BinaryEntityBuilder_writeStreamFlags(zen_BinaryEntityBuilder_t* builder
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeConstantPoolHeader(zen_BinaryEntityBuilder_t* builder, int32_t entries);
+void k_BinaryEntityBuilder_writeConstantPoolHeader(k_BinaryEntityBuilder_t* builder, int32_t entries);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolInteger(zen_BinaryEntityBuilder_t* builder, uint32_t value);
+uint16_t k_BinaryEntityBuilder_writeConstantPoolInteger(k_BinaryEntityBuilder_t* builder, uint32_t value);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolLong(zen_BinaryEntityBuilder_t* builder, uint64_t value);
+uint16_t k_BinaryEntityBuilder_writeConstantPoolLong(k_BinaryEntityBuilder_t* builder, uint64_t value);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolLongEx(zen_BinaryEntityBuilder_t* builder,
+uint16_t k_BinaryEntityBuilder_writeConstantPoolLongEx(k_BinaryEntityBuilder_t* builder,
     uint32_t highBytes, uint32_t lowBytes);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolFloat(zen_BinaryEntityBuilder_t* builder, float value);
+uint16_t k_BinaryEntityBuilder_writeConstantPoolFloat(k_BinaryEntityBuilder_t* builder, float value);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolDouble(zen_BinaryEntityBuilder_t* builder, double value);
+uint16_t k_BinaryEntityBuilder_writeConstantPoolDouble(k_BinaryEntityBuilder_t* builder, double value);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolUtf8(zen_BinaryEntityBuilder_t* builder, uint16_t length, uint8_t* value);
+uint16_t k_BinaryEntityBuilder_writeConstantPoolUtf8(k_BinaryEntityBuilder_t* builder, uint16_t length, uint8_t* value);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolString(zen_BinaryEntityBuilder_t* builder, uint16_t stringIndex);
+uint16_t k_BinaryEntityBuilder_writeConstantPoolString(k_BinaryEntityBuilder_t* builder, uint16_t stringIndex);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolFunction(zen_BinaryEntityBuilder_t* builder, uint16_t classIndex, uint16_t descriptorIndex,
+uint16_t k_BinaryEntityBuilder_writeConstantPoolFunction(k_BinaryEntityBuilder_t* builder, uint16_t classIndex, uint16_t descriptorIndex,
     uint16_t nameIndex, uint16_t tableIndex);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolField(zen_BinaryEntityBuilder_t* builder, uint16_t classIndex,
+uint16_t k_BinaryEntityBuilder_writeConstantPoolField(k_BinaryEntityBuilder_t* builder, uint16_t classIndex,
     uint16_t descriptorIndex, uint16_t nameIndex);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-uint16_t zen_BinaryEntityBuilder_writeConstantPoolClass(zen_BinaryEntityBuilder_t* builder, uint16_t nameIndex);
+uint16_t k_BinaryEntityBuilder_writeConstantPoolClass(k_BinaryEntityBuilder_t* builder, uint16_t nameIndex);
 
 // Entity
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeEntityHeader(zen_BinaryEntityBuilder_t* builder, uint8_t type, uint16_t flags,
+void k_BinaryEntityBuilder_writeEntityHeader(k_BinaryEntityBuilder_t* builder, uint8_t type, uint16_t flags,
     uint16_t reference);
 
 // Class
@@ -215,7 +215,7 @@ void zen_BinaryEntityBuilder_writeEntityHeader(zen_BinaryEntityBuilder_t* builde
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeClass(zen_BinaryEntityBuilder_t* builder, uint16_t flags, uint16_t reference,
+void k_BinaryEntityBuilder_writeClass(k_BinaryEntityBuilder_t* builder, uint16_t flags, uint16_t reference,
     uint16_t superclassCount, uint16_t* superclassIndexes);
 
 // Attribute
@@ -223,20 +223,20 @@ void zen_BinaryEntityBuilder_writeClass(zen_BinaryEntityBuilder_t* builder, uint
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeAttributeCount(zen_BinaryEntityBuilder_t* builder, uint16_t attributeCount);
+void k_BinaryEntityBuilder_writeAttributeCount(k_BinaryEntityBuilder_t* builder, uint16_t attributeCount);
 
 // Field
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeFieldsHeader(zen_BinaryEntityBuilder_t* builder,
+void k_BinaryEntityBuilder_writeFieldsHeader(k_BinaryEntityBuilder_t* builder,
     uint16_t fieldCount, uint16_t fieldTableSize);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeField(zen_BinaryEntityBuilder_t* builder,
+void k_BinaryEntityBuilder_writeField(k_BinaryEntityBuilder_t* builder,
     uint16_t flags, uint16_t nameIndex, uint16_t descriptorIndex,
     uint16_t tableIndex);
 
@@ -245,13 +245,13 @@ void zen_BinaryEntityBuilder_writeField(zen_BinaryEntityBuilder_t* builder,
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeFunctionsHeader(zen_BinaryEntityBuilder_t* builder,
+void k_BinaryEntityBuilder_writeFunctionsHeader(k_BinaryEntityBuilder_t* builder,
     uint16_t functionCount, uint16_t functionTableSize);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeFunction(zen_BinaryEntityBuilder_t* builder,
+void k_BinaryEntityBuilder_writeFunction(k_BinaryEntityBuilder_t* builder,
     uint16_t flags, uint16_t nameIndex, uint16_t descriptorIndex,
     uint16_t tableIndex);
 
@@ -260,11 +260,11 @@ void zen_BinaryEntityBuilder_writeFunction(zen_BinaryEntityBuilder_t* builder,
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_writeInstructionAttributeHeader(zen_BinaryEntityBuilder_t* builder, uint16_t nameIndex,
+void k_BinaryEntityBuilder_writeInstructionAttributeHeader(k_BinaryEntityBuilder_t* builder, uint16_t nameIndex,
     uint32_t length, uint16_t maxStackSize, uint16_t localVariableCount,
     uint32_t instructionCount);
 
-void zen_BinaryEntityBuilder_writeExceptionTableHeader(zen_BinaryEntityBuilder_t* builder, uint16_t size);
+void k_BinaryEntityBuilder_writeExceptionTableHeader(k_BinaryEntityBuilder_t* builder, uint16_t size);
 
 // Instructions
 
@@ -273,680 +273,680 @@ void zen_BinaryEntityBuilder_writeExceptionTableHeader(zen_BinaryEntityBuilder_t
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitNop(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitNop(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitAddInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitAddInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitAddLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitAddLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitAddFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitAddFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitAddDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitAddDouble(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitAndInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitAndInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitAndLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitAndLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitOrInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitOrInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitOrLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitOrLong(k_BinaryEntityBuilder_t* builder);
 
 /* Shift Left */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitShiftLeftInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitShiftLeftInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitShiftLeftLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitShiftLeftLong(k_BinaryEntityBuilder_t* builder);
 
 /* Shift Right */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitShiftRightInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitShiftRightInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitShiftRightLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitShiftRightLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitShiftRightUnsignedInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitShiftRightUnsignedInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitShiftRightUnsignedLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitShiftRightUnsignedLong(k_BinaryEntityBuilder_t* builder);
 
 /* XOR */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitXorInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitXorInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitXorLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitXorLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastITB(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastITB(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastITS(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastITS(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastITL(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastITL(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastITF(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastITF(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastITD(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastITD(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastLTB(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastLTB(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastLTS(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastLTS(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastLTI(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastLTI(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastLTF(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastLTF(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastLTD(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastLTD(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastFTI(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastFTI(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastFTL(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastFTL(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastFTD(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastFTD(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastDTI(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastDTI(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastDTL(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastDTL(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastDTF(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastDTF(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCastITC(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCastITC(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCheckCast(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCheckCast(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCompareLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCompareLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCompareLesserThanFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCompareLesserThanFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCompareGreaterThanFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCompareGreaterThanFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCompareLesserThanDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCompareLesserThanDouble(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitCompareGreaterThanDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitCompareGreaterThanDouble(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDivideInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDivideInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDivideLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDivideLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDivideFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDivideFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDivideDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDivideDouble(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDuplicate(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDuplicate(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDuplicateX1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDuplicateX1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDuplicateX2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDuplicateX2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDuplicate2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDuplicate2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDuplicate2X1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDuplicate2X1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitDuplicate2X2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitDuplicate2X2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpEqual0Integer(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpEqual0Integer(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpNotEqual0Integer(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpNotEqual0Integer(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpLesserThan0Integer(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpLesserThan0Integer(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpGreaterThan0Integer(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpGreaterThan0Integer(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpLesserThanOrEqualTo0Integer(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpLesserThanOrEqualTo0Integer(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpGreaterThanOrEqualTo0Integer(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpGreaterThanOrEqualTo0Integer(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpEqualInteger(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpEqualInteger(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpNotEqualInteger(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpNotEqualInteger(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpLesserThanInteger(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpLesserThanInteger(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpGreaterThanInteger(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpGreaterThanInteger(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpLesserThanOrEqualInteger(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpLesserThanOrEqualInteger(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpGreaterThanOrEqualInteger(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpGreaterThanOrEqualInteger(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpEqualReference(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpEqualReference(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpNotEqualReference(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpNotEqualReference(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpEqualNullReference(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpEqualNullReference(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJumpNotEqualNullReference(zen_BinaryEntityBuilder_t* builder, int16_t offset);
+void k_BinaryEntityBuilder_emitJumpNotEqualNullReference(k_BinaryEntityBuilder_t* builder, int16_t offset);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitIncrementInteger(zen_BinaryEntityBuilder_t* builder, uint8_t index, uint8_t constant);
+void k_BinaryEntityBuilder_emitIncrementInteger(k_BinaryEntityBuilder_t* builder, uint8_t index, uint8_t constant);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideIncrementInteger(zen_BinaryEntityBuilder_t* builder, uint16_t index, uint16_t constant);
+void k_BinaryEntityBuilder_emitWideIncrementInteger(k_BinaryEntityBuilder_t* builder, uint16_t index, uint16_t constant);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitInvokeSpecial(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitInvokeSpecial(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitInvokeVirtual(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitInvokeVirtual(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitInvokeDynamic(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitInvokeDynamic(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitInvokeStatic(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitInvokeStatic(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /* Jump */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitJump(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitJump(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /* Load */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadInteger(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitLoadInteger(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideLoadInteger(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideLoadInteger(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadLong(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitLoadLong(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideLoadLong(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideLoadLong(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadFloat(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitLoadFloat(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideLoadFloat(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideLoadFloat(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadDouble(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitLoadDouble(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideLoadDouble(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideLoadDouble(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadReference(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitLoadReference(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideLoadReference(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideLoadReference(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad0Integer(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad0Integer(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad1Integer(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad1Integer(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad2Integer(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad2Integer(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad3Integer(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad3Integer(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad0Long(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad0Long(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad1Long(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad1Long(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad2Long(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad2Long(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad3Long(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad3Long(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad0Float(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad0Float(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad1Float(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad1Float(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad2Float(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad2Float(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad3Float(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad3Float(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad0Double(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad0Double(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad1Double(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad1Double(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad2Double(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad2Double(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad3Double(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad3Double(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad0Reference(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad0Reference(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad1Reference(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad1Reference(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad2Reference(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad2Reference(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoad3Reference(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoad3Reference(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadArrayByte(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoadArrayByte(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadArrayCharacter(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoadArrayCharacter(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadArrayShort(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoadArrayShort(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadArrayInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoadArrayInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadArrayLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoadArrayLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadArrayFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoadArrayFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadArrayDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoadArrayDouble(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadArrayReference(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoadArrayReference(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadInstanceField(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitLoadInstanceField(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadStaticField(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitLoadStaticField(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadCPR(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitLoadCPR(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideLoadCPR(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideLoadCPR(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitLoadArraySize(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitLoadArraySize(k_BinaryEntityBuilder_t* builder);
 
 /* Modulo */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitModuloInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitModuloInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitModuloLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitModuloLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitModuloFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitModuloFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitModuloDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitModuloDouble(k_BinaryEntityBuilder_t* builder);
 
 /* Multiply */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitMultiplyInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitMultiplyInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitMultiplyLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitMultiplyLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitMultiplyFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitMultiplyFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitMultiplyDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitMultiplyDouble(k_BinaryEntityBuilder_t* builder);
 
 /* Negate */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitNegateInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitNegateInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitNegateLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitNegateLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitNegateFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitNegateFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitNegateDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitNegateDouble(k_BinaryEntityBuilder_t* builder);
 
 /* New */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitNew(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitNew(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitNewArray(zen_BinaryEntityBuilder_t* builder, uint8_t type);
+void k_BinaryEntityBuilder_emitNewArray(k_BinaryEntityBuilder_t* builder, uint8_t type);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitNewReferenceArray(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitNewReferenceArray(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitNewDimensionalArray(zen_BinaryEntityBuilder_t* builder, uint16_t index,
+void k_BinaryEntityBuilder_emitNewDimensionalArray(k_BinaryEntityBuilder_t* builder, uint16_t index,
     uint8_t dimensions);
 
 /* Pop */
@@ -954,141 +954,141 @@ void zen_BinaryEntityBuilder_emitNewDimensionalArray(zen_BinaryEntityBuilder_t* 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPop(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPop(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPop2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPop2(k_BinaryEntityBuilder_t* builder);
 
 /* Push */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushNull(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushNull(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushIntegerNegative1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushIntegerNegative1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushInteger0(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushInteger0(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushInteger1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushInteger1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushInteger2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushInteger2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushInteger3(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushInteger3(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushInteger4(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushInteger4(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushInteger5(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushInteger5(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushLong0(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushLong0(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushLong1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushLong1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushLong2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushLong2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushFloat0(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushFloat0(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushFloat1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushFloat1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushFloat2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushFloat2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushDouble0(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushDouble0(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushDouble1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushDouble1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushDouble2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitPushDouble2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushByte(zen_BinaryEntityBuilder_t* builder, int8_t value);
+void k_BinaryEntityBuilder_emitPushByte(k_BinaryEntityBuilder_t* builder, int8_t value);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitPushShort(zen_BinaryEntityBuilder_t* builder, int16_t value);
+void k_BinaryEntityBuilder_emitPushShort(k_BinaryEntityBuilder_t* builder, int16_t value);
 
 /* Return */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitReturn(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitReturn(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitReturnInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitReturnInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitReturnLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitReturnLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitReturnFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitReturnFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitReturnDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitReturnDouble(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitReturnReference(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitReturnReference(k_BinaryEntityBuilder_t* builder);
 
 /* RTTI */
 
@@ -1097,248 +1097,248 @@ void zen_BinaryEntityBuilder_emitReturnReference(zen_BinaryEntityBuilder_t* buil
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreInteger(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitStoreInteger(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideStoreInteger(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideStoreInteger(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreInteger0(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreInteger0(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreInteger1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreInteger1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreInteger2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreInteger2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreInteger3(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreInteger3(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreLong(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitStoreLong(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideStoreLong(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideStoreLong(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreLong0(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreLong0(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreLong1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreLong1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreLong2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreLong2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreLong3(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreLong3(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreFloat(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitStoreFloat(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideStoreFloat(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideStoreFloat(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreFloat0(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreFloat0(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreFloat1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreFloat1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreFloat2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreFloat2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreFloat3(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreFloat3(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreDouble(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitStoreDouble(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideStoreDouble(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideStoreDouble(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreDouble0(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreDouble0(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreDouble1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreDouble1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreDouble2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreDouble2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreDouble3(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreDouble3(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreReference(zen_BinaryEntityBuilder_t* builder, uint8_t index);
+void k_BinaryEntityBuilder_emitStoreReference(k_BinaryEntityBuilder_t* builder, uint8_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWideStoreReference(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitWideStoreReference(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreReference0(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreReference0(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreReference1(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreReference1(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreReference2(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreReference2(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreReference3(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreReference3(k_BinaryEntityBuilder_t* builder);
 
 /* Store Array */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreArrayByte(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreArrayByte(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreArrayCharacter(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreArrayCharacter(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreArrayShort(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreArrayShort(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreArrayInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreArrayInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreArrayLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreArrayLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreArrayFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreArrayFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreArrayDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreArrayDouble(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreArrayReference(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitStoreArrayReference(k_BinaryEntityBuilder_t* builder);
 
 /* Store Field */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreInstanceField(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitStoreInstanceField(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitStoreStaticField(zen_BinaryEntityBuilder_t* builder, uint16_t index);
+void k_BinaryEntityBuilder_emitStoreStaticField(k_BinaryEntityBuilder_t* builder, uint16_t index);
 
 /* Subtract */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitSubtractInteger(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitSubtractInteger(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitSubtractLong(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitSubtractLong(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitSubtractFloat(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitSubtractFloat(k_BinaryEntityBuilder_t* builder);
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitSubtractDouble(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitSubtractDouble(k_BinaryEntityBuilder_t* builder);
 
 /* Swap */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitSwap(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitSwap(k_BinaryEntityBuilder_t* builder);
 
 /* Throw */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitThrow(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitThrow(k_BinaryEntityBuilder_t* builder);
 
 /* Wide */
 
 /**
  * @memberof BinaryEntityBuilder
  */
-void zen_BinaryEntityBuilder_emitWide(zen_BinaryEntityBuilder_t* builder);
+void k_BinaryEntityBuilder_emitWide(k_BinaryEntityBuilder_t* builder);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_GENERATOR_BINARY_ENTITY_BUILDER_H */

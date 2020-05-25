@@ -41,108 +41,108 @@
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ConstantPoolBuilder_t {
+struct k_ConstantPoolBuilder_t {
     jtk_ArrayList_t* m_entries;
 };
 
 /**
  * @memberof ConstantPoolBuilder
  */
-typedef struct zen_ConstantPoolBuilder_t zen_ConstantPoolBuilder_t;
+typedef struct k_ConstantPoolBuilder_t k_ConstantPoolBuilder_t;
 
 // Constructor
 
 /**
  * @memberof ConstantPoolBuilder
  */
-zen_ConstantPoolBuilder_t* zen_ConstantPoolBuilder_new();
+k_ConstantPoolBuilder_t* k_ConstantPoolBuilder_new();
 
 // Destructor
 
 /**
  * @memberof ConstantPoolBuilder
  */
-void zen_ConstantPoolBuilder_delete(zen_ConstantPoolBuilder_t* builder);
+void k_ConstantPoolBuilder_delete(k_ConstantPoolBuilder_t* builder);
 
 // Clear
 
-void zen_ConstantPoolBuilder_clear(zen_ConstantPoolBuilder_t* builder);
+void k_ConstantPoolBuilder_clear(k_ConstantPoolBuilder_t* builder);
 
 // Reset
 
-void zen_ConstantPoolBuilder_reset(zen_ConstantPoolBuilder_t* builder);
+void k_ConstantPoolBuilder_reset(k_ConstantPoolBuilder_t* builder);
 
 // Entries
 
 /**
  * @memberof ConstantPoolBuilder
  */
-int32_t zen_ConstantPoolBuilder_countEntries(zen_ConstantPoolBuilder_t* builder);
+int32_t k_ConstantPoolBuilder_countEntries(k_ConstantPoolBuilder_t* builder);
 
 /**
  * @memberof ConstantPoolBuilder
  */
-zen_ConstantPoolEntry_t* zen_ConstantPoolBuilder_getEntry(zen_ConstantPoolBuilder_t* builder,
+k_ConstantPoolEntry_t* k_ConstantPoolBuilder_getEntry(k_ConstantPoolBuilder_t* builder,
     int32_t index);
 
 // Class Entry
 
-zen_ConstantPoolClass_t* zen_ConstantPoolBuilder_getClassEntry(
-    zen_ConstantPoolBuilder_t* builder, int32_t index);
+k_ConstantPoolClass_t* k_ConstantPoolBuilder_getClassEntry(
+    k_ConstantPoolBuilder_t* builder, int32_t index);
 
-int32_t zen_ConstantPoolBuilder_getClassEntryIndexEx(
-    zen_ConstantPoolBuilder_t* builder, uint8_t* bytes, int32_t bytesSize);
+int32_t k_ConstantPoolBuilder_getClassEntryIndexEx(
+    k_ConstantPoolBuilder_t* builder, uint8_t* bytes, int32_t bytesSize);
 
 // Field Entry
 
-zen_ConstantPoolField_t* zen_ConstantPoolBuilder_getFieldEntry(
-    zen_ConstantPoolBuilder_t* builder, int32_t index);
+k_ConstantPoolField_t* k_ConstantPoolBuilder_getFieldEntry(
+    k_ConstantPoolBuilder_t* builder, int32_t index);
 
-int32_t zen_ConstantPoolBuilder_getFieldEntryIndexEx(
-    zen_ConstantPoolBuilder_t* builder, const uint8_t* class0, int32_t classSize,
+int32_t k_ConstantPoolBuilder_getFieldEntryIndexEx(
+    k_ConstantPoolBuilder_t* builder, const uint8_t* class0, int32_t classSize,
     const uint8_t* descriptor, int32_t descriptorSize, const uint8_t* name,
     int32_t nameSize);
 
 // Function Entry
 
-zen_ConstantPoolFunction_t* zen_ConstantPoolBuilder_getFunctionEntry(
-    zen_ConstantPoolBuilder_t* builder, int32_t index);
+k_ConstantPoolFunction_t* k_ConstantPoolBuilder_getFunctionEntry(
+    k_ConstantPoolBuilder_t* builder, int32_t index);
 
-int32_t zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
-    zen_ConstantPoolBuilder_t* builder, const uint8_t* class0, int32_t classSize,
+int32_t k_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    k_ConstantPoolBuilder_t* builder, const uint8_t* class0, int32_t classSize,
     const uint8_t* descriptor, int32_t descriptorSize, const uint8_t* name,
     int32_t nameSize, uint16_t tableIndex);
 
 // Integer Entry
 
-zen_ConstantPoolInteger_t* zen_ConstantPoolBuilder_getIntegerEntry(
-    zen_ConstantPoolBuilder_t* builder, int32_t index);
+k_ConstantPoolInteger_t* k_ConstantPoolBuilder_getIntegerEntry(
+    k_ConstantPoolBuilder_t* builder, int32_t index);
 
-int32_t zen_ConstantPoolBuilder_getIntegerEntryIndex(
-    zen_ConstantPoolBuilder_t* builder, int32_t value);
+int32_t k_ConstantPoolBuilder_getIntegerEntryIndex(
+    k_ConstantPoolBuilder_t* builder, int32_t value);
 
 // String Entry
 
-zen_ConstantPoolString_t* zen_ConstantPoolBuilder_getStringEntry(
-    zen_ConstantPoolBuilder_t* builder, int32_t index);
+k_ConstantPoolString_t* k_ConstantPoolBuilder_getStringEntry(
+    k_ConstantPoolBuilder_t* builder, int32_t index);
 
-int32_t zen_ConstantPoolBuilder_getStringEntryIndexEx(
-    zen_ConstantPoolBuilder_t* builder, uint8_t* bytes, int32_t bytesSize);
+int32_t k_ConstantPoolBuilder_getStringEntryIndexEx(
+    k_ConstantPoolBuilder_t* builder, uint8_t* bytes, int32_t bytesSize);
 
 // UTF-8 Entry
 
-zen_ConstantPoolUtf8_t* zen_ConstantPoolBuilder_getUtf8Entry(
-    zen_ConstantPoolBuilder_t* builder, int32_t index);
+k_ConstantPoolUtf8_t* k_ConstantPoolBuilder_getUtf8Entry(
+    k_ConstantPoolBuilder_t* builder, int32_t index);
 
 // Long Entry
 
-zen_ConstantPoolLong_t* zen_ConstantPoolBuilder_getLongEntry(
-    zen_ConstantPoolBuilder_t* builder, int32_t index);
+k_ConstantPoolLong_t* k_ConstantPoolBuilder_getLongEntry(
+    k_ConstantPoolBuilder_t* builder, int32_t index);
 
-int32_t zen_ConstantPoolBuilder_getLongEntryIndex(
-    zen_ConstantPoolBuilder_t* builder, int64_t value);
+int32_t k_ConstantPoolBuilder_getLongEntryIndex(
+    k_ConstantPoolBuilder_t* builder, int64_t value);
 
-int32_t zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
-    zen_ConstantPoolBuilder_t* builder, uint8_t* bytes, int32_t bytesSize);
+int32_t k_ConstantPoolBuilder_getUtf8EntryIndexEx(
+    k_ConstantPoolBuilder_t* builder, uint8_t* bytes, int32_t bytesSize);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_GENERATOR_CONSTANT_POOL_BUILDER_H */

@@ -24,9 +24,9 @@
  * Symbol                                                                      *
  *******************************************************************************/
 
-zen_Symbol_t* zen_Symbol_new(zen_SymbolCategory_t category,
-    zen_ASTNode_t* identifier, zen_Scope_t* enclosingScope) {
-    zen_Symbol_t* symbol = zen_Memory_allocate(zen_Symbol_t, 1);
+k_Symbol_t* k_Symbol_new(k_SymbolCategory_t category,
+    k_ASTNode_t* identifier, k_Scope_t* enclosingScope) {
+    k_Symbol_t* symbol = k_Memory_allocate(k_Symbol_t, 1);
     symbol->m_category = category;
     symbol->m_identifier = identifier;
     symbol->m_enclosingScope = enclosingScope;
@@ -35,40 +35,40 @@ zen_Symbol_t* zen_Symbol_new(zen_SymbolCategory_t category,
     symbol->m_index = -1;
     symbol->m_flags = 0;
     if (identifier != NULL) {
-        zen_Token_t* token = (zen_Token_t*)identifier->m_context;
+        k_Token_t* token = (k_Token_t*)identifier->m_context;
         symbol->m_name = token->m_text;
         symbol->m_nameSize = token->m_length;
     }
 
     if (category == ZEN_SYMBOL_CATEGORY_FUNCTION) {
-        zen_FunctionSymbol_initialize(&symbol->m_context.m_asFunction);
+        k_FunctionSymbol_initialize(&symbol->m_context.m_asFunction);
     }
     else if (category == ZEN_SYMBOL_CATEGORY_CLASS) {
-        zen_ClassSymbol_initialize(&symbol->m_context.m_asClass);
+        k_ClassSymbol_initialize(&symbol->m_context.m_asClass);
     }
 
     return symbol;
 }
 
-zen_Symbol_t* zen_Symbol_forConstant(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope) {
-    return zen_Symbol_new(ZEN_SYMBOL_CATEGORY_CONSTANT, identifier, enclosingScope);
+k_Symbol_t* k_Symbol_forConstant(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope) {
+    return k_Symbol_new(ZEN_SYMBOL_CATEGORY_CONSTANT, identifier, enclosingScope);
 }
 
-zen_Symbol_t* zen_Symbol_forVariable(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope) {
-    return zen_Symbol_new(ZEN_SYMBOL_CATEGORY_VARIABLE, identifier, enclosingScope);
+k_Symbol_t* k_Symbol_forVariable(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope) {
+    return k_Symbol_new(ZEN_SYMBOL_CATEGORY_VARIABLE, identifier, enclosingScope);
 }
 
-zen_Symbol_t* zen_Symbol_forFunction(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope) {
-    zen_Symbol_t* symbol = zen_Symbol_new(ZEN_SYMBOL_CATEGORY_FUNCTION,
+k_Symbol_t* k_Symbol_forFunction(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope) {
+    k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_FUNCTION,
         identifier, enclosingScope);
     return symbol;
 }
 
-zen_Symbol_t* zen_Symbol_forClass(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope, zen_Scope_t* classScope, const uint8_t* name,
+k_Symbol_t* k_Symbol_forClass(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope, k_Scope_t* classScope, const uint8_t* name,
     int32_t nameSize, const uint8_t* package, int32_t packageSize) {
     uint8_t* qualifiedName = NULL;
     int32_t qualifiedNameSize = -1;
@@ -93,8 +93,8 @@ zen_Symbol_t* zen_Symbol_forClass(zen_ASTNode_t* identifier,
     uint8_t* descriptor = jtk_CString_newEx(qualifiedName, qualifiedNameSize);
     jtk_Arrays_replace_b(descriptor, qualifiedNameSize, '.', '/');
 
-    zen_Symbol_t* symbol = zen_Symbol_new(ZEN_SYMBOL_CATEGORY_CLASS, identifier, enclosingScope);
-    zen_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
+    k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_CLASS, identifier, enclosingScope);
+    k_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
     classSymbol->m_qualifiedName = qualifiedName;
     classSymbol->m_qualifiedNameSize = qualifiedNameSize;
     classSymbol->m_descriptor = descriptor;
@@ -104,14 +104,14 @@ zen_Symbol_t* zen_Symbol_forClass(zen_ASTNode_t* identifier,
     return symbol;
 }
 
-zen_Symbol_t* zen_Symbol_forClassAlt(zen_Scope_t* classScope, const uint8_t* descriptor,
+k_Symbol_t* k_Symbol_forClassAlt(k_Scope_t* classScope, const uint8_t* descriptor,
     int32_t descriptorSize) {
     uint8_t* qualifiedName = jtk_CString_newEx(descriptor,
         descriptorSize);
     jtk_Arrays_replace_b(qualifiedName, descriptorSize, '/', '.');
 
-    zen_Symbol_t* symbol = zen_Symbol_new(ZEN_SYMBOL_CATEGORY_CLASS, NULL, NULL);
-    zen_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
+    k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_CLASS, NULL, NULL);
+    k_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
     classSymbol->m_qualifiedName = qualifiedName;
     classSymbol->m_qualifiedNameSize = descriptorSize;
     classSymbol->m_descriptor = descriptor;
@@ -121,28 +121,28 @@ zen_Symbol_t* zen_Symbol_forClassAlt(zen_Scope_t* classScope, const uint8_t* des
     return symbol;
 }
 
-zen_Symbol_t* zen_Symbol_forLabel(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope) {
-    return zen_Symbol_new(ZEN_SYMBOL_CATEGORY_LABEL, identifier, enclosingScope);
+k_Symbol_t* k_Symbol_forLabel(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope) {
+    return k_Symbol_new(ZEN_SYMBOL_CATEGORY_LABEL, identifier, enclosingScope);
 }
 
-zen_Symbol_t* zen_Symbol_forExternal(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope, zen_Symbol_t* other) {
-    zen_Symbol_t* result = zen_Symbol_new(ZEN_SYMBOL_CATEGORY_EXTERNAL,
+k_Symbol_t* k_Symbol_forExternal(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope, k_Symbol_t* other) {
+    k_Symbol_t* result = k_Symbol_new(ZEN_SYMBOL_CATEGORY_EXTERNAL,
         identifier, enclosingScope);
     result->m_context.m_asExternal = other;
 
     return result;
 }
 
-void zen_Symbol_delete(zen_Symbol_t* symbol) {
+void k_Symbol_delete(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     if (symbol->m_category == ZEN_SYMBOL_CATEGORY_FUNCTION) {
-        zen_FunctionSymbol_destroy(&symbol->m_context.m_asFunction);
+        k_FunctionSymbol_destroy(&symbol->m_context.m_asFunction);
     }
     else if (symbol->m_category == ZEN_SYMBOL_CATEGORY_CLASS) {
-        zen_ClassSymbol_destroy(&symbol->m_context.m_asClass);
+        k_ClassSymbol_destroy(&symbol->m_context.m_asClass);
     }
 
     jtk_Memory_deallocate(symbol);
@@ -150,85 +150,85 @@ void zen_Symbol_delete(zen_Symbol_t* symbol) {
 
 // Category
 
-zen_SymbolCategory_t zen_Symbol_getCategory(zen_Symbol_t* symbol) {
+k_SymbolCategory_t k_Symbol_getCategory(k_Symbol_t* symbol) {
     return symbol->m_category;
 }
 
-bool zen_Symbol_isEnumeration(zen_Symbol_t* symbol) {
+bool k_Symbol_isEnumeration(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
     return (symbol->m_category == ZEN_SYMBOL_CATEGORY_ENUMERATION);
 }
 
-bool zen_Symbol_isEnumerate(zen_Symbol_t* symbol) {
+bool k_Symbol_isEnumerate(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
     return (symbol->m_category == ZEN_SYMBOL_CATEGORY_ENUMERATE);
 }
 
-bool zen_Symbol_isFunction(zen_Symbol_t* symbol) {
+bool k_Symbol_isFunction(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
     return (symbol->m_category == ZEN_SYMBOL_CATEGORY_FUNCTION);
 }
 
-bool zen_Symbol_isConstant(zen_Symbol_t* symbol) {
+bool k_Symbol_isConstant(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
     return (symbol->m_category == ZEN_SYMBOL_CATEGORY_CONSTANT);
 }
 
-bool zen_Symbol_isVariable(zen_Symbol_t* symbol) {
+bool k_Symbol_isVariable(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
     return (symbol->m_category == ZEN_SYMBOL_CATEGORY_VARIABLE);
 }
 
-bool zen_Symbol_isClass(zen_Symbol_t* symbol) {
+bool k_Symbol_isClass(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
     return (symbol->m_category == ZEN_SYMBOL_CATEGORY_CLASS);
 }
 
-bool zen_Symbol_isExternal(zen_Symbol_t* symbol) {
+bool k_Symbol_isExternal(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
     return (symbol->m_category == ZEN_SYMBOL_CATEGORY_EXTERNAL);
 }
 
-zen_Scope_t* zen_Symbol_getEnclosingScope(zen_Symbol_t* symbol) {
+k_Scope_t* k_Symbol_getEnclosingScope(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
     return symbol->m_enclosingScope;
 }
 
-zen_ASTNode_t* zen_Symbol_getIdentifier(zen_Symbol_t* symbol) {
+k_ASTNode_t* k_Symbol_getIdentifier(k_Symbol_t* symbol) {
     return symbol->m_identifier;
 }
 
 /* Modifier */
 
-void zen_Symbol_addModifiers(zen_Symbol_t* symbol, uint32_t modifiers) {
+void k_Symbol_addModifiers(k_Symbol_t* symbol, uint32_t modifiers) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     symbol->m_modifiers |= modifiers;
 }
 
-bool zen_Symbol_hasModifiers(zen_Symbol_t* symbol, uint32_t modifiers) {
+bool k_Symbol_hasModifiers(k_Symbol_t* symbol, uint32_t modifiers) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     return (symbol->m_modifiers & modifiers) == modifiers;
 }
 
-bool zen_Symbol_isStatic(zen_Symbol_t* symbol) {
+bool k_Symbol_isStatic(k_Symbol_t* symbol) {
     return (symbol->m_modifiers & ZEN_MODIFIER_STATIC) != 0;
 }
 
-zen_FunctionSignature_t* zen_Symbol_getFunctionSignature(zen_Symbol_t* symbol,
+k_FunctionSignature_t* k_Symbol_getFunctionSignature(k_Symbol_t* symbol,
     int32_t argumentCount) {
-    zen_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
+    k_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
     if ((argumentCount >= functionSymbol->m_parameterThreshold) &&
         (functionSymbol->m_parameterThreshold >= 0)) {
         argumentCount = functionSymbol->m_parameterThreshold;
     }
 
-    zen_FunctionSignature_t* result = NULL;
+    k_FunctionSignature_t* result = NULL;
     int32_t i;
     int32_t count = jtk_ArrayList_getSize(functionSymbol->m_signatures);
     for (i = 0; i < count; i++) {
-        zen_FunctionSignature_t* signature = (zen_FunctionSignature_t*)
+        k_FunctionSignature_t* signature = (k_FunctionSignature_t*)
             jtk_ArrayList_getValue(functionSymbol->m_signatures, i);
         int32_t parameterCount = signature->m_fixedParameterCount; // jtk_ArrayList_getSize(signature->m_fixedParameters);
         if (parameterCount == argumentCount) {
@@ -239,14 +239,14 @@ zen_FunctionSignature_t* zen_Symbol_getFunctionSignature(zen_Symbol_t* symbol,
     return result;
 }
 
-zen_FunctionSignature_t* zen_Symbol_getFunctionSignatureEx(zen_Symbol_t* symbol,
+k_FunctionSignature_t* k_Symbol_getFunctionSignatureEx(k_Symbol_t* symbol,
     const uint8_t* descriptor, int32_t descriptorSize) {
-    zen_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
-    zen_FunctionSignature_t* result = NULL;
+    k_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
+    k_FunctionSignature_t* result = NULL;
     int32_t i;
     int32_t count = jtk_ArrayList_getSize(functionSymbol->m_signatures);
     for (i = 0; i < count; i++) {
-        zen_FunctionSignature_t* signature = (zen_FunctionSignature_t*)
+        k_FunctionSignature_t* signature = (k_FunctionSignature_t*)
             jtk_ArrayList_getValue(functionSymbol->m_signatures, i);
         if (jtk_CString_equals(signature->m_descriptor, signature->m_descriptorSize,
             descriptor, descriptorSize)) {

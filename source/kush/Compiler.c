@@ -60,8 +60,8 @@
 
 // Register
 
-void zen_Compiler_registerSymbol(zen_Compiler_t* compiler, const uint8_t* identifier,
-    int32_t identifierSize, zen_Symbol_t* symbol) {
+void k_Compiler_registerSymbol(k_Compiler_t* compiler, const uint8_t* identifier,
+    int32_t identifierSize, k_Symbol_t* symbol) {
     // uint8_t* copy = jtk_CString_newEx(identifier, identifierSize);
     /* NOTE: Do not create a copy of the qualified name because the string belongs
      * to the symbol we are mapping. Therefore, the lifetime of both the qualified
@@ -70,12 +70,12 @@ void zen_Compiler_registerSymbol(zen_Compiler_t* compiler, const uint8_t* identi
     jtk_HashMap_put(compiler->m_repository, identifier, symbol);
 }
 
-zen_Symbol_t* zen_Compiler_resolveSymbol(zen_Compiler_t* compiler,
+k_Symbol_t* k_Compiler_resolveSymbol(k_Compiler_t* compiler,
     const uint8_t* name, int32_t nameSize) {
-    zen_Symbol_t* result = jtk_HashMap_getValue(compiler->m_repository,
+    k_Symbol_t* result = jtk_HashMap_getValue(compiler->m_repository,
         name);
     if (result == NULL) {
-        result = zen_SymbolLoader_findSymbol(compiler->m_symbolLoader,
+        result = k_SymbolLoader_findSymbol(compiler->m_symbolLoader,
             name, nameSize);
     }
     return result;
@@ -83,9 +83,9 @@ zen_Symbol_t* zen_Compiler_resolveSymbol(zen_Compiler_t* compiler,
 
 // Token
 
-void zen_Compiler_printToken(zen_Token_t* token) {
-    printf("[%d-%d:%d-%d:%s:%s]", token->m_startLine, token->m_stopLine, token->m_startColumn + 1, token->m_stopColumn + 1, token->m_channel == ZEN_TOKEN_CHANNEL_DEFAULT? "default" : "hidden", zen_Lexer_getLiteralName(token->m_type));
-    zen_TokenType_t type = zen_Token_getType(token);
+void k_Compiler_printToken(k_Token_t* token) {
+    printf("[%d-%d:%d-%d:%s:%s]", token->m_startLine, token->m_stopLine, token->m_startColumn + 1, token->m_stopColumn + 1, token->m_channel == ZEN_TOKEN_CHANNEL_DEFAULT? "default" : "hidden", k_Lexer_getLiteralName(token->m_type));
+    k_TokenType_t type = k_Token_getType(token);
     if ((type == ZEN_TOKEN_IDENTIFIER) || (type == ZEN_TOKEN_INTEGER_LITERAL) ||
         (type == ZEN_TOKEN_STRING_LITERAL)) {
         printf(" %.*s", token->m_length, token->m_text);
@@ -93,7 +93,7 @@ void zen_Compiler_printToken(zen_Token_t* token) {
     puts("");
 }
 
-void zen_Compiler_zen_Compiler_printTokens(zen_Compiler_t* compiler, jtk_ArrayList_t* tokens) {
+void k_Compiler_k_Compiler_printTokens(k_Compiler_t* compiler, jtk_ArrayList_t* tokens) {
     int32_t defaultChannel = 0;
     int32_t hiddenChannel = 0;
     int32_t otherChannel = 0;
@@ -101,8 +101,8 @@ void zen_Compiler_zen_Compiler_printTokens(zen_Compiler_t* compiler, jtk_ArrayLi
     int32_t limit = jtk_ArrayList_getSize(tokens);
     int32_t i;
     for (i = 0; i < limit; i++) {
-        zen_Token_t* token = (zen_Token_t*)jtk_ArrayList_getValue(tokens, i);
-        zen_TokenChannel_t channel = zen_Token_getChannel(token);
+        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(tokens, i);
+        k_TokenChannel_t channel = k_Token_getChannel(token);
         if (channel == ZEN_TOKEN_CHANNEL_DEFAULT) {
             defaultChannel++;
         }
@@ -112,7 +112,7 @@ void zen_Compiler_zen_Compiler_printTokens(zen_Compiler_t* compiler, jtk_ArrayLi
         else {
             otherChannel++;
         }
-        zen_Compiler_printToken(token);
+        k_Compiler_printToken(token);
     }
     fflush(stdout);
     fprintf(stdout, "[info] %d tokens were recognized on the default channel.\n", defaultChannel);
@@ -180,27 +180,27 @@ uint8_t* jtk_PathHelper_getParent(const uint8_t* path, int32_t size,
 
 // Constructor
 
-zen_Compiler_t* zen_Compiler_new() {
+k_Compiler_t* k_Compiler_new() {
     jtk_ObjectAdapter_t* stringObjectAdapter = jtk_CStringObjectAdapter_getInstance();
 
-    zen_Compiler_t* compiler = jtk_Memory_allocate(zen_Compiler_t, 1);
+    k_Compiler_t* compiler = jtk_Memory_allocate(k_Compiler_t, 1);
     compiler->m_dumpTokens = false;
     compiler->m_dumpNodes = false;
     compiler->m_footprint = false;
     compiler->m_dumpInstructions = false;
     compiler->m_inputFiles = jtk_ArrayList_new();
     compiler->m_currentFileIndex = -1;
-    compiler->m_errorHandler = zen_ErrorHandler_new();
+    compiler->m_errorHandler = k_ErrorHandler_new();
     compiler->m_compilationUnits = NULL;
     compiler->m_symbolTables = NULL;
     compiler->m_scopes = NULL;
     compiler->m_packages = NULL;
     compiler->m_packageSizes = NULL;
-    compiler->m_symbolLoader = zen_SymbolLoader_new(compiler);
+    compiler->m_symbolLoader = k_SymbolLoader_new(compiler);
     compiler->m_repository = jtk_HashMap_new(stringObjectAdapter, NULL);
     compiler->m_trash = NULL;
     compiler->m_coreApi = false;
-    compiler->m_disassembler = zen_BinaryEntityDisassembler_new(NULL);
+    compiler->m_disassembler = k_BinaryEntityDisassembler_new(NULL);
 #ifdef JTK_LOGGER_DISABLE
     compiler->m_logger = NULL;
 #else
@@ -213,7 +213,7 @@ zen_Compiler_t* zen_Compiler_new() {
 
 // Destructor
 
-void zen_Compiler_delete(zen_Compiler_t* compiler) {
+void k_Compiler_delete(k_Compiler_t* compiler) {
     jtk_Assert_assertObject(compiler, "The specified compiler is null.");
 
     if (compiler->m_compilationUnits != NULL) {
@@ -237,8 +237,8 @@ void zen_Compiler_delete(zen_Compiler_t* compiler) {
             * their creation. Therefore, the token stream
             * has to destroy the buffered tokens.
             */
-            zen_Token_t* token = (zen_Token_t*)jtk_ArrayList_getValue(compiler->m_trash, i);
-            zen_Token_delete(token);
+            k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(compiler->m_trash, i);
+            k_Token_delete(token);
         }
         jtk_ArrayList_delete(compiler->m_trash);
     }
@@ -261,7 +261,7 @@ void zen_Compiler_delete(zen_Compiler_t* compiler) {
     jtk_Iterator_delete(iterator);
     jtk_HashMap_delete(compiler->m_repository);
 
-    zen_ErrorHandler_delete(compiler->m_errorHandler);
+    k_ErrorHandler_delete(compiler->m_errorHandler);
 
 #ifndef JTK_LOGGER_DISABLE
     jtk_Logger_delete(compiler->m_logger);
@@ -270,12 +270,12 @@ void zen_Compiler_delete(zen_Compiler_t* compiler) {
     jtk_Memory_deallocate(compiler);
 }
 
-void zen_Compiler_onLexerError(zen_LexerError_t* error) {
+void k_Compiler_onLexerError(k_LexerError_t* error) {
     fprintf(stderr, "[error] %s:%d:%d -- %s\n", error->m_path, error->m_line, error->m_column, error->m_message);
     fflush(stderr);
 }
 
-const uint8_t* zen_ErrorCode_messages[] = {
+const uint8_t* k_ErrorCode_messages[] = {
     "None",
 
     // Lexical Errors
@@ -325,14 +325,14 @@ const uint8_t* zen_ErrorCode_messages[] = {
     "Binary entity encoded in unrecognizable FEB version"
 };
 
-void zen_Compiler_printErrors(zen_Compiler_t* compiler) {
-    jtk_ArrayList_t* errors = zen_ErrorHandler_getErrors(compiler->m_errorHandler);
+void k_Compiler_printErrors(k_Compiler_t* compiler) {
+    jtk_ArrayList_t* errors = k_ErrorHandler_getErrors(compiler->m_errorHandler);
     int32_t errorCount = jtk_ArrayList_getSize(errors);
     int32_t i;
     for (i = 0; i < errorCount; i++) {
-        zen_Error_t* error = (zen_Error_t*)jtk_ArrayList_getValue(errors, i);
-        zen_Token_t* token = error->m_token;
-        const char* message = zen_ErrorCode_messages[(int32_t)error->m_code];
+        k_Error_t* error = (k_Error_t*)jtk_ArrayList_getValue(errors, i);
+        k_Token_t* token = error->m_token;
+        const char* message = k_ErrorCode_messages[(int32_t)error->m_code];
         char message0[128];
 
         char lineNumbers[100];
@@ -344,8 +344,8 @@ void zen_Compiler_printErrors(zen_Compiler_t* compiler) {
         }
 
         if (error->m_expected != ZEN_TOKEN_UNKNOWN) {
-            const uint8_t* expectedName = zen_Lexer_getLiteralName(error->m_expected);
-            const uint8_t* actualName = zen_Lexer_getLiteralName(token->m_type);
+            const uint8_t* expectedName = k_Lexer_getLiteralName(error->m_expected);
+            const uint8_t* actualName = k_Lexer_getLiteralName(token->m_type);
             sprintf(message0, "Expected token '%s', encountered token '%s'",
                 expectedName, actualName);
             message = message0;
@@ -356,21 +356,21 @@ void zen_Compiler_printErrors(zen_Compiler_t* compiler) {
     }
 }
 
-void zen_Compiler_initialize(zen_Compiler_t* compiler) {
+void k_Compiler_initialize(k_Compiler_t* compiler) {
     int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
-    compiler->m_compilationUnits = jtk_Memory_allocate(zen_ASTNode_t*, size);
-    compiler->m_symbolTables = jtk_Memory_allocate(zen_SymbolTable_t*, size);
-    compiler->m_scopes = jtk_Memory_allocate(zen_ASTAnnotations_t*, size);
+    compiler->m_compilationUnits = jtk_Memory_allocate(k_ASTNode_t*, size);
+    compiler->m_symbolTables = jtk_Memory_allocate(k_SymbolTable_t*, size);
+    compiler->m_scopes = jtk_Memory_allocate(k_ASTAnnotations_t*, size);
     compiler->m_packages = jtk_Memory_allocate(uint8_t*, size);
     compiler->m_packageSizes = jtk_Memory_allocate(int32_t, size);
 }
 
-void zen_Compiler_buildAST(zen_Compiler_t* compiler) {
-    zen_Lexer_t* lexer = zen_Lexer_new(compiler);
-    zen_TokenStream_t* tokens = zen_TokenStream_new(compiler, lexer, ZEN_TOKEN_CHANNEL_DEFAULT);
-    zen_Parser_t* parser = zen_Parser_new(compiler, tokens);
-    zen_ASTPrinter_t* astPrinter = zen_ASTPrinter_new();
-    zen_ASTListener_t* astPrinterASTListener = zen_ASTPrinter_getASTListener(astPrinter);
+void k_Compiler_buildAST(k_Compiler_t* compiler) {
+    k_Lexer_t* lexer = k_Lexer_new(compiler);
+    k_TokenStream_t* tokens = k_TokenStream_new(compiler, lexer, ZEN_TOKEN_CHANNEL_DEFAULT);
+    k_Parser_t* parser = k_Parser_new(compiler, tokens);
+    k_ASTPrinter_t* astPrinter = k_ASTPrinter_new();
+    k_ASTListener_t* astPrinterASTListener = k_ASTPrinter_getASTListener(astPrinter);
 
     int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
     int32_t i;
@@ -389,17 +389,17 @@ void zen_Compiler_buildAST(zen_Compiler_t* compiler) {
             jtk_Arrays_replace_b(package, packageSize, '/', '.');
 
             jtk_InputStream_t* stream = jtk_PathHelper_read(path);
-            zen_Lexer_reset(lexer, stream);
+            k_Lexer_reset(lexer, stream);
 
             jtk_Logger_info(compiler->m_logger, "The lexical analysis phase has started.");
 
-            int32_t previousLexicalErrors = zen_ErrorHandler_getErrorCount(compiler->m_errorHandler);
-            zen_TokenStream_reset(tokens);
-            zen_TokenStream_fill(tokens);
+            int32_t previousLexicalErrors = k_ErrorHandler_getErrorCount(compiler->m_errorHandler);
+            k_TokenStream_reset(tokens);
+            k_TokenStream_fill(tokens);
             if (compiler->m_dumpTokens) {
-                zen_Compiler_zen_Compiler_printTokens(compiler, tokens->m_tokens);
+                k_Compiler_k_Compiler_printTokens(compiler, tokens->m_tokens);
             }
-            int32_t currentLexicalErrors = zen_ErrorHandler_getErrorCount(compiler->m_errorHandler);
+            int32_t currentLexicalErrors = k_ErrorHandler_getErrorCount(compiler->m_errorHandler);
 
             jtk_Logger_info(compiler->m_logger, "The lexical analysis phase is complete.");
 
@@ -409,22 +409,22 @@ void zen_Compiler_buildAST(zen_Compiler_t* compiler) {
             if (previousLexicalErrors == currentLexicalErrors) {
                 jtk_Logger_info(compiler->m_logger, "The syntactical analysis phase has started.");
 
-                zen_ASTNode_t* compilationUnit = zen_ASTNode_new(NULL);
+                k_ASTNode_t* compilationUnit = k_ASTNode_new(NULL);
                 /* We do not have to reset the parser because the same token stream
                  * provides the tokens to the parser. Further, as of this writing,
                  * the parser actually does not maintain any internal state.
                  * If the parser is extended to maintain some kind of internal
-                 * state, please make sure that the zen_Parser_reset() function
+                 * state, please make sure that the k_Parser_reset() function
                  * is invoked.
                  */
-                zen_Parser_reset(parser, tokens);
-                zen_Parser_compilationUnit(parser, compilationUnit);
+                k_Parser_reset(parser, tokens);
+                k_Parser_compilationUnit(parser, compilationUnit);
                 compiler->m_compilationUnits[i] = compilationUnit;
 
                 jtk_Logger_info(compiler->m_logger, "The syntactical analysis phase is complete.");
 
                 if (compiler->m_dumpNodes) {
-                    zen_ASTWalker_walk(astPrinterASTListener, compilationUnit);
+                    k_ASTWalker_walk(astPrinterASTListener, compilationUnit);
                 }
             }
 
@@ -434,34 +434,34 @@ void zen_Compiler_buildAST(zen_Compiler_t* compiler) {
 
     compiler->m_trash = tokens->m_trash;
 
-    zen_ASTPrinter_delete(astPrinter);
-    zen_Parser_delete(parser);
-    zen_TokenStream_delete(tokens);
-    zen_Lexer_delete(lexer);
+    k_ASTPrinter_delete(astPrinter);
+    k_Parser_delete(parser);
+    k_TokenStream_delete(tokens);
+    k_Lexer_delete(lexer);
 
-    zen_Compiler_printErrors(compiler);
+    k_Compiler_printErrors(compiler);
 }
 
-void zen_Compiler_analyze(zen_Compiler_t* compiler) {
-    zen_SymbolDefinitionListener_t* symbolDefinitionListener = zen_SymbolDefinitionListener_new(compiler);
-    zen_ASTListener_t* symbolDefinitionASTListener = zen_SymbolDefinitionListener_getASTListener(symbolDefinitionListener);
+void k_Compiler_analyze(k_Compiler_t* compiler) {
+    k_SymbolDefinitionListener_t* symbolDefinitionListener = k_SymbolDefinitionListener_new(compiler);
+    k_ASTListener_t* symbolDefinitionASTListener = k_SymbolDefinitionListener_getASTListener(symbolDefinitionListener);
 
-    zen_SymbolResolutionListener_t* symbolResolutionListener = zen_SymbolResolutionListener_new(compiler);
-    zen_ASTListener_t* symbolResolutionASTListener = zen_SymbolResolutionListener_getASTListener(symbolResolutionListener);
+    k_SymbolResolutionListener_t* symbolResolutionListener = k_SymbolResolutionListener_new(compiler);
+    k_ASTListener_t* symbolResolutionASTListener = k_SymbolResolutionListener_getASTListener(symbolResolutionListener);
 
     int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
         compiler->m_currentFileIndex = i;
-        zen_ASTNode_t* compilationUnit = compiler->m_compilationUnits[i];
+        k_ASTNode_t* compilationUnit = compiler->m_compilationUnits[i];
 
-        zen_SymbolTable_t* symbolTable = zen_SymbolTable_new(compiler);
-        zen_ASTAnnotations_t* scopes = zen_ASTAnnotations_new();
+        k_SymbolTable_t* symbolTable = k_SymbolTable_new(compiler);
+        k_ASTAnnotations_t* scopes = k_ASTAnnotations_new();
 
         jtk_Logger_info(compiler->m_logger, "Starting definition phase...");
-        zen_SymbolDefinitionListener_reset(symbolDefinitionListener, symbolTable,
+        k_SymbolDefinitionListener_reset(symbolDefinitionListener, symbolTable,
             scopes, compiler->m_packages[i], compiler->m_packageSizes[i]);
-        zen_ASTWalker_walk(symbolDefinitionASTListener, compilationUnit);
+        k_ASTWalker_walk(symbolDefinitionASTListener, compilationUnit);
         jtk_Logger_info(compiler->m_logger, "The symbol definition phase is complete.");
 
         compiler->m_symbolTables[i] = symbolTable;
@@ -470,25 +470,25 @@ void zen_Compiler_analyze(zen_Compiler_t* compiler) {
 
     for (i = 0; i < size; i++) {
         compiler->m_currentFileIndex = i;
-        zen_ASTNode_t* compilationUnit = compiler->m_compilationUnits[i];
+        k_ASTNode_t* compilationUnit = compiler->m_compilationUnits[i];
 
-        zen_SymbolTable_t* symbolTable = compiler->m_symbolTables[i];
-        zen_ASTAnnotations_t* scopes = compiler->m_scopes[i];
+        k_SymbolTable_t* symbolTable = compiler->m_symbolTables[i];
+        k_ASTAnnotations_t* scopes = compiler->m_scopes[i];
 
         jtk_Logger_info(compiler->m_logger, "Starting symbol resolution phase...");
-        zen_SymbolResolutionListener_reset(symbolResolutionListener, symbolTable, scopes);
-        zen_ASTWalker_walk(symbolResolutionASTListener, compilationUnit);
+        k_SymbolResolutionListener_reset(symbolResolutionListener, symbolTable, scopes);
+        k_ASTWalker_walk(symbolResolutionASTListener, compilationUnit);
         jtk_Logger_info(compiler->m_logger, "The symbol resolution phase is complete.");
     }
 
-    zen_SymbolResolutionListener_delete(symbolResolutionListener);
-    zen_SymbolDefinitionListener_delete(symbolDefinitionListener);
+    k_SymbolResolutionListener_delete(symbolResolutionListener);
+    k_SymbolDefinitionListener_delete(symbolDefinitionListener);
 
-    zen_Compiler_printErrors(compiler);
+    k_Compiler_printErrors(compiler);
 }
 
-void zen_Compiler_generate(zen_Compiler_t* compiler) {
-    zen_BinaryEntityGenerator_t* generator = zen_BinaryEntityGenerator_new(compiler);
+void k_Compiler_generate(k_Compiler_t* compiler) {
+    k_BinaryEntityGenerator_t* generator = k_BinaryEntityGenerator_new(compiler);
 
     int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
     int32_t i;
@@ -497,14 +497,14 @@ void zen_Compiler_generate(zen_Compiler_t* compiler) {
 
         jtk_Logger_info(compiler->m_logger, "Starting code generation phase...");
 
-        zen_SymbolTable_t* symbolTable = compiler->m_symbolTables[i];
-        zen_ASTAnnotations_t* scopes = compiler->m_scopes[i];
-        zen_ASTNode_t* compilationUnit = compiler->m_compilationUnits[i];
-        zen_BinaryEntityGenerator_reset(generator, symbolTable, scopes,
+        k_SymbolTable_t* symbolTable = compiler->m_symbolTables[i];
+        k_ASTAnnotations_t* scopes = compiler->m_scopes[i];
+        k_ASTNode_t* compilationUnit = compiler->m_compilationUnits[i];
+        k_BinaryEntityGenerator_reset(generator, symbolTable, scopes,
             compilationUnit, compiler->m_packages[i], compiler->m_packageSizes[i],
             NULL);
 
-        zen_BinaryEntityGenerator_generate(generator);
+        k_BinaryEntityGenerator_generate(generator);
 
         jtk_Logger_info(compiler->m_logger, "The code generation phase is complete.");
     }
@@ -512,10 +512,10 @@ void zen_Compiler_generate(zen_Compiler_t* compiler) {
     /* The binary entity generator is not required anymore. Therefore, destroy
     * it and release the resources it holds.
     */
-    zen_BinaryEntityGenerator_delete(generator);
+    k_BinaryEntityGenerator_delete(generator);
 }
 
-void zen_Compiler_destroyNestedScopes(zen_ASTAnnotations_t* scopes) {
+void k_Compiler_destroyNestedScopes(k_ASTAnnotations_t* scopes) {
     jtk_Assert_assertObject(scopes, "The specified annotations is null.");
 
     /* There are three algorithms that can help us in the destruction of the
@@ -542,17 +542,17 @@ void zen_Compiler_destroyNestedScopes(zen_ASTAnnotations_t* scopes) {
         /* The scopes are created during the definition phase of the symbol table.
          * Therefore, we destroy them here.
          */
-        zen_Scope_t* scope = (zen_Scope_t*)jtk_Iterator_getNext(iterator);
+        k_Scope_t* scope = (k_Scope_t*)jtk_Iterator_getNext(iterator);
 
         /* Retrieve the children symbols declared in the current scope. */
-        zen_Scope_getChildrenSymbols(scope, temporary);
+        k_Scope_getChildrenSymbols(scope, temporary);
 
         /* Iterate over the children symbols and destroy them. */
         int32_t limit = jtk_ArrayList_getSize(temporary);
         int32_t i;
         for (i = 0; i < limit; i++) {
-            zen_Symbol_t* symbol = (zen_Symbol_t*)jtk_ArrayList_getValue(temporary, i);
-            // zen_Symbol_delete(symbol);
+            k_Symbol_t* symbol = (k_Symbol_t*)jtk_ArrayList_getValue(temporary, i);
+            // k_Symbol_delete(symbol);
         }
 
         /* At this point, the symbols retrieved form the scope are destroyed.
@@ -561,14 +561,14 @@ void zen_Compiler_destroyNestedScopes(zen_ASTAnnotations_t* scopes) {
         jtk_ArrayList_clear(temporary);
 
         /* Destroy the current scope. */
-        zen_Scope_delete(scope);
+        k_Scope_delete(scope);
     }
     jtk_Iterator_delete(iterator);
     jtk_ArrayList_delete(temporary);
-    zen_ASTAnnotations_delete(scopes);
+    k_ASTAnnotations_delete(scopes);
 }
 
-jtk_ArrayList_t* zen_CString_split_c(const uint8_t* sequence, int32_t size,
+jtk_ArrayList_t* k_CString_split_c(const uint8_t* sequence, int32_t size,
     uint8_t value, bool inclusive) {
     jtk_ArrayList_t* result = jtk_ArrayList_new();
     int32_t i;
@@ -585,9 +585,9 @@ jtk_ArrayList_t* zen_CString_split_c(const uint8_t* sequence, int32_t size,
     return result;
 }
 
-int32_t zen_ZenVirtualMachine_main(char** arguments, int32_t length);
+int32_t k_ZenVirtualMachine_main(char** arguments, int32_t length);
 
-void zen_Compiler_printHelp() {
+void k_Compiler_printHelp() {
     printf(
         "[Usage]\n"
         "    zc [--tokens] [--nodes] [--footprint] [--instructions] [--core-api] [--log <level>] [--help] <inputFiles> [--run <vmArguments>]\n\n"
@@ -603,12 +603,12 @@ void zen_Compiler_printHelp() {
         );
 }
 
-bool zen_Compiler_compileEx(zen_Compiler_t* compiler, char** arguments, int32_t length) {
+bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t length) {
     jtk_Assert_assertObject(compiler, "The specified compiler is null.");
 
     // TODO: Add the --path flag
-    zen_SymbolLoader_addDirectory(compiler->m_symbolLoader, ".");
-    zen_BinaryEntityDisassembler_addDirectory(compiler->m_disassembler, ".", 1);
+    k_SymbolLoader_addDirectory(compiler->m_symbolLoader, ".");
+    k_BinaryEntityDisassembler_addDirectory(compiler->m_disassembler, ".", 1);
 
     char** vmArguments = NULL;
     int32_t vmArgumentsSize = 0;
@@ -644,7 +644,7 @@ bool zen_Compiler_compileEx(zen_Compiler_t* compiler, char** arguments, int32_t 
                 }
             }
             else if (strcmp(arguments[i], "--help") == 0) {
-                zen_Compiler_printHelp();
+                k_Compiler_printHelp();
                 exit(0);
             }
             else if (strcmp(arguments[i], "--log") == 0) {
@@ -717,13 +717,13 @@ bool zen_Compiler_compileEx(zen_Compiler_t* compiler, char** arguments, int32_t 
         fprintf(stderr, "[error] Please specify input files.\n");
     }
     else {
-        zen_Compiler_initialize(compiler);
-        zen_Compiler_buildAST(compiler);
-        if ((noErrors = !zen_ErrorHandler_hasErrors(compiler->m_errorHandler))) {
-            zen_Compiler_analyze(compiler);
+        k_Compiler_initialize(compiler);
+        k_Compiler_buildAST(compiler);
+        if ((noErrors = !k_ErrorHandler_hasErrors(compiler->m_errorHandler))) {
+            k_Compiler_analyze(compiler);
 
-            if ((noErrors = !zen_ErrorHandler_hasErrors(compiler->m_errorHandler))) {
-                zen_Compiler_generate(compiler);
+            if ((noErrors = !k_ErrorHandler_hasErrors(compiler->m_errorHandler))) {
+                k_Compiler_generate(compiler);
             }
         }
     }
@@ -733,7 +733,7 @@ bool zen_Compiler_compileEx(zen_Compiler_t* compiler, char** arguments, int32_t 
         * Therefore, destroy it and release the resources it holds.
         */
         if (compiler->m_scopes[i] != NULL) {
-            zen_Compiler_destroyNestedScopes(compiler->m_scopes[i]);
+            k_Compiler_destroyNestedScopes(compiler->m_scopes[i]);
         }
     }
 
@@ -742,27 +742,27 @@ bool zen_Compiler_compileEx(zen_Compiler_t* compiler, char** arguments, int32_t 
          * and release the resources it holds.
          */
         if (compiler->m_symbolTables[i] != NULL) {
-            zen_SymbolTable_delete(compiler->m_symbolTables[i]);
+            k_SymbolTable_delete(compiler->m_symbolTables[i]);
         }
 
         if (compiler->m_compilationUnits[i] != NULL) {
-            zen_ASTNode_delete(compiler->m_compilationUnits[i]);
+            k_ASTNode_delete(compiler->m_compilationUnits[i]);
         }
     }
 
     if (compiler->m_footprint) {
-        int32_t footprint = zen_Memory_getFootprint();
+        int32_t footprint = k_Memory_getFootprint();
         printf("Memory Footprint = %.2f KB\n", footprint / 1024.0f);
     }
 
     if ((vmArguments != NULL) && noErrors) {
-        zen_ZenVirtualMachine_main(vmArguments, vmArgumentsSize);
+        k_ZenVirtualMachine_main(vmArguments, vmArgumentsSize);
     }
 
     // TODO: Return true only if the compilation suceeded.
     return true;
 }
 
-bool zen_Compiler_compile(zen_Compiler_t* compiler) {
-    return zen_Compiler_compileEx(compiler, NULL, -1);
+bool k_Compiler_compile(k_Compiler_t* compiler) {
+    return k_Compiler_compileEx(compiler, NULL, -1);
 }

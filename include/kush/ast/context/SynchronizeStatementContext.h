@@ -28,40 +28,40 @@
 
 /**
  * @class SynchronizeStatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_SynchronizeStatementContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_expression;
-    zen_ASTNode_t* m_statementSuite;
+struct k_SynchronizeStatementContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_expression;
+    k_ASTNode_t* m_statementSuite;
 };
 
 /**
  * @memberof SynchronizeStatementContext
  */
-typedef struct zen_SynchronizeStatementContext_t zen_SynchronizeStatementContext_t;
+typedef struct k_SynchronizeStatementContext_t k_SynchronizeStatementContext_t;
 
 // Constructor
 
 /**
  * @memberof SynchronizeStatementContext
  */
-zen_SynchronizeStatementContext_t* zen_SynchronizeStatementContext_new(zen_ASTNode_t* node);
+k_SynchronizeStatementContext_t* k_SynchronizeStatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof SynchronizeStatementContext
  */
-void zen_SynchronizeStatementContext_delete(zen_SynchronizeStatementContext_t* context);
+void k_SynchronizeStatementContext_delete(k_SynchronizeStatementContext_t* context);
 
 // Children
 
 /**
  * @memberof SynchronizeStatementContext
  */
-void zen_SynchronizeStatementContext_getChildren(zen_SynchronizeStatementContext_t* context, jtk_ArrayList_t* children);
+void k_SynchronizeStatementContext_getChildren(k_SynchronizeStatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_SYNCHRONIZE_STATEMENT_CONTEXT_H */

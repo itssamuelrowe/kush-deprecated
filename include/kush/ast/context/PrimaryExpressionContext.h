@@ -28,39 +28,39 @@
 
 /**
  * @class PrimaryExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_PrimaryExpressionContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_expression;
+struct k_PrimaryExpressionContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_expression;
 };
 
 /**
  * @memberof PrimaryExpressionContext
  */
-typedef struct zen_PrimaryExpressionContext_t zen_PrimaryExpressionContext_t;
+typedef struct k_PrimaryExpressionContext_t k_PrimaryExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof PrimaryExpressionContext
  */
-zen_PrimaryExpressionContext_t* zen_PrimaryExpressionContext_new(zen_ASTNode_t* node);
+k_PrimaryExpressionContext_t* k_PrimaryExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof PrimaryExpressionContext
  */
-void zen_PrimaryExpressionContext_delete(zen_PrimaryExpressionContext_t* context);
+void k_PrimaryExpressionContext_delete(k_PrimaryExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof PrimaryExpressionContext
  */
-void zen_PrimaryExpressionContext_getChildren(zen_PrimaryExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_PrimaryExpressionContext_getChildren(k_PrimaryExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_PRIMARY_EXPRESSION_CONTEXT_H */

@@ -28,40 +28,40 @@
 
 /**
  * @class AnnotationAttributeContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_AnnotationAttributeContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_identifier;
-    zen_ASTNode_t* m_literal;
+struct k_AnnotationAttributeContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_identifier;
+    k_ASTNode_t* m_literal;
 };
 
 /**
  * @memberof AnnotationAttributeContext
  */
-typedef struct zen_AnnotationAttributeContext_t zen_AnnotationAttributeContext_t;
+typedef struct k_AnnotationAttributeContext_t k_AnnotationAttributeContext_t;
 
 // Constructor
 
 /**
  * @memberof AnnotationAttributeContext
  */
-zen_AnnotationAttributeContext_t* zen_AnnotationAttributeContext_new(zen_ASTNode_t* node);
+k_AnnotationAttributeContext_t* k_AnnotationAttributeContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof AnnotationAttributeContext
  */
-void zen_AnnotationAttributeContext_delete(zen_AnnotationAttributeContext_t* context);
+void k_AnnotationAttributeContext_delete(k_AnnotationAttributeContext_t* context);
 
 // Children
 
 /**
  * @memberof AnnotationAttributeContext
  */
-void zen_AnnotationAttributeContext_getChildren(zen_AnnotationAttributeContext_t* context, jtk_ArrayList_t* children);
+void k_AnnotationAttributeContext_getChildren(k_AnnotationAttributeContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ANNOTATION_ATTRIBUTE_CONTEXT_H */

@@ -30,39 +30,39 @@
 
 /**
  * @class AnnotationsContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_AnnotationsContext_t {
-    zen_ASTNode_t* m_node;
-	jtk_ArrayList_t* m_annotations; /* <zen_ASTNode_t*> */
+struct k_AnnotationsContext_t {
+    k_ASTNode_t* m_node;
+	jtk_ArrayList_t* m_annotations; /* <k_ASTNode_t*> */
 };
 
 /**
  * @memberof AnnotationsContext
  */
-typedef struct zen_AnnotationsContext_t zen_AnnotationsContext_t;
+typedef struct k_AnnotationsContext_t k_AnnotationsContext_t;
 
 // Constructor
 
 /**
  * @memberof AnnotationsContext
  */
-zen_AnnotationsContext_t* zen_AnnotationsContext_new(zen_ASTNode_t* node);
+k_AnnotationsContext_t* k_AnnotationsContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof AnnotationsContext
  */
-void zen_AnnotationsContext_delete(zen_AnnotationsContext_t* context);
+void k_AnnotationsContext_delete(k_AnnotationsContext_t* context);
 
 // Children
 
 /**
  * @memberof AnnotationsContext
  */
-void zen_AnnotationsContext_getChildren(zen_AnnotationsContext_t* context, jtk_ArrayList_t* children);
+void k_AnnotationsContext_getChildren(k_AnnotationsContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ANNOTATIONS_CONTEXT_H */

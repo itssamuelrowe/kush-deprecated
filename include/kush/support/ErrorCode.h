@@ -25,11 +25,11 @@
 
 /**
  * @class ErrorCode
- * @ingroup zen_compiler_support
+ * @ingroup k_compiler_support
  * @author Samuel Rowe
  * @since Zen 1.0
  */
-enum zen_ErrorCode_t {
+enum k_ErrorCode_t {
     ZEN_ERROR_CODE_NONE = 0,
 
     // Lexcial Errors
@@ -81,6 +81,6 @@ enum zen_ErrorCode_t {
     ZEN_ERROR_CODE_COUNT
 };
 
-typedef enum zen_ErrorCode_t zen_ErrorCode_t;
+typedef enum k_ErrorCode_t k_ErrorCode_t;
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SUPPORT_ERROR_CODE_H */

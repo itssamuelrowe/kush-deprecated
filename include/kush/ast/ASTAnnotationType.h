@@ -27,7 +27,7 @@
  * @author Samuel Rowe
  * @since  zen 1.0
  */
-enum zen_ASTAnnotationType_t {
+enum k_ASTAnnotationType_t {
 
     /**
      * A situation where certain instructions are required to be inserted between
@@ -46,6 +46,6 @@ enum zen_ASTAnnotationType_t {
     AST_ANNOTATION_TYPE_CUSTOM
 };
 
-typedef enum zen_ASTAnnotationType_t zen_ASTAnnotationType_t;
+typedef enum k_ASTAnnotationType_t k_ASTAnnotationType_t;
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_AST_ANNOTATION_TYPE_H */

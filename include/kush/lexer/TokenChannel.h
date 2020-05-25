@@ -25,11 +25,11 @@
 
 /**
  * @class TokenChannel
- * @ingroup zen_compiler_lexer
+ * @ingroup k_compiler_lexer
  * @author Samuel Rowe
  * @since zen 1.0
  */
-enum zen_TokenChannel_t {
+enum k_TokenChannel_t {
     ZEN_TOKEN_CHANNEL_DEFAULT,
     ZEN_TOKEN_CHANNEL_HIDDEN,
 };
@@ -37,6 +37,6 @@ enum zen_TokenChannel_t {
 /**
  * @memberof TokenChannel
  */
-typedef enum zen_TokenChannel_t zen_TokenChannel_t;
+typedef enum k_TokenChannel_t k_TokenChannel_t;
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_LEXER_TOKEN_CHANNEL_H */

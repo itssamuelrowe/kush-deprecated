@@ -30,41 +30,41 @@
 
 /**
  * @class TryStatementContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_TryStatementContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_tryClause;
-    jtk_ArrayList_t* m_catchClauses; /* <zen_ASTNode_t*> */
-    zen_ASTNode_t* m_finallyClause;
+struct k_TryStatementContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_tryClause;
+    jtk_ArrayList_t* m_catchClauses; /* <k_ASTNode_t*> */
+    k_ASTNode_t* m_finallyClause;
 };
 
 /**
  * @memberof TryStatementContext
  */
-typedef struct zen_TryStatementContext_t zen_TryStatementContext_t;
+typedef struct k_TryStatementContext_t k_TryStatementContext_t;
 
 // Constructor
 
 /**
  * @memberof TryStatementContext
  */
-zen_TryStatementContext_t* zen_TryStatementContext_new(zen_ASTNode_t* node);
+k_TryStatementContext_t* k_TryStatementContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof TryStatementContext
  */
-void zen_TryStatementContext_delete(zen_TryStatementContext_t* context);
+void k_TryStatementContext_delete(k_TryStatementContext_t* context);
 
 // Children
 
 /**
  * @memberof TryStatementContext
  */
-void zen_TryStatementContext_getChildren(zen_TryStatementContext_t* context, jtk_ArrayList_t* children);
+void k_TryStatementContext_getChildren(k_TryStatementContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_TRY_STATEMENT_CONTEXT_H */

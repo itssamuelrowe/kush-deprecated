@@ -25,11 +25,11 @@
 
 /**
  * @class SymbolCategory
- * @ingroup zen_compiler_symbolTable
+ * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
  * @since zen 1.0
  */
-enum zen_SymbolCategory_t {
+enum k_SymbolCategory_t {
     ZEN_SYMBOL_CATEGORY_ANNOTATION,
     ZEN_SYMBOL_CATEGORY_CLASS,
     ZEN_SYMBOL_CATEGORY_ENUMERATE,
@@ -45,6 +45,6 @@ enum zen_SymbolCategory_t {
 /**
  * @memberof SymbolCategory
  */
-typedef enum zen_SymbolCategory_t zen_SymbolCategory_t;
+typedef enum k_SymbolCategory_t k_SymbolCategory_t;
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_CATEGORY_H */

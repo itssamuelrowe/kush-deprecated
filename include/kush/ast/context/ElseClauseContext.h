@@ -28,39 +28,39 @@
 
 /**
  * @class ElseClauseContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_ElseClauseContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_statementSuite;
+struct k_ElseClauseContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_statementSuite;
 };
 
 /**
  * @memberof ElseClauseContext
  */
-typedef struct zen_ElseClauseContext_t zen_ElseClauseContext_t;
+typedef struct k_ElseClauseContext_t k_ElseClauseContext_t;
 
 // Constructor
 
 /**
  * @memberof ElseClauseContext
  */
-zen_ElseClauseContext_t* zen_ElseClauseContext_new(zen_ASTNode_t* node);
+k_ElseClauseContext_t* k_ElseClauseContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof ElseClauseContext
  */
-void zen_ElseClauseContext_delete(zen_ElseClauseContext_t* context);
+void k_ElseClauseContext_delete(k_ElseClauseContext_t* context);
 
 // Children
 
 /**
  * @memberof ElseClauseContext
  */
-void zen_ElseClauseContext_getChildren(zen_ElseClauseContext_t* context, jtk_ArrayList_t* children);
+void k_ElseClauseContext_getChildren(k_ElseClauseContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ELSE_CLAUSE_CONTEXT_H */

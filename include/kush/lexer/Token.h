@@ -36,9 +36,9 @@
  * @author Samuel Rowe
  * @since  zen 1.0
  */
-struct zen_Token_t {
-    zen_TokenChannel_t m_channel;
-    zen_TokenType_t m_type;
+struct k_Token_t {
+    k_TokenChannel_t m_channel;
+    k_TokenType_t m_type;
     uint8_t* m_text;
     int32_t m_length;
     int32_t m_startIndex;
@@ -54,14 +54,14 @@ struct zen_Token_t {
 /**
  * @memberof Token
  */
-typedef struct zen_Token_t zen_Token_t;
+typedef struct k_Token_t k_Token_t;
 
 // Constructor
 
 /**
  * @memberof Token
  */
-zen_Token_t* zen_Token_new(zen_TokenChannel_t channel, zen_TokenType_t type,
+k_Token_t* k_Token_new(k_TokenChannel_t channel, k_TokenType_t type,
     const uint8_t* text, int32_t length, int32_t startIndex, int32_t stopIndex,
     int32_t startLine, int32_t stopLine, int32_t startColumn, int32_t stopColumn,
     const char* file);
@@ -71,121 +71,121 @@ zen_Token_t* zen_Token_new(zen_TokenChannel_t channel, zen_TokenType_t type,
 /**
  * @memberof Token
  */
-void zen_Token_delete(zen_Token_t* token);
+void k_Token_delete(k_Token_t* token);
 
 // Channel
 
 /**
  * @memberof Token
  */
-zen_TokenChannel_t zen_Token_getChannel(zen_Token_t* token);
+k_TokenChannel_t k_Token_getChannel(k_Token_t* token);
 
 /**
  * @memberof Token
  */
-void zen_Token_setChannel(zen_Token_t* token, zen_TokenChannel_t channel);
+void k_Token_setChannel(k_Token_t* token, k_TokenChannel_t channel);
 
 // Type
 
 /**
  * @memberof Token
  */
-zen_TokenType_t zen_Token_getType(zen_Token_t* token);
+k_TokenType_t k_Token_getType(k_Token_t* token);
 
 /**
  * @memberof Token
  */
-void zen_Token_setType(zen_Token_t* token, zen_TokenType_t type);
+void k_Token_setType(k_Token_t* token, k_TokenType_t type);
 
 // Text
 
 /**
  * @memberof Token
  */
-void zen_Token_setText(zen_Token_t* token, const uint8_t* text, int32_t length);
+void k_Token_setText(k_Token_t* token, const uint8_t* text, int32_t length);
 
 /**
  * @memberof Token
  */
-const uint8_t* zen_Token_getText(zen_Token_t* token);
+const uint8_t* k_Token_getText(k_Token_t* token);
 
 // Length
 
 /**
  * @memberof Token
  */
-int32_t zen_Token_getLength(zen_Token_t* token);
+int32_t k_Token_getLength(k_Token_t* token);
 
 // Start Index
 
 /**
  * @memberof Token
  */
-void zen_Token_setStartIndex(zen_Token_t* token, int32_t startIndex);
+void k_Token_setStartIndex(k_Token_t* token, int32_t startIndex);
 
 /**
  * @memberof Token
  */
-void zen_Token_setStopIndex(zen_Token_t* token, int32_t stopIndex);
+void k_Token_setStopIndex(k_Token_t* token, int32_t stopIndex);
 
 // Start Line
 
 /**
  * @memberof Token
  */
-void zen_Token_setStartLine(zen_Token_t* token, int32_t startLine);
+void k_Token_setStartLine(k_Token_t* token, int32_t startLine);
 
 /**
  * @memberof Token
  */
-int32_t zen_Token_getStartLine(zen_Token_t* token);
+int32_t k_Token_getStartLine(k_Token_t* token);
 
 // Stop Line
 
 /**
  * @memberof Token
  */
-void zen_Token_setStopLine(zen_Token_t* token, int32_t stopLine);
+void k_Token_setStopLine(k_Token_t* token, int32_t stopLine);
 
 /**
  * @memberof Token
  */
-int32_t zen_Token_getStopLine(zen_Token_t* token);
+int32_t k_Token_getStopLine(k_Token_t* token);
 
 // Start Column
 
 /**
  * @memberof Token
  */
-void zen_Token_setStartColumn(zen_Token_t* token, int32_t startColumn);
+void k_Token_setStartColumn(k_Token_t* token, int32_t startColumn);
 
 /**
  * @memberof Token
  */
-int32_t zen_Token_getStartColumn(zen_Token_t* token);
+int32_t k_Token_getStartColumn(k_Token_t* token);
 
 // Stop Column
 
 /**
  * @memberof Token
  */
-void zen_Token_setStopColumn(zen_Token_t* token, int32_t stopColumn);
+void k_Token_setStopColumn(k_Token_t* token, int32_t stopColumn);
 
 /**
  * @memberof Token
  */
-int32_t zen_Token_getStopColumn(zen_Token_t* token);
+int32_t k_Token_getStopColumn(k_Token_t* token);
 
 // Index
 
 /**
  * @memberof Token
  */
-int32_t zen_Token_getIndex(zen_Token_t* token);
+int32_t k_Token_getIndex(k_Token_t* token);
 
 /**
  * @memberof Token
  */
-void zen_Token_setIndex(zen_Token_t* token, int32_t index);
+void k_Token_setIndex(k_Token_t* token, int32_t index);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_LEXER_TOKEN_H */

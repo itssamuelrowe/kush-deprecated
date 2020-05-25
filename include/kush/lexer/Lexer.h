@@ -38,7 +38,7 @@
 
 /* Forward Reference */
 
-typedef struct zen_ErrorHandler_t zen_ErrorHandler_t;
+typedef struct k_ErrorHandler_t k_ErrorHandler_t;
 
 /*******************************************************************************
  * Lexer                                                                       *
@@ -52,9 +52,9 @@ typedef struct zen_ErrorHandler_t zen_ErrorHandler_t;
  * @author Samuel Rowe
  * @since  zen 1.0
  */
-struct zen_Lexer_t {
+struct k_Lexer_t {
 
-    zen_Compiler_t* m_compiler;
+    k_Compiler_t* m_compiler;
 
     /**
      * The input stream of characters.
@@ -63,7 +63,7 @@ struct zen_Lexer_t {
 
     /**
      * The character at LA(1), this field is always updated
-     * by zen_Lexer_consume(...).
+     * by k_Lexer_consume(...).
      */
     int32_t m_la1;
 
@@ -112,13 +112,13 @@ struct zen_Lexer_t {
     /**
      * The token that was most recently emitted.
      */
-    zen_Token_t* m_token;
+    k_Token_t* m_token;
 
     /**
      * The channel on which the next recognized
      * token will be created on.
      */
-    zen_TokenChannel_t  m_channel;
+    k_TokenChannel_t  m_channel;
 
     /**
      * The text consumed so far to recognize the next
@@ -129,12 +129,12 @@ struct zen_Lexer_t {
     /**
      * The token type of the next recognized token.
      */
-    zen_TokenType_t m_type;
+    k_TokenType_t m_type;
 
     /**
      * A buffer to store emitted tokens.
      *
-     * A single call to zen_Lexer_nextToken() may result in
+     * A single call to k_Lexer_nextToken() may result in
      * emission of multiple tokens. Therefore, the lexer
      * buffers up tokens.
      */
@@ -160,15 +160,15 @@ struct zen_Lexer_t {
      */
     int32_t m_enclosures;
 
-    zen_ErrorCode_t m_errorCode;
+    k_ErrorCode_t m_errorCode;
 };
 
 /**
  * @memberof Lexer
  */
-typedef struct zen_Lexer_t zen_Lexer_t;
+typedef struct k_Lexer_t k_Lexer_t;
 
-const uint8_t* zen_Lexer_getLiteralName(zen_TokenType_t type);
+const uint8_t* k_Lexer_getLiteralName(k_TokenType_t type);
 
 // Constructor
 
@@ -177,7 +177,7 @@ const uint8_t* zen_Lexer_getLiteralName(zen_TokenType_t type);
  *
  * @return A new lexer.
  */
-zen_Lexer_t* zen_Lexer_new(zen_Compiler_t* compiler);
+k_Lexer_t* k_Lexer_new(k_Compiler_t* compiler);
 
 // Destructor
 
@@ -187,19 +187,19 @@ zen_Lexer_t* zen_Lexer_new(zen_Compiler_t* compiler);
  * @param lexer
  *        The lexer to destroy.
  */
-void zen_Lexer_delete(zen_Lexer_t* lexer);
+void k_Lexer_delete(k_Lexer_t* lexer);
 
 // Consume
 
-void zen_Lexer_consume(zen_Lexer_t* lexer);
+void k_Lexer_consume(k_Lexer_t* lexer);
 
 // Emit
 
-void zen_Lexer_emit(zen_Lexer_t* lexer, zen_Token_t* token);
+void k_Lexer_emit(k_Lexer_t* lexer, k_Token_t* token);
 
 // Error
 
-zen_LexerError_t* zen_Lexer_createError(zen_Lexer_t* lexer, const char* message);
+k_LexerError_t* k_Lexer_createError(k_Lexer_t* lexer, const char* message);
 
 // Token
 
@@ -210,7 +210,7 @@ zen_LexerError_t* zen_Lexer_createError(zen_Lexer_t* lexer, const char* message)
  *         The lexer that is creating the token.
  * @return A token.
  */
-zen_Token_t* zen_Lexer_createToken(zen_Lexer_t* lexer);
+k_Token_t* k_Lexer_createToken(k_Lexer_t* lexer);
 
 /**
  * The primary interface for the Lexer class. It uses the lookahead
@@ -226,7 +226,7 @@ zen_Token_t* zen_Lexer_createToken(zen_Lexer_t* lexer);
  *         is encountered; ignored, otherwise.
  * @return The next recognized token.
  */
-zen_Token_t* zen_Lexer_nextToken(zen_Lexer_t* lexer);
+k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer);
 
 
 // Newline
@@ -234,105 +234,105 @@ zen_Token_t* zen_Lexer_nextToken(zen_Lexer_t* lexer);
 /**
  * @memberof Lexer
  */
-void zen_Lexer_onNewline(zen_Lexer_t* lexer);
+void k_Lexer_onNewline(k_Lexer_t* lexer);
 
 // Reset
 
 /**
  * @memberof Lexer
  */
-void zen_Lexer_reset(zen_Lexer_t* lexer, jtk_InputStream_t* inputStream);
+void k_Lexer_reset(k_Lexer_t* lexer, jtk_InputStream_t* inputStream);
 
 // Misc.
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isInputStart(zen_Lexer_t* lexer);
+bool k_Lexer_isInputStart(k_Lexer_t* lexer);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isBinaryPrefix(int32_t codePoint);
+bool k_Lexer_isBinaryPrefix(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isBinaryDigit(int32_t codePoint);
+bool k_Lexer_isBinaryDigit(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isBinaryDigitOrUnderscore(int32_t codePoint);
+bool k_Lexer_isBinaryDigitOrUnderscore(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isBasicEscapeSequence(int32_t codePoint);
+bool k_Lexer_isBasicEscapeSequence(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isDecimalDigit(int32_t codePoint);
+bool k_Lexer_isDecimalDigit(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isDecimalDigitOrUnderscore(int32_t codePoint);
+bool k_Lexer_isDecimalDigitOrUnderscore(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isIdentifierStart(int32_t codePoint);
+bool k_Lexer_isIdentifierStart(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isIdentifierPart(int32_t codePoint);
+bool k_Lexer_isIdentifierPart(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isLetter(int32_t codePoint);
+bool k_Lexer_isLetter(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isLetterOrDigit(int32_t codePoint);
+bool k_Lexer_isLetterOrDigit(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isHexadecimalPrefix(int32_t codePoint);
+bool k_Lexer_isHexadecimalPrefix(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isHexadecimalDigit(int32_t codePoint);
+bool k_Lexer_isHexadecimalDigit(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isHexadecimalDigitOrUnderscore(int32_t codePoint);
+bool k_Lexer_isHexadecimalDigitOrUnderscore(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isOctalDigit(int32_t codePoint);
+bool k_Lexer_isOctalDigit(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isOctalPrefix(int32_t codePoint);
+bool k_Lexer_isOctalPrefix(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isOctalDigitOrUnderscore(int32_t codePoint);
+bool k_Lexer_isOctalDigitOrUnderscore(int32_t codePoint);
 
 /**
  * @memberof Lexer
  */
-bool zen_Lexer_isIntegerSuffix(int32_t codePoint);
+bool k_Lexer_isIntegerSuffix(int32_t codePoint);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_LEXER_LEXER_H */

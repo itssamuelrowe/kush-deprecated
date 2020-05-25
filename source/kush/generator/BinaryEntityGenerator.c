@@ -40,7 +40,7 @@
 #include <com/onecube/zen/virtual-machine/feb/attribute/InstructionAttribute.h>
 #include <com/onecube/zen/virtual-machine/feb/attribute/PredefinedAttribute.h>
 
-/* TODO: Move the variable to zen_BinaryEntityGenerator_t. */
+/* TODO: Move the variable to k_BinaryEntityGenerator_t. */
 bool lhs = false;
 
 // Initialize
@@ -53,13 +53,13 @@ bool lhs = false;
 #define ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_INVOKE_EX 4
 #define ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_LOAD_FIELD 5
 
-uint16_t zen_Symbol_findFunctionIndex(zen_ConstantPoolBuilder_t* builder,
-    zen_Symbol_t* symbol,
+uint16_t k_Symbol_findFunctionIndex(k_ConstantPoolBuilder_t* builder,
+    k_Symbol_t* symbol,
     const uint8_t* functionName, int32_t functionNameSize,
     const uint8_t* descriptor, uint8_t* descriptorSize) {
-    zen_Symbol_t* function = zen_Scope_resolve(symbol->m_context.m_asClass.m_classScope,
+    k_Symbol_t* function = k_Scope_resolve(symbol->m_context.m_asClass.m_classScope,
         functionName);
-    zen_FunctionSignature_t* signature = zen_Symbol_getFunctionSignatureEx(
+    k_FunctionSignature_t* signature = k_Symbol_getFunctionSignatureEx(
         function, descriptor, descriptorSize);
 
     const uint8_t* className = symbol->m_context.m_asClass.m_qualifiedName;
@@ -68,7 +68,7 @@ uint16_t zen_Symbol_findFunctionIndex(zen_ConstantPoolBuilder_t* builder,
     uint8_t* classDescriptor = jtk_CString_newEx(className, classNameSize);
     jtk_Arrays_replace_b(classDescriptor, classNameSize, '.', '/');
 
-    uint16_t index = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t index = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         builder, classDescriptor, classNameSize, descriptor,
         descriptorSize, functionName, functionNameSize,
         signature->m_tableIndex
@@ -79,51 +79,51 @@ uint16_t zen_Symbol_findFunctionIndex(zen_ConstantPoolBuilder_t* builder,
     return index;
 }
 
-void zen_BinaryEntityGenerator_initializeCPFCache(zen_BinaryEntityGenerator_t* generator) {
+void k_BinaryEntityGenerator_initializeCPFCache(k_BinaryEntityGenerator_t* generator) {
     generator->m_cpfIndexes = jtk_Memory_allocate(uint16_t, ZEN_BINARY_ENTITY_GENERATOR_CPF_COUNT);
 
     // Boolean
-    zen_Symbol_t* booleanClass = zen_Compiler_resolveSymbol(generator->m_compiler,
+    k_Symbol_t* booleanClass = k_Compiler_resolveSymbol(generator->m_compiler,
         "zen.core.Boolean", 16);
      // TODO: "z:v", 3
     generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE] =
-        zen_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
+        k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
             booleanClass, "getValue", 8, "(zen/core/Object):v", 19);
 
     // ZenKernel
-    zen_Symbol_t* zenKernelClass = zen_Compiler_resolveSymbol(generator->m_compiler,
+    k_Symbol_t* zenKernelClass = k_Compiler_resolveSymbol(generator->m_compiler,
         "zen.core.ZenKernel", 18);
     generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_EVALUATE] =
-        zen_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
+        k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
             zenKernelClass, "evaluate", 8, "(zen/core/Object):(zen/core/Object)(zen/core/Object)(zen/core/Object)", 69);
     generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_STORE_FIELD] =
-        zen_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
+        k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
             zenKernelClass, "storeField", 10, "(zen/core/Object):(zen/core/Object)(zen/core/Object)(zen/core/Object)", 69);
     generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_INVOKE] =
-        zen_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
+        k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
             zenKernelClass, "invoke", 6, "(zen/core/Object):(zen/core/Object)(zen/core/Object)", 52);
     generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_INVOKE_EX] =
-        zen_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
+        k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
             zenKernelClass, "invokeEx", 8, "(zen/core/Object):(zen/core/Object)(zen/core/Object)@(zen/core/Object)", 70);
     generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_LOAD_FIELD] =
-        zen_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
+        k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
             zenKernelClass, "loadField", 9, "(zen/core/Object):(zen/core/Object)(zen/core/Object)", 52);
 }
 
 // Constructor
 
-zen_BinaryEntityGenerator_t* zen_BinaryEntityGenerator_new(
-    zen_Compiler_t* compiler) {
-    zen_BinaryEntityGenerator_t* generator = zen_Memory_allocate(zen_BinaryEntityGenerator_t, 1);
+k_BinaryEntityGenerator_t* k_BinaryEntityGenerator_new(
+    k_Compiler_t* compiler) {
+    k_BinaryEntityGenerator_t* generator = k_Memory_allocate(k_BinaryEntityGenerator_t, 1);
     generator->m_compiler = compiler;
-    generator->m_astListener = zen_ASTListener_newWithContext(generator);
-    generator->m_builder = zen_BinaryEntityBuilder_new();
+    generator->m_astListener = k_ASTListener_newWithContext(generator);
+    generator->m_builder = k_BinaryEntityBuilder_new();
     generator->m_symbolTable = NULL;
     generator->m_scopes = NULL;
     generator->m_compilationUnit = NULL;
     generator->m_outputStream = NULL;
-    generator->m_entityFile = zen_Memory_allocate(zen_EntityFile_t, 1);
-    generator->m_constantPoolBuilder = zen_ConstantPoolBuilder_new();
+    generator->m_entityFile = k_Memory_allocate(k_EntityFile_t, 1);
+    generator->m_constantPoolBuilder = k_ConstantPoolBuilder_new();
     generator->m_package = NULL;
     generator->m_fields = jtk_ArrayList_new();
     generator->m_functions = jtk_ArrayList_new();
@@ -144,244 +144,244 @@ zen_BinaryEntityGenerator_t* zen_BinaryEntityGenerator_new(
     generator->m_classNameSize = -1;
     generator->m_cpfIndexes = NULL;
 
-    zen_ASTListener_t* astListener = generator->m_astListener;
+    k_ASTListener_t* astListener = generator->m_astListener;
 
-    astListener->m_onVisitErrorNode = zen_BinaryEntityGenerator_onVisitErrorNode;
-    astListener->m_onVisitTerminal = zen_BinaryEntityGenerator_onVisitTerminal;
+    astListener->m_onVisitErrorNode = k_BinaryEntityGenerator_onVisitErrorNode;
+    astListener->m_onVisitTerminal = k_BinaryEntityGenerator_onVisitTerminal;
 
-    astListener->m_onEnterEveryRule = zen_BinaryEntityGenerator_onEnterEveryRule;
-    astListener->m_onExitEveryRule = zen_BinaryEntityGenerator_onExitEveryRule;
+    astListener->m_onEnterEveryRule = k_BinaryEntityGenerator_onEnterEveryRule;
+    astListener->m_onExitEveryRule = k_BinaryEntityGenerator_onExitEveryRule;
 
-    astListener->m_onEnterCompilationUnit = zen_BinaryEntityGenerator_onEnterCompilationUnit;
-    astListener->m_onExitCompilationUnit = zen_BinaryEntityGenerator_onExitCompilationUnit;
+    astListener->m_onEnterCompilationUnit = k_BinaryEntityGenerator_onEnterCompilationUnit;
+    astListener->m_onExitCompilationUnit = k_BinaryEntityGenerator_onExitCompilationUnit;
 
-    astListener->m_onEnterImportDeclaration = zen_BinaryEntityGenerator_onEnterImportDeclaration;
-    astListener->m_onExitImportDeclaration = zen_BinaryEntityGenerator_onExitImportDeclaration;
+    astListener->m_onEnterImportDeclaration = k_BinaryEntityGenerator_onEnterImportDeclaration;
+    astListener->m_onExitImportDeclaration = k_BinaryEntityGenerator_onExitImportDeclaration;
 
-    astListener->m_onEnterAnnotatedComponentDeclaration = zen_BinaryEntityGenerator_onEnterAnnotatedComponentDeclaration;
-    astListener->m_onExitAnnotatedComponentDeclaration = zen_BinaryEntityGenerator_onExitAnnotatedComponentDeclaration;
+    astListener->m_onEnterAnnotatedComponentDeclaration = k_BinaryEntityGenerator_onEnterAnnotatedComponentDeclaration;
+    astListener->m_onExitAnnotatedComponentDeclaration = k_BinaryEntityGenerator_onExitAnnotatedComponentDeclaration;
 
-    astListener->m_onEnterAnnotations = zen_BinaryEntityGenerator_onEnterAnnotations;
-    astListener->m_onExitAnnotations = zen_BinaryEntityGenerator_onExitAnnotations;
+    astListener->m_onEnterAnnotations = k_BinaryEntityGenerator_onEnterAnnotations;
+    astListener->m_onExitAnnotations = k_BinaryEntityGenerator_onExitAnnotations;
 
-    astListener->m_onEnterAnnotation = zen_BinaryEntityGenerator_onEnterAnnotation;
-    astListener->m_onExitAnnotation = zen_BinaryEntityGenerator_onExitAnnotation;
+    astListener->m_onEnterAnnotation = k_BinaryEntityGenerator_onEnterAnnotation;
+    astListener->m_onExitAnnotation = k_BinaryEntityGenerator_onExitAnnotation;
 
-    astListener->m_onEnterAnnotationType = zen_BinaryEntityGenerator_onEnterAnnotationType;
-    astListener->m_onExitAnnotationType = zen_BinaryEntityGenerator_onExitAnnotationType;
+    astListener->m_onEnterAnnotationType = k_BinaryEntityGenerator_onEnterAnnotationType;
+    astListener->m_onExitAnnotationType = k_BinaryEntityGenerator_onExitAnnotationType;
 
-    astListener->m_onEnterAnnotationAttribute = zen_BinaryEntityGenerator_onEnterAnnotationAttribute;
-    astListener->m_onExitAnnotationAttribute = zen_BinaryEntityGenerator_onExitAnnotationAttribute;
+    astListener->m_onEnterAnnotationAttribute = k_BinaryEntityGenerator_onEnterAnnotationAttribute;
+    astListener->m_onExitAnnotationAttribute = k_BinaryEntityGenerator_onExitAnnotationAttribute;
 
-    astListener->m_onEnterComponentDeclaration = zen_BinaryEntityGenerator_onEnterComponentDeclaration;
-    astListener->m_onExitComponentDeclaration = zen_BinaryEntityGenerator_onExitComponentDeclaration;
+    astListener->m_onEnterComponentDeclaration = k_BinaryEntityGenerator_onEnterComponentDeclaration;
+    astListener->m_onExitComponentDeclaration = k_BinaryEntityGenerator_onExitComponentDeclaration;
 
-    astListener->m_onEnterFunctionDeclaration = zen_BinaryEntityGenerator_onEnterFunctionDeclaration;
-    astListener->m_onExitFunctionDeclaration = zen_BinaryEntityGenerator_onExitFunctionDeclaration;
+    astListener->m_onEnterFunctionDeclaration = k_BinaryEntityGenerator_onEnterFunctionDeclaration;
+    astListener->m_onExitFunctionDeclaration = k_BinaryEntityGenerator_onExitFunctionDeclaration;
 
-    astListener->m_onEnterFunctionParameters = zen_BinaryEntityGenerator_onEnterFunctionParameters;
-    astListener->m_onExitFunctionParameters = zen_BinaryEntityGenerator_onExitFunctionParameters;
+    astListener->m_onEnterFunctionParameters = k_BinaryEntityGenerator_onEnterFunctionParameters;
+    astListener->m_onExitFunctionParameters = k_BinaryEntityGenerator_onExitFunctionParameters;
 
-    astListener->m_onEnterFunctionBody = zen_BinaryEntityGenerator_onEnterFunctionBody;
-    astListener->m_onExitFunctionBody = zen_BinaryEntityGenerator_onExitFunctionBody;
+    astListener->m_onEnterFunctionBody = k_BinaryEntityGenerator_onEnterFunctionBody;
+    astListener->m_onExitFunctionBody = k_BinaryEntityGenerator_onExitFunctionBody;
 
-    astListener->m_onEnterStatementSuite = zen_BinaryEntityGenerator_onEnterStatementSuite;
-    astListener->m_onExitStatementSuite = zen_BinaryEntityGenerator_onExitStatementSuite;
+    astListener->m_onEnterStatementSuite = k_BinaryEntityGenerator_onEnterStatementSuite;
+    astListener->m_onExitStatementSuite = k_BinaryEntityGenerator_onExitStatementSuite;
 
-    astListener->m_onEnterSimpleStatement = zen_BinaryEntityGenerator_onEnterSimpleStatement;
-    astListener->m_onExitSimpleStatement = zen_BinaryEntityGenerator_onExitSimpleStatement;
+    astListener->m_onEnterSimpleStatement = k_BinaryEntityGenerator_onEnterSimpleStatement;
+    astListener->m_onExitSimpleStatement = k_BinaryEntityGenerator_onExitSimpleStatement;
 
-    astListener->m_onEnterStatement = zen_BinaryEntityGenerator_onEnterStatement;
-    astListener->m_onExitStatement = zen_BinaryEntityGenerator_onExitStatement;
+    astListener->m_onEnterStatement = k_BinaryEntityGenerator_onEnterStatement;
+    astListener->m_onExitStatement = k_BinaryEntityGenerator_onExitStatement;
 
-    astListener->m_onEnterEmptyStatement = zen_BinaryEntityGenerator_onEnterEmptyStatement;
-    astListener->m_onExitEmptyStatement = zen_BinaryEntityGenerator_onExitEmptyStatement;
+    astListener->m_onEnterEmptyStatement = k_BinaryEntityGenerator_onEnterEmptyStatement;
+    astListener->m_onExitEmptyStatement = k_BinaryEntityGenerator_onExitEmptyStatement;
 
-    astListener->m_onEnterVariableDeclaration = zen_BinaryEntityGenerator_onEnterVariableDeclaration;
-    astListener->m_onExitVariableDeclaration = zen_BinaryEntityGenerator_onExitVariableDeclaration;
+    astListener->m_onEnterVariableDeclaration = k_BinaryEntityGenerator_onEnterVariableDeclaration;
+    astListener->m_onExitVariableDeclaration = k_BinaryEntityGenerator_onExitVariableDeclaration;
 
-    astListener->m_onEnterVariableDeclarator = zen_BinaryEntityGenerator_onEnterVariableDeclarator;
-    astListener->m_onExitVariableDeclarator = zen_BinaryEntityGenerator_onExitVariableDeclarator;
+    astListener->m_onEnterVariableDeclarator = k_BinaryEntityGenerator_onEnterVariableDeclarator;
+    astListener->m_onExitVariableDeclarator = k_BinaryEntityGenerator_onExitVariableDeclarator;
 
-    astListener->m_onEnterConstantDeclaration = zen_BinaryEntityGenerator_onEnterConstantDeclaration;
-    astListener->m_onExitConstantDeclaration = zen_BinaryEntityGenerator_onExitConstantDeclaration;
+    astListener->m_onEnterConstantDeclaration = k_BinaryEntityGenerator_onEnterConstantDeclaration;
+    astListener->m_onExitConstantDeclaration = k_BinaryEntityGenerator_onExitConstantDeclaration;
 
-    astListener->m_onEnterConstantDeclarator = zen_BinaryEntityGenerator_onEnterConstantDeclarator;
-    astListener->m_onExitConstantDeclarator = zen_BinaryEntityGenerator_onExitConstantDeclarator;
+    astListener->m_onEnterConstantDeclarator = k_BinaryEntityGenerator_onEnterConstantDeclarator;
+    astListener->m_onExitConstantDeclarator = k_BinaryEntityGenerator_onExitConstantDeclarator;
 
-    astListener->m_onEnterAssertStatement = zen_BinaryEntityGenerator_onEnterAssertStatement;
-    astListener->m_onExitAssertStatement = zen_BinaryEntityGenerator_onExitAssertStatement;
+    astListener->m_onEnterAssertStatement = k_BinaryEntityGenerator_onEnterAssertStatement;
+    astListener->m_onExitAssertStatement = k_BinaryEntityGenerator_onExitAssertStatement;
 
-    astListener->m_onEnterBreakStatement = zen_BinaryEntityGenerator_onEnterBreakStatement;
-    astListener->m_onExitBreakStatement = zen_BinaryEntityGenerator_onExitBreakStatement;
+    astListener->m_onEnterBreakStatement = k_BinaryEntityGenerator_onEnterBreakStatement;
+    astListener->m_onExitBreakStatement = k_BinaryEntityGenerator_onExitBreakStatement;
 
-    astListener->m_onEnterContinueStatement = zen_BinaryEntityGenerator_onEnterContinueStatement;
-    astListener->m_onExitContinueStatement = zen_BinaryEntityGenerator_onExitContinueStatement;
+    astListener->m_onEnterContinueStatement = k_BinaryEntityGenerator_onEnterContinueStatement;
+    astListener->m_onExitContinueStatement = k_BinaryEntityGenerator_onExitContinueStatement;
 
-    astListener->m_onEnterReturnStatement = zen_BinaryEntityGenerator_onEnterReturnStatement;
-    astListener->m_onExitReturnStatement = zen_BinaryEntityGenerator_onExitReturnStatement;
+    astListener->m_onEnterReturnStatement = k_BinaryEntityGenerator_onEnterReturnStatement;
+    astListener->m_onExitReturnStatement = k_BinaryEntityGenerator_onExitReturnStatement;
 
-    astListener->m_onEnterThrowStatement = zen_BinaryEntityGenerator_onEnterThrowStatement;
-    astListener->m_onExitThrowStatement = zen_BinaryEntityGenerator_onExitThrowStatement;
+    astListener->m_onEnterThrowStatement = k_BinaryEntityGenerator_onEnterThrowStatement;
+    astListener->m_onExitThrowStatement = k_BinaryEntityGenerator_onExitThrowStatement;
 
-    astListener->m_onEnterCompoundStatement = zen_BinaryEntityGenerator_onEnterCompoundStatement;
-    astListener->m_onExitCompoundStatement = zen_BinaryEntityGenerator_onExitCompoundStatement;
+    astListener->m_onEnterCompoundStatement = k_BinaryEntityGenerator_onEnterCompoundStatement;
+    astListener->m_onExitCompoundStatement = k_BinaryEntityGenerator_onExitCompoundStatement;
 
-    astListener->m_onEnterIfStatement = zen_BinaryEntityGenerator_onEnterIfStatement;
-    astListener->m_onExitIfStatement = zen_BinaryEntityGenerator_onExitIfStatement;
+    astListener->m_onEnterIfStatement = k_BinaryEntityGenerator_onEnterIfStatement;
+    astListener->m_onExitIfStatement = k_BinaryEntityGenerator_onExitIfStatement;
 
-    astListener->m_onEnterIfClause = zen_BinaryEntityGenerator_onEnterIfClause;
-    astListener->m_onExitIfClause = zen_BinaryEntityGenerator_onExitIfClause;
+    astListener->m_onEnterIfClause = k_BinaryEntityGenerator_onEnterIfClause;
+    astListener->m_onExitIfClause = k_BinaryEntityGenerator_onExitIfClause;
 
-    astListener->m_onEnterElseIfClause = zen_BinaryEntityGenerator_onEnterElseIfClause;
-    astListener->m_onExitElseIfClause = zen_BinaryEntityGenerator_onExitElseIfClause;
+    astListener->m_onEnterElseIfClause = k_BinaryEntityGenerator_onEnterElseIfClause;
+    astListener->m_onExitElseIfClause = k_BinaryEntityGenerator_onExitElseIfClause;
 
-    astListener->m_onEnterElseClause = zen_BinaryEntityGenerator_onEnterElseClause;
-    astListener->m_onExitElseClause = zen_BinaryEntityGenerator_onExitElseClause;
+    astListener->m_onEnterElseClause = k_BinaryEntityGenerator_onEnterElseClause;
+    astListener->m_onExitElseClause = k_BinaryEntityGenerator_onExitElseClause;
 
-    astListener->m_onEnterIterativeStatement = zen_BinaryEntityGenerator_onEnterIterativeStatement;
-    astListener->m_onExitIterativeStatement = zen_BinaryEntityGenerator_onExitIterativeStatement;
+    astListener->m_onEnterIterativeStatement = k_BinaryEntityGenerator_onEnterIterativeStatement;
+    astListener->m_onExitIterativeStatement = k_BinaryEntityGenerator_onExitIterativeStatement;
 
-    astListener->m_onEnterLabelClause = zen_BinaryEntityGenerator_onEnterLabel;
-    astListener->m_onExitLabelClause = zen_BinaryEntityGenerator_onExitLabel;
+    astListener->m_onEnterLabelClause = k_BinaryEntityGenerator_onEnterLabel;
+    astListener->m_onExitLabelClause = k_BinaryEntityGenerator_onExitLabel;
 
-    astListener->m_onEnterWhileStatement = zen_BinaryEntityGenerator_onEnterWhileStatement;
-    astListener->m_onExitWhileStatement = zen_BinaryEntityGenerator_onExitWhileStatement;
+    astListener->m_onEnterWhileStatement = k_BinaryEntityGenerator_onEnterWhileStatement;
+    astListener->m_onExitWhileStatement = k_BinaryEntityGenerator_onExitWhileStatement;
 
-    astListener->m_onEnterForStatement = zen_BinaryEntityGenerator_onEnterForStatement;
-    astListener->m_onExitForStatement = zen_BinaryEntityGenerator_onExitForStatement;
+    astListener->m_onEnterForStatement = k_BinaryEntityGenerator_onEnterForStatement;
+    astListener->m_onExitForStatement = k_BinaryEntityGenerator_onExitForStatement;
 
-    astListener->m_onEnterForParameter = zen_BinaryEntityGenerator_onEnterForParameters;
-    astListener->m_onExitForParameter = zen_BinaryEntityGenerator_onExitForParameters;
+    astListener->m_onEnterForParameter = k_BinaryEntityGenerator_onEnterForParameters;
+    astListener->m_onExitForParameter = k_BinaryEntityGenerator_onExitForParameters;
 
-    astListener->m_onEnterTryStatement = zen_BinaryEntityGenerator_onEnterTryStatement;
-    astListener->m_onExitTryStatement = zen_BinaryEntityGenerator_onExitTryStatement;
+    astListener->m_onEnterTryStatement = k_BinaryEntityGenerator_onEnterTryStatement;
+    astListener->m_onExitTryStatement = k_BinaryEntityGenerator_onExitTryStatement;
 
-    astListener->m_onEnterTryClause = zen_BinaryEntityGenerator_onEnterTryClause;
-    astListener->m_onExitTryClause = zen_BinaryEntityGenerator_onExitTryClause;
+    astListener->m_onEnterTryClause = k_BinaryEntityGenerator_onEnterTryClause;
+    astListener->m_onExitTryClause = k_BinaryEntityGenerator_onExitTryClause;
 
-    astListener->m_onEnterCatchClause = zen_BinaryEntityGenerator_onEnterCatchClause;
-    astListener->m_onExitCatchClause = zen_BinaryEntityGenerator_onExitCatchClause;
+    astListener->m_onEnterCatchClause = k_BinaryEntityGenerator_onEnterCatchClause;
+    astListener->m_onExitCatchClause = k_BinaryEntityGenerator_onExitCatchClause;
 
-    astListener->m_onEnterCatchFilter = zen_BinaryEntityGenerator_onEnterCatchFilter;
-    astListener->m_onExitCatchFilter = zen_BinaryEntityGenerator_onExitCatchFilter;
+    astListener->m_onEnterCatchFilter = k_BinaryEntityGenerator_onEnterCatchFilter;
+    astListener->m_onExitCatchFilter = k_BinaryEntityGenerator_onExitCatchFilter;
 
-    astListener->m_onEnterFinallyClause = zen_BinaryEntityGenerator_onEnterFinallyClause;
-    astListener->m_onExitFinallyClause = zen_BinaryEntityGenerator_onExitFinallyClause;
+    astListener->m_onEnterFinallyClause = k_BinaryEntityGenerator_onEnterFinallyClause;
+    astListener->m_onExitFinallyClause = k_BinaryEntityGenerator_onExitFinallyClause;
 
-    astListener->m_onEnterSynchronizeStatement = zen_BinaryEntityGenerator_onEnterSynchronizeStatement;
-    astListener->m_onExitSynchronizeStatement = zen_BinaryEntityGenerator_onExitSynchronizeStatement;
+    astListener->m_onEnterSynchronizeStatement = k_BinaryEntityGenerator_onEnterSynchronizeStatement;
+    astListener->m_onExitSynchronizeStatement = k_BinaryEntityGenerator_onExitSynchronizeStatement;
 
-    astListener->m_onEnterWithStatement = zen_BinaryEntityGenerator_onEnterWithStatement;
-    astListener->m_onExitWithStatement = zen_BinaryEntityGenerator_onExitWithStatement;
+    astListener->m_onEnterWithStatement = k_BinaryEntityGenerator_onEnterWithStatement;
+    astListener->m_onExitWithStatement = k_BinaryEntityGenerator_onExitWithStatement;
 
-    astListener->m_onEnterClassDeclaration = zen_BinaryEntityGenerator_onEnterClassDeclaration;
-    astListener->m_onExitClassDeclaration = zen_BinaryEntityGenerator_onExitClassDeclaration;
+    astListener->m_onEnterClassDeclaration = k_BinaryEntityGenerator_onEnterClassDeclaration;
+    astListener->m_onExitClassDeclaration = k_BinaryEntityGenerator_onExitClassDeclaration;
 
-    astListener->m_onEnterClassExtendsClause = zen_BinaryEntityGenerator_onEnterClassExtendsClause;
-    astListener->m_onExitClassExtendsClause = zen_BinaryEntityGenerator_onExitClassExtendsClause;
+    astListener->m_onEnterClassExtendsClause = k_BinaryEntityGenerator_onEnterClassExtendsClause;
+    astListener->m_onExitClassExtendsClause = k_BinaryEntityGenerator_onExitClassExtendsClause;
 
-    astListener->m_onEnterClassSuite = zen_BinaryEntityGenerator_onEnterClassSuite;
-    astListener->m_onExitClassSuite = zen_BinaryEntityGenerator_onExitClassSuite;
+    astListener->m_onEnterClassSuite = k_BinaryEntityGenerator_onEnterClassSuite;
+    astListener->m_onExitClassSuite = k_BinaryEntityGenerator_onExitClassSuite;
 
-    astListener->m_onEnterClassMember = zen_BinaryEntityGenerator_onEnterClassMember;
-    astListener->m_onExitClassMember = zen_BinaryEntityGenerator_onExitClassMember;
+    astListener->m_onEnterClassMember = k_BinaryEntityGenerator_onEnterClassMember;
+    astListener->m_onExitClassMember = k_BinaryEntityGenerator_onExitClassMember;
 
-    // astListener->m_onEnterConstructorDeclaration = zen_BinaryEntityGenerator_onEnterConstructorDeclaration;
-    // astListener->m_onExitConstructorDeclaration = zen_BinaryEntityGenerator_onExitConstructorDeclaration;
+    // astListener->m_onEnterConstructorDeclaration = k_BinaryEntityGenerator_onEnterConstructorDeclaration;
+    // astListener->m_onExitConstructorDeclaration = k_BinaryEntityGenerator_onExitConstructorDeclaration;
 
-    astListener->m_onEnterEnumerationDeclaration = zen_BinaryEntityGenerator_onEnterEnumerationDeclaration;
-    astListener->m_onExitEnumerationDeclaration = zen_BinaryEntityGenerator_onExitEnumerationDeclaration;
+    astListener->m_onEnterEnumerationDeclaration = k_BinaryEntityGenerator_onEnterEnumerationDeclaration;
+    astListener->m_onExitEnumerationDeclaration = k_BinaryEntityGenerator_onExitEnumerationDeclaration;
 
-    astListener->m_onEnterEnumerationBaseClause = zen_BinaryEntityGenerator_onEnterEnumrationBaseClass;
-    astListener->m_onExitEnumerationBaseClause = zen_BinaryEntityGenerator_onExitEnumerationBaseClause;
+    astListener->m_onEnterEnumerationBaseClause = k_BinaryEntityGenerator_onEnterEnumrationBaseClass;
+    astListener->m_onExitEnumerationBaseClause = k_BinaryEntityGenerator_onExitEnumerationBaseClause;
 
-    astListener->m_onEnterEnumerationSuite = zen_BinaryEntityGenerator_onEnterEnumerationSuite;
-    astListener->m_onExitEnumerationSuite = zen_BinaryEntityGenerator_onExitEnumerationSuite;
+    astListener->m_onEnterEnumerationSuite = k_BinaryEntityGenerator_onEnterEnumerationSuite;
+    astListener->m_onExitEnumerationSuite = k_BinaryEntityGenerator_onExitEnumerationSuite;
 
-    astListener->m_onEnterEnumerate = zen_BinaryEntityGenerator_onEnterEnumerate;
-    astListener->m_onExitEnumerate = zen_BinaryEntityGenerator_onExitEnumerate;
+    astListener->m_onEnterEnumerate = k_BinaryEntityGenerator_onEnterEnumerate;
+    astListener->m_onExitEnumerate = k_BinaryEntityGenerator_onExitEnumerate;
 
-    astListener->m_onEnterExpressions = zen_BinaryEntityGenerator_onEnterExpressions;
-    astListener->m_onExitExpressions = zen_BinaryEntityGenerator_onExitExpressions;
+    astListener->m_onEnterExpressions = k_BinaryEntityGenerator_onEnterExpressions;
+    astListener->m_onExitExpressions = k_BinaryEntityGenerator_onExitExpressions;
 
-    astListener->m_onEnterExpression = zen_BinaryEntityGenerator_onEnterExpression;
-    astListener->m_onExitExpression = zen_BinaryEntityGenerator_onExitExpression;
+    astListener->m_onEnterExpression = k_BinaryEntityGenerator_onEnterExpression;
+    astListener->m_onExitExpression = k_BinaryEntityGenerator_onExitExpression;
 
-    astListener->m_onEnterAssignmentExpression = zen_BinaryEntityGenerator_onEnterAssignmentExpression;
-    astListener->m_onExitAssignmentExpression = zen_BinaryEntityGenerator_onExitAssignmentExpression;
+    astListener->m_onEnterAssignmentExpression = k_BinaryEntityGenerator_onEnterAssignmentExpression;
+    astListener->m_onExitAssignmentExpression = k_BinaryEntityGenerator_onExitAssignmentExpression;
 
-    astListener->m_onEnterConditionalExpression = zen_BinaryEntityGenerator_onEnterConditionalExpression;
-    astListener->m_onExitConditionalExpression = zen_BinaryEntityGenerator_onExitConditionalExpression;
+    astListener->m_onEnterConditionalExpression = k_BinaryEntityGenerator_onEnterConditionalExpression;
+    astListener->m_onExitConditionalExpression = k_BinaryEntityGenerator_onExitConditionalExpression;
 
-    astListener->m_onEnterLogicalOrExpression = zen_BinaryEntityGenerator_onEnterLogicalOrExpression;
-    astListener->m_onExitLogicalOrExpression = zen_BinaryEntityGenerator_onExitLogicalOrExpression;
+    astListener->m_onEnterLogicalOrExpression = k_BinaryEntityGenerator_onEnterLogicalOrExpression;
+    astListener->m_onExitLogicalOrExpression = k_BinaryEntityGenerator_onExitLogicalOrExpression;
 
-    astListener->m_onEnterLogicalAndExpression = zen_BinaryEntityGenerator_onEnterLogicalAndExpression;
-    astListener->m_onExitLogicalAndExpression = zen_BinaryEntityGenerator_onExitLogicalAndExpression;
+    astListener->m_onEnterLogicalAndExpression = k_BinaryEntityGenerator_onEnterLogicalAndExpression;
+    astListener->m_onExitLogicalAndExpression = k_BinaryEntityGenerator_onExitLogicalAndExpression;
 
-    astListener->m_onEnterInclusiveOrExpression = zen_BinaryEntityGenerator_onEnterInclusiveOrExpression;
-    astListener->m_onExitInclusiveOrExpression = zen_BinaryEntityGenerator_onExitInclusiveOrExpression;
+    astListener->m_onEnterInclusiveOrExpression = k_BinaryEntityGenerator_onEnterInclusiveOrExpression;
+    astListener->m_onExitInclusiveOrExpression = k_BinaryEntityGenerator_onExitInclusiveOrExpression;
 
-    astListener->m_onEnterExclusiveOrExpression = zen_BinaryEntityGenerator_onEnterExclusiveOrExpression;
-    astListener->m_onExitExclusiveOrExpression = zen_BinaryEntityGenerator_onExitExclusiveOrExpression;
+    astListener->m_onEnterExclusiveOrExpression = k_BinaryEntityGenerator_onEnterExclusiveOrExpression;
+    astListener->m_onExitExclusiveOrExpression = k_BinaryEntityGenerator_onExitExclusiveOrExpression;
 
-    astListener->m_onEnterAndExpression = zen_BinaryEntityGenerator_onEnterAndExpression;
-    astListener->m_onExitAndExpression = zen_BinaryEntityGenerator_onExitAndExpression;
+    astListener->m_onEnterAndExpression = k_BinaryEntityGenerator_onEnterAndExpression;
+    astListener->m_onExitAndExpression = k_BinaryEntityGenerator_onExitAndExpression;
 
-    astListener->m_onEnterEqualityExpression = zen_BinaryEntityGenerator_onEnterEqualityExpression;
-    astListener->m_onExitEqualityExpression = zen_BinaryEntityGenerator_onExitEqualityExpression;
+    astListener->m_onEnterEqualityExpression = k_BinaryEntityGenerator_onEnterEqualityExpression;
+    astListener->m_onExitEqualityExpression = k_BinaryEntityGenerator_onExitEqualityExpression;
 
-    astListener->m_onEnterRelationalExpression = zen_BinaryEntityGenerator_onEnterRelationalExpression;
-    astListener->m_onExitRelationalExpression = zen_BinaryEntityGenerator_onExitRelationalExpression;
+    astListener->m_onEnterRelationalExpression = k_BinaryEntityGenerator_onEnterRelationalExpression;
+    astListener->m_onExitRelationalExpression = k_BinaryEntityGenerator_onExitRelationalExpression;
 
-    astListener->m_onEnterShiftExpression = zen_BinaryEntityGenerator_onEnterShiftExpression;
-    astListener->m_onExitShiftExpression = zen_BinaryEntityGenerator_onExitShiftExpression;
+    astListener->m_onEnterShiftExpression = k_BinaryEntityGenerator_onEnterShiftExpression;
+    astListener->m_onExitShiftExpression = k_BinaryEntityGenerator_onExitShiftExpression;
 
-    astListener->m_onEnterAdditiveExpression = zen_BinaryEntityGenerator_onEnterAdditiveExpression;
-    astListener->m_onExitAdditiveExpression = zen_BinaryEntityGenerator_onExitAdditiveExpression;
+    astListener->m_onEnterAdditiveExpression = k_BinaryEntityGenerator_onEnterAdditiveExpression;
+    astListener->m_onExitAdditiveExpression = k_BinaryEntityGenerator_onExitAdditiveExpression;
 
-    astListener->m_onEnterMultiplicativeExpression = zen_BinaryEntityGenerator_onEnterMultiplicativeExpression;
-    astListener->m_onExitMultiplicativeExpression = zen_BinaryEntityGenerator_onExitMultiplicativeExpression;
+    astListener->m_onEnterMultiplicativeExpression = k_BinaryEntityGenerator_onEnterMultiplicativeExpression;
+    astListener->m_onExitMultiplicativeExpression = k_BinaryEntityGenerator_onExitMultiplicativeExpression;
 
-    astListener->m_onEnterUnaryExpression = zen_BinaryEntityGenerator_onEnterUnaryExpression;
-    astListener->m_onExitUnaryExpression = zen_BinaryEntityGenerator_onExitUnaryExpression;
+    astListener->m_onEnterUnaryExpression = k_BinaryEntityGenerator_onEnterUnaryExpression;
+    astListener->m_onExitUnaryExpression = k_BinaryEntityGenerator_onExitUnaryExpression;
 
-    astListener->m_onEnterPostfixExpression = zen_BinaryEntityGenerator_onEnterPostfixExpression;
-    astListener->m_onExitPostfixExpression = zen_BinaryEntityGenerator_onExitPostfixExpression;
+    astListener->m_onEnterPostfixExpression = k_BinaryEntityGenerator_onEnterPostfixExpression;
+    astListener->m_onExitPostfixExpression = k_BinaryEntityGenerator_onExitPostfixExpression;
 
-    astListener->m_onEnterSubscript = zen_BinaryEntityGenerator_onEnterSubscript;
-    astListener->m_onExitSubscript = zen_BinaryEntityGenerator_onExitSubscript;
+    astListener->m_onEnterSubscript = k_BinaryEntityGenerator_onEnterSubscript;
+    astListener->m_onExitSubscript = k_BinaryEntityGenerator_onExitSubscript;
 
-    astListener->m_onEnterFunctionArguments = zen_BinaryEntityGenerator_onEnterFunctionArguments;
-    astListener->m_onExitFunctionArguments = zen_BinaryEntityGenerator_onExitFunctionArguments;
+    astListener->m_onEnterFunctionArguments = k_BinaryEntityGenerator_onEnterFunctionArguments;
+    astListener->m_onExitFunctionArguments = k_BinaryEntityGenerator_onExitFunctionArguments;
 
-    astListener->m_onEnterMemberAccess = zen_BinaryEntityGenerator_onEnterMemberAccess;
-    astListener->m_onExitMemberAccess = zen_BinaryEntityGenerator_onExitMemberAccess;
+    astListener->m_onEnterMemberAccess = k_BinaryEntityGenerator_onEnterMemberAccess;
+    astListener->m_onExitMemberAccess = k_BinaryEntityGenerator_onExitMemberAccess;
 
-    astListener->m_onEnterPostfixOperator = zen_BinaryEntityGenerator_onEnterPostfixOperator;
-    astListener->m_onExitPostfixOperator = zen_BinaryEntityGenerator_onExitPostfixOperator;
+    astListener->m_onEnterPostfixOperator = k_BinaryEntityGenerator_onEnterPostfixOperator;
+    astListener->m_onExitPostfixOperator = k_BinaryEntityGenerator_onExitPostfixOperator;
 
-    astListener->m_onEnterPrimaryExpression = zen_BinaryEntityGenerator_onEnterPrimaryExpression;
-    astListener->m_onExitPrimaryExpression = zen_BinaryEntityGenerator_onExitPrimaryExpression;
+    astListener->m_onEnterPrimaryExpression = k_BinaryEntityGenerator_onEnterPrimaryExpression;
+    astListener->m_onExitPrimaryExpression = k_BinaryEntityGenerator_onExitPrimaryExpression;
 
-    astListener->m_onEnterMapExpression = zen_BinaryEntityGenerator_onEnterMapExpression;
-    astListener->m_onExitMapExpression = zen_BinaryEntityGenerator_onExitMapExpression;
+    astListener->m_onEnterMapExpression = k_BinaryEntityGenerator_onEnterMapExpression;
+    astListener->m_onExitMapExpression = k_BinaryEntityGenerator_onExitMapExpression;
 
-    astListener->m_onEnterMapEntries = zen_BinaryEntityGenerator_onEnterMapEntries;
-    astListener->m_onExitMapEntries = zen_BinaryEntityGenerator_onExitMapEntries;
+    astListener->m_onEnterMapEntries = k_BinaryEntityGenerator_onEnterMapEntries;
+    astListener->m_onExitMapEntries = k_BinaryEntityGenerator_onExitMapEntries;
 
-    astListener->m_onEnterMapEntry = zen_BinaryEntityGenerator_onEnterMapEntry;
-    astListener->m_onExitMapEntry = zen_BinaryEntityGenerator_onExitMapEntry;
+    astListener->m_onEnterMapEntry = k_BinaryEntityGenerator_onEnterMapEntry;
+    astListener->m_onExitMapEntry = k_BinaryEntityGenerator_onExitMapEntry;
 
-    astListener->m_onEnterListExpression = zen_BinaryEntityGenerator_onEnterListExpression;
-    astListener->m_onExitListExpression = zen_BinaryEntityGenerator_onExitListExpression;
+    astListener->m_onEnterListExpression = k_BinaryEntityGenerator_onEnterListExpression;
+    astListener->m_onExitListExpression = k_BinaryEntityGenerator_onExitListExpression;
 
-    astListener->m_onEnterNewExpression = zen_BinaryEntityGenerator_onEnterNewExpression;
-    astListener->m_onExitNewExpression = zen_BinaryEntityGenerator_onExitNewExpression;
+    astListener->m_onEnterNewExpression = k_BinaryEntityGenerator_onEnterNewExpression;
+    astListener->m_onExitNewExpression = k_BinaryEntityGenerator_onExitNewExpression;
 
     if (!generator->m_compiler->m_coreApi) {
-        zen_BinaryEntityGenerator_initializeCPFCache(generator);
+        k_BinaryEntityGenerator_initializeCPFCache(generator);
     }
 
     return generator;
@@ -389,14 +389,14 @@ zen_BinaryEntityGenerator_t* zen_BinaryEntityGenerator_new(
 
 // Constructor
 
-void zen_BinaryEntityGenerator_clearExceptionHandlerSites(zen_BinaryEntityGenerator_t* generator) {
+void k_BinaryEntityGenerator_clearExceptionHandlerSites(k_BinaryEntityGenerator_t* generator) {
     int32_t exceptionHandlerSiteCount = jtk_ArrayList_getSize(generator->m_exceptionHandlerSites);
     int32_t exceptionHandlerSiteIndex;
     for (exceptionHandlerSiteIndex = 0;
         exceptionHandlerSiteIndex < exceptionHandlerSiteCount;
         exceptionHandlerSiteIndex++) {
-        zen_ExceptionHandlerSite_t* exceptionHandlerSite =
-            (zen_ExceptionHandlerSite_t*)jtk_ArrayList_getValue(
+        k_ExceptionHandlerSite_t* exceptionHandlerSite =
+            (k_ExceptionHandlerSite_t*)jtk_ArrayList_getValue(
                 generator->m_exceptionHandlerSites,
                 exceptionHandlerSiteIndex);
         jtk_Memory_deallocate(exceptionHandlerSite);
@@ -404,48 +404,48 @@ void zen_BinaryEntityGenerator_clearExceptionHandlerSites(zen_BinaryEntityGenera
     jtk_ArrayList_clear(generator->m_exceptionHandlerSites);
 }
 
-void zen_BinaryEntityGenerator_clearFields(zen_BinaryEntityGenerator_t* generator) {
+void k_BinaryEntityGenerator_clearFields(k_BinaryEntityGenerator_t* generator) {
     int32_t fieldCount = jtk_ArrayList_getSize(generator->m_fields);
     int32_t fieldIndex;
     for (fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
-        zen_FieldEntity_t* fieldEntity = (zen_FieldEntity_t*)jtk_ArrayList_getValue(
+        k_FieldEntity_t* fieldEntity = (k_FieldEntity_t*)jtk_ArrayList_getValue(
             generator->m_fields, fieldIndex);
-        zen_FieldEntity_delete(fieldEntity);
+        k_FieldEntity_delete(fieldEntity);
     }
     jtk_ArrayList_clear(generator->m_fields);
 }
 
-void zen_BinaryEntityGenerator_clearFunctions(zen_BinaryEntityGenerator_t* generator) {
+void k_BinaryEntityGenerator_clearFunctions(k_BinaryEntityGenerator_t* generator) {
     int32_t functionCount = jtk_ArrayList_getSize(generator->m_functions);
     int32_t functionIndex;
     for (functionIndex = 0; functionIndex < functionCount; functionIndex++) {
-        zen_FunctionEntity_t* functionEntity = (zen_FunctionEntity_t*)jtk_ArrayList_getValue(
+        k_FunctionEntity_t* functionEntity = (k_FunctionEntity_t*)jtk_ArrayList_getValue(
             generator->m_functions, functionIndex);
-        zen_FunctionEntity_delete(functionEntity);
+        k_FunctionEntity_delete(functionEntity);
     }
     jtk_ArrayList_clear(generator->m_functions);
 }
 
-void zen_BinaryEntityGenerator_delete(zen_BinaryEntityGenerator_t* generator) {
+void k_BinaryEntityGenerator_delete(k_BinaryEntityGenerator_t* generator) {
     jtk_Assert_assertObject(generator, "The specified generator is null.");
 
 #warning "TODO: The exception handler sites must be deleted when the associated function entity and instruction attribute are destroyed."
-    zen_BinaryEntityGenerator_clearExceptionHandlerSites(generator);
+    k_BinaryEntityGenerator_clearExceptionHandlerSites(generator);
     jtk_ArrayList_delete(generator->m_exceptionHandlerSites);
 
-    zen_BinaryEntityBuilder_delete(generator->m_builder);
+    k_BinaryEntityBuilder_delete(generator->m_builder);
 
-    zen_BinaryEntityGenerator_clearFields(generator);
+    k_BinaryEntityGenerator_clearFields(generator);
     jtk_ArrayList_delete(generator->m_fields);
 
-    zen_BinaryEntityGenerator_clearFunctions(generator);
+    k_BinaryEntityGenerator_clearFunctions(generator);
     jtk_ArrayList_delete(generator->m_functions);
 
     /* Destroy the constant pool builder. It takes care of destroying the
      * constant pool entries.
      */
-    zen_ConstantPoolBuilder_delete(generator->m_constantPoolBuilder);
-    zen_Memory_deallocate(generator->m_entityFile);
+    k_ConstantPoolBuilder_delete(generator->m_constantPoolBuilder);
+    k_Memory_deallocate(generator->m_entityFile);
 
     if (generator->m_breakRecords != NULL) {
         jtk_Memory_deallocate(generator->m_breakRecords);
@@ -459,27 +459,27 @@ void zen_BinaryEntityGenerator_delete(zen_BinaryEntityGenerator_t* generator) {
         jtk_Memory_deallocate(generator->m_cpfIndexes);
     }
 
-    zen_ASTListener_delete(generator->m_astListener);
+    k_ASTListener_delete(generator->m_astListener);
     jtk_Memory_deallocate(generator);
 }
 
 // Generate
 
-void zen_BinaryEntityGenerator_generate(zen_BinaryEntityGenerator_t* generator) {
+void k_BinaryEntityGenerator_generate(k_BinaryEntityGenerator_t* generator) {
     jtk_Assert_assertObject(generator, "The specified generator is null.");
 
-    zen_ASTWalker_walk(generator->m_astListener, generator->m_compilationUnit);
+    k_ASTWalker_walk(generator->m_astListener, generator->m_compilationUnit);
 }
 
 // Reset
 
-void zen_BinaryEntityGenerator_reset(zen_BinaryEntityGenerator_t* generator,
-    zen_SymbolTable_t* symbolTable, zen_ASTAnnotations_t* scopes,
-    zen_ASTNode_t* compilationUnit, const uint8_t* package, int32_t packageSize,
+void k_BinaryEntityGenerator_reset(k_BinaryEntityGenerator_t* generator,
+    k_SymbolTable_t* symbolTable, k_ASTAnnotations_t* scopes,
+    k_ASTNode_t* compilationUnit, const uint8_t* package, int32_t packageSize,
     jtk_OutputStream_t* outputStream) {
     jtk_Assert_assertObject(generator, "The specified generator is null.");
 
-    // zen_BinaryEntityBuilder_clear(generator->m_builder);
+    // k_BinaryEntityBuilder_clear(generator->m_builder);
 
     if (generator->m_className != NULL) {
         jtk_CString_delete(generator->m_className);
@@ -499,37 +499,37 @@ void zen_BinaryEntityGenerator_reset(zen_BinaryEntityGenerator_t* generator,
 
 // Event Handlers
 
-void zen_BinaryEntityGenerator_onVisitErrorNode(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onVisitErrorNode(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     fprintf(stderr, "[warning] Cannot resolve symbols on erroneous AST.\n");
 }
 
-void zen_BinaryEntityGenerator_onVisitTerminal(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onVisitTerminal(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onEnterEveryRule(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterEveryRule(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitEveryRule(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitEveryRule(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
 /* compilationUnit */
 
-void zen_BinaryEntityGenerator_onEnterCompilationUnit(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterCompilationUnit(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the scope associated with the current AST node. */
-    zen_Scope_t* scope = zen_ASTAnnotations_get(generator->m_scopes, node);
+    k_Scope_t* scope = k_ASTAnnotations_get(generator->m_scopes, node);
     /* Activate the scope associated with the current AST node. */
-    zen_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
+    k_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
 
     /* Push a data channel, where the bytes generated will be written. */
-    int32_t primaryChannelIndex = zen_BinaryEntityBuilder_addChannel(generator->m_builder);
-    zen_BinaryEntityBuilder_setActiveChannelIndex(generator->m_builder, primaryChannelIndex);
+    int32_t primaryChannelIndex = k_BinaryEntityBuilder_addChannel(generator->m_builder);
+    k_BinaryEntityBuilder_setActiveChannelIndex(generator->m_builder, primaryChannelIndex);
 
     /* Set the major version of the target binary entity format. */
     generator->m_entityFile->m_version.m_majorVersion = 0x0000;
@@ -539,24 +539,24 @@ void zen_BinaryEntityGenerator_onEnterCompilationUnit(zen_ASTListener_t* astList
     generator->m_mainComponent = ZEN_AST_NODE_TYPE_UNKNOWN;
 }
 
-void zen_BinaryEntityGenerator_onExitCompilationUnit(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitCompilationUnit(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
 
     /* Invalidate the current scope in the symbol table. */
-    zen_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
+    k_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
 
     if (generator->m_mainComponent != ZEN_AST_NODE_TYPE_CLASS_DECLARATION) {
-        zen_BinaryEntityGenerator_writeEntity(generator);
+        k_BinaryEntityGenerator_writeEntity(generator);
     }
 }
 
 #include <stdio.h>
 
-void zen_BinaryEntityGenerator_writeOutput(zen_BinaryEntityGenerator_t* generator,
-    zen_Entity_t* entity) {
-    zen_ConstantPoolUtf8_t* name = zen_ConstantPoolBuilder_getUtf8Entry(
+void k_BinaryEntityGenerator_writeOutput(k_BinaryEntityGenerator_t* generator,
+    k_Entity_t* entity) {
+    k_ConstantPoolUtf8_t* name = k_ConstantPoolBuilder_getUtf8Entry(
         generator->m_constantPoolBuilder, entity->m_reference);
     jtk_StringBuilder_t* builder = jtk_StringBuilder_new();
     jtk_StringBuilder_appendEx_z(builder, name->m_bytes, name->m_length);
@@ -565,9 +565,9 @@ void zen_BinaryEntityGenerator_writeOutput(zen_BinaryEntityGenerator_t* generato
     uint8_t* path = jtk_StringBuilder_toCString(builder, &pathSize);
     jtk_StringBuilder_delete(builder);
 
-    zen_DataChannel_t* channel = jtk_ArrayList_getValue(generator->m_builder->m_channels, 0);
+    k_DataChannel_t* channel = jtk_ArrayList_getValue(generator->m_builder->m_channels, 0);
     if (generator->m_compiler->m_dumpInstructions) {
-        zen_BinaryEntityDisassembler_disassemble(generator->m_compiler->m_disassembler,
+        k_BinaryEntityDisassembler_disassemble(generator->m_compiler->m_disassembler,
             channel->m_bytes, channel->m_index);
     }
 
@@ -582,69 +582,69 @@ void zen_BinaryEntityGenerator_writeOutput(zen_BinaryEntityGenerator_t* generato
     jtk_CString_delete(path);
 }
 
-void zen_BinaryEntityGenerator_writeEntity(zen_BinaryEntityGenerator_t* generator) {
+void k_BinaryEntityGenerator_writeEntity(k_BinaryEntityGenerator_t* generator) {
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
 
     /* Write magic number, major version, and minor version on the main channel. */
-    zen_BinaryEntityBuilder_writeMagicNumber(generator->m_builder);
+    k_BinaryEntityBuilder_writeMagicNumber(generator->m_builder);
     /* Write the major version of the binary entity file format the stream is encoded in. */
-    zen_BinaryEntityBuilder_writeMajorVersion(generator->m_builder,
+    k_BinaryEntityBuilder_writeMajorVersion(generator->m_builder,
         generator->m_entityFile->m_version.m_majorVersion);
     /* Write the minor version of the binary entity file format the stream is encoded in. */
-    zen_BinaryEntityBuilder_writeMinorVersion(generator->m_builder,
+    k_BinaryEntityBuilder_writeMinorVersion(generator->m_builder,
         generator->m_entityFile->m_version.m_minorVersion);
     /* Write additional flags on how the binary entity file should be loaded. */
-    zen_BinaryEntityBuilder_writeStreamFlags(generator->m_builder,
+    k_BinaryEntityBuilder_writeStreamFlags(generator->m_builder,
         generator->m_entityFile->m_flags);
 
     /* At this point, all the constant pool entries required by the binary entity
      * file should be available to the constant pool builder. The constant pool
      * can now be built.
      */
-    int32_t entryCount = zen_ConstantPoolBuilder_countEntries(generator->m_constantPoolBuilder);
+    int32_t entryCount = k_ConstantPoolBuilder_countEntries(generator->m_constantPoolBuilder);
     /* The constant pool builder counts the null entry at the beginning, too.
      * However, the virtual machine's binary entity parser implicitly recognizes
      * first entry. Therefore, subtract the constant pool entry count by one.
      */
-    zen_BinaryEntityBuilder_writeConstantPoolHeader(generator->m_builder, entryCount - 1);
+    k_BinaryEntityBuilder_writeConstantPoolHeader(generator->m_builder, entryCount - 1);
     int32_t i;
     for (i = 1; i < entryCount; i++) {
-        zen_ConstantPoolEntry_t* entry = zen_ConstantPoolBuilder_getEntry(generator->m_constantPoolBuilder, i);
-        zen_BinaryEntityBuilder_writeConstantPoolEntry(generator->m_builder, entry);
+        k_ConstantPoolEntry_t* entry = k_ConstantPoolBuilder_getEntry(generator->m_constantPoolBuilder, i);
+        k_BinaryEntityBuilder_writeConstantPoolEntry(generator->m_builder, entry);
     }
 
     /* Retrieve the entity to write. */
-    zen_Entity_t* entity = &generator->m_entityFile->m_entity;
+    k_Entity_t* entity = &generator->m_entityFile->m_entity;
     /* Write the entity header. */
-    zen_BinaryEntityBuilder_writeEntityHeader(generator->m_builder, entity->m_type,
+    k_BinaryEntityBuilder_writeEntityHeader(generator->m_builder, entity->m_type,
         entity->m_flags, entity->m_reference);
     /* Write the superclasses. */
-    zen_BinaryEntityBuilder_writeSuperclasses(generator->m_builder, entity->m_superclassCount,
+    k_BinaryEntityBuilder_writeSuperclasses(generator->m_builder, entity->m_superclassCount,
         entity->m_superclasses);
     /* Write the attribute count. */
-    zen_BinaryEntityBuilder_writeAttributeCount(generator->m_builder, entity->m_attributeTable.m_size);
+    k_BinaryEntityBuilder_writeAttributeCount(generator->m_builder, entity->m_attributeTable.m_size);
     // TODO: Write the attribute
 
     /* Retrieve the field count. */
     int32_t fieldCount = jtk_ArrayList_getSize(generator->m_fields);
     /* Write the field count. */
     // TODO: The field table size should be computed when inheritance is implemented.
-    zen_BinaryEntityBuilder_writeFieldsHeader(generator->m_builder, fieldCount,
+    k_BinaryEntityBuilder_writeFieldsHeader(generator->m_builder, fieldCount,
         fieldCount);
 
     int32_t fieldIndex;
     for (fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
         /* Retrieve the next field to write. */
-        zen_FieldEntity_t* fieldEntity = (zen_FieldEntity_t*)jtk_ArrayList_getValue(
+        k_FieldEntity_t* fieldEntity = (k_FieldEntity_t*)jtk_ArrayList_getValue(
             generator->m_fields, fieldIndex);
 
         /* Write the field to the data channel. */
-        zen_BinaryEntityBuilder_writeField(generator->m_builder, fieldEntity->m_flags,
+        k_BinaryEntityBuilder_writeField(generator->m_builder, fieldEntity->m_flags,
             fieldEntity->m_nameIndex, fieldEntity->m_descriptorIndex,
             fieldEntity->m_tableIndex);
 
         /* Write the attribute count. */
-        zen_BinaryEntityBuilder_writeAttributeCount(generator->m_builder, fieldEntity->m_attributeTable.m_size);
+        k_BinaryEntityBuilder_writeAttributeCount(generator->m_builder, fieldEntity->m_attributeTable.m_size);
 
         // TODO: Write the attribute!
     }
@@ -653,7 +653,7 @@ void zen_BinaryEntityGenerator_writeEntity(zen_BinaryEntityGenerator_t* generato
     int32_t functionCount = jtk_ArrayList_getSize(generator->m_functions);
     /* Write the function count. */
     // TODO: Function table size should be computed when inheritance is supported.
-    zen_BinaryEntityBuilder_writeFunctionsHeader(generator->m_builder, functionCount,
+    k_BinaryEntityBuilder_writeFunctionsHeader(generator->m_builder, functionCount,
         functionCount);
     /* Log the function count. */
     jtk_Logger_debug(logger, "Entity has %d functions.", functionCount);
@@ -661,26 +661,26 @@ void zen_BinaryEntityGenerator_writeEntity(zen_BinaryEntityGenerator_t* generato
     int32_t functionIndex;
     for (functionIndex = 0; functionIndex < functionCount; functionIndex++) {
         /* Retrieve the next function to write. */
-        zen_FunctionEntity_t* functionEntity = (zen_FunctionEntity_t*)jtk_ArrayList_getValue(
+        k_FunctionEntity_t* functionEntity = (k_FunctionEntity_t*)jtk_ArrayList_getValue(
             generator->m_functions, functionIndex);
 
         /* Write the function to the data channel. */
-        zen_BinaryEntityBuilder_writeFunction(generator->m_builder,
+        k_BinaryEntityBuilder_writeFunction(generator->m_builder,
             functionEntity->m_flags, functionEntity->m_nameIndex,
             functionEntity->m_descriptorIndex, functionEntity->m_tableIndex);
 
         /* Retrieve the attribute table for the current function entity. */
-        zen_AttributeTable_t* attributeTable = &functionEntity->m_attributeTable;
+        k_AttributeTable_t* attributeTable = &functionEntity->m_attributeTable;
 
         /* Write the total number of attributes. */
-        zen_BinaryEntityBuilder_writeAttributeCount(generator->m_builder, attributeTable->m_size);
+        k_BinaryEntityBuilder_writeAttributeCount(generator->m_builder, attributeTable->m_size);
 
         int32_t attributeIndex;
         for (attributeIndex = 0; attributeIndex < attributeTable->m_size; attributeIndex++) {
-            zen_Attribute_t* attribute = attributeTable->m_attributes[attributeIndex];
+            k_Attribute_t* attribute = attributeTable->m_attributes[attributeIndex];
 
             /* Retrieve the name of the current attribute. */
-            zen_ConstantPoolUtf8_t* name = zen_ConstantPoolBuilder_getUtf8Entry(
+            k_ConstantPoolUtf8_t* name = k_ConstantPoolBuilder_getUtf8Entry(
                 generator->m_constantPoolBuilder, attribute->m_nameIndex);
 
             /* If the current attribute is an instruction attribute, extract
@@ -688,15 +688,15 @@ void zen_BinaryEntityGenerator_writeEntity(zen_BinaryEntityGenerator_t* generato
              */
             if (jtk_CString_equals(name->m_bytes, name->m_length,
                 ZEN_PREDEFINED_ATTRIBUTE_INSTRUCTION, ZEN_PREDEFINED_ATTRIBUTE_INSTRUCTION_SIZE)) {
-                /* Cast to zen_InstructionAttribute_t to extract further information. */
-                zen_InstructionAttribute_t* instructionAttribute =
-                    (zen_InstructionAttribute_t*)attribute;
+                /* Cast to k_InstructionAttribute_t to extract further information. */
+                k_InstructionAttribute_t* instructionAttribute =
+                    (k_InstructionAttribute_t*)attribute;
 
                 // TODO: CHANGE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!
                 instructionAttribute->m_maxStackSize = 100;
 
                 /* Write the instruction attribute for the current function. */
-                zen_BinaryEntityBuilder_writeInstructionAttribute(
+                k_BinaryEntityBuilder_writeInstructionAttribute(
                     generator->m_builder,
                     instructionAttribute->m_nameIndex,
                     instructionAttribute->m_length,
@@ -709,98 +709,98 @@ void zen_BinaryEntityGenerator_writeEntity(zen_BinaryEntityGenerator_t* generato
         }
     }
 
-    zen_BinaryEntityGenerator_writeOutput(generator, entity);
+    k_BinaryEntityGenerator_writeOutput(generator, entity);
 }
 
 // importDeclaration
 
-void zen_BinaryEntityGenerator_onEnterImportDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterImportDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitImportDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitImportDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // annotatedComponentDeclaration
 
-void zen_BinaryEntityGenerator_onEnterAnnotatedComponentDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterAnnotatedComponentDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitAnnotatedComponentDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitAnnotatedComponentDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // annotations
 
-void zen_BinaryEntityGenerator_onEnterAnnotations(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterAnnotations(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitAnnotations(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitAnnotations(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // annotation
 
-void zen_BinaryEntityGenerator_onEnterAnnotation(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterAnnotation(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitAnnotation(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitAnnotation(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // annotationType
 
-void zen_BinaryEntityGenerator_onEnterAnnotationType(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterAnnotationType(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitAnnotationType(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitAnnotationType(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // annotationAttribute
 
-void zen_BinaryEntityGenerator_onEnterAnnotationAttribute(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterAnnotationAttribute(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitAnnotationAttribute(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitAnnotationAttribute(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // componentDeclaration
 
-void zen_BinaryEntityGenerator_onEnterComponentDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterComponentDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitComponentDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitComponentDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // functionDeclaration
 
-void zen_BinaryEntityGenerator_assignParameterIndexes(zen_BinaryEntityGenerator_t* generator,
-    zen_ASTNode_t* functionParameters) {
-    zen_FunctionParametersContext_t* functionParametersContext =
-        (zen_FunctionParametersContext_t*)functionParameters->m_context;
+void k_BinaryEntityGenerator_assignParameterIndexes(k_BinaryEntityGenerator_t* generator,
+    k_ASTNode_t* functionParameters) {
+    k_FunctionParametersContext_t* functionParametersContext =
+        (k_FunctionParametersContext_t*)functionParameters->m_context;
 
     /* Retrieve the current scope from the symbol table. */
-    zen_Scope_t* currentScope = zen_SymbolTable_getCurrentScope(generator->m_symbolTable);
+    k_Scope_t* currentScope = k_SymbolTable_getCurrentScope(generator->m_symbolTable);
 
     int32_t fixedParameterCount = jtk_ArrayList_getSize(functionParametersContext->m_fixedParameters);
     int32_t i;
     for (i = 0; i < fixedParameterCount; i++) {
-        zen_ASTNode_t* identifier = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+        k_ASTNode_t* identifier = (k_ASTNode_t*)jtk_ArrayList_getValue(
             functionParametersContext->m_fixedParameters, i);
         int32_t identifierSize;
-        uint8_t* identifierText = zen_ASTNode_toCString(identifier, &identifierSize);
+        uint8_t* identifierText = k_ASTNode_toCString(identifier, &identifierSize);
 
-        zen_Symbol_t* symbol = zen_Scope_resolve(currentScope, identifierText);
+        k_Symbol_t* symbol = k_Scope_resolve(currentScope, identifierText);
 
         /* Generate an index for the parameter. */
         symbol->m_index = generator->m_localVariableCount;
@@ -814,10 +814,10 @@ void zen_BinaryEntityGenerator_assignParameterIndexes(zen_BinaryEntityGenerator_
 
     if (functionParametersContext->m_variableParameter != NULL) {
         int32_t identifierSize;
-        uint8_t* identifierText = zen_ASTNode_toCString(
+        uint8_t* identifierText = k_ASTNode_toCString(
             functionParametersContext->m_variableParameter, &identifierSize);
 
-        zen_Symbol_t* symbol = zen_Scope_resolve(currentScope, identifierText);
+        k_Symbol_t* symbol = k_Scope_resolve(currentScope, identifierText);
         /* Generate an index for the parameter. */
         symbol->m_index = generator->m_localVariableCount;
         /* Update the local variable count, each parameter is a reference. Therefore,
@@ -829,7 +829,7 @@ void zen_BinaryEntityGenerator_assignParameterIndexes(zen_BinaryEntityGenerator_
     }
 }
 
-void zen_BinaryEntityGenerator_prepareClass(zen_BinaryEntityGenerator_t* generator,
+void k_BinaryEntityGenerator_prepareClass(k_BinaryEntityGenerator_t* generator,
     const uint8_t* name, int32_t nameSize, const int16_t* superclassIndexes,
     int32_t superclassCount) {
     uint8_t* reference = NULL;
@@ -857,7 +857,7 @@ void zen_BinaryEntityGenerator_prepareClass(zen_BinaryEntityGenerator_t* generat
 
     uint16_t flags = 0;
     uint16_t referenceIndex =
-        zen_ConstantPoolBuilder_getUtf8EntryIndexEx(generator->m_constantPoolBuilder,
+        k_ConstantPoolBuilder_getUtf8EntryIndexEx(generator->m_constantPoolBuilder,
         reference, referenceSize);
 
     /* At this point, the reference is not required anymore. We have the index into
@@ -867,7 +867,7 @@ void zen_BinaryEntityGenerator_prepareClass(zen_BinaryEntityGenerator_t* generat
         jtk_CString_delete(reference0);
     }
 
-    zen_Entity_t* entity = &generator->m_entityFile->m_entity;
+    k_Entity_t* entity = &generator->m_entityFile->m_entity;
     entity->m_type = ZEN_ENTITY_TYPE_CLASS;
     entity->m_flags = 0;
     entity->m_reference = referenceIndex;
@@ -881,13 +881,13 @@ void zen_BinaryEntityGenerator_prepareClass(zen_BinaryEntityGenerator_t* generat
 
     generator->m_classPrepared = true;
 
-    zen_Symbol_t* symbol = zen_SymbolTable_resolve(generator->m_symbolTable,
+    k_Symbol_t* symbol = k_SymbolTable_resolve(generator->m_symbolTable,
         generator->m_className);
-    zen_SymbolTable_setCurrentScope(generator->m_symbolTable, symbol->m_context.m_asClass.m_classScope);
+    k_SymbolTable_setCurrentScope(generator->m_symbolTable, symbol->m_context.m_asClass.m_classScope);
 }
 
-void zen_BinaryEntityGenerator_initializeClassName(zen_BinaryEntityGenerator_t* generator) {
-    zen_Compiler_t* compiler = generator->m_compiler;
+void k_BinaryEntityGenerator_initializeClassName(k_BinaryEntityGenerator_t* generator) {
+    k_Compiler_t* compiler = generator->m_compiler;
     const uint8_t* fileName = (const uint8_t*)jtk_ArrayList_getValue(
         compiler->m_inputFiles, compiler->m_currentFileIndex);
     int32_t size = jtk_CString_getSize(fileName);
@@ -898,14 +898,14 @@ void zen_BinaryEntityGenerator_initializeClassName(zen_BinaryEntityGenerator_t* 
     generator->m_classNameSize = dotIndex - (slashIndex + 1);
 }
 
-void zen_BinaryEntityGenerator_onEnterFunctionDeclaration(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterFunctionDeclaration(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_FunctionDeclarationContext_t* context = (zen_FunctionDeclarationContext_t*)node->m_context;
-    zen_FunctionParametersContext_t* functionParameters = (zen_FunctionParametersContext_t*)context->m_functionParameters->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_FunctionDeclarationContext_t* context = (k_FunctionDeclarationContext_t*)node->m_context;
+    k_FunctionParametersContext_t* functionParameters = (k_FunctionParametersContext_t*)context->m_functionParameters->m_context;
 
     if ((generator->m_mainComponent != ZEN_AST_NODE_TYPE_CLASS_DECLARATION)
         && !generator->m_classPrepared) {
@@ -916,45 +916,45 @@ void zen_BinaryEntityGenerator_onEnterFunctionDeclaration(
 
         int32_t superclassCount = 1;
         uint16_t* superclassIndexes = jtk_Memory_allocate(uint16_t, 1);
-        superclassIndexes[0] = zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+        superclassIndexes[0] = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
             generator->m_constantPoolBuilder, "zen/core/Object", 15);
 
-        zen_BinaryEntityGenerator_initializeClassName(generator);
-        zen_BinaryEntityGenerator_prepareClass(generator, generator->m_className,
+        k_BinaryEntityGenerator_initializeClassName(generator);
+        k_BinaryEntityGenerator_prepareClass(generator, generator->m_className,
             generator->m_classNameSize, superclassIndexes, superclassCount);
     }
 
-    int32_t instructionChannelIndex = zen_BinaryEntityBuilder_addChannel(generator->m_builder);
-    zen_BinaryEntityBuilder_setActiveChannelIndex(generator->m_builder, instructionChannelIndex);
+    int32_t instructionChannelIndex = k_BinaryEntityBuilder_addChannel(generator->m_builder);
+    k_BinaryEntityBuilder_setActiveChannelIndex(generator->m_builder, instructionChannelIndex);
 
     // TODO: Remove the following statement. Make sure that the instruction
     // length is never zero.
-    zen_BinaryEntityBuilder_emitNop(generator->m_builder);
+    k_BinaryEntityBuilder_emitNop(generator->m_builder);
 
-    zen_ASTNode_t* identifier = context->m_identifier;
-    zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
-    zen_Symbol_t* symbol = zen_SymbolTable_resolve(generator->m_symbolTable,
+    k_ASTNode_t* identifier = context->m_identifier;
+    k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
+    k_Symbol_t* symbol = k_SymbolTable_resolve(generator->m_symbolTable,
         identifierToken->m_text);
-    bool constructor = zen_Token_getType(identifierToken) == ZEN_TOKEN_KEYWORD_NEW;
-    generator->m_descriptor = zen_BinaryEntityGenerator_getDescriptorEx(
+    bool constructor = k_Token_getType(identifierToken) == ZEN_TOKEN_KEYWORD_NEW;
+    generator->m_descriptor = k_BinaryEntityGenerator_getDescriptorEx(
         context->m_functionParameters, constructor,
         &generator->m_descriptorSize);
 
-    zen_Scope_t* scope = zen_ASTAnnotations_get(generator->m_scopes, node);
-    zen_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
+    k_Scope_t* scope = k_ASTAnnotations_get(generator->m_scopes, node);
+    k_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
 
     int32_t parameterCount = jtk_ArrayList_getSize(functionParameters->m_fixedParameters);
-    zen_FunctionSignature_t* signature = zen_Symbol_getFunctionSignature(symbol,
+    k_FunctionSignature_t* signature = k_Symbol_getFunctionSignature(symbol,
         parameterCount);
 
     /* The first local variable in the local variable array is reserved for the "this" pointer.
      * Therefore, do not perform the following increment for static functions.
      */
-    if (!zen_Modifier_hasStatic(signature->m_modifiers)) {
+    if (!k_Modifier_hasStatic(signature->m_modifiers)) {
         generator->m_localVariableCount += 2;
     }
 
-    zen_BinaryEntityGenerator_assignParameterIndexes(generator, context->m_functionParameters);
+    k_BinaryEntityGenerator_assignParameterIndexes(generator, context->m_functionParameters);
 
     lhs = false;
 }
@@ -1004,10 +1004,10 @@ void zen_BinaryEntityGenerator_onEnterFunctionDeclaration(
  * The function descriptor for this function is shown below.
  * (zen/core/Object):(zen/core/Object)@(zen/core/Object)
  */
-uint8_t* zen_BinaryEntityGenerator_getDescriptorEx(zen_ASTNode_t* functionParameters,
+uint8_t* k_BinaryEntityGenerator_getDescriptorEx(k_ASTNode_t* functionParameters,
     bool constructor, int32_t* descriptorSize) {
-    zen_FunctionParametersContext_t* functionParametersContext =
-        (zen_FunctionParametersContext_t*)functionParameters->m_context;
+    k_FunctionParametersContext_t* functionParametersContext =
+        (k_FunctionParametersContext_t*)functionParameters->m_context;
 
     jtk_StringBuilder_t* builder = jtk_StringBuilder_new();
     jtk_StringBuilder_append_z(builder, constructor? "v:" : "(zen/core/Object):");
@@ -1035,25 +1035,25 @@ uint8_t* zen_BinaryEntityGenerator_getDescriptorEx(zen_ASTNode_t* functionParame
     return result;
 }
 
-uint8_t* zen_BinaryEntityGenerator_getDescriptor(zen_ASTNode_t* functionParameters,
+uint8_t* k_BinaryEntityGenerator_getDescriptor(k_ASTNode_t* functionParameters,
     int32_t* descriptorSize) {
-    return zen_BinaryEntityGenerator_getDescriptorEx(functionParameters, false, descriptorSize);
+    return k_BinaryEntityGenerator_getDescriptorEx(functionParameters, false, descriptorSize);
 }
 
-zen_InstructionAttribute_t* zen_BinaryEntityGenerator_makeInstructionAttribute(
-    zen_BinaryEntityGenerator_t* generator) {
+k_InstructionAttribute_t* k_BinaryEntityGenerator_makeInstructionAttribute(
+    k_BinaryEntityGenerator_t* generator) {
 
     /* Retrieve the data channel on which the instructions of the
      * function/initializer were written.
      */
-    zen_DataChannel_t* channel = zen_BinaryEntityBuilder_getActiveChannel(generator->m_builder);
+    k_DataChannel_t* channel = k_BinaryEntityBuilder_getActiveChannel(generator->m_builder);
     /* Retrieve the bytes that were written on the data channel. */
-    uint8_t* instructionBytes = zen_DataChannel_getBytes(channel);
+    uint8_t* instructionBytes = k_DataChannel_getBytes(channel);
 
     /* Retrieve a valid index into the constant pool where an UTF-8 entry
      * represents "vm/primary/Instruction".
      */
-    uint16_t attributeNameIndex = zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+    uint16_t attributeNameIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
         generator->m_constantPoolBuilder, ZEN_PREDEFINED_ATTRIBUTE_INSTRUCTION,
         ZEN_PREDEFINED_ATTRIBUTE_INSTRUCTION_SIZE);
     /* Load the maximum stack size. */
@@ -1061,7 +1061,7 @@ zen_InstructionAttribute_t* zen_BinaryEntityGenerator_makeInstructionAttribute(
     /* Load the number of local variables. */
     uint16_t localVariableCount = generator->m_localVariableCount;
     /* Retrieve the length of the instructions. */
-    uint32_t instructionLength = zen_DataChannel_getSize(channel);
+    uint32_t instructionLength = k_DataChannel_getSize(channel);
     /* The instructions of the function. */
     uint8_t* instructions = jtk_Arrays_clone_b(instructionBytes, instructionLength);
     /* The total number of exception handler sistes within the function. */
@@ -1081,7 +1081,7 @@ zen_InstructionAttribute_t* zen_BinaryEntityGenerator_makeInstructionAttribute(
             2 + // handlerIndex occupies two bytes.
             2); // exceptionClassIndex occupies two bytes.
 
-    zen_InstructionAttribute_t* instructionAttribute = zen_InstructionAttribute_new(
+    k_InstructionAttribute_t* instructionAttribute = k_InstructionAttribute_new(
         attributeNameIndex,
         attributeLength,
         maxStackSize,
@@ -1089,9 +1089,9 @@ zen_InstructionAttribute_t* zen_BinaryEntityGenerator_makeInstructionAttribute(
         instructionLength,
         instructions);
 
-    zen_ExceptionTable_t* exceptionTable = &instructionAttribute->m_exceptionTable;
+    k_ExceptionTable_t* exceptionTable = &instructionAttribute->m_exceptionTable;
     exceptionTable->m_size = jtk_ArrayList_getSize(generator->m_exceptionHandlerSites);
-    exceptionTable->m_exceptionHandlerSites = jtk_Memory_allocate(zen_ExceptionHandlerSite_t*,
+    exceptionTable->m_exceptionHandlerSites = jtk_Memory_allocate(k_ExceptionHandlerSite_t*,
         exceptionTable->m_size);
 #warning "TODO: Destroy the memory allocated here."
 
@@ -1099,8 +1099,8 @@ zen_InstructionAttribute_t* zen_BinaryEntityGenerator_makeInstructionAttribute(
     for (exceptionHandlerSiteIndex = 0;
         exceptionHandlerSiteIndex < exceptionTable->m_size;
         exceptionHandlerSiteIndex++) {
-        zen_ExceptionHandlerSite_t* exceptionHandlerSite =
-            (zen_ExceptionHandlerSite_t*)jtk_ArrayList_getValue(
+        k_ExceptionHandlerSite_t* exceptionHandlerSite =
+            (k_ExceptionHandlerSite_t*)jtk_ArrayList_getValue(
                 generator->m_exceptionHandlerSites, exceptionHandlerSiteIndex);
         exceptionTable->m_exceptionHandlerSites[exceptionHandlerSiteIndex] =
             exceptionHandlerSite;
@@ -1110,61 +1110,61 @@ zen_InstructionAttribute_t* zen_BinaryEntityGenerator_makeInstructionAttribute(
 }
 
 // TODO: Somebody has to destroy the instruction attribute that was allocated here.
-void zen_BinaryEntityGenerator_onExitFunctionDeclaration(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitFunctionDeclaration(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
 
     /* Retrieve the context associated with the AST node. */
-    zen_FunctionDeclarationContext_t* context = (zen_FunctionDeclarationContext_t*)node->m_context;
-    zen_FunctionParametersContext_t* parameters = (zen_FunctionParametersContext_t*)context->m_functionParameters->m_context;
+    k_FunctionDeclarationContext_t* context = (k_FunctionDeclarationContext_t*)node->m_context;
+    k_FunctionParametersContext_t* parameters = (k_FunctionParametersContext_t*)context->m_functionParameters->m_context;
     int32_t parameterCount = jtk_ArrayList_getSize(parameters->m_fixedParameters);
 
-    zen_ASTNode_t* identifier = context->m_identifier;
-    zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
+    k_ASTNode_t* identifier = context->m_identifier;
+    k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
 
-    bool constructor = zen_Token_getType(identifierToken) == ZEN_TOKEN_KEYWORD_NEW;
+    bool constructor = k_Token_getType(identifierToken) == ZEN_TOKEN_KEYWORD_NEW;
 
     uint8_t* temporary = jtk_CString_newEx(identifierToken->m_text, identifierToken->m_length);
-    zen_Symbol_t* symbol = zen_SymbolTable_resolve(generator->m_symbolTable, temporary);
+    k_Symbol_t* symbol = k_SymbolTable_resolve(generator->m_symbolTable, temporary);
     jtk_Memory_deallocate(temporary);
 
     // TODO: What happens when variable parameters are present?!
-    zen_FunctionSignature_t* signature = zen_Symbol_getFunctionSignature(symbol,
+    k_FunctionSignature_t* signature = k_Symbol_getFunctionSignature(symbol,
         parameterCount);
 
     uint16_t flags = signature->m_modifiers;
     uint16_t nameIndex = constructor?
-        zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+        k_ConstantPoolBuilder_getUtf8EntryIndexEx(
             generator->m_constantPoolBuilder, "<initialize>", 12) :
-        zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+        k_ConstantPoolBuilder_getUtf8EntryIndexEx(
             generator->m_constantPoolBuilder, identifierToken->m_text,
             identifierToken->m_length);
-    uint16_t descriptorIndex = zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+    uint16_t descriptorIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
         generator->m_constantPoolBuilder, generator->m_descriptor,
         generator->m_descriptorSize);
     uint16_t tableIndex = signature->m_tableIndex;
 
-    zen_FunctionEntity_t* functionEntity = zen_FunctionEntity_new(flags,
+    k_FunctionEntity_t* functionEntity = k_FunctionEntity_new(flags,
         nameIndex, descriptorIndex, tableIndex);
-    zen_AttributeTable_t* attributeTable = &functionEntity->m_attributeTable;
+    k_AttributeTable_t* attributeTable = &functionEntity->m_attributeTable;
 
-    zen_InstructionAttribute_t* instructionAttribute =
-        zen_BinaryEntityGenerator_makeInstructionAttribute(generator);
+    k_InstructionAttribute_t* instructionAttribute =
+        k_BinaryEntityGenerator_makeInstructionAttribute(generator);
 
     attributeTable->m_size = 1;
-    attributeTable->m_attributes = zen_Memory_allocate(zen_Attribute_t*, 1);
-    attributeTable->m_attributes[0] = (zen_Attribute_t*)instructionAttribute;
+    attributeTable->m_attributes = k_Memory_allocate(k_Attribute_t*, 1);
+    attributeTable->m_attributes[0] = (k_Attribute_t*)instructionAttribute;
 
     /* Add the function entity to the list of functions. */
     jtk_ArrayList_add(generator->m_functions, functionEntity);
 
-    zen_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
+    k_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
 
     int32_t exceptionHandlerSiteCount = jtk_ArrayList_getSize(
         generator->m_exceptionHandlerSites);
@@ -1173,8 +1173,8 @@ void zen_BinaryEntityGenerator_onExitFunctionDeclaration(
     for (exceptionHandlerSiteIndex = 0;
         exceptionHandlerSiteIndex < exceptionHandlerSiteCount;
         exceptionHandlerSiteIndex++) {
-        zen_ExceptionHandlerSite_t* exceptionHandlerSite =
-            (zen_ExceptionHandlerSite_t*)jtk_ArrayList_getValue(
+        k_ExceptionHandlerSite_t* exceptionHandlerSite =
+            (k_ExceptionHandlerSite_t*)jtk_ArrayList_getValue(
                 generator->m_exceptionHandlerSites, exceptionHandlerSiteIndex);
         jtk_Logger_debug(logger, "(startIndex = %d, stopIndex = %d, handlerIndex = %d, exceptionClassIndex = %d)",
             exceptionHandlerSite->m_startIndex, exceptionHandlerSite->m_stopIndex,
@@ -1184,11 +1184,11 @@ void zen_BinaryEntityGenerator_onExitFunctionDeclaration(
     /* Here, we assume that the channels are added and removed as if they were
      * stored in a stack. The primary channel is assumed to be at zeroth index.
      */
-    int32_t instructionChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(generator->m_builder);
-    zen_BinaryEntityBuilder_removeChannel(generator->m_builder, instructionChannelIndex);
+    int32_t instructionChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(generator->m_builder);
+    k_BinaryEntityBuilder_removeChannel(generator->m_builder, instructionChannelIndex);
 
 #warning "TODO: Implement a stack like behaviour to alter active channel."
-    zen_BinaryEntityBuilder_setActiveChannelIndex(generator->m_builder, 0);
+    k_BinaryEntityBuilder_setActiveChannelIndex(generator->m_builder, 0);
 
     /* Destroy the descriptor of the function. */
     jtk_CString_delete(generator->m_descriptor);
@@ -1208,63 +1208,63 @@ void zen_BinaryEntityGenerator_onExitFunctionDeclaration(
 
 // functionParameters
 
-void zen_BinaryEntityGenerator_onEnterFunctionParameters(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterFunctionParameters(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitFunctionParameters(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitFunctionParameters(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // functionBody
 
-void zen_BinaryEntityGenerator_onEnterFunctionBody(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterFunctionBody(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitFunctionBody(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitFunctionBody(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // statementSuite
 
-void zen_BinaryEntityGenerator_onEnterStatementSuite(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterStatementSuite(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
 
-    zen_Scope_t* scope = zen_ASTAnnotations_get(generator->m_scopes, node);
-    zen_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
+    k_Scope_t* scope = k_ASTAnnotations_get(generator->m_scopes, node);
+    k_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
 }
 
-void zen_BinaryEntityGenerator_onExitStatementSuite(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitStatementSuite(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
 
-    zen_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
+    k_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
 }
 
 // simpleStatement
 
-void zen_BinaryEntityGenerator_onEnterSimpleStatement(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterSimpleStatement(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitSimpleStatement(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_SimpleStatementContext_t* context = (zen_SimpleStatementContext_t*)node->m_context;
-    zen_Compiler_t* compiler = generator->m_compiler;
+void k_BinaryEntityGenerator_onExitSimpleStatement(k_ASTListener_t* astListener, k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_SimpleStatementContext_t* context = (k_SimpleStatementContext_t*)node->m_context;
+    k_Compiler_t* compiler = generator->m_compiler;
     jtk_Logger_t* logger = compiler->m_logger;
 
     if (context->m_statement->m_type == ZEN_AST_NODE_TYPE_EXPRESSION) {
         /* Emit the pop2 instruction to clear the operand stack. Without the generation
         * of this instruction, the operand stack will overflow.
         */
-        zen_BinaryEntityBuilder_emitPop2(generator->m_builder);
+        k_BinaryEntityBuilder_emitPop2(generator->m_builder);
 
         /* Log the emission of the `pop2` instruction. */
         jtk_Logger_debug(logger, "Emitted `pop2`");
@@ -1273,94 +1273,94 @@ void zen_BinaryEntityGenerator_onExitSimpleStatement(zen_ASTListener_t* astListe
 
 // statement
 
-void zen_BinaryEntityGenerator_onEnterStatement(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterStatement(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // emptyStatement
 
-void zen_BinaryEntityGenerator_onEnterEmptyStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator =
-        (zen_BinaryEntityGenerator_t*)astListener->m_context;
+void k_BinaryEntityGenerator_onEnterEmptyStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator =
+        (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
 
     /* Emit the nop instruction. */
-    zen_BinaryEntityBuilder_emitNop(generator->m_builder);
+    k_BinaryEntityBuilder_emitNop(generator->m_builder);
 
     /* Log the emission of the nop instruction. */
     jtk_Logger_debug(logger, "Emitted nop");
 }
 
-void zen_BinaryEntityGenerator_onExitEmptyStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitEmptyStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // variableDeclaration
 
-void zen_BinaryEntityGenerator_onEnterVariableDeclaration(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterVariableDeclaration(k_ASTListener_t* astListener, k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
 
     /* Retrieve the context associated with the AST node. */
-    zen_VariableDeclarationContext_t* context = (zen_VariableDeclarationContext_t*)node->m_context;
+    k_VariableDeclarationContext_t* context = (k_VariableDeclarationContext_t*)node->m_context;
 
     /* Retrieve the current scope from the symbol table. */
-    zen_Scope_t* currentScope = zen_SymbolTable_getCurrentScope(generator->m_symbolTable);
+    k_Scope_t* currentScope = k_SymbolTable_getCurrentScope(generator->m_symbolTable);
 
     int32_t variableCount = jtk_ArrayList_getSize(context->m_variableDeclarators);
     int32_t i;
     for (i = 0; i < variableCount; i++) {
-        zen_ASTNode_t* variableDeclarator = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+        k_ASTNode_t* variableDeclarator = (k_ASTNode_t*)jtk_ArrayList_getValue(
             context->m_variableDeclarators, i);
-        zen_VariableDeclaratorContext_t* variableDeclaratorContext =
-            (zen_VariableDeclaratorContext_t*)variableDeclarator->m_context;
+        k_VariableDeclaratorContext_t* variableDeclaratorContext =
+            (k_VariableDeclaratorContext_t*)variableDeclarator->m_context;
 
         /* Retrieve the identifier AST node. */
-        zen_ASTNode_t* identifier = variableDeclaratorContext->m_identifier;
+        k_ASTNode_t* identifier = variableDeclaratorContext->m_identifier;
         /* Retrieve the identifier token. */
-        zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
+        k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
 
         /* If a class scope encloses the variable being declared, we are processing
          * a class member declaration.
          */
-        if (zen_Scope_isClassScope(currentScope)) {
+        if (k_Scope_isClassScope(currentScope)) {
             uint16_t flags = 0;
 
             /* Retrieve the constant pool index for the variable name. */
-            uint16_t nameIndex = zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+            uint16_t nameIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
                 generator->m_constantPoolBuilder,
                 identifierToken->m_text, identifierToken->m_length);
 
-            uint16_t descriptorIndex = zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+            uint16_t descriptorIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
                 generator->m_constantPoolBuilder,
                 "zen/core/Object", 15);
 
             /* Create an instance of the field entity that represents the variable
              * declared.
              */
-            zen_FieldEntity_t* fieldEntity = zen_FieldEntity_new(flags, nameIndex, descriptorIndex);
+            k_FieldEntity_t* fieldEntity = k_FieldEntity_new(flags, nameIndex, descriptorIndex);
 
             /* Add the field entity to the list of fields. */
             jtk_ArrayList_add(generator->m_fields, fieldEntity);
         }
-        else if (zen_Scope_isLocalScope(currentScope)) {
+        else if (k_Scope_isLocalScope(currentScope)) {
             /* Retrieve the string equivalent to the identifier node. */
             int32_t identifierSize;
-            uint8_t* identifierText = zen_ASTNode_toCString(identifier, &identifierSize);
+            uint8_t* identifierText = k_ASTNode_toCString(identifier, &identifierSize);
 
             /* TODO: If the local scope belongs to an instance function, then a local
              * variable for the "this" reference should be created.
              */
 
-            zen_Symbol_t* symbol = zen_Scope_resolve(currentScope, identifierText);
-            if (zen_Symbol_isVariable(symbol)) {
+            k_Symbol_t* symbol = k_Scope_resolve(currentScope, identifierText);
+            if (k_Symbol_isVariable(symbol)) {
                 /* Generate and assign the index of the local variable only if it
                  * was not previously assigned an index.
                  *
@@ -1373,16 +1373,16 @@ void zen_BinaryEntityGenerator_onEnterVariableDeclaration(zen_ASTListener_t* ast
                     generator->m_localVariableCount += 2;
 
                     if (variableDeclaratorContext->m_expression != NULL) {
-                        zen_ASTWalker_walk(astListener, variableDeclaratorContext->m_expression);
+                        k_ASTWalker_walk(astListener, variableDeclaratorContext->m_expression);
 
                         /* Store the obtained result in the local variable.
                         * The actual emission of the instruction is delegated to the
-                        * zen_BinaryEntityGenerator_storeLocalReference() function which takes
+                        * k_BinaryEntityGenerator_storeLocalReference() function which takes
                         * care of optimizing the emission.
                         *
-                        * TODO: Implement the zen_BinaryEntityGenerator_storeLocalReference() function.
+                        * TODO: Implement the k_BinaryEntityGenerator_storeLocalReference() function.
                         */
-                        zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder, symbol->m_index);
+                        k_BinaryEntityBuilder_emitStoreReference(generator->m_builder, symbol->m_index);
 
                         /* Log the emission of the store_a instruction. */
                         jtk_Logger_debug(logger, "Emitted store_a %d", symbol->m_index);
@@ -1398,87 +1398,87 @@ void zen_BinaryEntityGenerator_onEnterVariableDeclaration(zen_ASTListener_t* ast
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitVariableDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitVariableDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // variableDeclarator
 
-void zen_BinaryEntityGenerator_onEnterVariableDeclarator(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterVariableDeclarator(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitVariableDeclarator(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitVariableDeclarator(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // constantDeclaration
 
-void zen_BinaryEntityGenerator_onEnterConstantDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterConstantDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
 
     /* Retrieve the context associated with the AST node. */
-    zen_ConstantDeclarationContext_t* context = (zen_ConstantDeclarationContext_t*)node->m_context;
+    k_ConstantDeclarationContext_t* context = (k_ConstantDeclarationContext_t*)node->m_context;
 
     /* Retrieve the current scope from the symbol table. */
-    zen_Scope_t* currentScope = zen_SymbolTable_getCurrentScope(generator->m_symbolTable);
+    k_Scope_t* currentScope = k_SymbolTable_getCurrentScope(generator->m_symbolTable);
 
     int32_t variableCount = jtk_ArrayList_getSize(context->m_constantDeclarators);
     int32_t i;
     for (i = 0; i < variableCount; i++) {
-        zen_ASTNode_t* constantDeclarator = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+        k_ASTNode_t* constantDeclarator = (k_ASTNode_t*)jtk_ArrayList_getValue(
             context->m_constantDeclarators, i);
-        zen_ConstantDeclaratorContext_t* constantDeclaratorContext =
-            (zen_ConstantDeclaratorContext_t*)constantDeclarator->m_context;
+        k_ConstantDeclaratorContext_t* constantDeclaratorContext =
+            (k_ConstantDeclaratorContext_t*)constantDeclarator->m_context;
 
         /* Retrieve the identifier AST node. */
-        zen_ASTNode_t* identifier = constantDeclaratorContext->m_identifier;
+        k_ASTNode_t* identifier = constantDeclaratorContext->m_identifier;
         /* Retrieve the identifier token. */
-        zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
+        k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
 
         /* If a class scope encloses the variable being declared, we are processing
          * a class member declaration.
          */
-        if (zen_Scope_isClassScope(currentScope)) {
+        if (k_Scope_isClassScope(currentScope)) {
             uint16_t flags = 0;
 
             /* Retrieve the constant pool index for the variable name. */
-            uint16_t nameIndex = zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+            uint16_t nameIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
                 generator->m_constantPoolBuilder,
                 identifierToken->m_text, identifierToken->m_length);
 
-            uint16_t descriptorIndex = zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+            uint16_t descriptorIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
                 generator->m_constantPoolBuilder, "zen/core/Object", 15);
 
             /* Create an instance of the field entity that represents the variable
              * declared.
              */
-            zen_FieldEntity_t* fieldEntity = zen_FieldEntity_new(flags, nameIndex, descriptorIndex);
+            k_FieldEntity_t* fieldEntity = k_FieldEntity_new(flags, nameIndex, descriptorIndex);
 
             /* Add the field entity to the list of fields. */
             jtk_ArrayList_add(generator->m_fields, fieldEntity);
         }
-        else if (zen_Scope_isLocalScope(currentScope)) {
+        else if (k_Scope_isLocalScope(currentScope)) {
             /* Retrieve the string equivalent to the identifier node. */
             int32_t identifierSize;
-            uint8_t* identifierText = zen_ASTNode_toCString(identifier, &identifierSize);
+            uint8_t* identifierText = k_ASTNode_toCString(identifier, &identifierSize);
 
             /* TODO: If the local scope belongs to an instance function, then a local
              * variable for the "this" reference should be created.
              */
 
-            zen_Symbol_t* symbol = zen_Scope_resolve(currentScope, identifierText);
-            if (zen_Symbol_isConstant(symbol)) {
+            k_Symbol_t* symbol = k_Scope_resolve(currentScope, identifierText);
+            if (k_Symbol_isConstant(symbol)) {
                 /* Generate and assign the index of the local variable only if it
                  * was not previously assigned an index.
                  */
@@ -1488,16 +1488,16 @@ void zen_BinaryEntityGenerator_onEnterConstantDeclaration(zen_ASTListener_t* ast
                 generator->m_localVariableCount += 2;
 
                 if (constantDeclaratorContext->m_expression != NULL) {
-                    zen_ASTWalker_walk(astListener, constantDeclaratorContext->m_expression);
+                    k_ASTWalker_walk(astListener, constantDeclaratorContext->m_expression);
 
                     /* Store the obtained result in the local constant.
                      * The actual emission of the instruction is delegated to the
-                     * zen_BinaryEntityGenerator_storeLocalReference() function which takes
+                     * k_BinaryEntityGenerator_storeLocalReference() function which takes
                      * care of optimizing the emission.
                      *
-                     * TODO: Implement the zen_BinaryEntityGenerator_storeLocalReference() function.
+                     * TODO: Implement the k_BinaryEntityGenerator_storeLocalReference() function.
                      */
-                    zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder, symbol->m_index);
+                    k_BinaryEntityBuilder_emitStoreReference(generator->m_builder, symbol->m_index);
 
                     /* Log the emission of the store_a instruction. */
                     jtk_Logger_debug(logger, "Emitted store_a %d", symbol->m_index);
@@ -1512,24 +1512,24 @@ void zen_BinaryEntityGenerator_onEnterConstantDeclaration(zen_ASTListener_t* ast
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitConstantDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitConstantDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // constantDeclarator
 
-void zen_BinaryEntityGenerator_onEnterConstantDeclarator(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterConstantDeclarator(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitConstantDeclarator(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitConstantDeclarator(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // assertStatement
@@ -1553,34 +1553,34 @@ void zen_BinaryEntityGenerator_onExitConstantDeclarator(zen_ASTListener_t* astLi
  * 7. Generate the instructions required to create and throw an exception.
  *    The exception is an instance of the zen.core.AssertionError class.
  */
-void zen_BinaryEntityGenerator_onEnterAssertStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterAssertStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the context of the AST node. */
-    zen_AssertStatementContext_t* context = (zen_AssertStatementContext_t*)node->m_context;
+    k_AssertStatementContext_t* context = (k_AssertStatementContext_t*)node->m_context;
 
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitAssertStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitAssertStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
     /* Retrieve the context of the AST node. */
-    zen_AssertStatementContext_t* context = (zen_AssertStatementContext_t*)node->m_context;
+    k_AssertStatementContext_t* context = (k_AssertStatementContext_t*)node->m_context;
 
-    int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+    int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
          generator->m_builder);
-    zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+    k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
          generator->m_builder, parentChannelIndex);
 
     uint8_t* className = "Unknown"; // TODO: Get the name of the current class!
@@ -1589,7 +1589,7 @@ void zen_BinaryEntityGenerator_onExitAssertStatement(zen_ASTListener_t* astListe
     int32_t descriptorSize = 1;
     uint8_t* name = "$assertionEnabled";
     int32_t nameSize = 17;
-    int32_t assertionEnabledIndex = zen_ConstantPoolBuilder_getFieldEntryIndexEx(
+    int32_t assertionEnabledIndex = k_ConstantPoolBuilder_getFieldEntryIndexEx(
         generator->m_constantPoolBuilder, className, classNameSize,
         descriptor, descriptorSize, name, nameSize);
 
@@ -1601,14 +1601,14 @@ void zen_BinaryEntityGenerator_onExitAssertStatement(zen_ASTListener_t* astListe
     int32_t getValueDescriptorSize = 19;
     const uint8_t* getValueName = "getValue";
     int32_t getValueNameSize = 8;
-    uint16_t getValueIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t getValueIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, booleanClassName, booleanClassNameSize,
         getValueDescriptor, getValueDescriptorSize, getValueName,
         getValueNameSize, 0);
 
     const uint8_t* assertionErrorClassName = "zen/core/AssertionError";
     int32_t assertionErrorClassNameSize = 26;
-    uint16_t assertionErrorClassIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+    uint16_t assertionErrorClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, assertionErrorClassName,
         assertionErrorClassNameSize);
 
@@ -1616,86 +1616,86 @@ void zen_BinaryEntityGenerator_onExitAssertStatement(zen_ASTListener_t* astListe
     int32_t constructor1DescriptorSize = 20;
     const uint8_t* constructorName = "<initialize>";
     int32_t constructorNameSize = 10;
-    uint16_t constructor1Index = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t constructor1Index = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, assertionErrorClassName,
         assertionErrorClassNameSize, constructor1Descriptor, constructor1DescriptorSize,
         constructorName, constructorNameSize, 0);
 
     const uint8_t* constructor2Descriptor = "v:v";
     int32_t constructor2DescriptorSize = 3;
-    uint16_t constructor2Index = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t constructor2Index = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, assertionErrorClassName,
         assertionErrorClassNameSize, constructor2Descriptor, constructor2DescriptorSize,
         constructorName, constructorNameSize, 0);
 
     /* Emit the load_static_field instruction. */
-    zen_BinaryEntityBuilder_emitLoadStaticField(generator->m_builder,
+    k_BinaryEntityBuilder_emitLoadStaticField(generator->m_builder,
         assertionEnabledIndex);
     /* Log the emission of the load_static_field instruction. */
     jtk_Logger_debug(logger, "Emitted load_static_field %d", assertionEnabledIndex);
 
     /* Emit the jump_eq0_i instruction. */
-    zen_BinaryEntityBuilder_emitJumpEqual0Integer(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitJumpEqual0Integer(generator->m_builder, 0);
     /* Log the emission of the jump_eq0_i instruction. */
     jtk_Logger_debug(logger, "Emitted jump_eq0_i 0 (dummy index)");
 
     /* Save the index of the byte where the dummy data was written. */
-    int32_t updateIndex1 = zen_DataChannel_getSize(parentChannel) - 2;
+    int32_t updateIndex1 = k_DataChannel_getSize(parentChannel) - 2;
 
     /* Generate the instructions corresponding to the condition expression
      * specified to the assert statement.
      */
-    zen_ASTWalker_walk(astListener, context->m_conditionExpression);
+    k_ASTWalker_walk(astListener, context->m_conditionExpression);
 
     /* Invoke the Boolean#getValue() function to retrieve the primitive equivalent
      * of the resulting object.
      */
-    zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder,
+    k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder,
         getValueIndex);
     /* Log the emission of the invoke_virtual instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_virtual %d", getValueIndex);
 
     /* Emit the jump_ne0_i instruction. */
-    zen_BinaryEntityBuilder_emitJumpNotEqual0Integer(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitJumpNotEqual0Integer(generator->m_builder, 0);
     /* Log the emission of the jump_ne0_i instruction. */
     jtk_Logger_debug(logger, "Emitted jump_ne0_i 0 (dummy index)");
 
     /* Save the index of the byte where the dummy data was written. */
-    int32_t updateIndex2 = zen_DataChannel_getSize(parentChannel) - 2;
+    int32_t updateIndex2 = k_DataChannel_getSize(parentChannel) - 2;
 
     int32_t constructorIndex = constructor2Index;
     if (context->m_messageExpression != NULL) {
         /* Generate the instructions corresponding to the message expression
          * specified to the assert statement.
          */
-        zen_ASTWalker_walk(astListener, context->m_messageExpression);
+        k_ASTWalker_walk(astListener, context->m_messageExpression);
 
         /* Use the constructor that accepts a detail message parameter. */
         constructorIndex = constructor1Index;
     }
 
     /* Create an instance of the AssertionError class. */
-    zen_BinaryEntityBuilder_emitNew(generator->m_builder, assertionErrorClassIndex);
+    k_BinaryEntityBuilder_emitNew(generator->m_builder, assertionErrorClassIndex);
     /* Log the emission of the new instruction. */
     jtk_Logger_debug(logger, "Emitted new %d", assertionErrorClassIndex);
 
     /* Duplicate the reference of the newly created exception. */
-    zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+    k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
     /* Log the emission of the duplicate instruction. */
     jtk_Logger_debug(logger, "Emitted duplicate");
 
     /* Invoke the constructor to initialize the new exception instance. */
-    zen_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
+    k_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
         constructorIndex);
     /* Log the emission of the invoke_special instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_special %d", constructorIndex);
 
     /* Throw the newly created exception. */
-    zen_BinaryEntityBuilder_emitThrow(generator->m_builder);
+    k_BinaryEntityBuilder_emitThrow(generator->m_builder);
     /* Log the emission of the throw instruction. */
     jtk_Logger_debug(logger, "Emitted throw");
 
-    int32_t newParentChannelSize = zen_DataChannel_getSize(parentChannel);
+    int32_t newParentChannelSize = k_DataChannel_getSize(parentChannel);
     /* Update the jump offset of the first jump instruction. */
     parentChannel->m_bytes[updateIndex1] = (newParentChannelSize & 0x0000FF00) >> 8;
     parentChannel->m_bytes[updateIndex1 + 1] = newParentChannelSize & 0x000000FF;
@@ -1708,7 +1708,7 @@ void zen_BinaryEntityGenerator_onExitAssertStatement(zen_ASTListener_t* astListe
 
 #define ZEN_BREAK_RECORDS_BUFFER_INCREMENT 8
 
-void zen_BinaryEntityGenerator_recordBreak(zen_BinaryEntityGenerator_t* generator,
+void k_BinaryEntityGenerator_recordBreak(k_BinaryEntityGenerator_t* generator,
     int32_t loopIdentifier, int32_t updateIndex) {
     if (generator->m_breakRecordsCount + 1 >= generator->m_breakRecordsCapacity) {
         int32_t newCapacity = generator->m_breakRecordsCapacity + ZEN_BREAK_RECORDS_BUFFER_INCREMENT;
@@ -1744,36 +1744,36 @@ void zen_BinaryEntityGenerator_recordBreak(zen_BinaryEntityGenerator_t* generato
  * ----------------------------------------
  *          break statement record
  */
-void zen_BinaryEntityGenerator_onEnterBreakStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterBreakStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
     /* Retrieve the context of the AST node. */
-    zen_BreakStatementContext_t* context = (zen_BreakStatementContext_t*)node->m_context;
+    k_BreakStatementContext_t* context = (k_BreakStatementContext_t*)node->m_context;
 
     if (generator->m_currentLoopLabel >= 0) {
-        int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+        int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
             generator->m_builder);
-        zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+        k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
             generator->m_builder, parentChannelIndex);
 
         /* Emit the jump instruction. */
-        zen_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
+        k_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
         /* Log the emission of the jump instruction. */
         jtk_Logger_debug(logger, "Emitted jump 0 (dummy index)");
 
         /* Calculate the inndex of the byte where the dummy data was written. */
-        int32_t updateIndex = zen_DataChannel_getSize(parentChannel) - 2;
+        int32_t updateIndex = k_DataChannel_getSize(parentChannel) - 2;
         /* Determine the identifier of the loop to break. */
         int32_t loopIdentifier;
         if (context->m_identifier != NULL) {
             int32_t identifierSize;
-            uint8_t* identifierText = zen_ASTNode_toCString(context->m_identifier, &identifierSize);
+            uint8_t* identifierText = k_ASTNode_toCString(context->m_identifier, &identifierSize);
 
             /* Resolve the parameter symbol in the symbol table. */
-            zen_Symbol_t* symbol = zen_SymbolTable_resolve(generator->m_symbolTable, identifierText);
+            k_Symbol_t* symbol = k_SymbolTable_resolve(generator->m_symbolTable, identifierText);
             /* Retrieve the label symbol. */
             loopIdentifier = symbol->m_index;
         }
@@ -1781,7 +1781,7 @@ void zen_BinaryEntityGenerator_onEnterBreakStatement(zen_ASTListener_t* astListe
             loopIdentifier = generator->m_currentLoopLabel;
         }
 
-        zen_BinaryEntityGenerator_recordBreak(generator, loopIdentifier, updateIndex);
+        k_BinaryEntityGenerator_recordBreak(generator, loopIdentifier, updateIndex);
     }
     else {
         printf("[error] Break statement outside an iterative statement.\n");
@@ -1789,39 +1789,39 @@ void zen_BinaryEntityGenerator_onEnterBreakStatement(zen_ASTListener_t* astListe
     }
 }
 
-void zen_BinaryEntityGenerator_onExitBreakStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitBreakStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // continueStatement
 
-void zen_BinaryEntityGenerator_onEnterContinueStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterContinueStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitContinueStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitContinueStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // returnStatement
 
-void zen_BinaryEntityGenerator_onEnterReturnStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterReturnStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitReturnStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitReturnStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
 
     /* Retrieve the context of the AST node. */
-    zen_ReturnStatementContext_t* context =
-        (zen_ReturnStatementContext_t*)node->m_context;
+    k_ReturnStatementContext_t* context =
+        (k_ReturnStatementContext_t*)node->m_context;
 
     /* Emit the return_a instruction. */
-    zen_BinaryEntityBuilder_emitReturnReference(generator->m_builder);
+    k_BinaryEntityBuilder_emitReturnReference(generator->m_builder);
 
     /* Log the emission of the instruction. */
     jtk_Logger_debug(logger, "Emitted return_a");
@@ -1829,23 +1829,23 @@ void zen_BinaryEntityGenerator_onExitReturnStatement(zen_ASTListener_t* astListe
 
 // throwStatement
 
-void zen_BinaryEntityGenerator_onEnterThrowStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterThrowStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitThrowStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitThrowStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
 
     /* Retrieve the context of the AST node. */
-    zen_ThrowStatementContext_t* context =
-        (zen_ThrowStatementContext_t*)node->m_context;
+    k_ThrowStatementContext_t* context =
+        (k_ThrowStatementContext_t*)node->m_context;
 
     /* Emit the throw instruction. */
-    zen_BinaryEntityBuilder_emitThrow(generator->m_builder);
+    k_BinaryEntityBuilder_emitThrow(generator->m_builder);
 
     /* Log the emission of the instruction. */
     jtk_Logger_debug(logger, "Emitted throw");
@@ -1853,48 +1853,48 @@ void zen_BinaryEntityGenerator_onExitThrowStatement(zen_ASTListener_t* astListen
 
 // compoundStatement
 
-void zen_BinaryEntityGenerator_onEnterCompoundStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterCompoundStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitCompoundStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitCompoundStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // ifStatement
 
-void zen_BinaryEntityGenerator_onEnterIfStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_IfStatementContext_t* context = (zen_IfStatementContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterIfStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_IfStatementContext_t* context = (k_IfStatementContext_t*)node->m_context;
 
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitIfStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+void k_BinaryEntityGenerator_onExitIfStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
-    zen_IfStatementContext_t* context = (zen_IfStatementContext_t*)node->m_context;
+    k_IfStatementContext_t* context = (k_IfStatementContext_t*)node->m_context;
 
     uint16_t getValueIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE];
 
-    int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+    int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
          generator->m_builder);
-    zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+    k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
          generator->m_builder, parentChannelIndex);
 
-    zen_ASTNode_t* ifClause = context->m_ifClause;
-    zen_IfClauseContext_t* ifClauseContext = (zen_IfClauseContext_t*)ifClause->m_context;
-    zen_ASTNode_t* expression = ifClauseContext->m_expression;
-    zen_ASTNode_t* statementSuite = ifClauseContext->m_statementSuite;
+    k_ASTNode_t* ifClause = context->m_ifClause;
+    k_IfClauseContext_t* ifClauseContext = (k_IfClauseContext_t*)ifClause->m_context;
+    k_ASTNode_t* expression = ifClauseContext->m_expression;
+    k_ASTNode_t* statementSuite = ifClauseContext->m_statementSuite;
 
     int32_t size = jtk_ArrayList_getSize(context->m_elseIfClauses);
     int32_t* skipIndexes = jtk_Memory_allocate(int32_t, size + 1);
@@ -1905,30 +1905,30 @@ void zen_BinaryEntityGenerator_onExitIfStatement(zen_ASTListener_t* astListener,
         /* Generate the instructions corresponding to the conditional expression
          * specified to the if clause.
          */
-        zen_ASTWalker_walk(astListener, expression);
+        k_ASTWalker_walk(astListener, expression);
 
         /* Invoke the Boolean#getValue() function to retrieve the primitive equivalent
          * of the resulting object.
          */
-        zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder,
+        k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder,
             getValueIndex);
 
         /* Log the emission of the invoke_special instruction. */
         jtk_Logger_debug(logger, "Emitted invoke_virtual %d", getValueIndex);
 
         /* Emit the jump_eq0_i instruction. */
-        zen_BinaryEntityBuilder_emitJumpEqual0Integer(generator->m_builder, 0);
+        k_BinaryEntityBuilder_emitJumpEqual0Integer(generator->m_builder, 0);
 
         /* Log the emission of the jump_eq0_i instruction. */
         jtk_Logger_debug(logger, "Emitted jump_eq0_i 0 (dummy index)");
 
         /* Save the index of the byte where the dummy data was written. */
-        updateIndex = zen_DataChannel_getSize(parentChannel) - 2;
+        updateIndex = k_DataChannel_getSize(parentChannel) - 2;
 
         /* Generate the instructions corresponding to the statement suite specified
          * to the if clause.
          */
-        zen_ASTWalker_walk(astListener, statementSuite);
+        k_ASTWalker_walk(astListener, statementSuite);
 
         /* Update the loop counter and prepare for the next iteration, if any. */
         index++;
@@ -1943,17 +1943,17 @@ void zen_BinaryEntityGenerator_onExitIfStatement(zen_ASTListener_t* astListener,
              * evaluated right now. Therefore, emit the jump instruction with a dummy
              * offset.
              */
-            zen_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
+            k_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
 
             /* Log the emission of the jump instruction. */
             jtk_Logger_debug(logger, "Emitted jump 0 (dummy index)");
 
             /* Save the index of the bytes where the dummy data was written. */
-            skipIndexes[index] = zen_DataChannel_getSize(parentChannel) - 2;
+            skipIndexes[index] = k_DataChannel_getSize(parentChannel) - 2;
 
-            zen_ASTNode_t* elseIfClause = jtk_ArrayList_getValue(context->m_elseIfClauses, index);
-            zen_ElseIfClauseContext_t* elseIfClauseContext =
-                (zen_ElseIfClauseContext_t*)elseIfClause->m_context;
+            k_ASTNode_t* elseIfClause = jtk_ArrayList_getValue(context->m_elseIfClauses, index);
+            k_ElseIfClauseContext_t* elseIfClauseContext =
+                (k_ElseIfClauseContext_t*)elseIfClause->m_context;
             expression = elseIfClauseContext->m_expression;
             statementSuite = elseIfClauseContext->m_statementSuite;
         }
@@ -1964,7 +1964,7 @@ void zen_BinaryEntityGenerator_onExitIfStatement(zen_ASTListener_t* astListener,
          * Note: the instructions are indexed beginning from zero. Otherwise,
          * an extra 1 should be added to the offset.
          */
-        int32_t newParentChannelSize = zen_DataChannel_getSize(parentChannel);
+        int32_t newParentChannelSize = k_DataChannel_getSize(parentChannel);
 
         parentChannel->m_bytes[updateIndex] = (newParentChannelSize & 0x0000FF00) >> 8;
         parentChannel->m_bytes[updateIndex + 1] = newParentChannelSize & 0x000000FF;
@@ -1988,7 +1988,7 @@ void zen_BinaryEntityGenerator_onExitIfStatement(zen_ASTListener_t* astListener,
          * the jump offset cannot be evaluated right now. Therefore, emit the
          * jump instruction with a dummy offset.
          */
-        zen_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
+        k_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
 
         /* Log the emission of the jump instruction. */
         jtk_Logger_debug(logger, "Emitted jump 0 (dummy index)");
@@ -2000,26 +2000,26 @@ void zen_BinaryEntityGenerator_onExitIfStatement(zen_ASTListener_t* astListener,
          * the index given to the jump_ne0_i instruction corresponding to the last
          * if clause.
          */
-        int32_t newParentChannelSize = zen_DataChannel_getSize(parentChannel);
+        int32_t newParentChannelSize = k_DataChannel_getSize(parentChannel);
         parentChannel->m_bytes[updateIndex] = (newParentChannelSize & 0x0000FF00) >> 8;
         parentChannel->m_bytes[updateIndex + 1] = newParentChannelSize & 0x000000FF;
 
         /* Save the index of the bytes where the dummy data was written. */
-        skipIndexes[index] = zen_DataChannel_getSize(parentChannel) - 2;
+        skipIndexes[index] = k_DataChannel_getSize(parentChannel) - 2;
 
         /* Increase the number of skips to indicate the presence of an else clause. */
         numberOfSkips++;
 
         /* Retrieve the AST node for the else clause. */
-        zen_ASTNode_t* elseClause = context->m_elseClause;
+        k_ASTNode_t* elseClause = context->m_elseClause;
         /* Retrieve the context associated with the AST node of the else clause. */
-        zen_ElseClauseContext_t* elseClauseContext =
-            (zen_ElseClauseContext_t*)elseClause->m_context;
+        k_ElseClauseContext_t* elseClauseContext =
+            (k_ElseClauseContext_t*)elseClause->m_context;
         /* Generate the instructions for the statements within the else clause. */
-        zen_ASTWalker_walk(astListener, elseClauseContext->m_statementSuite);
+        k_ASTWalker_walk(astListener, elseClauseContext->m_statementSuite);
     }
 
-    int32_t newParentChannelSize = zen_DataChannel_getSize(parentChannel);
+    int32_t newParentChannelSize = k_DataChannel_getSize(parentChannel);
     int32_t i;
     for (i = 0; i < numberOfSkips; i++) {
         uint16_t skipIndex = skipIndexes[i];
@@ -2032,57 +2032,57 @@ void zen_BinaryEntityGenerator_onExitIfStatement(zen_ASTListener_t* astListener,
 
 // ifClause
 
-void zen_BinaryEntityGenerator_onEnterIfClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterIfClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitIfClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitIfClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // elseIfClause
 
-void zen_BinaryEntityGenerator_onEnterElseIfClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterElseIfClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitElseIfClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitElseIfClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // elseClause
 
-void zen_BinaryEntityGenerator_onEnterElseClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterElseClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitElseClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitElseClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // iterativeStatement
 
-void zen_BinaryEntityGenerator_onEnterIterativeStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterIterativeStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
     /* Retrieve the context of the AST node. */
-    zen_IterativeStatementContext_t* context = (zen_IterativeStatementContext_t*)node->m_context;
+    k_IterativeStatementContext_t* context = (k_IterativeStatementContext_t*)node->m_context;
 
     int32_t parentLoop = generator->m_currentLoopLabel;
     int32_t loopIdentifier = generator->m_nextLoopLabel++;
 
     if (context->m_labelClause != NULL) {
-        zen_LabelClauseContext_t* labelClauseContext =
-            (zen_LabelClauseContext_t*)context->m_labelClause->m_context;
+        k_LabelClauseContext_t* labelClauseContext =
+            (k_LabelClauseContext_t*)context->m_labelClause->m_context;
         int32_t identifierTextSize;
-        uint8_t* identifierText = zen_ASTNode_toCString(labelClauseContext->m_identifier,
+        uint8_t* identifierText = k_ASTNode_toCString(labelClauseContext->m_identifier,
             &identifierTextSize);
 
         /* Resolve the parameter symbol in the symbol table. */
-        zen_Symbol_t* symbol = zen_SymbolTable_resolve(generator->m_symbolTable, identifierText);
+        k_Symbol_t* symbol = k_SymbolTable_resolve(generator->m_symbolTable, identifierText);
         /* Associate the label symbol with the identifier generated
          * for the current loop.
          */
@@ -2090,15 +2090,15 @@ void zen_BinaryEntityGenerator_onEnterIterativeStatement(zen_ASTListener_t* astL
     }
 
     generator->m_currentLoopLabel = loopIdentifier;
-    zen_ASTWalker_walk(astListener, context->m_statement);
+    k_ASTWalker_walk(astListener, context->m_statement);
     generator->m_currentLoopLabel = parentLoop;
 
-    int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+    int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
          generator->m_builder);
-    zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+    k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
          generator->m_builder, parentChannelIndex);
 
-    int32_t channelSize = zen_DataChannel_getSize(parentChannel);
+    int32_t channelSize = k_DataChannel_getSize(parentChannel);
     int32_t i;
     for (i = 0; i < generator->m_breakRecordsCount; i++) {
         int32_t index = i * 2;
@@ -2112,115 +2112,115 @@ void zen_BinaryEntityGenerator_onEnterIterativeStatement(zen_ASTListener_t* astL
     }
 
     /* Cause the AST walker to skip iterating over the children nodes. */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitIterativeStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitIterativeStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // label
 
-void zen_BinaryEntityGenerator_onEnterLabel(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterLabel(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitLabel(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitLabel(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // whileStatement
 
-void zen_BinaryEntityGenerator_onEnterWhileStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_WhileStatementContext_t* context = (zen_WhileStatementContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterWhileStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_WhileStatementContext_t* context = (k_WhileStatementContext_t*)node->m_context;
 
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitWhileStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+void k_BinaryEntityGenerator_onExitWhileStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
-    zen_WhileStatementContext_t* context = (zen_WhileStatementContext_t*)node->m_context;
+    k_WhileStatementContext_t* context = (k_WhileStatementContext_t*)node->m_context;
 
     uint16_t getValueIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE];
 
-    int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+    int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
         generator->m_builder);
-    zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+    k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
         generator->m_builder, parentChannelIndex);
-    uint16_t loopIndex = zen_DataChannel_getSize(parentChannel);
+    uint16_t loopIndex = k_DataChannel_getSize(parentChannel);
 
     /* Generate the instructions corresponding to the conditional expression
      * specified to the while statement.
      */
-    zen_ASTWalker_walk(astListener, context->m_expression);
+    k_ASTWalker_walk(astListener, context->m_expression);
 
     /* Invoke the Boolean#getValue() function to retrieve the primitive equivalent
      * of the resulting object.
      */
-    zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder,
+    k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder,
         getValueIndex);
 
     /* Log the emission of the invoke_virtual instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_virtual %d", getValueIndex);
 
     /* Emit the jump_eq0_i instruction. */
-    zen_BinaryEntityBuilder_emitJumpEqual0Integer(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitJumpEqual0Integer(generator->m_builder, 0);
 
     /* Log the emission of the jump_eq0_i instruction. */
     jtk_Logger_debug(logger, "Emitted jump_eq0_i 0 (dummy index)");
 
     /* Save the index of the byte where the dummy data was written. */
-    int32_t updateIndex = zen_DataChannel_getSize(parentChannel) - 2;
+    int32_t updateIndex = k_DataChannel_getSize(parentChannel) - 2;
 
     /* Generate the instructions corresponding to the statement suite specified
      * to the while statement.
      */
-    zen_ASTWalker_walk(astListener, context->m_statementSuite);
+    k_ASTWalker_walk(astListener, context->m_statementSuite);
 
     /* Generate a jump instruction to loop back to the conditional expression. */
-    zen_BinaryEntityBuilder_emitJump(generator->m_builder, loopIndex);
+    k_BinaryEntityBuilder_emitJump(generator->m_builder, loopIndex);
 
     /* Log the emission of the jump instruction. */
     jtk_Logger_debug(logger, "Emitted jump %d", loopIndex);
 
-    uint16_t newParentChannelSize = zen_DataChannel_getSize(parentChannel);
+    uint16_t newParentChannelSize = k_DataChannel_getSize(parentChannel);
     parentChannel->m_bytes[updateIndex] = (newParentChannelSize & 0x0000FF00) >> 8;
     parentChannel->m_bytes[updateIndex + 1] = newParentChannelSize & 0x000000FF;
 }
 
 // forStatement
 
-void zen_BinaryEntityGenerator_onEnterForStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_ForStatementContext_t* context = (zen_ForStatementContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterForStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_ForStatementContext_t* context = (k_ForStatementContext_t*)node->m_context;
 
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+void k_BinaryEntityGenerator_onExitForStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
-    zen_ForStatementContext_t* context = (zen_ForStatementContext_t*)node->m_context;
+    k_ForStatementContext_t* context = (k_ForStatementContext_t*)node->m_context;
 
     const uint8_t* iterableClassName = "zen/core/Iterable";
     int32_t iterableClassNameSize = 17;
@@ -2228,14 +2228,14 @@ void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener
     int32_t getIteratorDescriptorSize = 19;
     const uint8_t* getIteratorName = "getIterator";
     int32_t getIteratorNameSize = 11;
-    uint16_t getIteratorIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t getIteratorIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, iterableClassName, iterableClassNameSize,
         getIteratorDescriptor, getIteratorDescriptorSize, getIteratorName,
         getIteratorNameSize, 0);
 
-    int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+    int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
         generator->m_builder);
-    zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+    k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
         generator->m_builder, parentChannelIndex);
 
     const uint8_t* iteratorClassName = "zen/core/Iterator";
@@ -2244,7 +2244,7 @@ void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener
     int32_t hasNextDescriptorSize = 19;
     const uint8_t* hasNextName = "hasNext";
     int32_t hasNextNameSize = 7;
-    uint16_t hasNextIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t hasNextIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, iteratorClassName, iteratorClassNameSize,
         hasNextDescriptor, hasNextDescriptorSize, hasNextName,
         hasNextNameSize, 0);
@@ -2253,25 +2253,25 @@ void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener
     int32_t getNextDescriptorSize = 19;
     const uint8_t* getNextName = "getNext";
     int32_t getNextNameSize = 7;
-    uint16_t getNextIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t getNextIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, iteratorClassName, iteratorClassNameSize,
         getNextDescriptor, getNextDescriptorSize, getNextName,
         getNextNameSize, 0);
 
     uint16_t getValueIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE];
 
-    zen_ASTNode_t* forParameter = context->m_forParameter;
-    zen_ForParameterContext_t* forParameterContext =
-        (zen_ForParameterContext_t*)forParameter->m_context;
+    k_ASTNode_t* forParameter = context->m_forParameter;
+    k_ForParameterContext_t* forParameterContext =
+        (k_ForParameterContext_t*)forParameter->m_context;
 
     /* Generate the instructions corresponding to the expression specified to
      * the for statement.
      */
-    zen_ASTWalker_walk(astListener, context->m_expression);
+    k_ASTWalker_walk(astListener, context->m_expression);
 
     /* Invoke the Iterable#getIterator() function to retrieve the iterator.
      */
-    zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder,
+    k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder,
         getIteratorIndex);
 
     /* Log the emission of the invoke_virtual instruction. */
@@ -2282,26 +2282,26 @@ void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener
 
     /* Store the obtained iterator in a local variable for future reference.
      * The actual emission of the instruction is delegated to the
-     * zen_BinaryEntityGenerator_storeLocalReference() function which takes
+     * k_BinaryEntityGenerator_storeLocalReference() function which takes
      * care of optimizing the emission.
      *
-     * TODO: Implement the zen_BinaryEntityGenerator_storeLocalReference() function.
+     * TODO: Implement the k_BinaryEntityGenerator_storeLocalReference() function.
      */
-    zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder, iteratorIndex);
+    k_BinaryEntityBuilder_emitStoreReference(generator->m_builder, iteratorIndex);
 
     /* Log the emission of the store_a instruction. */
     jtk_Logger_debug(logger, "Emitted store_a %d", iteratorIndex);
 
-    uint16_t loopIndex = zen_DataChannel_getSize(parentChannel);
+    uint16_t loopIndex = k_DataChannel_getSize(parentChannel);
 
     /* Load the iterator from the local variable.
      * The actual emission of the instruction is delegated to the
-     * zen_BinaryEntityGenerator_loadLocalReference() function which takes
+     * k_BinaryEntityGenerator_loadLocalReference() function which takes
      * care of optimizing the emission.
      *
-     * TODO: Implement the zen_BinaryEntityGenerator_loadLocalReference() function.
+     * TODO: Implement the k_BinaryEntityGenerator_loadLocalReference() function.
      */
-    zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, iteratorIndex);
+    k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, iteratorIndex);
 
     /* Log the emission of the load_a instruction. */
     jtk_Logger_debug(logger, "Emitted load_a %d", iteratorIndex);
@@ -2309,7 +2309,7 @@ void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener
     /* Invoke the Iterator#hasNext() function to determine whether the iterator
      * has more values to return.
      */
-    zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, hasNextIndex);
+    k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, hasNextIndex);
 
     /* Log the emission of the invoke_virtual instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_virtual %d", hasNextIndex);
@@ -2317,34 +2317,34 @@ void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener
     /* Invoke the Boolean#getValue() function to determine whether the iterator
      * has more values to return.
      */
-    zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, getValueIndex);
+    k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, getValueIndex);
 
     /* Log the emission of the invoke_virtual instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_virtual %d", getValueIndex);
 
     /* Emit the jump_eq0_i instruction. */
-    zen_BinaryEntityBuilder_emitJumpEqual0Integer(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitJumpEqual0Integer(generator->m_builder, 0);
 
     /* Log the emission of the jump_eq0_i instruction. */
     jtk_Logger_debug(logger, "Emitted jump_eq0_i 0 (dummy index)");
 
     /* Save the index of the byte where the dummy data was written. */
-    int32_t updateIndex = zen_DataChannel_getSize(parentChannel) - 2;
+    int32_t updateIndex = k_DataChannel_getSize(parentChannel) - 2;
 
     /* Load the iterator from the local variable so we can invoke
      * Iterator#getNext(). The actual emission of the instruction is delegated to the
-     * zen_BinaryEntityGenerator_loadLocalReference() function which takes
+     * k_BinaryEntityGenerator_loadLocalReference() function which takes
      * care of optimizing the emission.
      *
-     * TODO: Implement the zen_BinaryEntityGenerator_loadLocalReference() function.
+     * TODO: Implement the k_BinaryEntityGenerator_loadLocalReference() function.
      */
-    zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, iteratorIndex);
+    k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, iteratorIndex);
 
     /* Log the emission of the load_a instruction. */
     jtk_Logger_debug(logger, "Emitted load_a %d", iteratorIndex);
 
     /* Invoke the Iterator#getNext() function to retrieve the next value. */
-    zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, getNextIndex);
+    k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, getNextIndex);
 
     /* Log the emission of the invoke_virtual instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_virtual %d", getNextIndex);
@@ -2352,9 +2352,9 @@ void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener
     int32_t parameterIndex = -1;
     /* Retrieve the string equivalent to the identifier node. */
     int32_t identifierSize;
-    uint8_t* identifierText = zen_ASTNode_toCString(forParameterContext->m_identifier, &identifierSize);
+    uint8_t* identifierText = k_ASTNode_toCString(forParameterContext->m_identifier, &identifierSize);
     /* Resolve the parameter symbol in the symbol table. */
-    zen_Symbol_t* symbol = zen_SymbolTable_resolve(generator->m_symbolTable, identifierText);
+    k_Symbol_t* symbol = k_SymbolTable_resolve(generator->m_symbolTable, identifierText);
     if (forParameterContext->m_declaration) {
         /* Generate an index for the parameter. */
         parameterIndex = generator->m_localVariableCount;
@@ -2370,7 +2370,7 @@ void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener
     }
 
     /* Store the retrieved value in a local variable. */
-    zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder, parameterIndex);
+    k_BinaryEntityBuilder_emitStoreReference(generator->m_builder, parameterIndex);
 
     /* Log the emission of the store_a instruction. */
     jtk_Logger_debug(logger, "Emitted store_a %d", parameterIndex);
@@ -2378,45 +2378,45 @@ void zen_BinaryEntityGenerator_onExitForStatement(zen_ASTListener_t* astListener
     /* Generate the instructions corresponding to the statement suite specified
      * to the while statement.
      */
-    zen_ASTWalker_walk(astListener, context->m_statementSuite);
+    k_ASTWalker_walk(astListener, context->m_statementSuite);
 
     /* Generate a jump instruction to loop back to the conditional expression. */
-    zen_BinaryEntityBuilder_emitJump(generator->m_builder, loopIndex);
+    k_BinaryEntityBuilder_emitJump(generator->m_builder, loopIndex);
 
     /* Log the emission of the jump instruction. */
     jtk_Logger_debug(logger, "Emitted jump %d", loopIndex);
 
-    uint16_t newParentChannelSize = zen_DataChannel_getSize(parentChannel);
+    uint16_t newParentChannelSize = k_DataChannel_getSize(parentChannel);
     parentChannel->m_bytes[updateIndex] = (newParentChannelSize & 0x0000FF00) >> 8;
     parentChannel->m_bytes[updateIndex + 1] = newParentChannelSize & 0x000000FF;
 }
 
 // forParameters
 
-void zen_BinaryEntityGenerator_onEnterForParameters(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterForParameters(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitForParameters(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitForParameters(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // tryStatement
 
-void zen_BinaryEntityGenerator_onEnterTryStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterTryStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the context of the AST node. */
-    zen_TryStatementContext_t* context = (zen_TryStatementContext_t*)node->m_context;
+    k_TryStatementContext_t* context = (k_TryStatementContext_t*)node->m_context;
 
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
 /*
@@ -2527,24 +2527,24 @@ void zen_BinaryEntityGenerator_onEnterTryStatement(zen_ASTListener_t* astListene
  *
  * The latter algorithm is used in this implementation.
  */
-void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitTryStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
     /* Retrieve the context of the AST node. */
-    zen_TryStatementContext_t* context = (zen_TryStatementContext_t*)node->m_context;
+    k_TryStatementContext_t* context = (k_TryStatementContext_t*)node->m_context;
 
-    int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+    int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
         generator->m_builder);
-    zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+    k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
         generator->m_builder, parentChannelIndex);
 
-    zen_ASTNode_t* tryClause = context->m_tryClause;
-    zen_TryClauseContext_t* tryClauseContext = (zen_TryClauseContext_t*)tryClause->m_context;
+    k_ASTNode_t* tryClause = context->m_tryClause;
+    k_TryClauseContext_t* tryClauseContext = (k_TryClauseContext_t*)tryClause->m_context;
 
-    zen_ASTNode_t* statementSuite = tryClauseContext->m_statementSuite;
+    k_ASTNode_t* statementSuite = tryClauseContext->m_statementSuite;
 
     int32_t numberOfCatchClauses = jtk_ArrayList_getSize(context->m_catchClauses);
     /* This includes indexes for the try clause and n - 1 catch clauses,
@@ -2558,8 +2558,8 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
     int32_t tryClauseStartIndex = -1;
     int32_t tryClauseStopIndex = -1;
 
-    zen_ASTNode_t* catchClause = NULL;
-    zen_CatchClauseContext_t* catchClauseContext = NULL;
+    k_ASTNode_t* catchClause = NULL;
+    k_CatchClauseContext_t* catchClauseContext = NULL;
 
     /* Generate an index into the local variable array. This index is
      * used for all the catch clause parameters in the current try
@@ -2576,17 +2576,17 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
         /* Save the index where the instruction section for the current clause
          * begins (inclusive).
          */
-        int32_t startIndex = zen_DataChannel_getSize(parentChannel);
+        int32_t startIndex = k_DataChannel_getSize(parentChannel);
 
         /* Generate the instructions corresponding to the statement suite specified
          * to the current clause.
          */
-        zen_ASTWalker_walk(astListener, statementSuite);
+        k_ASTWalker_walk(astListener, statementSuite);
 
         /* Save the index where the instruction section for the current clause
          * ends (exclusive).
          */
-        int32_t stopIndex = zen_DataChannel_getSize(parentChannel);
+        int32_t stopIndex = k_DataChannel_getSize(parentChannel);
 
         if (index == -1) {
             tryClauseStartIndex = startIndex;
@@ -2601,26 +2601,26 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
             catchClauseIndexes[(index * 2) + 0] = startIndex - 2;
             catchClauseIndexes[(index * 2) + 1] = stopIndex;
 
-            zen_ASTNode_t* catchFilter = catchClauseContext->m_catchFilter;
-            zen_CatchFilterContext_t* catchFilterContext =
-                (zen_CatchFilterContext_t*)catchFilter->m_context;
+            k_ASTNode_t* catchFilter = catchClauseContext->m_catchFilter;
+            k_CatchFilterContext_t* catchFilterContext =
+                (k_CatchFilterContext_t*)catchFilter->m_context;
             int32_t filterCount = jtk_ArrayList_getSize(catchFilterContext->m_typeNames);
             int32_t filterIndex;
             for (filterIndex = 0; filterIndex < filterCount; filterIndex++) {
-                zen_ASTNode_t* typeName = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+                k_ASTNode_t* typeName = (k_ASTNode_t*)jtk_ArrayList_getValue(
                     catchFilterContext->m_typeNames, filterIndex);
 
                 int32_t exceptionClassNameSize;
-                uint8_t* exceptionClassName = zen_ASTNode_toCString(catchClauseContext->m_catchFilter,
+                uint8_t* exceptionClassName = k_ASTNode_toCString(catchClauseContext->m_catchFilter,
                     &exceptionClassNameSize);
-                zen_Symbol_t* exceptionClass = zen_SymbolTable_resolve(generator->m_symbolTable,
+                k_Symbol_t* exceptionClass = k_SymbolTable_resolve(generator->m_symbolTable,
                     exceptionClassName);
                 exceptionClassNameSize = exceptionClass->m_context.m_asClass.m_qualifiedNameSize;
                 uint8_t* descriptor = jtk_CString_newEx(exceptionClass->m_context.m_asClass.m_qualifiedName,
                     exceptionClass->m_context.m_asClass.m_qualifiedNameSize);
                 jtk_Arrays_replace_b(descriptor, exceptionClassNameSize, '.', '/');
                 // TODO: Resolve the symbol of the class with the given name.
-                uint16_t exceptionClassIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+                uint16_t exceptionClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
                     generator->m_constantPoolBuilder, descriptor, exceptionClassNameSize);
                 jtk_CString_delete(descriptor);
 
@@ -2628,8 +2628,8 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
                  * try clause are handled by the catch clauses. These exceptions are
                  * not implicitly thrown again.
                  */
-                zen_ExceptionHandlerSite_t* type1Handler =
-                    jtk_Memory_allocate(zen_ExceptionHandlerSite_t, 1);
+                k_ExceptionHandlerSite_t* type1Handler =
+                    jtk_Memory_allocate(k_ExceptionHandlerSite_t, 1);
                 type1Handler->m_startIndex = tryClauseStartIndex;
                 type1Handler->m_stopIndex = tryClauseStopIndex;
                 type1Handler->m_handlerIndex = startIndex - 2;
@@ -2660,38 +2660,38 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
              *
              * Emit the jump instruction to skip the other clauses.
              */
-            zen_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
+            k_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
 
             /* Log the emission of the jump instruction. */
             jtk_Logger_debug(logger, "Emitted jump 0 (dummy index)");
 
             /* Save the index of the bytes where the dummy data was written. */
-            updateIndexes[index] = zen_DataChannel_getSize(parentChannel) - 2;
+            updateIndexes[index] = k_DataChannel_getSize(parentChannel) - 2;
 
-            catchClause = (zen_ASTNode_t*)jtk_ArrayList_getValue(context->m_catchClauses,
+            catchClause = (k_ASTNode_t*)jtk_ArrayList_getValue(context->m_catchClauses,
                 index);
-            catchClauseContext =(zen_CatchClauseContext_t*)catchClause->m_context;
+            catchClauseContext =(k_CatchClauseContext_t*)catchClause->m_context;
             statementSuite = catchClauseContext->m_statementSuite;
 
             /* Invalidate the the previous local scope. */
             if (index >= 1) {
-                zen_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
+                k_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
             }
             /* Activate the scope of the catch clause. */
-            zen_Scope_t* scope = zen_ASTAnnotations_get(generator->m_scopes, catchClause);
-            zen_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
+            k_Scope_t* scope = k_ASTAnnotations_get(generator->m_scopes, catchClause);
+            k_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
             // Update the exception class name here.
 
-            zen_ASTNode_t* catchParameter = catchClauseContext->m_identifier;
+            k_ASTNode_t* catchParameter = catchClauseContext->m_identifier;
             int32_t catchParameterSize;
-            uint8_t* catchParameterText = zen_ASTNode_toCString(catchParameter, &catchParameterSize);
-            zen_Symbol_t* catchParameterSymbol = zen_SymbolTable_resolve(generator->m_symbolTable, catchParameterText);
+            uint8_t* catchParameterText = k_ASTNode_toCString(catchParameter, &catchParameterSize);
+            k_Symbol_t* catchParameterSymbol = k_SymbolTable_resolve(generator->m_symbolTable, catchParameterText);
             catchParameterSymbol->m_index = parameterIndex;
 
             /* The virtual machine pushes the exception that was caught to the
              * operand stack. Store this reference in a local variable.
              */
-            zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder, parameterIndex);
+            k_BinaryEntityBuilder_emitStoreReference(generator->m_builder, parameterIndex);
 
             /* Log the emission of the load_a instruction. */
             jtk_Logger_debug(logger, "Emitted store_a %d", parameterIndex);
@@ -2701,10 +2701,10 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
 
     /* Invalidate the local scope of the last catch clause. */
     if (numberOfCatchClauses > 0) {
-        zen_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
+        k_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
     }
 
-    int32_t fc1StartIndex = zen_DataChannel_getSize(parentChannel);
+    int32_t fc1StartIndex = k_DataChannel_getSize(parentChannel);
     int32_t i;
     for (i = 0; i < numberOfCatchClauses; i++) {
         uint16_t updateIndex = updateIndexes[i];
@@ -2714,15 +2714,15 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
 
     if (context->m_finallyClause != NULL) {
         /* Retrieve the AST node for the finally clause. */
-        zen_ASTNode_t* finallyClause = context->m_finallyClause;
+        k_ASTNode_t* finallyClause = context->m_finallyClause;
         /* Retrieve the context associated with the AST node of the finally clause. */
-        zen_FinallyClauseContext_t* finallyClauseContext =
-            (zen_FinallyClauseContext_t*)finallyClause->m_context;
+        k_FinallyClauseContext_t* finallyClauseContext =
+            (k_FinallyClauseContext_t*)finallyClause->m_context;
 
         /* Generate the instructions for the statement suite specified to the
          * finally clause. This constitutes the bulk of the FC1 section.
          */
-        zen_ASTWalker_walk(astListener, finallyClauseContext->m_statementSuite);
+        k_ASTWalker_walk(astListener, finallyClauseContext->m_statementSuite);
 
         /* Once the FC1 section is completed, the program should skip the FC2
          * section.
@@ -2733,24 +2733,24 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
          *
          * Emit the jump instruction to skip the FC2 section.
          */
-        zen_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
+        k_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
 
         /* Log the emission of the jump instruction. */
         jtk_Logger_debug(logger, "Emitted jump 0 (dummy index)");
 
         /* Save the index of the bytes where the dummy data was written. */
-        int32_t skipIndex = zen_DataChannel_getSize(parentChannel) - 2;
+        int32_t skipIndex = k_DataChannel_getSize(parentChannel) - 2;
 
         /* Generate the FC2 section. */
 
-        int32_t fc2StartIndex = zen_DataChannel_getSize(parentChannel);
+        int32_t fc2StartIndex = k_DataChannel_getSize(parentChannel);
 
         /* In this exception handler site, the exceptions triggered within the try
          * clause but are not handled by the catch clauses are taken care of. These
          * exceptions are thrown again implicity by the finally clause.
          */
-        zen_ExceptionHandlerSite_t* type2Handler =
-            jtk_Memory_allocate(zen_ExceptionHandlerSite_t, 1);
+        k_ExceptionHandlerSite_t* type2Handler =
+            jtk_Memory_allocate(k_ExceptionHandlerSite_t, 1);
         type2Handler->m_startIndex = tryClauseStartIndex;
         type2Handler->m_stopIndex = tryClauseStopIndex;
         type2Handler->m_handlerIndex = fc2StartIndex;
@@ -2761,7 +2761,7 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
         /* The virtual machine pushes the exception that was caught to the operand
          * stack. Store this reference in a local variable.
          */
-        zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder, 0);
+        k_BinaryEntityBuilder_emitStoreReference(generator->m_builder, 0);
 
         /* Log the emission of the store_a instruction. */
         jtk_Logger_debug(logger, "Emitted store_a 0 (dummy index)");
@@ -2769,21 +2769,21 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
         /* Generate the instructions for the statement suite specified to the
          * finally clause. This constitutes the bulk of the FC2 section.
          */
-        zen_ASTWalker_walk(astListener, finallyClauseContext->m_statementSuite);
+        k_ASTWalker_walk(astListener, finallyClauseContext->m_statementSuite);
 
         /* Load the caught exception from the local variable. */
-        zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
+        k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
 
         /* Log the emission of the store_a instruction. */
         jtk_Logger_debug(logger, "Emitted load_a 0 (dummy index)");
 
         /* Throw the caught exception again. */
-        zen_BinaryEntityBuilder_emitThrow(generator->m_builder);
+        k_BinaryEntityBuilder_emitThrow(generator->m_builder);
 
         /* Log the emission of the throw instruction. */
         jtk_Logger_debug(logger, "Emitted throw");
 
-        int32_t fc2StopIndex = zen_DataChannel_getSize(parentChannel);
+        int32_t fc2StopIndex = k_DataChannel_getSize(parentChannel);
 
         /* Update the jump instruction in the FC1 section that skips the FC2
          * section.
@@ -2797,8 +2797,8 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
          */
         int32_t j;
         for (j = 0; j < numberOfCatchClauses; j++) {
-            zen_ExceptionHandlerSite_t* type3Handler =
-                jtk_Memory_allocate(zen_ExceptionHandlerSite_t, 1);
+            k_ExceptionHandlerSite_t* type3Handler =
+                jtk_Memory_allocate(k_ExceptionHandlerSite_t, 1);
             type3Handler->m_startIndex = catchClauseIndexes[(j * 2) + 0];
             type3Handler->m_stopIndex = catchClauseIndexes[(j * 2) + 1];
             type3Handler->m_handlerIndex = fc2StartIndex;
@@ -2814,62 +2814,62 @@ void zen_BinaryEntityGenerator_onExitTryStatement(zen_ASTListener_t* astListener
 
 // tryClause
 
-void zen_BinaryEntityGenerator_onEnterTryClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterTryClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitTryClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitTryClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // catchClause
 
-void zen_BinaryEntityGenerator_onEnterCatchClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterCatchClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitCatchClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitCatchClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // catchFilter
 
-void zen_BinaryEntityGenerator_onEnterCatchFilter(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterCatchFilter(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitCatchFilter(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitCatchFilter(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // finallyClause
 
-void zen_BinaryEntityGenerator_onEnterFinallyClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterFinallyClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitFinallyClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitFinallyClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // synchronizeStatement
 
-void zen_BinaryEntityGenerator_onEnterSynchronizeStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterSynchronizeStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator =
-        (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator =
+        (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the context of the AST node. */
-    zen_SynchronizeStatementContext_t* context =
-        (zen_SynchronizeStatementContext_t*)node->m_context;
+    k_SynchronizeStatementContext_t* context =
+        (k_SynchronizeStatementContext_t*)node->m_context;
 
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
 /*
@@ -2909,20 +2909,20 @@ void zen_BinaryEntityGenerator_onEnterSynchronizeStatement(zen_ASTListener_t* as
  * implicit finally clause when an exception is thrown by the Lock#release()
  * function. This results in the implicit finally clause forming a loop.
  */
-void zen_BinaryEntityGenerator_onExitSynchronizeStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitSynchronizeStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator =
-        (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator =
+        (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
     /* Retrieve the context of the AST node. */
-    zen_SynchronizeStatementContext_t* context =
-        (zen_SynchronizeStatementContext_t*)node->m_context;
+    k_SynchronizeStatementContext_t* context =
+        (k_SynchronizeStatementContext_t*)node->m_context;
 
-    int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+    int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
         generator->m_builder);
-    zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+    k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
         generator->m_builder, parentChannelIndex);
 
     const uint8_t* lockClassName = "zen/concurrency/lock/Lock";
@@ -2932,7 +2932,7 @@ void zen_BinaryEntityGenerator_onExitSynchronizeStatement(zen_ASTListener_t* ast
     int32_t acquireDescriptorSize = 3;
     const uint8_t* acquireName = "acquire";
     int32_t acquireNameSize = 7;
-    uint16_t acquireIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t acquireIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, lockClassName, lockClassNameSize,
         acquireDescriptor, acquireDescriptorSize, acquireName, acquireNameSize, 0);
 
@@ -2940,17 +2940,17 @@ void zen_BinaryEntityGenerator_onExitSynchronizeStatement(zen_ASTListener_t* ast
     int32_t releaseDescriptorSize = 3;
     const uint8_t* releaseName = "release";
     int32_t releaseNameSize = 7;
-    uint16_t releaseIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t releaseIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, lockClassName, lockClassNameSize,
         releaseDescriptor, releaseDescriptorSize, releaseName, releaseNameSize, 0);
 
     /* Generate the instructions for the expression specified to the
      * synchronize statement.
      */
-    zen_ASTWalker_walk(astListener, context->m_expression);
+    k_ASTWalker_walk(astListener, context->m_expression);
 
     /* Make a duplicate of the resulting lock object. */
-    zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+    k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
 
     /* Log the emission of the duplicate instruction. */
     jtk_Logger_debug(logger, "Emitted duplicate");
@@ -2958,13 +2958,13 @@ void zen_BinaryEntityGenerator_onExitSynchronizeStatement(zen_ASTListener_t* ast
     /* Store the duplicate reference in a local variable that only the
      * compiler has access to.
      */
-    zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitStoreReference(generator->m_builder, 0);
 
     /* Log the emission of the store_a instruction. */
     jtk_Logger_debug(logger, "Emitted store_a 0 (dummy index)");
 
     /* Invoke the Lock#acquire() function. */
-    zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, acquireIndex);
+    k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, acquireIndex);
 
     /* Log the emission of the invoke_virtual instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_virtual %d", acquireIndex);
@@ -2972,21 +2972,21 @@ void zen_BinaryEntityGenerator_onExitSynchronizeStatement(zen_ASTListener_t* ast
     /* Save the index where the instruction section for the statement suite
      * specified to the synchronize statement begins (inclusive).
      */
-    int32_t startIndex1 = zen_DataChannel_getSize(parentChannel);
+    int32_t startIndex1 = k_DataChannel_getSize(parentChannel);
 
     /* Generate the instructions corresponding to the statement suite specified
      * to the synchronize statement.
      */
-    zen_ASTWalker_walk(astListener, context->m_statementSuite);
+    k_ASTWalker_walk(astListener, context->m_statementSuite);
 
     /* Load the reference to the lock object from the local variable. */
-    zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
 
     /* Log the emission of the load_a instruction. */
     jtk_Logger_debug(logger, "Emitted load_a 0 (dummy index)");
 
     /* Invoke the Lock#release() function. */
-    zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, releaseIndex);
+    k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, releaseIndex);
 
     /* Log the emission of the invoke_virtual instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_virtual %d", releaseIndex);
@@ -2994,7 +2994,7 @@ void zen_BinaryEntityGenerator_onExitSynchronizeStatement(zen_ASTListener_t* ast
     /* Save the index where the instruction section for the statement suite
      * specified to the synchronize statement ends (exclusive).
      */
-    int32_t stopIndex1 = zen_DataChannel_getSize(parentChannel);
+    int32_t stopIndex1 = k_DataChannel_getSize(parentChannel);
 
     /* The synchronize statement generates an implicit finally clause that releases
      * the lock when an exception is triggered within the statement suite specified
@@ -3005,36 +3005,36 @@ void zen_BinaryEntityGenerator_onExitSynchronizeStatement(zen_ASTListener_t* ast
      * the jump offset cannot be evaluated right now. Therefore, emit the jump
      * instruction with a dummy offset.
      */
-    zen_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
 
     /* Log the emission of the jump instruction. */
     jtk_Logger_debug(logger, "Emitted jump 0 (dummy index)");
 
     /* Save the index of the bytes where the dummy data was written. */
-    int32_t skipIndex = zen_DataChannel_getSize(parentChannel) - 2;
+    int32_t skipIndex = k_DataChannel_getSize(parentChannel) - 2;
 
     /* Save the index where the instruction section for the implicit finally
      * clause begins (inclusive).
      */
-    int32_t startIndex2 = zen_DataChannel_getSize(parentChannel);
+    int32_t startIndex2 = k_DataChannel_getSize(parentChannel);
 
     /* The virtual machine pushes the exception that was thrown to the operand
      * stack before the control is passed to the implicit finally clause, thanks
      * to the exception table. Store this reference in a local variable.
      */
-    zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitStoreReference(generator->m_builder, 0);
 
     /* Log the emission of the store_a instruction. */
     jtk_Logger_debug(logger, "Emitted store_a 0 (dummy index)");
 
     /* Load the reference to the lock object from the local variable. */
-    zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
 
     /* Log the emission of the load_a instruction. */
     jtk_Logger_debug(logger, "Emitted load_a 0 (dummy index)");
 
     /* Invoke the Lock#release() function. */
-    zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, releaseIndex);
+    k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, releaseIndex);
 
     /* Log the emission of the invoke_virtual instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_virtual %d", releaseIndex);
@@ -3042,31 +3042,31 @@ void zen_BinaryEntityGenerator_onExitSynchronizeStatement(zen_ASTListener_t* ast
     /* Save the index where the instruction section for the implicit finally
      * clause ends (exclusive).
      */
-    int32_t stopIndex2 = zen_DataChannel_getSize(parentChannel);
+    int32_t stopIndex2 = k_DataChannel_getSize(parentChannel);
 
     /* Load the thrown exception from the local variable. */
-    zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
+    k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
 
     /* Log the emission of the store_a instruction. */
     jtk_Logger_debug(logger, "Emitted load_a 0 (dummy index)");
 
     /* Throw the exception again. */
-    zen_BinaryEntityBuilder_emitThrow(generator->m_builder);
+    k_BinaryEntityBuilder_emitThrow(generator->m_builder);
 
     /* Log the emission of the throw instruction. */
     jtk_Logger_debug(logger, "Emitted throw");
 
-    uint16_t newParentChannelSize = zen_DataChannel_getSize(parentChannel);
+    uint16_t newParentChannelSize = k_DataChannel_getSize(parentChannel);
     parentChannel->m_bytes[skipIndex] = (newParentChannelSize & 0x0000FF00) >> 8;
     parentChannel->m_bytes[skipIndex + 1] = newParentChannelSize & 0x000000FF;
 
-    zen_ExceptionHandlerSite_t* type1Handler = jtk_Memory_allocate(zen_ExceptionHandlerSite_t, 1);
+    k_ExceptionHandlerSite_t* type1Handler = jtk_Memory_allocate(k_ExceptionHandlerSite_t, 1);
     type1Handler->m_startIndex = startIndex1;
     type1Handler->m_stopIndex = stopIndex1;
     type1Handler->m_handlerIndex = startIndex2;
     type1Handler->m_exceptionClassIndex = 0;
 
-    zen_ExceptionHandlerSite_t* type2Handler = jtk_Memory_allocate(zen_ExceptionHandlerSite_t, 1);
+    k_ExceptionHandlerSite_t* type2Handler = jtk_Memory_allocate(k_ExceptionHandlerSite_t, 1);
     type2Handler->m_startIndex = startIndex2;
     type2Handler->m_stopIndex = stopIndex2;
     type2Handler->m_handlerIndex = startIndex2;
@@ -3186,29 +3186,29 @@ void zen_BinaryEntityGenerator_onExitSynchronizeStatement(zen_ASTListener_t* ast
  * Similarly, 3N + 1 sections of instructions are generated, that is,
  * N expressions, N FC1 sections, N FC2 sections, and 1 statement suite.
  */
-void zen_BinaryEntityGenerator_onEnterWithStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterWithStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
 
     /* Retrieve the context of the AST node. */
-    zen_WithStatementContext_t* context = (zen_WithStatementContext_t*)node->m_context;
+    k_WithStatementContext_t* context = (k_WithStatementContext_t*)node->m_context;
 
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
 #define ZEN_BINARY_ENTITY_GENERATOR_MAX_LOCAL_VARIABLES 255
 
-int32_t zen_BinaryEntityGenerator_allocateLocalVariables(zen_BinaryEntityGenerator_t*
+int32_t k_BinaryEntityGenerator_allocateLocalVariables(k_BinaryEntityGenerator_t*
     generator, int32_t count) {
     jtk_Assert_assertObject(generator, "The specified binary entity generator is null.");
     jtk_Assert_assertTrue(count > 0, "The specified local variable count is invalid.");
@@ -3324,18 +3324,18 @@ int32_t zen_BinaryEntityGenerator_allocateLocalVariables(zen_BinaryEntityGenerat
  * #65 load_a 2
  * #67 throw
  */
-void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitWithStatement(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
 
     /* Retrieve the context of the AST node. */
-    zen_WithStatementContext_t* context = (zen_WithStatementContext_t*)node->m_context;
+    k_WithStatementContext_t* context = (k_WithStatementContext_t*)node->m_context;
 
     const uint8_t* closeableClassName = "zen/core/Closeable";
     int32_t closeableClassNameSize = 18;
@@ -3343,7 +3343,7 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
     int32_t closeDescriptorSize = 3;
     const uint8_t* closeName = "close";
     int32_t closeNameSize = 5;
-    uint16_t closeIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t closeIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, closeableClassName, closeableClassNameSize,
         closeDescriptor, closeDescriptorSize, closeName, closeNameSize, 0);
 
@@ -3353,20 +3353,20 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
     int32_t suppressDescriptorSize = 22;
     const uint8_t* suppressName = "suppress";
     int32_t suppressNameSize = 8;
-    uint16_t suppressIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t suppressIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, throwableClassName, throwableClassNameSize,
         suppressDescriptor, suppressDescriptorSize, suppressName, suppressNameSize, 0);
 
-    int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+    int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
          generator->m_builder);
-    zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+    k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
          generator->m_builder, parentChannelIndex);
 
     /* Retrieve the the AST node for with parameters rule. */
-    zen_ASTNode_t* withParameters = context->m_withParameters;
+    k_ASTNode_t* withParameters = context->m_withParameters;
     /* Retrieve the context of the with parameters AST node. */
-    zen_WithParametersContext_t* withParametersContext =
-        (zen_WithParametersContext_t*)withParameters->m_context;
+    k_WithParametersContext_t* withParametersContext =
+        (k_WithParametersContext_t*)withParameters->m_context;
 
     int32_t withParameterCount = jtk_ArrayList_getSize(withParametersContext->m_withParameters);
 
@@ -3375,19 +3375,19 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
     /* Allocate local variables for storing the resource objects. These local
      * variables can only be accessed by the compiler.
      */
-    int32_t resourceBaseIndex = zen_BinaryEntityGenerator_allocateLocalVariables(
+    int32_t resourceBaseIndex = k_BinaryEntityGenerator_allocateLocalVariables(
         generator, withParameterCount);
     /* Allocate local variables for storing the exception objects thrown by
      * the core sections. These local variables can only be accessed by the
      * compiler.
      */
-    // int32_t fc1BaseIndex = zen_BinaryEntityGenerator_allocateLocalVariables(
+    // int32_t fc1BaseIndex = k_BinaryEntityGenerator_allocateLocalVariables(
     //    generator, withParameterCount);
     /* Allocate the local variables for storing the exception objects thrown
      * by the FC1-k sections. These local variables can only be accessed by
      * the compiler.
      */
-    // int32_t fc2BaseIndex = zen_BinaryEntityGenerator_allocateLocalVariables(
+    // int32_t fc2BaseIndex = k_BinaryEntityGenerator_allocateLocalVariables(
     //    generator, withParameterCount);
 
     /* Allocate a local variable for storing the exception objects thrown by
@@ -3397,7 +3397,7 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
      * propogated by the virtual machine. This local variable can only be
      * accessed by the compiler.
      */
-    int32_t fc1ExceptionIndex = zen_BinaryEntityGenerator_allocateLocalVariables(
+    int32_t fc1ExceptionIndex = k_BinaryEntityGenerator_allocateLocalVariables(
         generator, 1);
     /* Allocate a local variable for storing the exception objects thrown by
      * the FC1 sections. Unlike the previous algorithm, the new algorithm
@@ -3406,26 +3406,26 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
      * propogated by the virtual machine. This local variable can only be
      * accessed by the compiler.
      */
-    int32_t fc2ExceptionIndex = zen_BinaryEntityGenerator_allocateLocalVariables(
+    int32_t fc2ExceptionIndex = k_BinaryEntityGenerator_allocateLocalVariables(
         generator, 1);
 
     int32_t withParameterIndex;
     for (withParameterIndex = 0; withParameterIndex < withParameterCount;
         withParameterIndex++) {
         /* Retreive the current with parameter AST node. */
-        zen_ASTNode_t* withParameter = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+        k_ASTNode_t* withParameter = (k_ASTNode_t*)jtk_ArrayList_getValue(
             withParametersContext->m_withParameters, withParameterIndex);
 
         /* Retrieve the context of the current with parameter. */
-        zen_WithParameterContext_t* withParameterContext =
-            (zen_WithParameterContext_t*)withParameter->m_context;
+        k_WithParameterContext_t* withParameterContext =
+            (k_WithParameterContext_t*)withParameter->m_context;
 
         // TODO: Allocate a local variable if an identifier was specified.
 
         /* Generate the instructions corresponding to the expression specified to
          * the with statement.
          */
-        zen_ASTWalker_walk(astListener, withParameterContext->m_expression);
+        k_ASTWalker_walk(astListener, withParameterContext->m_expression);
 
         /* Allocate a local variable only the compiler has access to. */
         uint8_t resourceIndex = resourceBaseIndex + withParameterIndex;
@@ -3435,13 +3435,13 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
          *
          * TODO: Allocate a local variable!
          */
-        zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder, resourceIndex);
+        k_BinaryEntityBuilder_emitStoreReference(generator->m_builder, resourceIndex);
         /* Log the emission of the store_a instruction. */
         jtk_Logger_debug(logger, "Emitted store_a %d", resourceIndex);
 
-        int32_t coreStartIndex = zen_DataChannel_getSize(parentChannel);
-        zen_ExceptionHandlerSite_t* type1Handler = jtk_Memory_allocate(
-            zen_ExceptionHandlerSite_t, 1);
+        int32_t coreStartIndex = k_DataChannel_getSize(parentChannel);
+        k_ExceptionHandlerSite_t* type1Handler = jtk_Memory_allocate(
+            k_ExceptionHandlerSite_t, 1);
         type1Handler->m_startIndex = coreStartIndex;
         type1Handler->m_exceptionClassIndex = 0;
         jtk_ArrayList_add(generator->m_exceptionHandlerSites, type1Handler);
@@ -3450,12 +3450,12 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
     /* Save the index where the instruction for the statement suite clause
      * begins (inclusive).
      */
-    int32_t startIndex = zen_DataChannel_getSize(parentChannel);
+    int32_t startIndex = k_DataChannel_getSize(parentChannel);
 
     /* Generate the instructions corresponding to the statement suite specified to
      * the with statement.
      */
-    zen_ASTWalker_walk(astListener, context->m_statementSuite);
+    k_ASTWalker_walk(astListener, context->m_statementSuite);
 
     for (withParameterIndex = withParameterIndex - 1; withParameterIndex >= 0;
         withParameterIndex--) {
@@ -3464,34 +3464,34 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
         // uint8_t fc1ExceptionIndex = fc1BaseIndex + normalizedIndex;
         // uint8_t fc2ExceptionIndex = fc2BaseIndex + normalizedIndex;
 
-        int32_t coreStopIndex = zen_DataChannel_getSize(parentChannel);
-        zen_ExceptionHandlerSite_t* type1Handler = (zen_ExceptionHandlerSite_t*)
+        int32_t coreStopIndex = k_DataChannel_getSize(parentChannel);
+        k_ExceptionHandlerSite_t* type1Handler = (k_ExceptionHandlerSite_t*)
             jtk_ArrayList_getValue(generator->m_exceptionHandlerSites, withParameterIndex);
         type1Handler->m_stopIndex = coreStopIndex;
 
         /* Load the resulting object from the local variable we allocated in the
          * previous loop.
          */
-        zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, resourceIndex);
+        k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, resourceIndex);
         /* Log the emission of the load_a instruction. */
         jtk_Logger_debug(logger, "Emitted load_a %d", resourceIndex);
 
         /* Invoke the Closeable#close() function to close the resource. */
-        zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, closeIndex);
+        k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, closeIndex);
         /* Log the emission of the invoke_virtual instruction. */
         jtk_Logger_debug(logger, "Emitted invoke_virtual %d", closeIndex);
 
         /* Jump to skip FC1-k and FC2-k sections. */
-        zen_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
+        k_BinaryEntityBuilder_emitJump(generator->m_builder, 0);
         /* Log the emission of the jump instruction. */
         jtk_Logger_debug(logger, "Emitted jump 0 (dummy index)");
 
         /* Save the index of the bytes where the dummy data was written. */
-        int32_t skipIndex = zen_DataChannel_getSize(parentChannel) - 2;
+        int32_t skipIndex = k_DataChannel_getSize(parentChannel) - 2;
 
         /* -- Finally Clause 1 -- */
 
-        int32_t fc1StartIndex = zen_DataChannel_getSize(parentChannel);
+        int32_t fc1StartIndex = k_DataChannel_getSize(parentChannel);
         type1Handler->m_handlerIndex = fc1StartIndex;
 
         /* The virtual machine pushes the thrown exception to the operand stack.
@@ -3499,45 +3499,45 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
          * base local variable index for private FC1 local variables), which can
          * be accessed only by the compiler.
          */
-        zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder,
+        k_BinaryEntityBuilder_emitStoreReference(generator->m_builder,
             fc1ExceptionIndex);
         /* Log the emission of the store_a instruction. */
         jtk_Logger_debug(logger, "store_a %d", fc1ExceptionIndex);
 
         /* Load the resource object from the local variable Lk. */
-        zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
+        k_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
             resourceIndex);
         /* Log the emission of the load_a instruction. */
         jtk_Logger_debug(logger, "load_a %d", resourceIndex);
 
         /* Invoke the Closeable#close() function to close the resource. */
-        zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, closeIndex);
+        k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, closeIndex);
         /* Log the emission of the invoke_virtual instruction. */
         jtk_Logger_debug(logger, "Emitted invoke_virtual %d", closeIndex);
 
-        int32_t fc1StopIndex = zen_DataChannel_getSize(parentChannel);
+        int32_t fc1StopIndex = k_DataChannel_getSize(parentChannel);
 
         /* Load the exception object that was thrown by the core section. */
-        zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
+        k_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
             fc1ExceptionIndex);
         /* Log the emission of the load_a instruction. */
         jtk_Logger_debug(logger, "Emitted load_a %d", fc1ExceptionIndex);
 
         /* Throw the exception again. */
-        zen_BinaryEntityBuilder_emitThrow(generator->m_builder);
+        k_BinaryEntityBuilder_emitThrow(generator->m_builder);
         /* Log the emission of the throw instruction. */
         jtk_Logger_debug(logger, "Emitted throw");
 
         /* -- Finally Clause 2 -- */
 
-        int32_t fc2StartIndex = zen_DataChannel_getSize(parentChannel);
+        int32_t fc2StartIndex = k_DataChannel_getSize(parentChannel);
 
         /* The virtual machine pushes the thrown exception to the operand stack.
          * Store this reference in a local variable, say L[k + y] (where y is the base
          * local variable index for private FC2 local variables), which can be
          * accessed only by the compiler.
          */
-        zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder,
+        k_BinaryEntityBuilder_emitStoreReference(generator->m_builder,
             fc2ExceptionIndex);
         /* Log the emission of the store_a instruction. */
         jtk_Logger_debug(logger, "store_a %d", fc2ExceptionIndex);
@@ -3545,7 +3545,7 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
         /* Load the exception object that was thrown by the core section. In other
          * words, load the object referenced by L[k + x].
          */
-        zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
+        k_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
             fc1ExceptionIndex);
         /* Log the emission of the load_a instruction. */
         jtk_Logger_debug(logger, "Emitted load_a %d", fc1ExceptionIndex);
@@ -3554,7 +3554,7 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
          * function in the FC1 section. In other words, load the object referenced
          * by L[k + y].
          */
-        zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
+        k_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
             fc2ExceptionIndex);
         /* Log the emission of the load_a instruction. */
         jtk_Logger_debug(logger, "Emitted load_a %d", fc2ExceptionIndex);
@@ -3563,28 +3563,28 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
          * by the FC1 section to the exception thrown by the core section.
          * In other words, `L[k + x].suppress(L[k + y])`.
          */
-        zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, suppressIndex);
+        k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, suppressIndex);
         /* Log the emission of the invoke_virtual instruction. */
         jtk_Logger_debug(logger, "Emitted invoke_virtual %d", suppressIndex);
 
         /* Load the exception object that was thrown by the core section. In
          * other words, load the object referenced by L[k + x].
          */
-        zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
+        k_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
             fc1ExceptionIndex);
         /* Log the emission of the load_a instruction. */
         jtk_Logger_debug(logger, "Emitted load_a %d", fc1ExceptionIndex);
 
         /* Throw the exception again. */
-        zen_BinaryEntityBuilder_emitThrow(generator->m_builder);
+        k_BinaryEntityBuilder_emitThrow(generator->m_builder);
         /* Log the emission of the throw instruction. */
         jtk_Logger_debug(logger, "Emitted throw");
 
-        int32_t newParentChannelSize = zen_DataChannel_getSize(parentChannel);
+        int32_t newParentChannelSize = k_DataChannel_getSize(parentChannel);
         parentChannel->m_bytes[skipIndex] = (newParentChannelSize & 0x0000FF00) >> 8;
         parentChannel->m_bytes[skipIndex + 1] = newParentChannelSize & 0x000000FF;
 
-        zen_ExceptionHandlerSite_t* type2Handler = jtk_Memory_allocate(zen_ExceptionHandlerSite_t, 1);
+        k_ExceptionHandlerSite_t* type2Handler = jtk_Memory_allocate(k_ExceptionHandlerSite_t, 1);
         type2Handler->m_startIndex = fc1StartIndex;
         type2Handler->m_stopIndex = fc1StopIndex;
         type2Handler->m_handlerIndex = fc2StartIndex;
@@ -3601,33 +3601,33 @@ void zen_BinaryEntityGenerator_onExitWithStatement(zen_ASTListener_t* astListene
 
 // classDeclaration
 
-void zen_BinaryEntityGenerator_onEnterClassDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterClassDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
 
     /* Retrieve the current scope from the symbol table. At this point, it is
      * the enclosing scope.
      */
-    zen_Scope_t* parentScope = zen_SymbolTable_getCurrentScope(generator->m_symbolTable);
+    k_Scope_t* parentScope = k_SymbolTable_getCurrentScope(generator->m_symbolTable);
 
     /* Retrieve the context of the AST node. */
-    zen_ClassDeclarationContext_t* context =
-        (zen_ClassDeclarationContext_t*)node->m_context;
+    k_ClassDeclarationContext_t* context =
+        (k_ClassDeclarationContext_t*)node->m_context;
 
     /* Retrieve the scope associated with the class being declared. */
-    zen_Scope_t* scope = zen_ASTAnnotations_get(generator->m_scopes, node);
+    k_Scope_t* scope = k_ASTAnnotations_get(generator->m_scopes, node);
 
     /* Update the current scope in the symbol table. */
-    zen_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
+    k_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
 
     generator->m_mainComponent = ZEN_AST_NODE_TYPE_CLASS_DECLARATION;
 
-    zen_ASTNode_t* identifier = context->m_identifier;
-    zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
+    k_ASTNode_t* identifier = context->m_identifier;
+    k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
 
     uint16_t* superclassIndexes = NULL;
     uint16_t superclassCount = 0;
@@ -3635,8 +3635,8 @@ void zen_BinaryEntityGenerator_onEnterClassDeclaration(zen_ASTListener_t* astLis
         /* Retrieve the extends clause context to extract information about the
          * superclasses.
          */
-        zen_ClassExtendsClauseContext_t* extendsClauseContext =
-            (zen_ClassExtendsClauseContext_t*)context->m_classExtendsClause->m_context;
+        k_ClassExtendsClauseContext_t* extendsClauseContext =
+            (k_ClassExtendsClauseContext_t*)context->m_classExtendsClause->m_context;
 
         /* Calculate the total number of superclasses. */
         superclassCount = jtk_ArrayList_getSize(extendsClauseContext->m_typeNames);
@@ -3650,8 +3650,8 @@ void zen_BinaryEntityGenerator_onEnterClassDeclaration(zen_ASTListener_t* astLis
          */
         int32_t index;
         for (index = 0; index < superclassCount; index++) {
-            zen_ASTNode_t* typeNameNode = (zen_ASTNode_t*)jtk_ArrayList_getValue(extendsClauseContext->m_typeNames, index);
-            zen_TypeNameContext_t* typeNameContext = (zen_TypeNameContext_t*)typeNameNode->m_context;
+            k_ASTNode_t* typeNameNode = (k_ASTNode_t*)jtk_ArrayList_getValue(extendsClauseContext->m_typeNames, index);
+            k_TypeNameContext_t* typeNameContext = (k_TypeNameContext_t*)typeNameNode->m_context;
 
             // TODO: Prepare a qualified name from the type name context.
             uint8_t* qualifiedName = NULL;
@@ -3662,12 +3662,12 @@ void zen_BinaryEntityGenerator_onEnterClassDeclaration(zen_ASTListener_t* astLis
              * inner classes, this would allow inner classes to be inherited by their enclosing
              * classes!
              */
-            zen_Symbol_t* symbol = zen_Scope_resolveQualifiedSymbol(
+            k_Symbol_t* symbol = k_Scope_resolveQualifiedSymbol(
                 parentScope, qualifiedName, &qualifiedNameSize);
-            if (zen_Symbol_isClass(symbol)) {
-                zen_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
+            if (k_Symbol_isClass(symbol)) {
+                k_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
 
-                uint16_t superclassIndex = zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+                uint16_t superclassIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
                     generator->m_constantPoolBuilder, classSymbol->m_qualifiedName,
                     classSymbol->m_qualifiedNameSize);
                 superclassIndexes[index] = superclassIndex;
@@ -3685,46 +3685,46 @@ void zen_BinaryEntityGenerator_onEnterClassDeclaration(zen_ASTListener_t* astLis
 
         superclassCount = 1;
         superclassIndexes = jtk_Memory_allocate(uint16_t, 1);
-        superclassIndexes[0] = zen_ConstantPoolBuilder_getUtf8EntryIndexEx(
+        superclassIndexes[0] = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
             generator->m_constantPoolBuilder, "zen/core/Object", 15);
     }
 
-    zen_BinaryEntityGenerator_initializeClassName(generator);
-    zen_BinaryEntityGenerator_prepareClass(generator, identifierToken->m_text,
+    k_BinaryEntityGenerator_initializeClassName(generator);
+    k_BinaryEntityGenerator_prepareClass(generator, identifierToken->m_text,
         identifierToken->m_length, superclassIndexes, superclassCount);
 }
 
-void zen_BinaryEntityGenerator_onExitClassDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitClassDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
     /* Retrieve the generator associated with the AST listener. */
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
 
     /* Retrieve the context of the AST node. */
-    zen_ClassDeclarationContext_t* context =
-        (zen_ClassDeclarationContext_t*)node->m_context;
+    k_ClassDeclarationContext_t* context =
+        (k_ClassDeclarationContext_t*)node->m_context;
 
     /* Invalidate the current scope in the symbol table. */
-    zen_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
+    k_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
 
     /* Write the generated binary entity to the output stream. */
-    zen_BinaryEntityGenerator_writeEntity(generator);
+    k_BinaryEntityGenerator_writeEntity(generator);
 
     /* Reset all the fields used to generate the binary entity. */
-    int32_t parentChannelIndex = zen_BinaryEntityBuilder_getActiveChannelIndex(
+    int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
          generator->m_builder);
-    zen_DataChannel_t* parentChannel = zen_BinaryEntityBuilder_getChannel(
+    k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
          generator->m_builder, parentChannelIndex);
     // Reset the parent data channel
     parentChannel->m_index = 0;
 
     // TODO: Reset m_entityFile
-    zen_ConstantPoolBuilder_reset(generator->m_constantPoolBuilder);
-    zen_BinaryEntityGenerator_clearFields(generator);
-    zen_BinaryEntityGenerator_clearFunctions(generator);
-    zen_BinaryEntityGenerator_clearExceptionHandlerSites(generator);
+    k_ConstantPoolBuilder_reset(generator->m_constantPoolBuilder);
+    k_BinaryEntityGenerator_clearFields(generator);
+    k_BinaryEntityGenerator_clearFunctions(generator);
+    k_BinaryEntityGenerator_clearExceptionHandlerSites(generator);
 
     if (generator->m_breakRecords != NULL) {
         jtk_Memory_deallocate(generator->m_breakRecords);
@@ -3740,99 +3740,99 @@ void zen_BinaryEntityGenerator_onExitClassDeclaration(zen_ASTListener_t* astList
 
 // classExtends
 
-void zen_BinaryEntityGenerator_onEnterClassExtendsClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterClassExtendsClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitClassExtendsClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitClassExtendsClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // classSuite
 
-void zen_BinaryEntityGenerator_onEnterClassSuite(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterClassSuite(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitClassSuite(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitClassSuite(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // classMember
 
-void zen_BinaryEntityGenerator_onEnterClassMember(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterClassMember(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitClassMember(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitClassMember(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-// void zen_BinaryEntityGenerator_onEnterConstructorDeclaration(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+// void k_BinaryEntityGenerator_onEnterConstructorDeclaration(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 // }
 
-// void zen_BinaryEntityGenerator_onExitConstructorDeclaration(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+// void k_BinaryEntityGenerator_onExitConstructorDeclaration(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 // }
 
 
 // enumerationDeclaration
 
-void zen_BinaryEntityGenerator_onEnterEnumerationDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterEnumerationDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitEnumerationDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitEnumerationDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // enumerationBaseClass
 
-void zen_BinaryEntityGenerator_onEnterEnumrationBaseClass(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterEnumrationBaseClass(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitEnumerationBaseClause(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitEnumerationBaseClause(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // enumerationSuite
 
-void zen_BinaryEntityGenerator_onEnterEnumerationSuite(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterEnumerationSuite(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitEnumerationSuite(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitEnumerationSuite(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // enumerate
 
-void zen_BinaryEntityGenerator_onEnterEnumerate(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterEnumerate(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitEnumerate(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitEnumerate(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // expressions
 
-void zen_BinaryEntityGenerator_onEnterExpressions(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterExpressions(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitExpressions(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitExpressions(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // expression
 
-void zen_BinaryEntityGenerator_onEnterExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // assignmentExpression
@@ -3855,35 +3855,35 @@ void zen_BinaryEntityGenerator_onExitExpression(zen_ASTListener_t* astListener,
  * NOTE: The binary entity generator assumes that the left values were verified
  * to be valid in the previous phases of the compiler.
  */
-void zen_BinaryEntityGenerator_onEnterAssignmentExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_AssignmentExpressionContext_t* context = (zen_AssignmentExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterAssignmentExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_AssignmentExpressionContext_t* context = (k_AssignmentExpressionContext_t*)node->m_context;
 
     /* I have no idea, but the following statement just fixed a bug magically.
      * However, it has something to do with which type of code is generated,
      * the LHS or RHS, for postfix expressions.
      */
     lhs = false;
-    zen_ASTNode_t* assignmentOperator = context->m_assignmentOperator;
+    k_ASTNode_t* assignmentOperator = context->m_assignmentOperator;
     if (assignmentOperator != NULL) {
         lhs = false;
-        zen_ASTWalker_walk(astListener, context->m_assignmentExpression);
+        k_ASTWalker_walk(astListener, context->m_assignmentExpression);
         lhs = true;
-        zen_ASTWalker_walk(astListener, context->m_conditionalExpression);
+        k_ASTWalker_walk(astListener, context->m_conditionalExpression);
 
-        zen_ASTListener_skipChildren(astListener);
+        k_ASTListener_skipChildren(astListener);
     }
 }
 
-void zen_BinaryEntityGenerator_onExitAssignmentExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {/*
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_AssignmentExpressionContext_t* context = (zen_AssignmentExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitAssignmentExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {/*
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_AssignmentExpressionContext_t* context = (k_AssignmentExpressionContext_t*)node->m_context;
 
     if (context->m_assignmentOperator != NULL) {
-        zen_ASTNode_t* assignmentOperator = context->m_assignmentOperator;
-        zen_Token_t* operatorToken = (zen_Token_t*)assignmentOperator->m_context;
+        k_ASTNode_t* assignmentOperator = context->m_assignmentOperator;
+        k_Token_t* operatorToken = (k_Token_t*)assignmentOperator->m_context;
         switch (operatorToken->m_type) {
             /* The equal operator only stores a reference. Therefore, it requires no
              * special implementation.
@@ -3943,48 +3943,48 @@ void zen_BinaryEntityGenerator_onExitAssignmentExpression(zen_ASTListener_t* ast
             }
         }
         // Depending on the first push reference
-        zen_BinaryEntityGenerator_emitStoreReference(generator, 10);
+        k_BinaryEntityGenerator_emitStoreReference(generator, 10);
     }*/
 }
 
 // conditionalExpression
 
-void zen_BinaryEntityGenerator_onEnterConditionalExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_ConditionalExpressionContext_t* context = (zen_ConditionalExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterConditionalExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_ConditionalExpressionContext_t* context = (k_ConditionalExpressionContext_t*)node->m_context;
 }
 
-void zen_BinaryEntityGenerator_onExitConditionalExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_ConditionalExpressionContext_t* context = (zen_ConditionalExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitConditionalExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_ConditionalExpressionContext_t* context = (k_ConditionalExpressionContext_t*)node->m_context;
 
     /* TODO */
 }
 
 // logicalOrExpression
 
-void zen_BinaryEntityGenerator_onEnterLogicalOrExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_LogicalOrExpressionContext_t* context = (zen_LogicalOrExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterLogicalOrExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_LogicalOrExpressionContext_t* context = (k_LogicalOrExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitLogicalOrExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_LogicalOrExpressionContext_t* context = (zen_LogicalOrExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitLogicalOrExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_LogicalOrExpressionContext_t* context = (k_LogicalOrExpressionContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(context->m_logicalAndExpressions);
     int32_t i;
     for (i = 0; i < size; i++) {
-        zen_ASTNode_t* logicalAndExpressions = jtk_ArrayList_getValue(context->m_logicalAndExpressions, i);
+        k_ASTNode_t* logicalAndExpressions = jtk_ArrayList_getValue(context->m_logicalAndExpressions, i);
 
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
@@ -3994,7 +3994,7 @@ void zen_BinaryEntityGenerator_onExitLogicalOrExpression(zen_ASTListener_t* astL
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, logicalAndExpressions);
+        k_ASTWalker_walk(astListener, logicalAndExpressions);
 
         /* Generate the instructions corresponding to invoking the
          * ZenKernel.evaluate() function. Since, Zen is dynamically typed
@@ -4002,7 +4002,7 @@ void zen_BinaryEntityGenerator_onExitLogicalOrExpression(zen_ASTListener_t* astL
          * logical OR operation is delegated to functions annotated with the
          * Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, "||", 2);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, "||", 2);
 
         // TODO: The instructions generated here are wrong.
     }
@@ -4010,26 +4010,26 @@ void zen_BinaryEntityGenerator_onExitLogicalOrExpression(zen_ASTListener_t* astL
 
 // logicalAndExpression
 
-void zen_BinaryEntityGenerator_onEnterLogicalAndExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_LogicalAndExpressionContext_t* context = (zen_LogicalAndExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterLogicalAndExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_LogicalAndExpressionContext_t* context = (k_LogicalAndExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitLogicalAndExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_LogicalAndExpressionContext_t* context = (zen_LogicalAndExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitLogicalAndExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_LogicalAndExpressionContext_t* context = (k_LogicalAndExpressionContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(context->m_inclusiveOrExpressions);
     int32_t i;
     for (i = 0; i < size; i++) {
-        zen_ASTNode_t* inclusiveOrExpression = jtk_ArrayList_getValue(context->m_inclusiveOrExpressions, i);
+        k_ASTNode_t* inclusiveOrExpression = jtk_ArrayList_getValue(context->m_inclusiveOrExpressions, i);
 
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
@@ -4039,7 +4039,7 @@ void zen_BinaryEntityGenerator_onExitLogicalAndExpression(zen_ASTListener_t* ast
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, inclusiveOrExpression);
+        k_ASTWalker_walk(astListener, inclusiveOrExpression);
 
         /* Generate the instructions corresponding to invoking the
          * ZenKernel.evaluate() function. Since, Zen is dynamically typed
@@ -4047,7 +4047,7 @@ void zen_BinaryEntityGenerator_onExitLogicalAndExpression(zen_ASTListener_t* ast
          * logical AND operation is delegated to functions annotated with the
          * Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, "&&", 2);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, "&&", 2);
 
         // TODO: The instructions generated here are wrong.
     }
@@ -4055,26 +4055,26 @@ void zen_BinaryEntityGenerator_onExitLogicalAndExpression(zen_ASTListener_t* ast
 
 // inclusiveOrExpression
 
-void zen_BinaryEntityGenerator_onEnterInclusiveOrExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_InclusiveOrExpressionContext_t* context = (zen_InclusiveOrExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterInclusiveOrExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_InclusiveOrExpressionContext_t* context = (k_InclusiveOrExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitInclusiveOrExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_InclusiveOrExpressionContext_t* context = (zen_InclusiveOrExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitInclusiveOrExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_InclusiveOrExpressionContext_t* context = (k_InclusiveOrExpressionContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(context->m_exclusiveOrExpressions);
     int32_t i;
     for (i = 0; i < size; i++) {
-        zen_ASTNode_t* exclusiveOrExpression = jtk_ArrayList_getValue(context->m_exclusiveOrExpressions, i);
+        k_ASTNode_t* exclusiveOrExpression = jtk_ArrayList_getValue(context->m_exclusiveOrExpressions, i);
 
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
@@ -4084,7 +4084,7 @@ void zen_BinaryEntityGenerator_onExitInclusiveOrExpression(zen_ASTListener_t* as
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, exclusiveOrExpression);
+        k_ASTWalker_walk(astListener, exclusiveOrExpression);
 
         /* Generate the instructions corresponding to invoking the
          * ZenKernel.evaluate() function. Since, Zen is dynamically typed
@@ -4092,32 +4092,32 @@ void zen_BinaryEntityGenerator_onExitInclusiveOrExpression(zen_ASTListener_t* as
          * bitwise and operation is delegated to functions annotated with the
          * Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, "|", 1);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, "|", 1);
     }
 }
 
 // exclusiveOrExpression
 
-void zen_BinaryEntityGenerator_onEnterExclusiveOrExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_ExclusiveOrExpressionContext_t* context = (zen_ExclusiveOrExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterExclusiveOrExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_ExclusiveOrExpressionContext_t* context = (k_ExclusiveOrExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitExclusiveOrExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_ExclusiveOrExpressionContext_t* context = (zen_ExclusiveOrExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitExclusiveOrExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_ExclusiveOrExpressionContext_t* context = (k_ExclusiveOrExpressionContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(context->m_andExpressions);
     int32_t i;
     for (i = 0; i < size; i++) {
-        zen_ASTNode_t* andExpression = jtk_ArrayList_getValue(context->m_andExpressions, i);
+        k_ASTNode_t* andExpression = jtk_ArrayList_getValue(context->m_andExpressions, i);
 
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
@@ -4127,7 +4127,7 @@ void zen_BinaryEntityGenerator_onExitExclusiveOrExpression(zen_ASTListener_t* as
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, andExpression);
+        k_ASTWalker_walk(astListener, andExpression);
 
         /* Generate the instructions corresponding to invoking the
          * ZenKernel.evaluate() function. Since, Zen is dynamically typed
@@ -4135,32 +4135,32 @@ void zen_BinaryEntityGenerator_onExitExclusiveOrExpression(zen_ASTListener_t* as
          * bitwise and operation is delegated to functions annotated with the
          * Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, "^", 1);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, "^", 1);
     }
 }
 
 // andExpression
 
-void zen_BinaryEntityGenerator_onEnterAndExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_AndExpressionContext_t* context = (zen_AndExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterAndExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_AndExpressionContext_t* context = (k_AndExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitAndExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_AndExpressionContext_t* context = (zen_AndExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitAndExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_AndExpressionContext_t* context = (k_AndExpressionContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(context->m_equalityExpressions);
     int32_t i;
     for (i = 0; i < size; i++) {
-        zen_ASTNode_t* equalityExpression = jtk_ArrayList_getValue(context->m_equalityExpressions, i);
+        k_ASTNode_t* equalityExpression = jtk_ArrayList_getValue(context->m_equalityExpressions, i);
 
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
@@ -4170,7 +4170,7 @@ void zen_BinaryEntityGenerator_onExitAndExpression(zen_ASTListener_t* astListene
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, equalityExpression);
+        k_ASTWalker_walk(astListener, equalityExpression);
 
         /* Generate the instructions corresponding to invoking the
          * ZenKernel.evaluate() function. Since, Zen is dynamically typed
@@ -4178,27 +4178,27 @@ void zen_BinaryEntityGenerator_onExitAndExpression(zen_ASTListener_t* astListene
          * bitwise and operation is delegated to functions annotated with the
          * Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, "&", 1);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, "&", 1);
     }
 }
 
 // equalityExpression
 
-void zen_BinaryEntityGenerator_onEnterEqualityExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_EqualityExpressionContext_t* context = (zen_EqualityExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterEqualityExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_EqualityExpressionContext_t* context = (k_EqualityExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitEqualityExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_EqualityExpressionContext_t* context = (zen_EqualityExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitEqualityExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_EqualityExpressionContext_t* context = (k_EqualityExpressionContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(context->m_relationalExpressions);
     int32_t i;
@@ -4206,7 +4206,7 @@ void zen_BinaryEntityGenerator_onExitEqualityExpression(zen_ASTListener_t* astLi
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(context->m_relationalExpressions, i);
 
         /* Retrieve the equality operator. */
-        zen_ASTNode_t* equalityOperator = pair->m_left;
+        k_ASTNode_t* equalityOperator = pair->m_left;
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
          * equality expressions follow the order: operand1 operand2 operator.
@@ -4215,17 +4215,17 @@ void zen_BinaryEntityGenerator_onExitEqualityExpression(zen_ASTListener_t* astLi
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, (zen_ASTNode_t*)pair->m_right);
+        k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
 
         /* Retrieve the corresponding equality operator token from the AST
          * node.
          */
-        zen_Token_t* equalityOperatorToken = (zen_Token_t*)equalityOperator->m_context;
+        k_Token_t* equalityOperatorToken = (k_Token_t*)equalityOperator->m_context;
         /* Retrieve the type of the equality operator. */
-        zen_TokenType_t equalityOperatorTokenType = zen_Token_getType(equalityOperatorToken);
+        k_TokenType_t equalityOperatorTokenType = k_Token_getType(equalityOperatorToken);
 
         /* The values of symbol and symbolSize are the only arbitrary variables
-         * when invoking the zen_BinaryEntityGenerator_invokeEvaluate() function.
+         * when invoking the k_BinaryEntityGenerator_invokeEvaluate() function.
          * Therefore, instead of rewriting the invocation expression multiple
          * times, I have factored it out.
          */
@@ -4263,27 +4263,27 @@ void zen_BinaryEntityGenerator_onExitEqualityExpression(zen_ASTListener_t* astLi
          * the addition and subtraction operations are delegated to
          * functions annotated with the Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
     }
 }
 
 // relationalExpression
 
-void zen_BinaryEntityGenerator_onEnterRelationalExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_RelationalExpressionContext_t* context = (zen_RelationalExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterRelationalExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_RelationalExpressionContext_t* context = (k_RelationalExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitRelationalExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_RelationalExpressionContext_t* context = (zen_RelationalExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitRelationalExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_RelationalExpressionContext_t* context = (k_RelationalExpressionContext_t*)node->m_context;
 
     /* NOTE: Relational operators have no associativity. In order to implement
      * this behavior, the parser first recognizes relational operators as if
@@ -4299,7 +4299,7 @@ void zen_BinaryEntityGenerator_onExitRelationalExpression(zen_ASTListener_t* ast
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(context->m_shiftExpressions, i);
 
         /* Retrieve the relational operator. */
-        zen_ASTNode_t* relationalOperator = pair->m_left;
+        k_ASTNode_t* relationalOperator = pair->m_left;
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
          * relational expressions follow the order: operand1 operand2 operator.
@@ -4308,21 +4308,21 @@ void zen_BinaryEntityGenerator_onExitRelationalExpression(zen_ASTListener_t* ast
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, (zen_ASTNode_t*)pair->m_right);
+        k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
 
         /* Retrieve the corresponding relational operator token from the AST
          * node.
          */
-        zen_Token_t* relationalOperatorToken = (zen_Token_t*)relationalOperator->m_context;
+        k_Token_t* relationalOperatorToken = (k_Token_t*)relationalOperator->m_context;
         /* Retrieve the type of the relational operator. */
-        zen_TokenType_t relationalOperatorTokenType = zen_Token_getType(relationalOperatorToken);
+        k_TokenType_t relationalOperatorTokenType = k_Token_getType(relationalOperatorToken);
 
         if (relationalOperatorTokenType == ZEN_TOKEN_KEYWORD_IS) {
 
         }
         else {
             /* The values of symbol and symbolSize are the only arbitrary variables
-             * when invoking the zen_BinaryEntityGenerator_invokeEvaluate() function.
+             * when invoking the k_BinaryEntityGenerator_invokeEvaluate() function.
              * Therefore, instead of rewriting the invocation expression multiple
              * times, I have factored it out.
              */
@@ -4386,28 +4386,28 @@ void zen_BinaryEntityGenerator_onExitRelationalExpression(zen_ASTListener_t* ast
              * the left shift, right shift, and extended right shift operations are
              * delegated to functions annotated with the Operator annotation.
              */
-            zen_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
+            k_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
         }
     }
 }
 
 // shiftExpression
 
-void zen_BinaryEntityGenerator_onEnterShiftExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_ShiftExpressionContext_t* context = (zen_ShiftExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterShiftExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_ShiftExpressionContext_t* context = (k_ShiftExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitShiftExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_ShiftExpressionContext_t* context = (zen_ShiftExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitShiftExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_ShiftExpressionContext_t* context = (k_ShiftExpressionContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(context->m_additiveExpressions);
     int32_t i;
@@ -4415,7 +4415,7 @@ void zen_BinaryEntityGenerator_onExitShiftExpression(zen_ASTListener_t* astListe
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(context->m_additiveExpressions, i);
 
         /* Retrieve the shift operator. */
-        zen_ASTNode_t* shiftOperator = pair->m_left;
+        k_ASTNode_t* shiftOperator = pair->m_left;
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
          * shift expressions follow the order: operand1 operand2 operator.
@@ -4424,17 +4424,17 @@ void zen_BinaryEntityGenerator_onExitShiftExpression(zen_ASTListener_t* astListe
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, (zen_ASTNode_t*)pair->m_right);
+        k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
 
         /* Retrieve the corresponding shift operator token from the AST
          * node.
          */
-        zen_Token_t* shiftOperatorToken = (zen_Token_t*)shiftOperator->m_context;
+        k_Token_t* shiftOperatorToken = (k_Token_t*)shiftOperator->m_context;
         /* Retrieve the type of the shift operator. */
-        zen_TokenType_t shiftOperatorTokenType = zen_Token_getType(shiftOperatorToken);
+        k_TokenType_t shiftOperatorTokenType = k_Token_getType(shiftOperatorToken);
 
         /* The values of symbol and symbolSize are the only arbitrary variables
-         * when invoking the zen_BinaryEntityGenerator_invokeEvaluate() function.
+         * when invoking the k_BinaryEntityGenerator_invokeEvaluate() function.
          * Therefore, instead of rewriting the invocation expression multiple
          * times, I have factored it out.
          */
@@ -4485,27 +4485,27 @@ void zen_BinaryEntityGenerator_onExitShiftExpression(zen_ASTListener_t* astListe
          * the left shift, right shift, and extended right shift operations are
          * delegated to functions annotated with the Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
     }
 }
 
 // additiveExpression
 
-void zen_BinaryEntityGenerator_onEnterAdditiveExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_AdditiveExpressionContext_t* context = (zen_AdditiveExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterAdditiveExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_AdditiveExpressionContext_t* context = (k_AdditiveExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitAdditiveExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_AdditiveExpressionContext_t* context = (zen_AdditiveExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitAdditiveExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_AdditiveExpressionContext_t* context = (k_AdditiveExpressionContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(context->m_multiplicativeExpressions);
     int32_t i;
@@ -4513,7 +4513,7 @@ void zen_BinaryEntityGenerator_onExitAdditiveExpression(zen_ASTListener_t* astLi
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(context->m_multiplicativeExpressions, i);
 
         /* Retrieve the additive operator. */
-        zen_ASTNode_t* additiveOperator = pair->m_left;
+        k_ASTNode_t* additiveOperator = pair->m_left;
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
          * additive expressions follow the order: operand1 operand2 operator.
@@ -4522,17 +4522,17 @@ void zen_BinaryEntityGenerator_onExitAdditiveExpression(zen_ASTListener_t* astLi
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, (zen_ASTNode_t*)pair->m_right);
+        k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
 
         /* Retrieve the corresponding additive operator token from the AST
          * node.
          */
-        zen_Token_t* additiveOperatorToken = (zen_Token_t*)additiveOperator->m_context;
+        k_Token_t* additiveOperatorToken = (k_Token_t*)additiveOperator->m_context;
         /* Retrieve the type of the additive operator. */
-        zen_TokenType_t additiveOperatorTokenType = zen_Token_getType(additiveOperatorToken);
+        k_TokenType_t additiveOperatorTokenType = k_Token_getType(additiveOperatorToken);
 
         /* The values of symbol and symbolSize are the only arbitrary variables
-         * when invoking the zen_BinaryEntityGenerator_invokeEvaluate() function.
+         * when invoking the k_BinaryEntityGenerator_invokeEvaluate() function.
          * Therefore, instead of rewriting the invocation expression multiple
          * times, I have factored it out.
          */
@@ -4570,27 +4570,27 @@ void zen_BinaryEntityGenerator_onExitAdditiveExpression(zen_ASTListener_t* astLi
          * the addition and subtraction operations are delegated to
          * functions annotated with the Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
     }
 }
 
 // multiplicativeExpression
 
-void zen_BinaryEntityGenerator_onEnterMultiplicativeExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_MultiplicativeExpressionContext_t* context = (zen_MultiplicativeExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterMultiplicativeExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_MultiplicativeExpressionContext_t* context = (k_MultiplicativeExpressionContext_t*)node->m_context;
 
     /* Generates the instructions corresponding to the very first child of
      * the node.
      */
-    zen_ASTListener_visitFirstChild(astListener);
+    k_ASTListener_visitFirstChild(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitMultiplicativeExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_MultiplicativeExpressionContext_t* context = (zen_MultiplicativeExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onExitMultiplicativeExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_MultiplicativeExpressionContext_t* context = (k_MultiplicativeExpressionContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(context->m_unaryExpressions);
     int32_t i;
@@ -4598,7 +4598,7 @@ void zen_BinaryEntityGenerator_onExitMultiplicativeExpression(zen_ASTListener_t*
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(context->m_unaryExpressions, i);
 
         /* Retrieve the multiplicative operator. */
-        zen_ASTNode_t* multiplicativeOperator = pair->m_left;
+        k_ASTNode_t* multiplicativeOperator = pair->m_left;
         /* At this point, the instructions corresponding to the left operand
          * should be generated. The generation of the instructions for
          * multiplicative expressions follow the order: operand1 operand2 operator.
@@ -4607,17 +4607,17 @@ void zen_BinaryEntityGenerator_onExitMultiplicativeExpression(zen_ASTListener_t*
          * the right operand and invoking the ZenKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
-        zen_ASTWalker_walk(astListener, (zen_ASTNode_t*)pair->m_right);
+        k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
 
         /* Retrieve the corresponding multiplicative operator token from the AST
          * node.
          */
-        zen_Token_t* multiplicativeOperatorToken = (zen_Token_t*)multiplicativeOperator->m_context;
+        k_Token_t* multiplicativeOperatorToken = (k_Token_t*)multiplicativeOperator->m_context;
         /* Retrieve the type of the multiplicative operator. */
-        zen_TokenType_t multiplicativeOperatorTokenType = zen_Token_getType(multiplicativeOperatorToken);
+        k_TokenType_t multiplicativeOperatorTokenType = k_Token_getType(multiplicativeOperatorToken);
 
         /* The values of symbol and symbolSize are the only arbitrary variables
-         * when invoking the zen_BinaryEntityGenerator_invokeEvaluate() function.
+         * when invoking the k_BinaryEntityGenerator_invokeEvaluate() function.
          * Therefore, instead of rewriting the invocation expression multiple
          * times, I have factored it out.
          */
@@ -4664,33 +4664,33 @@ void zen_BinaryEntityGenerator_onExitMultiplicativeExpression(zen_ASTListener_t*
          * the multiplication/division/modulus operations are delegated to
          * functions annotated with the Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
     }
 }
 
 // unaryExpression
 
-void zen_BinaryEntityGenerator_onEnterUnaryExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+void k_BinaryEntityGenerator_onEnterUnaryExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
-    zen_UnaryExpressionContext_t* context = (zen_UnaryExpressionContext_t*)node->m_context;
+    k_UnaryExpressionContext_t* context = (k_UnaryExpressionContext_t*)node->m_context;
 
-    zen_ASTNode_t* unaryOperator = context->m_unaryOperator;
+    k_ASTNode_t* unaryOperator = context->m_unaryOperator;
     if (unaryOperator != NULL) {
         /* Generate the instructions corresponding to the unary expression. */
-        zen_ASTWalker_walk(astListener, context->m_unaryExpression);
+        k_ASTWalker_walk(astListener, context->m_unaryExpression);
 
         /* Retrieve the corresponding unary operator token from the AST
          * node.
          */
-        zen_Token_t* unaryOperatorToken = (zen_Token_t*)unaryOperator->m_context;
+        k_Token_t* unaryOperatorToken = (k_Token_t*)unaryOperator->m_context;
         /* Retrieve the type of the unary operator. */
-        zen_TokenType_t unaryOperatorType = zen_Token_getType(unaryOperatorToken);
+        k_TokenType_t unaryOperatorType = k_Token_getType(unaryOperatorToken);
 
         /* The values of symbol and symbolSize are the only arbitrary variables
-         * when invoking the zen_BinaryEntityGenerator_invokeEvaluate() function.
+         * when invoking the k_BinaryEntityGenerator_invokeEvaluate() function.
          * Therefore, instead of rewriting the invocation expression multiple
          * times, I have factored it out.
          */
@@ -4744,25 +4744,25 @@ void zen_BinaryEntityGenerator_onEnterUnaryExpression(zen_ASTListener_t* astList
                      * state has to be "incremented by 1". It returns an object with its internal
                      * state "incremented by 1".
                      *
-                    // zen_BinaryEntityGenerator_emitInvokeVirtual(generator, 0);
+                    // k_BinaryEntityGenerator_emitInvokeVirtual(generator, 0);
                 }
                 else {
                     /* The onPreDecrement() function is invoked against the object whose internal
                      * state has to be "incremented by 1". It returns an object with its internal
                      * state "incremented by 1".
                      *
-                    // zen_BinaryEntityGenerator_emitInvokeVirtual(generator, 0);
+                    // k_BinaryEntityGenerator_emitInvokeVirtual(generator, 0);
                 }
                 /* A copy of the "incremented" object is required on the operand stack for
                  * assignment.
                  */
-                // zen_BinaryEntityGenerator_emitDuplicate(generator);
+                // k_BinaryEntityGenerator_emitDuplicate(generator);
                 /* Assign the variable the object which represents the new state.
                  *
                  * TODO: Change store_a to store_a1 (and friends) and
                  *       store_field when necessary.
                  *
-                // zen_BinaryEntityGenerator_emitStoreReference(generator, 0);
+                // k_BinaryEntityGenerator_emitStoreReference(generator, 0);
 
                 break;
             }
@@ -4777,22 +4777,22 @@ void zen_BinaryEntityGenerator_onEnterUnaryExpression(zen_ASTListener_t* astList
          * the multiplication/division/modulus operations are delegated to
          * functions annotated with the Operator annotation.
          */
-        zen_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
+        k_BinaryEntityGenerator_invokeEvaluate(generator, symbol, symbolSize);
 
         /* The instructions corresponding to the children nodes have been generated.
          * Therefore, do not visit them again.
          */
-        zen_ASTListener_skipChildren(astListener);
+        k_ASTListener_skipChildren(astListener);
     }
 }
 
-void zen_BinaryEntityGenerator_onExitUnaryExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitUnaryExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // postfixExpression
 
-void zen_BinaryEntityGenerator_invokeEvaluate(zen_BinaryEntityGenerator_t* generator,
+void k_BinaryEntityGenerator_invokeEvaluate(k_BinaryEntityGenerator_t* generator,
     uint8_t* symbol, int32_t symbolSize) {
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
@@ -4800,22 +4800,22 @@ void zen_BinaryEntityGenerator_invokeEvaluate(zen_BinaryEntityGenerator_t* gener
     // ZenKernel.evaluate(Object operand, String symbol)
     // ZenKernel.evaluate(Object operand1, Object operand2, String symbol)
 
-    uint16_t symbolIndex = zen_ConstantPoolBuilder_getStringEntryIndexEx(
+    uint16_t symbolIndex = k_ConstantPoolBuilder_getStringEntryIndexEx(
         generator->m_constantPoolBuilder, symbol, symbolSize);
-    zen_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, symbolIndex);
+    k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, symbolIndex);
     jtk_Logger_debug(logger, "Emitted load_cpr %d", symbolIndex);
 
     uint16_t evaluateIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_EVALUATE];
 
     /* Invoke the static function to evaluate the expression. */
-    zen_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder,
+    k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder,
         evaluateIndex);
 
     /* Log the emission of the invoke_static instruction. */
     jtk_Logger_debug(logger, "Emitted invoke_static %d", evaluateIndex);
 }
 
-int64_t zen_Long_convert(const uint8_t* text, int32_t length, int32_t radix) {
+int64_t k_Long_convert(const uint8_t* text, int32_t length, int32_t radix) {
     jtk_Assert_assertObject(text, "The specified text is null.");
 
     bool error = false;
@@ -4875,7 +4875,7 @@ int64_t zen_Long_convert(const uint8_t* text, int32_t length, int32_t radix) {
     return result;
 }
 
-void zen_BinaryEntityGenerator_loadLong(zen_BinaryEntityGenerator_t* generator,
+void k_BinaryEntityGenerator_loadLong(k_BinaryEntityGenerator_t* generator,
     int64_t value) {
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
@@ -4883,7 +4883,7 @@ void zen_BinaryEntityGenerator_loadLong(zen_BinaryEntityGenerator_t* generator,
     switch (value) {
         case 0: {
             /* Emit the push_l0 instruction. */
-            zen_BinaryEntityBuilder_emitPushLong0(generator->m_builder);
+            k_BinaryEntityBuilder_emitPushLong0(generator->m_builder);
 
             /* Log the emission of the instruction. */
             jtk_Logger_debug(logger, "Emitted push_l0");
@@ -4893,7 +4893,7 @@ void zen_BinaryEntityGenerator_loadLong(zen_BinaryEntityGenerator_t* generator,
 
         case 1: {
             /* Emit the push_l1 instruction. */
-            zen_BinaryEntityBuilder_emitPushLong1(generator->m_builder);
+            k_BinaryEntityBuilder_emitPushLong1(generator->m_builder);
 
             /* Log the emission of the instruction. */
             jtk_Logger_debug(logger, "Emitted push_l1");
@@ -4903,7 +4903,7 @@ void zen_BinaryEntityGenerator_loadLong(zen_BinaryEntityGenerator_t* generator,
 
         case 2: {
             /* Emit the push_l2 instruction. */
-            zen_BinaryEntityBuilder_emitPushLong2(generator->m_builder);
+            k_BinaryEntityBuilder_emitPushLong2(generator->m_builder);
 
             /* Log the emission of the instruction. */
             jtk_Logger_debug(logger, "Emitted push_l2");
@@ -4928,13 +4928,13 @@ void zen_BinaryEntityGenerator_loadLong(zen_BinaryEntityGenerator_t* generator,
                 /* Emit the push_i0 instruction in order to provide padding on the operand
                  * stack.
                  */
-                zen_BinaryEntityBuilder_emitPushInteger0(generator->m_builder);
+                k_BinaryEntityBuilder_emitPushInteger0(generator->m_builder);
 
                 /* Log the emission of the instruction. */
                 jtk_Logger_debug(logger, "Emitted push_i0");
 
                 /* Emit the push_b instruction. */
-                zen_BinaryEntityBuilder_emitPushByte(generator->m_builder,
+                k_BinaryEntityBuilder_emitPushByte(generator->m_builder,
                     value);
 
                 /* Log the emission of the instruction. */
@@ -4944,7 +4944,7 @@ void zen_BinaryEntityGenerator_loadLong(zen_BinaryEntityGenerator_t* generator,
                 /* Emit the push_i0 instruction in order to provide padding on the operand
                  * stack.
                  */
-                zen_BinaryEntityBuilder_emitPushInteger0(generator->m_builder);
+                k_BinaryEntityBuilder_emitPushInteger0(generator->m_builder);
 
                 /* Log the emission of the instruction. */
                 jtk_Logger_debug(logger, "Emitted push_i0");
@@ -4960,7 +4960,7 @@ void zen_BinaryEntityGenerator_loadLong(zen_BinaryEntityGenerator_t* generator,
                  * pushed integer. This will be fixed in the future.
                  */
                 /* Emit the push_s instruction. */
-                zen_BinaryEntityBuilder_emitPushShort(generator->m_builder,
+                k_BinaryEntityBuilder_emitPushShort(generator->m_builder,
                     value);
 
                 /* Log the emission of the instruction. */
@@ -4978,11 +4978,11 @@ void zen_BinaryEntityGenerator_loadLong(zen_BinaryEntityGenerator_t* generator,
                  * pushed integer. This will be fixed in the future.
                  */
 
-                uint8_t longIndex = zen_ConstantPoolBuilder_getLongEntryIndex(
+                uint8_t longIndex = k_ConstantPoolBuilder_getLongEntryIndex(
                     generator->m_constantPoolBuilder, value);
 
                 /* Emit the load_cpr instruction. */
-                zen_BinaryEntityBuilder_emitLoadCPR(generator->m_builder,
+                k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder,
                     longIndex);
 
                 /* Log the emission of the instruction. */
@@ -4992,7 +4992,7 @@ void zen_BinaryEntityGenerator_loadLong(zen_BinaryEntityGenerator_t* generator,
     }
 }
 
-void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generator,
+void k_BinaryEntityGenerator_loadInteger(k_BinaryEntityGenerator_t* generator,
     int32_t value) {
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
@@ -5000,7 +5000,7 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
     switch (value) {
         case 0: {
             /* Emit the push_i0 instruction. */
-            zen_BinaryEntityBuilder_emitPushInteger0(generator->m_builder);
+            k_BinaryEntityBuilder_emitPushInteger0(generator->m_builder);
 
             /* Log the emission of the instruction. */
             jtk_Logger_debug(logger, "Emitted push_i0");
@@ -5010,7 +5010,7 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
 
         case 1: {
             /* Emit the push_i1 instruction. */
-            zen_BinaryEntityBuilder_emitPushInteger1(generator->m_builder);
+            k_BinaryEntityBuilder_emitPushInteger1(generator->m_builder);
 
             /* Log the emission of the instruction. */
             jtk_Logger_debug(logger, "Emitted push_i1");
@@ -5020,7 +5020,7 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
 
         case 2: {
             /* Emit the push_i2 instruction. */
-            zen_BinaryEntityBuilder_emitPushInteger2(generator->m_builder);
+            k_BinaryEntityBuilder_emitPushInteger2(generator->m_builder);
 
             /* Log the emission of the instruction. */
             jtk_Logger_debug(logger, "Emitted push_i2");
@@ -5030,7 +5030,7 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
 
         case 3: {
             /* Emit the push_i3 instruction. */
-            zen_BinaryEntityBuilder_emitPushInteger3(generator->m_builder);
+            k_BinaryEntityBuilder_emitPushInteger3(generator->m_builder);
 
             /* Log the emission of the instruction. */
             jtk_Logger_debug(logger, "Emitted push_i3");
@@ -5040,7 +5040,7 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
 
         case 4: {
             /* Emit the push_i4 instruction. */
-            zen_BinaryEntityBuilder_emitPushInteger4(generator->m_builder);
+            k_BinaryEntityBuilder_emitPushInteger4(generator->m_builder);
 
             /* Log the emission of the instruction. */
             jtk_Logger_debug(logger, "Emitted push_i4");
@@ -5050,7 +5050,7 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
 
         case 5: {
             /* Emit the push_i5 instruction. */
-            zen_BinaryEntityBuilder_emitPushInteger5(generator->m_builder);
+            k_BinaryEntityBuilder_emitPushInteger5(generator->m_builder);
 
             /* Log the emission of the instruction. */
             jtk_Logger_debug(logger, "Emitted push_i5");
@@ -5071,7 +5071,7 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
              */
             if ((value >= 6) && (value <= 127)) {
                 /* Emit the push_b instruction. */
-                zen_BinaryEntityBuilder_emitPushByte(generator->m_builder,
+                k_BinaryEntityBuilder_emitPushByte(generator->m_builder,
                     value);
 
                 /* Log the emission of the instruction. */
@@ -5089,7 +5089,7 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
                  * pushed integer. This will be fixed in the future.
                  */
                 /* Emit the push_s instruction. */
-                zen_BinaryEntityBuilder_emitPushShort(generator->m_builder,
+                k_BinaryEntityBuilder_emitPushShort(generator->m_builder,
                     value);
 
                 /* Log the emission of the instruction. */
@@ -5107,11 +5107,11 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
                  * pushed integer. This will be fixed in the future.
                  */
 
-                uint8_t integerIndex = zen_ConstantPoolBuilder_getIntegerEntryIndex(
+                uint8_t integerIndex = k_ConstantPoolBuilder_getIntegerEntryIndex(
                     generator->m_constantPoolBuilder, value);
 
                 /* Emit the load_cpr instruction. */
-                zen_BinaryEntityBuilder_emitLoadCPR(generator->m_builder,
+                k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder,
                     integerIndex);
 
                 /* Log the emission of the instruction. */
@@ -5160,21 +5160,21 @@ void zen_BinaryEntityGenerator_loadInteger(zen_BinaryEntityGenerator_t* generato
  * instructions as if the code was written in the latter form.
  */
 
-void zen_BinaryEntityGenerator_handleIntegerLiteral(zen_BinaryEntityGenerator_t* generator,
-    zen_Token_t* token) {
+void k_BinaryEntityGenerator_handleIntegerLiteral(k_BinaryEntityGenerator_t* generator,
+    k_Token_t* token) {
     const uint8_t* integerClassName = "zen/core/Integer";
     int32_t integerClassNameSize = 16;
-    uint16_t integerClassIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+    uint16_t integerClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, integerClassName,
         integerClassNameSize);
 
     /* Emit the new instruction. */
-    zen_BinaryEntityBuilder_emitNew(generator->m_builder, integerClassIndex);
+    k_BinaryEntityBuilder_emitNew(generator->m_builder, integerClassIndex);
     /* Emit the duplicate instruction. */
-    zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+    k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
 
-    uint8_t* integerText = zen_Token_getText(token);
-    int32_t actualIntegerLength = zen_Token_getLength(token);
+    uint8_t* integerText = k_Token_getText(token);
+    int32_t actualIntegerLength = k_Token_getLength(token);
     int32_t integerLength = actualIntegerLength;
 
     int32_t radix = 10;
@@ -5208,13 +5208,13 @@ void zen_BinaryEntityGenerator_handleIntegerLiteral(zen_BinaryEntityGenerator_t*
         // integerLength--;
     // }
 
-    int64_t value = zen_Long_convert(integerText, integerLength, radix);
+    int64_t value = k_Long_convert(integerText, integerLength, radix);
 
     // if (longLiteral) {
-        zen_BinaryEntityGenerator_loadLong(generator, value);
+        k_BinaryEntityGenerator_loadLong(generator, value);
     // }
     // else {
-        // zen_BinaryEntityGenerator_loadInteger(generator, value);
+        // k_BinaryEntityGenerator_loadInteger(generator, value);
     // }
 
     // TODO: Implement integer interning.
@@ -5224,18 +5224,18 @@ void zen_BinaryEntityGenerator_handleIntegerLiteral(zen_BinaryEntityGenerator_t*
     // const uint8_t* constructorDescriptor = "v:i";
     const uint8_t* constructorDescriptor = "v:(zen/core/Object)";
     int32_t constructorDescriptorSize = 19;
-    uint16_t constructorIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t constructorIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, integerClassName,
         integerClassNameSize, constructorDescriptor, constructorDescriptorSize,
         constructorName, constructorNameSize, 0);
 
     /* Invoke the constructor to initialize the new integer instance. */
-    zen_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
+    k_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
         constructorIndex);
 }
 
-void zen_BinaryEntityGenerator_handleStringLiteral(zen_BinaryEntityGenerator_t* generator,
-    zen_Token_t* token) {
+void k_BinaryEntityGenerator_handleStringLiteral(k_BinaryEntityGenerator_t* generator,
+    k_Token_t* token) {
     int32_t size = 0;
     int32_t limit = token->m_length - 1;
     uint8_t* string = jtk_Memory_allocate(uint8_t, limit);
@@ -5269,34 +5269,34 @@ void zen_BinaryEntityGenerator_handleStringLiteral(zen_BinaryEntityGenerator_t* 
      * Another 1 is subtracted from the text length because the first
      * quote was skipped.
      */
-    uint8_t stringIndex = zen_ConstantPoolBuilder_getStringEntryIndexEx(
+    uint8_t stringIndex = k_ConstantPoolBuilder_getStringEntryIndexEx(
         generator->m_constantPoolBuilder, string, size);
     /* Emit load_cpr instruction. */
-    zen_BinaryEntityBuilder_emitLoadCPR(generator->m_builder,
+    k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder,
         stringIndex);
 
     jtk_Memory_deallocate(string);
 }
 
-void zen_BinaryEntityGenerator_handleDirectFunction(
-    zen_BinaryEntityGenerator_t* generator, zen_Symbol_t* symbol,
-    zen_FunctionArgumentsContext_t* functionArgumentsContext) {
-    zen_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
+void k_BinaryEntityGenerator_handleDirectFunction(
+    k_BinaryEntityGenerator_t* generator, k_Symbol_t* symbol,
+    k_FunctionArgumentsContext_t* functionArgumentsContext) {
+    k_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
     jtk_ArrayList_t* arguments = NULL;
     int32_t argumentCount = 0;
     if (expressions != NULL) {
-        zen_ExpressionsContext_t* expressionsContext = (zen_ExpressionsContext_t*)expressions->m_context;
+        k_ExpressionsContext_t* expressionsContext = (k_ExpressionsContext_t*)expressions->m_context;
         arguments = expressionsContext->m_expressions;
         argumentCount = jtk_ArrayList_getSize(arguments);
     }
 
-    zen_FunctionSignature_t* signature = zen_Symbol_getFunctionSignature(symbol,
+    k_FunctionSignature_t* signature = k_Symbol_getFunctionSignature(symbol,
         argumentCount);
     if (signature == NULL) {
         printf("[error] Cannot find a suitable static function. A previous phase in the compiler has failed.\n");
     }
 
-    bool instance = !zen_Modifier_hasStatic(signature->m_modifiers);
+    bool instance = !k_Modifier_hasStatic(signature->m_modifiers);
     if (instance) {
         /* The "this" reference is always stored at the zeroth position
         * in the local variable array. Further, we assume that the
@@ -5304,84 +5304,84 @@ void zen_BinaryEntityGenerator_handleDirectFunction(
         * in the same class. Therefore, emit a load reference to the
         * this reference.
         */
-        zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
+        k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
     }
 
     if (arguments != NULL) {
         int32_t argumentIndex;
         for (argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
             /* Retrieve the expression for the current argument. */
-            zen_ASTNode_t* argument = (zen_ASTNode_t*)jtk_ArrayList_getValue(arguments,
+            k_ASTNode_t* argument = (k_ASTNode_t*)jtk_ArrayList_getValue(arguments,
                 argumentIndex);
 
             /* Visit the expression node and generate the relevant instructions. */
-            zen_ASTWalker_walk(generator->m_astListener, argument);
+            k_ASTWalker_walk(generator->m_astListener, argument);
         }
     }
 
-    zen_Scope_t* enclosingScope = symbol->m_enclosingScope;
-    zen_Symbol_t* classSymbol = enclosingScope->m_symbol;
+    k_Scope_t* enclosingScope = symbol->m_enclosingScope;
+    k_Symbol_t* classSymbol = enclosingScope->m_symbol;
     const uint8_t* classDescriptor = classSymbol->m_context.m_asClass.m_descriptor;
     uint16_t classDescriptorSize = classSymbol->m_context.m_asClass.m_descriptorSize;
-    int32_t index = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    int32_t index = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, classDescriptor,
         classDescriptorSize, signature->m_descriptor, signature->m_descriptorSize,
         symbol->m_name, symbol->m_nameSize, signature->m_tableIndex);
 
     if (instance) {
-        zen_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, index);
+        k_BinaryEntityBuilder_emitInvokeVirtual(generator->m_builder, index);
     }
     else {
-        zen_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, index);
+        k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, index);
     }
 }
 
 /* This function assumes that the reference for instance fields is already
  * pushed onto the operand stack.
  */
-void zen_BinaryEntityGenerator_handleDirectField(zen_BinaryEntityGenerator_t* generator,
-    zen_Symbol_t* classSymbol, zen_Symbol_t* targetSymbol, bool last) {
-    zen_ClassSymbol_t* classSymbolContext = &classSymbol->m_context.m_asClass;
-    if (zen_Symbol_isFunction(targetSymbol)) {
+void k_BinaryEntityGenerator_handleDirectField(k_BinaryEntityGenerator_t* generator,
+    k_Symbol_t* classSymbol, k_Symbol_t* targetSymbol, bool last) {
+    k_ClassSymbol_t* classSymbolContext = &classSymbol->m_context.m_asClass;
+    if (k_Symbol_isFunction(targetSymbol)) {
         jtk_ArrayList_t* signatures = targetSymbol->m_context.m_asFunction.m_signatures;
         if (jtk_ArrayList_getSize(signatures) > 1) {
             printf("[error] Cannot reference an overloaded function. Consider using the reflection package.\n");
         }
         else {
-            zen_FunctionSignature_t* signature = jtk_ArrayList_getValue(signatures, 0);
+            k_FunctionSignature_t* signature = jtk_ArrayList_getValue(signatures, 0);
 
-            int32_t cpIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+            int32_t cpIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
                 generator->m_constantPoolBuilder, classSymbolContext->m_descriptor,
                 classSymbolContext->m_descriptorSize, signature->m_descriptor, signature->m_descriptorSize,
                 targetSymbol->m_name, targetSymbol->m_nameSize, signature->m_tableIndex);
-            zen_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, cpIndex);
+            k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, cpIndex);
         }
     }
-    else if (zen_Symbol_isConstant(targetSymbol) ||
-        zen_Symbol_isVariable(targetSymbol)) {
+    else if (k_Symbol_isConstant(targetSymbol) ||
+        k_Symbol_isVariable(targetSymbol)) {
         // TODO: Add table indexes to fields!
-        uint16_t cpIndex = zen_ConstantPoolBuilder_getFieldEntryIndexEx(
+        uint16_t cpIndex = k_ConstantPoolBuilder_getFieldEntryIndexEx(
             generator->m_constantPoolBuilder, classSymbolContext->m_descriptor,
                 classSymbolContext->m_descriptorSize, "(zen/core/Object)", 17,
                 targetSymbol->m_name, targetSymbol->m_nameSize);
-        bool instance = !zen_Symbol_isStatic(targetSymbol);
+        bool instance = !k_Symbol_isStatic(targetSymbol);
         if (last && lhs) {
             if (instance) {
-                zen_BinaryEntityBuilder_emitStoreInstanceField(generator->m_builder,
+                k_BinaryEntityBuilder_emitStoreInstanceField(generator->m_builder,
                     cpIndex);
             }
             else {
-                zen_BinaryEntityBuilder_emitStoreStaticField(generator->m_builder,
+                k_BinaryEntityBuilder_emitStoreStaticField(generator->m_builder,
                     cpIndex);
             }
         }
         else {
             if (instance) {
-                zen_BinaryEntityBuilder_emitLoadInstanceField(generator->m_builder,
+                k_BinaryEntityBuilder_emitLoadInstanceField(generator->m_builder,
                     cpIndex);
             }
             else {
-                zen_BinaryEntityBuilder_emitLoadStaticField(generator->m_builder,
+                k_BinaryEntityBuilder_emitLoadStaticField(generator->m_builder,
                     cpIndex);
             }
         }
@@ -5405,15 +5405,15 @@ void zen_BinaryEntityGenerator_handleDirectField(zen_BinaryEntityGenerator_t* ge
  * Here, primary can an identifier referencing a class, integer literal, string
  * literal, Boolean literal, or this reference.
  */
-void zen_BinaryEntityGenerator_handleDirectAccess(zen_BinaryEntityGenerator_t* generator,
-    zen_MemberAccessContext_t* context, zen_Token_t* primaryToken,
-    zen_Symbol_t* primarySymbol, jtk_ArrayList_t* postfixParts, int32_t* index) {
+void k_BinaryEntityGenerator_handleDirectAccess(k_BinaryEntityGenerator_t* generator,
+    k_MemberAccessContext_t* context, k_Token_t* primaryToken,
+    k_Symbol_t* primarySymbol, jtk_ArrayList_t* postfixParts, int32_t* index) {
 
-    zen_ASTNode_t* identifier = context->m_identifier;
-    zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
+    k_ASTNode_t* identifier = context->m_identifier;
+    k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
 
-    zen_Symbol_t* targetSymbol = NULL;
-    zen_Symbol_t* classSymbol = NULL;
+    k_Symbol_t* targetSymbol = NULL;
+    k_Symbol_t* classSymbol = NULL;
     switch (primaryToken->m_type) {
         case ZEN_TOKEN_IDENTIFIER: {
             classSymbol = primarySymbol;
@@ -5421,21 +5421,21 @@ void zen_BinaryEntityGenerator_handleDirectAccess(zen_BinaryEntityGenerator_t* g
         }
 
         case ZEN_TOKEN_INTEGER_LITERAL: {
-            classSymbol = zen_Compiler_resolveSymbol(
+            classSymbol = k_Compiler_resolveSymbol(
                 generator->m_compiler, "zen.core.Integer", 16);
 
             break;
         }
 
         case ZEN_TOKEN_STRING_LITERAL: {
-            classSymbol = zen_Compiler_resolveSymbol(generator->m_compiler,
+            classSymbol = k_Compiler_resolveSymbol(generator->m_compiler,
                 "zen.core.String", 15);
             break;
         }
 
         case ZEN_TOKEN_KEYWORD_TRUE:
         case ZEN_TOKEN_KEYWORD_FALSE: {
-            classSymbol = zen_Compiler_resolveSymbol(
+            classSymbol = k_Compiler_resolveSymbol(
                 generator->m_compiler, "zen.core.Boolean", 16);
         }
 
@@ -5450,35 +5450,35 @@ void zen_BinaryEntityGenerator_handleDirectAccess(zen_BinaryEntityGenerator_t* g
         }
     }
 
-    targetSymbol = zen_Scope_resolve(primarySymbol->m_context.m_asClass.m_classScope,
+    targetSymbol = k_Scope_resolve(primarySymbol->m_context.m_asClass.m_classScope,
         identifierToken->m_text);
 
     int32_t postfixPartCount = jtk_ArrayList_getSize(postfixParts);
     if ((*index + 1) < postfixPartCount) {
-        zen_ASTNode_t* nextPostfixPart = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+        k_ASTNode_t* nextPostfixPart = (k_ASTNode_t*)jtk_ArrayList_getValue(
             postfixParts, *index + 1);
-        zen_ASTNodeType_t nextPostfixPartType = zen_ASTNode_getType(nextPostfixPart);
+        k_ASTNodeType_t nextPostfixPartType = k_ASTNode_getType(nextPostfixPart);
 
         if (nextPostfixPartType == ZEN_AST_NODE_TYPE_FUNCTION_ARGUMENTS) {
-            zen_ASTNode_t* functionArguments = nextPostfixPart;
+            k_ASTNode_t* functionArguments = nextPostfixPart;
             *index++;
 
-            zen_FunctionArgumentsContext_t* functionArgumentsContext =
-                (zen_FunctionArgumentsContext_t*)functionArguments->m_context;
+            k_FunctionArgumentsContext_t* functionArgumentsContext =
+                (k_FunctionArgumentsContext_t*)functionArguments->m_context;
 
-            zen_ExpressionsContext_t* expressionsContext = NULL;
-            zen_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
+            k_ExpressionsContext_t* expressionsContext = NULL;
+            k_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
             if (expressions != NULL) {
-                expressionsContext = (zen_ExpressionsContext_t*)expressions->m_context;
+                expressionsContext = (k_ExpressionsContext_t*)expressions->m_context;
             }
 
-            zen_BinaryEntityGenerator_handleDirectFunction(generator,
+            k_BinaryEntityGenerator_handleDirectFunction(generator,
                 targetSymbol, expressionsContext);
         }
     }
     else {
         // If lhs and last postfix part, data should be stored!
-        zen_BinaryEntityGenerator_handleDirectField(generator, classSymbol,
+        k_BinaryEntityGenerator_handleDirectField(generator, classSymbol,
             targetSymbol, (*index + 1) == postfixPartCount);
     }
 }
@@ -5497,41 +5497,41 @@ void zen_BinaryEntityGenerator_handleDirectAccess(zen_BinaryEntityGenerator_t* g
  * ensures this assertion based on the fact that nested classes and
  * static methods and fields cannot be referenced via objects in Zen.
  */
-void zen_BinaryEntityGenerator_handleDynamicAccess(zen_BinaryEntityGenerator_t* generator,
-    zen_MemberAccessContext_t* memberAccessContext, jtk_ArrayList_t* postfixParts,
+void k_BinaryEntityGenerator_handleDynamicAccess(k_BinaryEntityGenerator_t* generator,
+    k_MemberAccessContext_t* memberAccessContext, jtk_ArrayList_t* postfixParts,
     int32_t* index) {
-    zen_ASTNode_t* identifier = memberAccessContext->m_identifier;
-    zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
+    k_ASTNode_t* identifier = memberAccessContext->m_identifier;
+    k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
 
     /* The name of the function/field to invoke/load. */
-    int32_t targetNameIndex = zen_ConstantPoolBuilder_getStringEntryIndexEx(
+    int32_t targetNameIndex = k_ConstantPoolBuilder_getStringEntryIndexEx(
         generator->m_constantPoolBuilder, identifierToken->m_text,
         identifierToken->m_length);
 
     int32_t postfixPartCount = jtk_ArrayList_getSize(postfixParts);
     int32_t previousIndex = *index;
     if ((*index + 1) < postfixPartCount) {
-        zen_ASTNode_t* nextPostfixPart = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+        k_ASTNode_t* nextPostfixPart = (k_ASTNode_t*)jtk_ArrayList_getValue(
             postfixParts, *index + 1);
-        zen_ASTNodeType_t nextPostfixPartType = zen_ASTNode_getType(nextPostfixPart);
+        k_ASTNodeType_t nextPostfixPartType = k_ASTNode_getType(nextPostfixPart);
         if (nextPostfixPartType == ZEN_AST_NODE_TYPE_FUNCTION_ARGUMENTS) {
             *index++;
-            zen_ASTNode_t* functionArguments = nextPostfixPart;
-            zen_FunctionArgumentsContext_t* functionArgumentsContext = (zen_FunctionArgumentsContext_t*)functionArguments->m_context;
+            k_ASTNode_t* functionArguments = nextPostfixPart;
+            k_FunctionArgumentsContext_t* functionArgumentsContext = (k_FunctionArgumentsContext_t*)functionArguments->m_context;
 
             int32_t argumentCount = 0;
-            zen_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
+            k_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
             if (expressions != NULL) {
-                zen_ExpressionsContext_t* expressionsContext = (zen_ExpressionsContext_t*)expressions->m_context;
+                k_ExpressionsContext_t* expressionsContext = (k_ExpressionsContext_t*)expressions->m_context;
                 argumentCount = jtk_ArrayList_getSize(expressionsContext->m_expressions);
                 int32_t argumentIndex;
                 for (argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
                     /* Retrieve the expression for the current argument. */
-                    zen_ASTNode_t* argument = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+                    k_ASTNode_t* argument = (k_ASTNode_t*)jtk_ArrayList_getValue(
                         expressionsContext->m_expressions, argumentIndex);
 
                     /* Visit the expression node and generate the relevant instructions. */
-                    zen_ASTWalker_walk(generator->m_astListener, argument);
+                    k_ASTWalker_walk(generator->m_astListener, argument);
                 }
             }
 
@@ -5545,12 +5545,12 @@ void zen_BinaryEntityGenerator_handleDynamicAccess(zen_BinaryEntityGenerator_t* 
      */
     if (previousIndex != *index) {
         /* Push the name of the target function on the operand stack. */
-        zen_BinaryEntityBuilder_emitLoadCPR(generator->m_builder,
+        k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder,
             targetNameIndex);
 
         if ((*index + 1 == postfixPartCount) && lhs) {
             uint16_t storeFieldIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_STORE_FIELD];
-            zen_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, storeFieldIndex);
+            k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, storeFieldIndex);
         }
         else {
             /* We may be generating instructions either for LHS or RHS,
@@ -5558,24 +5558,24 @@ void zen_BinaryEntityGenerator_handleDynamicAccess(zen_BinaryEntityGenerator_t* 
              * reference should be loaded.
              */
             uint16_t loadFieldIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_LOAD_FIELD];
-            zen_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, loadFieldIndex);
+            k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, loadFieldIndex);
         }
     }
 }
 
-void zen_BinaryEntityGenerator_handleIdentifier(zen_BinaryEntityGenerator_t* generator,
-    zen_Symbol_t* symbol) {
-    zen_ASTNode_t* identifier = symbol->m_identifier;
-    zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
-    zen_Scope_t* enclosingScope = zen_Symbol_getEnclosingScope(symbol);
+void k_BinaryEntityGenerator_handleIdentifier(k_BinaryEntityGenerator_t* generator,
+    k_Symbol_t* symbol) {
+    k_ASTNode_t* identifier = symbol->m_identifier;
+    k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
+    k_Scope_t* enclosingScope = k_Symbol_getEnclosingScope(symbol);
 
     uint16_t storeFieldIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_STORE_FIELD];
-    if (zen_Symbol_isVariable(symbol) || zen_Symbol_isConstant(symbol)) {
+    if (k_Symbol_isVariable(symbol) || k_Symbol_isConstant(symbol)) {
         if (lhs) {
-            if (zen_Scope_isClassScope(enclosingScope)) {
-                bool instance = !zen_Symbol_isStatic(symbol);
+            if (k_Scope_isClassScope(enclosingScope)) {
+                bool instance = !k_Symbol_isStatic(symbol);
 
-                uint16_t identifierIndex = zen_ConstantPoolBuilder_getStringEntryIndexEx(
+                uint16_t identifierIndex = k_ConstantPoolBuilder_getStringEntryIndexEx(
                     generator->m_constantPoolBuilder, identifierToken->m_text,
                     identifierToken->m_length);
 
@@ -5586,33 +5586,33 @@ void zen_BinaryEntityGenerator_handleIdentifier(zen_BinaryEntityGenerator_t* gen
                         * in the same class. Therefore, emit a load reference to the
                         * this reference.
                         */
-                    zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
+                    k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
                     /* Load the name of the field. */
-                    zen_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, identifierIndex);
+                    k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, identifierIndex);
                     /* Invoke the ZenKernel.storeField() function to update
                      * the field.
                      */
-                    zen_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, storeFieldIndex);
+                    k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, storeFieldIndex);
                 }
                 else {
                     /* Emit the `load_cpr` instruction to load the reference of the
                         * class to which the static field belongs.
                         */
-                    zen_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, 0);
+                    k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, 0);
                     /* Load the name of the field. */
-                    zen_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, identifierIndex);
+                    k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, identifierIndex);
                     /* Invoke the ZenKernel.storeField() function to update
                     * the field.
                     */
-                    zen_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, storeFieldIndex);
+                    k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, storeFieldIndex);
                 }
             }
-            else if (zen_Scope_isLocalScope(enclosingScope)) {
-                if (zen_Symbol_isVariable(symbol)) {
+            else if (k_Scope_isLocalScope(enclosingScope)) {
+                if (k_Symbol_isVariable(symbol)) {
                     /* Emit the duplicate instruction. */
-                    zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+                    k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
                     /* Emit the store_a instruction. */
-                    zen_BinaryEntityBuilder_emitStoreReference(generator->m_builder,
+                    k_BinaryEntityBuilder_emitStoreReference(generator->m_builder,
                         symbol->m_index);
                 }
                 else {
@@ -5621,44 +5621,44 @@ void zen_BinaryEntityGenerator_handleIdentifier(zen_BinaryEntityGenerator_t* gen
             }
         }
         else {
-            if (zen_Scope_isClassScope(enclosingScope)) {
-                if (!zen_Symbol_isStatic(symbol)) {
+            if (k_Scope_isClassScope(enclosingScope)) {
+                if (!k_Symbol_isStatic(symbol)) {
                     /* The this reference is always stored at the zeroth position
                         * in the local variable array. Further, we assume that the
                         * class member and the expression being processed appear in
                         * in the same class. Therefore, emit a load reference to the
                         * this reference.
                         */
-                    zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
+                    k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
                     /* Load the instance field. */
-                    zen_BinaryEntityBuilder_emitLoadInstanceField(generator->m_builder, 0);
+                    k_BinaryEntityBuilder_emitLoadInstanceField(generator->m_builder, 0);
                 }
                 else {
                     /* Load the static field. */
-                    zen_BinaryEntityBuilder_emitLoadStaticField(generator->m_builder, 0);
+                    k_BinaryEntityBuilder_emitLoadStaticField(generator->m_builder, 0);
                 }
             }
-            else if (zen_Scope_isLocalScope(enclosingScope) || zen_Scope_isFunctionScope(enclosingScope)) {
+            else if (k_Scope_isLocalScope(enclosingScope) || k_Scope_isFunctionScope(enclosingScope)) {
                 /* Emit the store_a instruction. */
-                zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
+                k_BinaryEntityBuilder_emitLoadReference(generator->m_builder,
                     symbol->m_index);
             }
         }
     }
-    else if (zen_Symbol_isFunction(symbol)) {
+    else if (k_Symbol_isFunction(symbol)) {
         printf("[TODO] Function references are yet to be implemented.\n");
     }
-    else if (zen_Symbol_isClass(symbol)) {
+    else if (k_Symbol_isClass(symbol)) {
         printf("[TODO] Class references are yet to be implemented.\n");
     }
 }
 
-void zen_BinaryEntityGenerator_handleSubscript(zen_BinaryEntityGenerator_t* generator,
-    zen_SubscriptContext_t* subscriptContext, bool lastPostfix) {
+void k_BinaryEntityGenerator_handleSubscript(k_BinaryEntityGenerator_t* generator,
+    k_SubscriptContext_t* subscriptContext, bool lastPostfix) {
     /* Visit the index expression node and generate the relevant
      * instructions.
      */
-    zen_ASTWalker_walk(generator->m_astListener, subscriptContext->m_expression);
+    k_ASTWalker_walk(generator->m_astListener, subscriptContext->m_expression);
 
     /* Generate the instructions corresponding to invoking the
      * ZenKernel.evaluate() function. Since, Zen is dynamically typed
@@ -5672,8 +5672,8 @@ void zen_BinaryEntityGenerator_handleSubscript(zen_BinaryEntityGenerator_t* gene
         operator0 = "[]";
         size = 2;
     }
-    zen_BinaryEntityGenerator_invokeEvaluate(generator, operator0, size);
-    zen_ASTListener_skipChildren(generator->m_astListener);
+    k_BinaryEntityGenerator_invokeEvaluate(generator, operator0, size);
+    k_ASTListener_skipChildren(generator->m_astListener);
 }
 
 /*
@@ -5753,63 +5753,63 @@ void zen_BinaryEntityGenerator_handleSubscript(zen_BinaryEntityGenerator_t* gene
  *    for their declaration in the symbol table. They are intended to be verified
  *    at runtime due to the dynamic nature of Zen.
  */
-void zen_BinaryEntityGenerator_onExitPostfixExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_PostfixExpressionContext_t* context = (zen_PostfixExpressionContext_t*)node->m_context;
-    zen_ASTNode_t* primaryExpression = context->m_primaryExpression;
-    zen_PrimaryExpressionContext_t* primaryExpressionContext = (zen_PrimaryExpressionContext_t*)primaryExpression->m_context;
-    zen_ASTNode_t* expression = primaryExpressionContext->m_expression;
+void k_BinaryEntityGenerator_onExitPostfixExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_PostfixExpressionContext_t* context = (k_PostfixExpressionContext_t*)node->m_context;
+    k_ASTNode_t* primaryExpression = context->m_primaryExpression;
+    k_PrimaryExpressionContext_t* primaryExpressionContext = (k_PrimaryExpressionContext_t*)primaryExpression->m_context;
+    k_ASTNode_t* expression = primaryExpressionContext->m_expression;
 
-    zen_Symbol_t* primarySymbol = NULL;
+    k_Symbol_t* primarySymbol = NULL;
     int32_t postfixPartCount = jtk_ArrayList_getSize(context->m_postfixParts);
-    zen_Token_t* primaryToken = NULL;
-    zen_TokenType_t primaryTokenType = ZEN_TOKEN_UNKNOWN;
+    k_Token_t* primaryToken = NULL;
+    k_TokenType_t primaryTokenType = ZEN_TOKEN_UNKNOWN;
 
-    if (zen_ASTNode_isTerminal(expression)) {
+    if (k_ASTNode_isTerminal(expression)) {
         /* Retrieve the token that the primary expression represents. */
-        primaryToken = (zen_Token_t*)expression->m_context;
+        primaryToken = (k_Token_t*)expression->m_context;
 
-        primaryTokenType = zen_Token_getType(primaryToken);
+        primaryTokenType = k_Token_getType(primaryToken);
         switch (primaryTokenType) {
             case ZEN_TOKEN_IDENTIFIER: {
                 /* Resolve the symbol and pass it to the next phase. */
-                primarySymbol = zen_SymbolTable_resolve(generator->m_symbolTable,
+                primarySymbol = k_SymbolTable_resolve(generator->m_symbolTable,
                     primaryToken->m_text);
                 break;
             }
 
             case ZEN_TOKEN_INTEGER_LITERAL: {
-                zen_BinaryEntityGenerator_handleIntegerLiteral(generator, primaryToken);
+                k_BinaryEntityGenerator_handleIntegerLiteral(generator, primaryToken);
                 break;
             }
 
             case ZEN_TOKEN_KEYWORD_TRUE: {
                 /* Emit push_i1. In the operand stack, 1 represents true. */
-                zen_BinaryEntityBuilder_emitPushInteger1(generator->m_builder);
+                k_BinaryEntityBuilder_emitPushInteger1(generator->m_builder);
                 break;
             }
 
             case ZEN_TOKEN_KEYWORD_FALSE: {
                 /* Emit push_i0 instruction. In the operand stack, 0 represents false. */
-                zen_BinaryEntityBuilder_emitPushInteger0(generator->m_builder);
+                k_BinaryEntityBuilder_emitPushInteger0(generator->m_builder);
                 break;
             }
 
             case ZEN_TOKEN_STRING_LITERAL: {
-                zen_BinaryEntityGenerator_handleStringLiteral(generator, primaryToken);
+                k_BinaryEntityGenerator_handleStringLiteral(generator, primaryToken);
                 break;
             }
 
             case ZEN_TOKEN_KEYWORD_NULL: {
                 /* Emit the push_null instruction. */
-                zen_BinaryEntityBuilder_emitPushNull(generator->m_builder);
+                k_BinaryEntityBuilder_emitPushNull(generator->m_builder);
                 break;
             }
 
             case ZEN_TOKEN_KEYWORD_THIS: {
                 /* Emit the load_a instruction. */
-                zen_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
+                k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
                 break;
             }
         }
@@ -5818,7 +5818,7 @@ void zen_BinaryEntityGenerator_onExitPostfixExpression(zen_ASTListener_t* astLis
         (expression->m_type == ZEN_AST_NODE_TYPE_LIST_EXPRESSION) ||
         (expression->m_type == ZEN_AST_NODE_TYPE_EXPRESSION) ||
         (expression->m_type == ZEN_AST_NODE_TYPE_NEW_EXPRESSION)) {
-        zen_ASTWalker_walk(astListener, expression);
+        k_ASTWalker_walk(astListener, expression);
     }
     else {
         printf("[internal error] What node do we have here?\n");
@@ -5826,18 +5826,18 @@ void zen_BinaryEntityGenerator_onExitPostfixExpression(zen_ASTListener_t* astLis
 
     const uint8_t* objectClassName = "zen/core/Object";
     int32_t objectClassNameSize = 15;
-    uint16_t objectClassIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+    uint16_t objectClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, objectClassName, objectClassNameSize);
 
     if ((postfixPartCount == 0) && (primaryTokenType == ZEN_TOKEN_IDENTIFIER)) {
-        zen_BinaryEntityGenerator_handleIdentifier(generator, primarySymbol);
+        k_BinaryEntityGenerator_handleIdentifier(generator, primarySymbol);
     }
     else {
         int32_t i;
         for (i = 0; i < postfixPartCount; i++) {
-            zen_ASTNode_t* postfixPart = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+            k_ASTNode_t* postfixPart = (k_ASTNode_t*)jtk_ArrayList_getValue(
                 context->m_postfixParts, i);
-            zen_ASTNodeType_t type = zen_ASTNode_getType(postfixPart);
+            k_ASTNodeType_t type = k_ASTNode_getType(postfixPart);
 
             /* When code written in a statically typed ZVM language is integrated
              * with code written in a dynamically typed ZVM language, such as Zen,
@@ -5864,38 +5864,38 @@ void zen_BinaryEntityGenerator_onExitPostfixExpression(zen_ASTListener_t* astLis
              */
             switch (type) {
                 case ZEN_AST_NODE_TYPE_SUBSCRIPT: {
-                    zen_SubscriptContext_t* subscriptContext = (zen_SubscriptContext_t*)postfixPart->m_context;
-                    zen_BinaryEntityGenerator_handleSubscript(generator, (zen_SubscriptContext_t*)postfixPart->m_context,
+                    k_SubscriptContext_t* subscriptContext = (k_SubscriptContext_t*)postfixPart->m_context;
+                    k_BinaryEntityGenerator_handleSubscript(generator, (k_SubscriptContext_t*)postfixPart->m_context,
                         i + 1 == postfixPartCount);
 
                     break;
                 }
 
                 case ZEN_AST_NODE_TYPE_FUNCTION_ARGUMENTS: {
-                    zen_FunctionArgumentsContext_t* functionArgumentsContext =
-                        (zen_FunctionArgumentsContext_t*)postfixPart->m_context;
-                    zen_BinaryEntityGenerator_handleDirectFunction(generator,
+                    k_FunctionArgumentsContext_t* functionArgumentsContext =
+                        (k_FunctionArgumentsContext_t*)postfixPart->m_context;
+                    k_BinaryEntityGenerator_handleDirectFunction(generator,
                         primarySymbol, functionArgumentsContext);
 
                     break;
                 }
 
                 case ZEN_AST_NODE_TYPE_MEMBER_ACCESS: {
-                    zen_MemberAccessContext_t* memberAccessContext =
-                        (zen_MemberAccessContext_t*)postfixPart->m_context;
+                    k_MemberAccessContext_t* memberAccessContext =
+                        (k_MemberAccessContext_t*)postfixPart->m_context;
 
                     /* The primary symbol should be a class for the current member
                      * access to be considered as direct. Otherwise, the expression
                      * `variable.field` will crash the compiler.
                      */
-                    if ((i == 0) && !zen_Symbol_isVariable(primarySymbol) &&
-                        !zen_Symbol_isConstant(primarySymbol)) {
-                        zen_BinaryEntityGenerator_handleDirectAccess(generator,
+                    if ((i == 0) && !k_Symbol_isVariable(primarySymbol) &&
+                        !k_Symbol_isConstant(primarySymbol)) {
+                        k_BinaryEntityGenerator_handleDirectAccess(generator,
                             memberAccessContext, primaryToken, primarySymbol,
                             context->m_postfixParts, &i);
                     }
                     else {
-                        zen_BinaryEntityGenerator_handleDynamicAccess(generator,
+                        k_BinaryEntityGenerator_handleDynamicAccess(generator,
                             memberAccessContext, context->m_postfixParts, &i);
                     }
 
@@ -5910,62 +5910,62 @@ void zen_BinaryEntityGenerator_onExitPostfixExpression(zen_ASTListener_t* astLis
     }
 }
 
-void zen_BinaryEntityGenerator_onEnterPostfixExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_PostfixExpressionContext_t* context = (zen_PostfixExpressionContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterPostfixExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_PostfixExpressionContext_t* context = (k_PostfixExpressionContext_t*)node->m_context;
 
     /* The normal behaviour of the AST walker causes the generator to
      * emit instructions in an undesirable fashion. Therefore, we partially
      * switch from the listener to visitor design pattern. The AST walker
-     * can be guided to switch to this mode via zen_ASTListener_skipChildren()
+     * can be guided to switch to this mode via k_ASTListener_skipChildren()
      * function which causes the AST walker to skip iterating over the children
      * nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
 // subscript
 
-void zen_BinaryEntityGenerator_onEnterSubscript(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterSubscript(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitSubscript(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitSubscript(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
 // functionArguments
 
-void zen_BinaryEntityGenerator_onEnterFunctionArguments(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterFunctionArguments(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitFunctionArguments(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitFunctionArguments(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
 // memberAccess
 
-void zen_BinaryEntityGenerator_onEnterMemberAccess(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterMemberAccess(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitMemberAccess(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitMemberAccess(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
 // postfixOperator
 
-void zen_BinaryEntityGenerator_onEnterPostfixOperator(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterPostfixOperator(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitPostfixOperator(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitPostfixOperator(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
 // primaryExpression
 
-void zen_BinaryEntityGenerator_onEnterPrimaryExpression(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+void k_BinaryEntityGenerator_onEnterPrimaryExpression(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
 }
 
-void zen_BinaryEntityGenerator_onExitPrimaryExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitPrimaryExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // mapExpression
@@ -5995,13 +5995,13 @@ void zen_BinaryEntityGenerator_onExitPrimaryExpression(zen_ASTListener_t* astLis
  * duplicate ; Duplicate the reference of the newly created map.
  * invoke_special functionIndex ; Invoke the constructor to initialize the new map instance.
  */
-void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+void k_BinaryEntityGenerator_onEnterMapExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
-    zen_MapExpressionContext_t* context = (zen_MapExpressionContext_t*)node->m_context;
-    zen_MapEntriesContext_t* entriesContext = (zen_MapEntriesContext_t*)context->m_mapEntries->m_context;
+    k_MapExpressionContext_t* context = (k_MapExpressionContext_t*)node->m_context;
+    k_MapEntriesContext_t* entriesContext = (k_MapEntriesContext_t*)context->m_mapEntries->m_context;
 
     /* Retrieve the size of the map. */
     int32_t size = jtk_ArrayList_getSize(entriesContext->m_mapEntries);
@@ -6009,11 +6009,11 @@ void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListen
     /* Push the size of the map onto the operand stack. The map size here indicates
      * the size of the temporary key array.
      */
-    zen_BinaryEntityGenerator_loadInteger(generator, size);
+    k_BinaryEntityGenerator_loadInteger(generator, size);
 
     const uint8_t* objectClassName = "zen/core/Object";
     int32_t objectClassNameSize = 15;
-    uint16_t objectClassIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+    uint16_t objectClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, objectClassName, objectClassNameSize);
 
     /* It is more efficient to create a temporary array before creating
@@ -6022,7 +6022,7 @@ void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListen
      *
      * Emit the new_array_a instruction to create the temporary key array.
      */
-    zen_BinaryEntityBuilder_emitNewReferenceArray(generator->m_builder,
+    k_BinaryEntityBuilder_emitNewReferenceArray(generator->m_builder,
         objectClassIndex);
 
     /* Log the emission of the new_array_a instruction. */
@@ -6031,26 +6031,26 @@ void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListen
     int32_t i;
     for (i = 0; i < size; i++) {
         /* Retrieve the map entry for the current iteration. */
-        zen_ASTNode_t* mapEntry = (zen_ASTNode_t*)jtk_ArrayList_getValue(entriesContext->m_mapEntries, i);
+        k_ASTNode_t* mapEntry = (k_ASTNode_t*)jtk_ArrayList_getValue(entriesContext->m_mapEntries, i);
 
         /* Retrieve the context for the current map entry. */
-        zen_MapEntryContext_t* mapEntryContext = (zen_MapEntryContext_t*)mapEntry->m_context;
+        k_MapEntryContext_t* mapEntryContext = (k_MapEntryContext_t*)mapEntry->m_context;
 
         /* Duplicate the reference to the temporary key array. */
-        zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+        k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
 
         /* Log the emission of the duplicate instruction. */
         jtk_Logger_debug(logger, "Emitted duplicate");
 
         /* Push the index at which the result of the key expression will be stored. */
-        zen_BinaryEntityGenerator_loadInteger(generator, i);
+        k_BinaryEntityGenerator_loadInteger(generator, i);
 
 
         /* Visit the key expression node and generate the relevant instructions. */
-        zen_ASTWalker_walk(astListener, mapEntryContext->m_keyExpression);
+        k_ASTWalker_walk(astListener, mapEntryContext->m_keyExpression);
 
         /* Store the result in the temporary key array. */
-        zen_BinaryEntityBuilder_emitStoreArrayReference(generator->m_builder);
+        k_BinaryEntityBuilder_emitStoreArrayReference(generator->m_builder);
 
         /* Log the emission of the store_aa instruction. */
         jtk_Logger_debug(logger, "Emitted store_aa");
@@ -6059,7 +6059,7 @@ void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListen
     /* Push the size of the map onto the operand stack. The map size here indicates
      * the size of the temporary value array.
      */
-    zen_BinaryEntityGenerator_loadInteger(generator, size);
+    k_BinaryEntityGenerator_loadInteger(generator, size);
 
     /* It is more efficient to create a temporary array before creating
      * the hash map. Otherwise, the HashMap#putValue() function
@@ -6071,7 +6071,7 @@ void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListen
      *
      * Emit the new_array_a instruction to create the temporary array.
      */
-    zen_BinaryEntityBuilder_emitNewReferenceArray(generator->m_builder,
+    k_BinaryEntityBuilder_emitNewReferenceArray(generator->m_builder,
         objectClassIndex);
 
     /* Log the emission of the new_array_a instruction. */
@@ -6080,25 +6080,25 @@ void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListen
     int32_t j;
     for (j = 0; j < size; j++) {
         /* Retrieve the map entry for the current iteration. */
-        zen_ASTNode_t* mapEntry = (zen_ASTNode_t*)jtk_ArrayList_getValue(entriesContext->m_mapEntries, j);
+        k_ASTNode_t* mapEntry = (k_ASTNode_t*)jtk_ArrayList_getValue(entriesContext->m_mapEntries, j);
 
         /* Retrieve the context for the current map entry. */
-        zen_MapEntryContext_t* mapEntryContext = (zen_MapEntryContext_t*)mapEntry->m_context;
+        k_MapEntryContext_t* mapEntryContext = (k_MapEntryContext_t*)mapEntry->m_context;
 
         /* Duplicate the reference to the temporary value array. */
-        zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+        k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
 
         /* Log the emission of the duplicate instruction. */
         jtk_Logger_debug(logger, "Emitted duplicate");
 
         /* Push the index at which the result of the value expression will be stored. */
-        zen_BinaryEntityGenerator_loadInteger(generator, j);
+        k_BinaryEntityGenerator_loadInteger(generator, j);
 
         /* Visit the value expression node and generate the relevant instructions. */
-        zen_ASTWalker_walk(astListener, mapEntryContext->m_valueExpression);
+        k_ASTWalker_walk(astListener, mapEntryContext->m_valueExpression);
 
         /* Store the result in the temporary value array. */
-        zen_BinaryEntityBuilder_emitStoreArrayReference(generator->m_builder);
+        k_BinaryEntityBuilder_emitStoreArrayReference(generator->m_builder);
 
         /* Log the emission of the store_aa instruction. */
         jtk_Logger_debug(logger, "Emitted store_aa");
@@ -6106,17 +6106,17 @@ void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListen
 
     const uint8_t* hashMapClassName = "zen/collection/map/HashMap";
     int32_t hashMapClassNameSize = 26;
-    uint16_t hashMapClassIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+    uint16_t hashMapClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, hashMapClassName, hashMapClassNameSize);
 
     /* Create an instance of the HashMap class. */
-    zen_BinaryEntityBuilder_emitNew(generator->m_builder, hashMapClassIndex);
+    k_BinaryEntityBuilder_emitNew(generator->m_builder, hashMapClassIndex);
 
     /* Log the emission of the new instruction. */
     jtk_Logger_debug(logger, "Emitted new %d", hashMapClassIndex);
 
     /* Duplicate the reference of the newly created map. */
-    zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+    k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
 
     /* Log the emission of the duplicate instruction. */
     jtk_Logger_debug(logger, "Emitted duplicate");
@@ -6125,13 +6125,13 @@ void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListen
     int32_t constructorDescriptorSize = 38;
     const uint8_t* constructorName = "<constructor>";
     int32_t constructorNameSize = 13;
-    uint16_t hashMapConstructorIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t hashMapConstructorIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, hashMapClassName, hashMapClassNameSize,
         constructorDescriptor, constructorDescriptorSize, constructorName,
         constructorNameSize, 0);
 
     /* Invoke the constructor to initialize the new map instance. */
-    zen_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
+    k_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
         hashMapConstructorIndex);
 
     /* Log the emission of the invoke_special instruction. */
@@ -6140,32 +6140,32 @@ void zen_BinaryEntityGenerator_onEnterMapExpression(zen_ASTListener_t* astListen
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitMapExpression(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitMapExpression(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
 // mapEntries
 
-void zen_BinaryEntityGenerator_onEnterMapEntries(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
-    zen_MapEntriesContext_t* context = (zen_MapEntriesContext_t*)node->m_context;
+void k_BinaryEntityGenerator_onEnterMapEntries(k_ASTListener_t* astListener, k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
+    k_MapEntriesContext_t* context = (k_MapEntriesContext_t*)node->m_context;
 }
 
-void zen_BinaryEntityGenerator_onExitMapEntries(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitMapEntries(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // mapEntry
 
-void zen_BinaryEntityGenerator_onEnterMapEntry(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterMapEntry(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
-void zen_BinaryEntityGenerator_onExitMapEntry(zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitMapEntry(k_ASTListener_t* astListener, k_ASTNode_t* node) {
 }
 
 // listExpression
@@ -6186,23 +6186,23 @@ void zen_BinaryEntityGenerator_onExitMapEntry(zen_ASTListener_t* astListener, ze
  * duplicate ; Duplicate the reference of the newly created list.
  * invoke_special functionIndex ; Invoke the constructor to initialize the new list instance.
  */
-void zen_BinaryEntityGenerator_onEnterListExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+void k_BinaryEntityGenerator_onEnterListExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
-    zen_ListExpressionContext_t* context = (zen_ListExpressionContext_t*)node->m_context;
-    zen_ExpressionsContext_t* expressionsContext = (zen_ExpressionsContext_t*)context->m_expressions->m_context;
+    k_ListExpressionContext_t* context = (k_ListExpressionContext_t*)node->m_context;
+    k_ExpressionsContext_t* expressionsContext = (k_ExpressionsContext_t*)context->m_expressions->m_context;
 
     /* Retrieve the size of the list. */
     int32_t size = jtk_ArrayList_getSize(expressionsContext->m_expressions);
 
     /* Push the size of the list onto the operand stack. */
-    zen_BinaryEntityGenerator_loadInteger(generator, size);
+    k_BinaryEntityGenerator_loadInteger(generator, size);
 
     const uint8_t* objectClassName = "zen/core/Object";
     int32_t objectClassNameSize = 15;
-    uint16_t objectClassIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+    uint16_t objectClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, objectClassName, objectClassNameSize);
 
     /* It is more efficient to create a temporary array before creating
@@ -6211,7 +6211,7 @@ void zen_BinaryEntityGenerator_onEnterListExpression(zen_ASTListener_t* astListe
      *
      * Emit the new_array_a instruction to create the temporary array.
      */
-    zen_BinaryEntityBuilder_emitNewReferenceArray(generator->m_builder,
+    k_BinaryEntityBuilder_emitNewReferenceArray(generator->m_builder,
         objectClassIndex);
 
     /* Log the emission of the new_array_a instruction. */
@@ -6220,22 +6220,22 @@ void zen_BinaryEntityGenerator_onEnterListExpression(zen_ASTListener_t* astListe
     int32_t i;
     for (i = 0; i < size; i++) {
         /* Retrieve the expression for the current element. */
-        zen_ASTNode_t* expression = (zen_ASTNode_t*)jtk_ArrayList_getValue(expressionsContext->m_expressions, i);
+        k_ASTNode_t* expression = (k_ASTNode_t*)jtk_ArrayList_getValue(expressionsContext->m_expressions, i);
 
         /* Duplicate the reference to the temporary array. */
-        zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+        k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
 
         /* Log the emission of the duplicate instruction. */
         jtk_Logger_debug(logger, "Emitted duplicate");
 
         /* Push the index at which the result of the expression will be stored. */
-        zen_BinaryEntityGenerator_loadInteger(generator, i);
+        k_BinaryEntityGenerator_loadInteger(generator, i);
 
         /* Visit the expression node and generate the relevant instructions. */
-        zen_ASTWalker_walk(astListener, expression);
+        k_ASTWalker_walk(astListener, expression);
 
         /* Store the result in the temporary array. */
-        zen_BinaryEntityBuilder_emitStoreArrayReference(generator->m_builder);
+        k_BinaryEntityBuilder_emitStoreArrayReference(generator->m_builder);
 
         /* Log the emission of the store_aa instruction. */
         jtk_Logger_debug(logger, "Emitted store_aa");
@@ -6243,17 +6243,17 @@ void zen_BinaryEntityGenerator_onEnterListExpression(zen_ASTListener_t* astListe
 
     const uint8_t* arrayListClassName = "zen.collection.list.ArrayList";
     int32_t arrayListClassNameSize = 29;
-    uint16_t arrayListClassIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+    uint16_t arrayListClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, arrayListClassName, arrayListClassNameSize);
 
     /* Create an instance of the ArrayList class. */
-    zen_BinaryEntityBuilder_emitNew(generator->m_builder, arrayListClassIndex);
+    k_BinaryEntityBuilder_emitNew(generator->m_builder, arrayListClassIndex);
 
     /* Log the emission of the new instruction. */
     jtk_Logger_debug(logger, "Emitted new %d", arrayListClassIndex);
 
     /* Duplicate the reference of the newly created list. */
-    zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+    k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
 
     /* Log the emission of the duplicate instruction. */
     jtk_Logger_debug(logger, "Emitted duplicate");
@@ -6262,13 +6262,13 @@ void zen_BinaryEntityGenerator_onEnterListExpression(zen_ASTListener_t* astListe
     int32_t constructorDescriptorSize = 20;
     const uint8_t* constructorName = "<constructor>";
     int32_t constructorNameSize = 13;
-    uint16_t arrayListConstructorIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t arrayListConstructorIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, arrayListClassName, arrayListClassNameSize,
         constructorDescriptor, constructorDescriptorSize, constructorName,
         constructorNameSize, 0);
 
     /* Invoke the constructor to initialize the new list instance. */
-    zen_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
+    k_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
         arrayListConstructorIndex);
 
     /* Log the emission of the invoke_special instruction. */
@@ -6277,14 +6277,14 @@ void zen_BinaryEntityGenerator_onEnterListExpression(zen_ASTListener_t* astListe
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitListExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitListExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // New Expression
@@ -6294,57 +6294,57 @@ void zen_BinaryEntityGenerator_onExitListExpression(zen_ASTListener_t* astListen
  * duplicate ; Duplicate the reference to the newly created instance.
  * invoke_special functionIndex ; Invoke the constructor to initialize the instance.
  */
-void zen_BinaryEntityGenerator_onEnterNewExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onEnterNewExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     // TODO: Debug this function when superclasses are implemented!
 
-    zen_BinaryEntityGenerator_t* generator = (zen_BinaryEntityGenerator_t*)astListener->m_context;
+    k_BinaryEntityGenerator_t* generator = (k_BinaryEntityGenerator_t*)astListener->m_context;
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
-    zen_NewExpressionContext_t* context = (zen_NewExpressionContext_t*)node->m_context;
+    k_NewExpressionContext_t* context = (k_NewExpressionContext_t*)node->m_context;
 
     /* Retrieve the scope within which the new expression appears. */
-    // zen_Scope_t* scope = zen_SymbolTable_getCurrentScope(generator->m_symbolTable);
+    // k_Scope_t* scope = k_SymbolTable_getCurrentScope(generator->m_symbolTable);
 
     /* Retrieve the string equivalent of the type name node. */
     int32_t typeNameSize;
-    uint8_t* typeNameText = zen_ASTNode_toCString(context->m_typeName, &typeNameSize);
+    uint8_t* typeNameText = k_ASTNode_toCString(context->m_typeName, &typeNameSize);
 
     /* Resolve the class symbol for the type name. */
-    zen_Symbol_t* symbol = zen_SymbolTable_resolve(generator->m_symbolTable, typeNameText);
+    k_Symbol_t* symbol = k_SymbolTable_resolve(generator->m_symbolTable, typeNameText);
 
     if (symbol == NULL) {
         printf("[error] Undeclared class %s\n", typeNameText);
         printf("[warning] Looks like a resolution phase failure was detected.\n");
     }
 
-    // if (zen_Symbol_isExternal(symbol)) {
+    // if (k_Symbol_isExternal(symbol)) {
     //     symbol = symbol->m_context.m_asExternal;
     // }
 
-    if (!zen_Symbol_isClass(symbol)) {
+    if (!k_Symbol_isClass(symbol)) {
         printf("[error] %s is a non-class symbol\n", typeNameText);
         printf("[warning] Looks like the syntactical phase or the resolution phase failed.\n");
     }
 
-    zen_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
+    k_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
     /* Retrieve the scope corresponding to the class symbol. */
-    zen_Scope_t* scope = classSymbol->m_classScope;
+    k_Scope_t* scope = classSymbol->m_classScope;
 
-    if (!zen_Scope_isClassScope(scope)) {
+    if (!k_Scope_isClassScope(scope)) {
         printf("[error] %s is a non-class scope\n", typeNameText);
         printf("[warning] Looks like the syntactical phase or the resolution phase failed.\n");
     }
 
     /* Retrieve the constructor declared in this class. */
-    zen_Symbol_t* constructorSymbol = zen_Scope_resolve(scope, "new");
+    k_Symbol_t* constructorSymbol = k_Scope_resolve(scope, "new");
 
-    if (zen_Symbol_getEnclosingScope(constructorSymbol) != scope) {
+    if (k_Symbol_getEnclosingScope(constructorSymbol) != scope) {
         printf("[error] No constructor defined in class %s, neither explicitly nor implicity.\n", typeNameText);
         printf("[warning] Looks like a resolution phase failure was detected.\n");
     }
 
-    if (!zen_Symbol_isFunction(constructorSymbol)) {
+    if (!k_Symbol_isFunction(constructorSymbol)) {
         printf("[error] 'new' declared as non-constructor symbol in class %s.\n", typeNameText);
         printf("[warning] Looks like the syntactical phase or the resolution phase failed.\n");
     }
@@ -6361,22 +6361,22 @@ void zen_BinaryEntityGenerator_onEnterNewExpression(zen_ASTListener_t* astListen
         }
     }
     /* Retrieve the class entry index for the type name. */
-    uint16_t typeNameIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+    uint16_t typeNameIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, qualifiedName, classSymbol->m_qualifiedNameSize);
 
     /* Create an instance of the specified class. */
-    zen_BinaryEntityBuilder_emitNew(generator->m_builder, typeNameIndex);
+    k_BinaryEntityBuilder_emitNew(generator->m_builder, typeNameIndex);
 
     /* Log the emission of the new instruction. */
     jtk_Logger_debug(logger, "Emitted new %d", typeNameIndex);
 
     /* Duplicate the reference of the newly created instance. */
-    zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+    k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
 
     /* Log the emission of the duplicate instruction. */
     jtk_Logger_debug(logger, "Emitted duplicate");
 
-    zen_FunctionSymbol_t* functionSymbol = &constructorSymbol->m_context.m_asFunction;
+    k_FunctionSymbol_t* functionSymbol = &constructorSymbol->m_context.m_asFunction;
 
     uint8_t* constructorName = "<initialize>";
     int32_t constructorNameSize = 12;
@@ -6384,16 +6384,16 @@ void zen_BinaryEntityGenerator_onEnterNewExpression(zen_ASTListener_t* astListen
     const uint8_t* constructorDescriptor = "v:v";
     int32_t constructorDescriptorSize = 3;
 
-    zen_ASTNode_t* functionArguments = context->m_functionArguments;
+    k_ASTNode_t* functionArguments = context->m_functionArguments;
     if (functionArguments != NULL) {
-        zen_FunctionArgumentsContext_t* functionArgumentsContext
-            = (zen_FunctionArgumentsContext_t*)functionArguments->m_context;
+        k_FunctionArgumentsContext_t* functionArgumentsContext
+            = (k_FunctionArgumentsContext_t*)functionArguments->m_context;
 
         if (functionArgumentsContext->m_expressions != NULL) {
-            zen_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
-            zen_ExpressionsContext_t* expressionsContext = (zen_ExpressionsContext_t*)expressions->m_context;
+            k_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
+            k_ExpressionsContext_t* expressionsContext = (k_ExpressionsContext_t*)expressions->m_context;
             int32_t numberOfArguments = jtk_ArrayList_getSize(expressionsContext->m_expressions);
-            int32_t parameterThreshold = zen_FunctionSymbol_getParameterThreshold(functionSymbol);
+            int32_t parameterThreshold = k_FunctionSymbol_getParameterThreshold(functionSymbol);
 
             /* NOTE: This function assumes that the previous phases were successful.
              * Therefore, it blindly generates the descriptor of the constructor.
@@ -6413,9 +6413,9 @@ void zen_BinaryEntityGenerator_onEnterNewExpression(zen_ASTListener_t* astListen
             for (j = 0; j < numberOfFixedArguments; j++) {
                 jtk_StringBuilder_appendEx_z(builder, "(zen/core/Object)", 17);
 
-                zen_ASTNode_t* argument = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+                k_ASTNode_t* argument = (k_ASTNode_t*)jtk_ArrayList_getValue(
                     expressionsContext->m_expressions, j);
-                zen_ASTWalker_walk(astListener, argument);
+                k_ASTWalker_walk(astListener, argument);
             }
 
             /* When one of the versions of a function has a variable parameter,
@@ -6429,17 +6429,17 @@ void zen_BinaryEntityGenerator_onEnterNewExpression(zen_ASTListener_t* astListen
                 int32_t size = numberOfArguments - parameterThreshold;
 
                 /* Push the size of the list onto the operand stack. */
-                zen_BinaryEntityGenerator_loadInteger(generator, size);
+                k_BinaryEntityGenerator_loadInteger(generator, size);
 
                 const uint8_t* objectClassName = "zen/core/Object";
                 int32_t objectClassNameSize = 15;
-                uint16_t objectClassIndex = zen_ConstantPoolBuilder_getClassEntryIndexEx(
+                uint16_t objectClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
                     generator->m_constantPoolBuilder, objectClassName, objectClassNameSize);
 
                 /* Emit the new_array_a instruction to create an array to
                  * represent the variable arguments.
                  */
-                zen_BinaryEntityBuilder_emitNewReferenceArray(generator->m_builder,
+                k_BinaryEntityBuilder_emitNewReferenceArray(generator->m_builder,
                     objectClassIndex);
 
                 /* Log the emission of the new_array_a instruction. */
@@ -6447,25 +6447,25 @@ void zen_BinaryEntityGenerator_onEnterNewExpression(zen_ASTListener_t* astListen
 
                 while (j < numberOfArguments) {
                     /* Retrieve the expression for the current argument. */
-                    zen_ASTNode_t* argument = (zen_ASTNode_t*)jtk_ArrayList_getValue(
+                    k_ASTNode_t* argument = (k_ASTNode_t*)jtk_ArrayList_getValue(
                         expressionsContext->m_expressions, j);
 
                     /* Duplicate the reference to the variable argument array. */
-                    zen_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
+                    k_BinaryEntityBuilder_emitDuplicate(generator->m_builder);
 
                     /* Log the emission of the duplicate instruction. */
                     jtk_Logger_debug(logger, "Emitted duplicate");
 
                     /* Push the index at which the result of the expression will be stored. */
-                    zen_BinaryEntityGenerator_loadInteger(generator, j - parameterThreshold);
+                    k_BinaryEntityGenerator_loadInteger(generator, j - parameterThreshold);
 
                     /* Visit the argument expression node and generate the relevant
                      * instructions.
                      */
-                    zen_ASTWalker_walk(astListener, argument);
+                    k_ASTWalker_walk(astListener, argument);
 
                     /* Store the result in the variable argument array. */
-                    zen_BinaryEntityBuilder_emitStoreArrayReference(generator->m_builder);
+                    k_BinaryEntityBuilder_emitStoreArrayReference(generator->m_builder);
 
                     /* Log the emission of the store_aa instruction. */
                     jtk_Logger_debug(logger, "Emitted store_aa");
@@ -6480,13 +6480,13 @@ void zen_BinaryEntityGenerator_onEnterNewExpression(zen_ASTListener_t* astListen
         }
     }
 
-    uint16_t constructorIndex = zen_ConstantPoolBuilder_getFunctionEntryIndexEx(
+    uint16_t constructorIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, qualifiedName, classSymbol->m_qualifiedNameSize,
         constructorDescriptor, constructorDescriptorSize, constructorName,
         constructorNameSize, 0);
 
     /* Invoke the constructor to initialize the new instance. */
-    zen_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
+    k_BinaryEntityBuilder_emitInvokeSpecial(generator->m_builder,
         constructorIndex);
 
     /* Log the emission of the invoke_special instruction. */
@@ -6506,14 +6506,14 @@ void zen_BinaryEntityGenerator_onEnterNewExpression(zen_ASTListener_t* astListen
     /* The normal behaviour of the AST walker causes the generator to emit instructions
      * in an undesirable fashion. Therefore, we partially switch from the listener
      * to visitor design pattern. The AST walker can be guided to switch to this
-     * mode via zen_ASTListener_skipChildren() function which causes the AST walker
+     * mode via k_ASTListener_skipChildren() function which causes the AST walker
      * to skip iterating over the children nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_BinaryEntityGenerator_onExitNewExpression(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_BinaryEntityGenerator_onExitNewExpression(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
 }
 
 // var j = [ 1, 2, 3, 4 ].freeze().clone().add(5).add(5).removeIndex(2)

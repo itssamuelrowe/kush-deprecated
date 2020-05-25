@@ -23,14 +23,14 @@
  * ClassSymbol                                                                 *
  *******************************************************************************/
 
-void zen_ClassSymbol_initialize(zen_ClassSymbol_t* symbol) {
+void k_ClassSymbol_initialize(k_ClassSymbol_t* symbol) {
     symbol->m_superClasses = jtk_ArrayList_new();
     symbol->m_classScope = NULL;
     symbol->m_qualifiedName = NULL; // jtk_CString_make(qualifiedName, &qualifiedNameSize);
     symbol->m_qualifiedNameSize = 0; // qualifiedNameSize;
 }
 
-void zen_ClassSymbol_destroy(zen_ClassSymbol_t* symbol) {
+void k_ClassSymbol_destroy(k_ClassSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     jtk_CString_delete(symbol->m_descriptor);
@@ -38,19 +38,19 @@ void zen_ClassSymbol_destroy(zen_ClassSymbol_t* symbol) {
     jtk_ArrayList_delete(symbol->m_superClasses);
 }
 
-zen_Scope_t* zen_ClassSymbol_getClassScope(zen_ClassSymbol_t* symbol) {
+k_Scope_t* k_ClassSymbol_getClassScope(k_ClassSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     return symbol->m_classScope;
 }
 
-jtk_ArrayList_t* zen_ClassSymbol_getSuperClasses(zen_ClassSymbol_t* symbol) {
+jtk_ArrayList_t* k_ClassSymbol_getSuperClasses(k_ClassSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     return symbol->m_superClasses;
 }
 
-uint8_t* zen_ClassSymbol_getQualifiedName(zen_ClassSymbol_t* symbol) {
+uint8_t* k_ClassSymbol_getQualifiedName(k_ClassSymbol_t* symbol) {
     /* To retrieve the fully qualified name a few resolution steps must be taken.
      * Therefore, a fully qualified name is evaluated and stored during the instantiation
      * of this class.

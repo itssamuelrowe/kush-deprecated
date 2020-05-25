@@ -22,8 +22,8 @@
 #include <kush/symbol-table/Scope.h>
 #include <kush/symbol-table/Symbol.h>
 
-struct zen_Compiler_t;
-typedef struct zen_Compiler_t zen_Compiler_t;
+struct k_Compiler_t;
+typedef struct k_Compiler_t k_Compiler_t;
 
 /*******************************************************************************
  * SymbolTable                                                                 *
@@ -31,68 +31,68 @@ typedef struct zen_Compiler_t zen_Compiler_t;
 
 /**
  * @class SymbolTable
- * @ingroup zen_compiler_symbolTable
+ * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_SymbolTable_t {
-    zen_Scope_t* m_currentScope;
-    zen_Compiler_t* m_compiler;
+struct k_SymbolTable_t {
+    k_Scope_t* m_currentScope;
+    k_Compiler_t* m_compiler;
 };
 
 /**
  * @memberof SymbolTable
  */
-typedef struct zen_SymbolTable_t zen_SymbolTable_t;
+typedef struct k_SymbolTable_t k_SymbolTable_t;
 
 // Constructor
 
 /**
  * @memberof SymbolTable
  */
-zen_SymbolTable_t* zen_SymbolTable_new(zen_Compiler_t* compiler);
+k_SymbolTable_t* k_SymbolTable_new(k_Compiler_t* compiler);
 
 // Destructor
 
 /**
  * @memberof SymbolTable
  */
-void zen_SymbolTable_delete(zen_SymbolTable_t* symbolTable);
+void k_SymbolTable_delete(k_SymbolTable_t* symbolTable);
 
 // Current Scope
 
 /**
  * @memberof SymbolTable
  */
-void zen_SymbolTable_setCurrentScope(zen_SymbolTable_t* symbolTable, zen_Scope_t* currentScope);
+void k_SymbolTable_setCurrentScope(k_SymbolTable_t* symbolTable, k_Scope_t* currentScope);
 
 /**
  * @memberof SymbolTable
  */
-zen_Scope_t* zen_SymbolTable_getCurrentScope(zen_SymbolTable_t* symbolTable);
+k_Scope_t* k_SymbolTable_getCurrentScope(k_SymbolTable_t* symbolTable);
 
 /**
  * @memberof SymbolTable
  */
-void zen_SymbolTable_invalidateCurrentScope(zen_SymbolTable_t* symbolTable);
+void k_SymbolTable_invalidateCurrentScope(k_SymbolTable_t* symbolTable);
 
 // Define
 
 /**
  * @memberof SymbolTable
  */
-void zen_SymbolTable_define(zen_SymbolTable_t* symbolTable, zen_Symbol_t* symbol);
+void k_SymbolTable_define(k_SymbolTable_t* symbolTable, k_Symbol_t* symbol);
 
 /**
  * @memberof SymbolTable
  */
-void zen_SymbolTable_defineClassMember(zen_SymbolTable_t* symbolTable, zen_Scope_t* classScope, zen_Symbol_t* symbol);
+void k_SymbolTable_defineClassMember(k_SymbolTable_t* symbolTable, k_Scope_t* classScope, k_Symbol_t* symbol);
 
 // Resolve
 
 /**
  * @memberof SymbolTable
  */
-zen_Symbol_t* zen_SymbolTable_resolve(zen_SymbolTable_t* symbolTable, const uint8_t* identifier);
+k_Symbol_t* k_SymbolTable_resolve(k_SymbolTable_t* symbolTable, const uint8_t* identifier);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_TABLE_H */

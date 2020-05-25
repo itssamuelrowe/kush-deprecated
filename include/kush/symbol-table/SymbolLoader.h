@@ -48,15 +48,15 @@
  */
 #define ZEN_ENTITY_LOADER_BUFFER_SIZE (3 * 1024)
 
-typedef struct zen_Compiler_t zen_Compiler_t;
+typedef struct k_Compiler_t k_Compiler_t;
 
 /**
  * @class SymbolLoader
- * @ingroup zen_virtual_machine_loader
+ * @ingroup k_virtual_machine_loader
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_SymbolLoader_t {
+struct k_SymbolLoader_t {
 
     /**
      * The list of directories where the loader looks for the definitions
@@ -71,33 +71,33 @@ struct zen_SymbolLoader_t {
      */
     jtk_HashMap_t* m_symbols;
 
-    zen_Compiler_t* m_compiler;
+    k_Compiler_t* m_compiler;
 
     int32_t m_index;
     uint8_t* m_bytes;
     int32_t m_size;
-    zen_ConstantPool_t m_constantPool;
-    zen_Symbol_t* m_symbol;
+    k_ConstantPool_t m_constantPool;
+    k_Symbol_t* m_symbol;
 };
 
 /**
  * @memberof SymbolLoader
  */
-typedef struct zen_SymbolLoader_t zen_SymbolLoader_t;
+typedef struct k_SymbolLoader_t k_SymbolLoader_t;
 
 /* Constructor */
 
-zen_SymbolLoader_t* zen_SymbolLoader_new(zen_Compiler_t* compiler);
-zen_SymbolLoader_t* zen_SymbolLoader_newWithEntityDirectories(zen_Compiler_t* compiler,
+k_SymbolLoader_t* k_SymbolLoader_new(k_Compiler_t* compiler);
+k_SymbolLoader_t* k_SymbolLoader_newWithEntityDirectories(k_Compiler_t* compiler,
     jtk_Iterator_t* entityDirectoryIterator);
 
 /* Destructor */
 
-void zen_SymbolLoader_delete(zen_SymbolLoader_t* loader);
+void k_SymbolLoader_delete(k_SymbolLoader_t* loader);
 
 /* Directory */
 
-bool zen_SymbolLoader_addDirectory(zen_SymbolLoader_t* loader, const uint8_t* directory);
+bool k_SymbolLoader_addDirectory(k_SymbolLoader_t* loader, const uint8_t* directory);
 
 // Find Symbol
 
@@ -110,7 +110,7 @@ bool zen_SymbolLoader_addDirectory(zen_SymbolLoader_t* loader, const uint8_t* di
  * @memberof SymbolLoader
  */
 
-zen_Symbol_t* zen_SymbolLoader_findSymbol(zen_SymbolLoader_t* loader,
+k_Symbol_t* k_SymbolLoader_findSymbol(k_SymbolLoader_t* loader,
     const uint8_t* descriptor, int32_t descriptorSize);
 
 /**
@@ -120,7 +120,7 @@ zen_Symbol_t* zen_SymbolLoader_findSymbol(zen_SymbolLoader_t* loader,
  *
  * @memberof SymbolLoader
  */
-zen_Symbol_t* zen_SymbolLoader_loadSymbol(zen_SymbolLoader_t* loader,
+k_Symbol_t* k_SymbolLoader_loadSymbol(k_SymbolLoader_t* loader,
     const uint8_t* descriptor, int32_t descriptorSize);
 
 /**
@@ -129,7 +129,7 @@ zen_Symbol_t* zen_SymbolLoader_loadSymbol(zen_SymbolLoader_t* loader,
  *
  * @memberof SymbolLoader
  */
-zen_Symbol_t* zen_SymbolLoader_loadEntityFromHandle(zen_SymbolLoader_t* loader,
+k_Symbol_t* k_SymbolLoader_loadEntityFromHandle(k_SymbolLoader_t* loader,
     jtk_PathHandle_t* handle);
 
 /**
@@ -138,15 +138,15 @@ zen_Symbol_t* zen_SymbolLoader_loadEntityFromHandle(zen_SymbolLoader_t* loader,
  *
  * @memberof SymbolLoader
  */
-zen_Symbol_t* zen_SymbolLoader_loadSymbolFromHandle(zen_SymbolLoader_t* loader,
+k_Symbol_t* k_SymbolLoader_loadSymbolFromHandle(k_SymbolLoader_t* loader,
     jtk_PathHandle_t* handle);
 
-zen_Symbol_t* zen_SymbolLoader_parse(zen_SymbolLoader_t* symbolLoader, uint8_t* bytes,
+k_Symbol_t* k_SymbolLoader_parse(k_SymbolLoader_t* symbolLoader, uint8_t* bytes,
     int32_t size);
 
 // Ignore Corrupt Entity
 
-bool zen_SymbolLoader_shouldIgnoreCorruptEntity(zen_SymbolLoader_t* loader);
-void zen_SymbolLoader_setIgnoreCorruptEntity(zen_SymbolLoader_t* loader, bool ignoreCorruptEntity);
+bool k_SymbolLoader_shouldIgnoreCorruptEntity(k_SymbolLoader_t* loader);
+void k_SymbolLoader_setIgnoreCorruptEntity(k_SymbolLoader_t* loader, bool ignoreCorruptEntity);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_LOADER_H */

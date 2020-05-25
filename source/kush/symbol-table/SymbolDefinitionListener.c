@@ -117,11 +117,11 @@
  * of symbols between compilation units.
  */
 
-zen_SymbolDefinitionListener_t* zen_SymbolDefinitionListener_new(
-    zen_Compiler_t* compiler) {
-    zen_SymbolDefinitionListener_t* listener = zen_Memory_allocate(zen_SymbolDefinitionListener_t, 1);
+k_SymbolDefinitionListener_t* k_SymbolDefinitionListener_new(
+    k_Compiler_t* compiler) {
+    k_SymbolDefinitionListener_t* listener = k_Memory_allocate(k_SymbolDefinitionListener_t, 1);
     listener->m_compiler = compiler;
-    listener->m_astListener = zen_ASTListener_newWithContext(listener);
+    listener->m_astListener = k_ASTListener_newWithContext(listener);
     listener->m_symbolTable = NULL;
     listener->m_scopes = NULL;
     listener->m_package = NULL;
@@ -131,44 +131,44 @@ zen_SymbolDefinitionListener_t* zen_SymbolDefinitionListener_new(
     listener->m_className = NULL;
     listener->m_classNameSize = 0;
 
-    zen_ASTListener_t* astListener = listener->m_astListener;
+    k_ASTListener_t* astListener = listener->m_astListener;
 
-    astListener->m_onEnterCompilationUnit = zen_SymbolDefinitionListener_onEnterCompilationUnit;
-    astListener->m_onExitCompilationUnit = zen_SymbolDefinitionListener_onExitCompilationUnit;
-    astListener->m_onEnterFunctionDeclaration = zen_SymbolDefinitionListener_onEnterFunctionDeclaration;
-    astListener->m_onExitFunctionDeclaration = zen_SymbolDefinitionListener_onExitFunctionDeclaration;
-    astListener->m_onEnterStatementSuite = zen_SymbolDefinitionListener_onEnterStatementSuite;
-    astListener->m_onExitStatementSuite = zen_SymbolDefinitionListener_onExitStatementSuite;
-    astListener->m_onEnterVariableDeclaration = zen_SymbolDefinitionListener_onEnterVariableDeclaration;
-    astListener->m_onEnterConstantDeclaration = zen_SymbolDefinitionListener_onEnterConstantDeclaration;
-    astListener->m_onEnterLabelClause = zen_SymbolDefinitionListener_onEnterLabelClause;
-    astListener->m_onEnterForParameter = zen_SymbolDefinitionListener_onEnterForParameters;
-    astListener->m_onEnterTryStatement = zen_SymbolDefinitionListener_onEnterTryStatement;
-    astListener->m_onEnterClassDeclaration = zen_SymbolDefinitionListener_onEnterClassDeclaration;
-    astListener->m_onExitClassDeclaration = zen_SymbolDefinitionListener_onExitClassDeclaration;
-    astListener->m_onEnterEnumerationDeclaration = zen_SymbolDefinitionListener_onEnterEnumerationDeclaration;
-    astListener->m_onExitEnumerationDeclaration = zen_SymbolDefinitionListener_onExitEnumerationDeclaration;
-    astListener->m_onEnterEnumerate = zen_SymbolDefinitionListener_onEnterEnumerate;
-    astListener->m_onExitEnumerate = zen_SymbolDefinitionListener_onExitEnumerate;
+    astListener->m_onEnterCompilationUnit = k_SymbolDefinitionListener_onEnterCompilationUnit;
+    astListener->m_onExitCompilationUnit = k_SymbolDefinitionListener_onExitCompilationUnit;
+    astListener->m_onEnterFunctionDeclaration = k_SymbolDefinitionListener_onEnterFunctionDeclaration;
+    astListener->m_onExitFunctionDeclaration = k_SymbolDefinitionListener_onExitFunctionDeclaration;
+    astListener->m_onEnterStatementSuite = k_SymbolDefinitionListener_onEnterStatementSuite;
+    astListener->m_onExitStatementSuite = k_SymbolDefinitionListener_onExitStatementSuite;
+    astListener->m_onEnterVariableDeclaration = k_SymbolDefinitionListener_onEnterVariableDeclaration;
+    astListener->m_onEnterConstantDeclaration = k_SymbolDefinitionListener_onEnterConstantDeclaration;
+    astListener->m_onEnterLabelClause = k_SymbolDefinitionListener_onEnterLabelClause;
+    astListener->m_onEnterForParameter = k_SymbolDefinitionListener_onEnterForParameters;
+    astListener->m_onEnterTryStatement = k_SymbolDefinitionListener_onEnterTryStatement;
+    astListener->m_onEnterClassDeclaration = k_SymbolDefinitionListener_onEnterClassDeclaration;
+    astListener->m_onExitClassDeclaration = k_SymbolDefinitionListener_onExitClassDeclaration;
+    astListener->m_onEnterEnumerationDeclaration = k_SymbolDefinitionListener_onEnterEnumerationDeclaration;
+    astListener->m_onExitEnumerationDeclaration = k_SymbolDefinitionListener_onExitEnumerationDeclaration;
+    astListener->m_onEnterEnumerate = k_SymbolDefinitionListener_onEnterEnumerate;
+    astListener->m_onExitEnumerate = k_SymbolDefinitionListener_onExitEnumerate;
 
     return listener;
 }
 
-void zen_SymbolDefinitionListener_delete(zen_SymbolDefinitionListener_t* listener) {
+void k_SymbolDefinitionListener_delete(k_SymbolDefinitionListener_t* listener) {
     jtk_Assert_assertObject(listener, "The specified listener is null.");
 
-    zen_ASTListener_delete(listener->m_astListener);
+    k_ASTListener_delete(listener->m_astListener);
     jtk_Memory_deallocate(listener);
 }
 
-zen_ASTListener_t* zen_SymbolDefinitionListener_getASTListener(zen_SymbolDefinitionListener_t* listener) {
+k_ASTListener_t* k_SymbolDefinitionListener_getASTListener(k_SymbolDefinitionListener_t* listener) {
     jtk_Assert_assertObject(listener, "The specified listener is null.");
     return listener->m_astListener;
 }
 
-void zen_SymbolDefinitionListener_reset(
-    zen_SymbolDefinitionListener_t* listener,
-    zen_SymbolTable_t* symbolTable, zen_ASTAnnotations_t* scopes,
+void k_SymbolDefinitionListener_reset(
+    k_SymbolDefinitionListener_t* listener,
+    k_SymbolTable_t* symbolTable, k_ASTAnnotations_t* scopes,
     const uint8_t* package, int32_t packageSize) {
     listener->m_symbolTable = symbolTable;
     listener->m_scopes = scopes;
@@ -186,28 +186,28 @@ void zen_SymbolDefinitionListener_reset(
 
 /* compilationUnit */
 
-void zen_SymbolDefinitionListener_onEnterCompilationUnit(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterCompilationUnit(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
 
     /* The scopes are represented as an n-ary tree, where the root scope is
-     * an instance of zen_CompilationUnitScope_t.
+     * an instance of k_CompilationUnitScope_t.
      */
-    zen_Scope_t* scope = zen_Scope_forCompilationUnit();
-    zen_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
-    zen_ASTAnnotations_put(listener->m_scopes, node, scope);
+    k_Scope_t* scope = k_Scope_forCompilationUnit();
+    k_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
+    k_ASTAnnotations_put(listener->m_scopes, node, scope);
 }
 
-void zen_SymbolDefinitionListener_onExitCompilationUnit(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onExitCompilationUnit(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
 }
 
 /* functionDeclaration */
@@ -216,14 +216,14 @@ void zen_SymbolDefinitionListener_onExitCompilationUnit(zen_ASTListener_t* astLi
 
 // TODO: Declare function even if it has no parameters.
 
-void zen_SymbolDefinitionListener_declareOverloadedFunction(
-    zen_SymbolDefinitionListener_t* listener, zen_Symbol_t* symbol,
-    jtk_ArrayList_t* fixedParameters, zen_ASTNode_t* variableParameter,
-    uint32_t modifiers, zen_Token_t* reference) {
-    zen_Compiler_t* compiler = listener->m_compiler;
-    zen_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    zen_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
-    zen_Token_t* identifierToken = (zen_Token_t*)symbol->m_identifier->m_context;
+void k_SymbolDefinitionListener_declareOverloadedFunction(
+    k_SymbolDefinitionListener_t* listener, k_Symbol_t* symbol,
+    jtk_ArrayList_t* fixedParameters, k_ASTNode_t* variableParameter,
+    uint32_t modifiers, k_Token_t* reference) {
+    k_Compiler_t* compiler = listener->m_compiler;
+    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
+    k_Token_t* identifierToken = (k_Token_t*)symbol->m_identifier->m_context;
 
     /* Determines whether the overloaded function is semantically erroneous. */
     bool error = false;
@@ -238,7 +238,7 @@ void zen_SymbolDefinitionListener_declareOverloadedFunction(
      * of fixed parameters for any overload of function X is limited to k - 1.
      * Where, k is known as the parameter threshold of function X.
      */
-    int32_t parameterThreshold = zen_FunctionSymbol_getParameterThreshold(functionSymbol);
+    int32_t parameterThreshold = k_FunctionSymbol_getParameterThreshold(functionSymbol);
 
     /* If currently there is no parameter threshold, try to update the
      * threshold.
@@ -250,12 +250,12 @@ void zen_SymbolDefinitionListener_declareOverloadedFunction(
          */
         if (variableParameter != NULL) {
             parameterThreshold = fixedParameterCount;
-            zen_FunctionSymbol_setParameterThreshold(functionSymbol, parameterThreshold);
+            k_FunctionSymbol_setParameterThreshold(functionSymbol, parameterThreshold);
         }
     }
 
     /* Retrieve the overloaded signatures of the function symbol. */
-    jtk_ArrayList_t* signatures = zen_FunctionSymbol_getSignatures(functionSymbol);
+    jtk_ArrayList_t* signatures = k_FunctionSymbol_getSignatures(functionSymbol);
     /* Determine the number of signatures. */
     int32_t size = jtk_ArrayList_getSize(signatures);
     /* Iterate over the signatures to determine if the signature of the
@@ -263,11 +263,11 @@ void zen_SymbolDefinitionListener_declareOverloadedFunction(
      */
     int32_t i;
     for (i = 0; i < size; i++) {
-        zen_FunctionSignature_t* signature = (zen_FunctionSignature_t*)jtk_ArrayList_getValue(signatures, i);
+        k_FunctionSignature_t* signature = (k_FunctionSignature_t*)jtk_ArrayList_getValue(signatures, i);
         if ((signature->m_variableParameter != NULL) && (variableParameter != NULL)) {
-            zen_ErrorHandler_handleSemanticalError(errorHandler,
+            k_ErrorHandler_handleSemanticalError(errorHandler,
                 listener, ZEN_ERROR_CODE_MULTIPLE_FUNCTION_OVERLOADS_WITH_VARIABLE_PARAMETER,
-                (zen_Token_t*)(variableParameter->m_context));
+                (k_Token_t*)(variableParameter->m_context));
 
             error = true;
         }
@@ -278,7 +278,7 @@ void zen_SymbolDefinitionListener_declareOverloadedFunction(
              */
             if ((fixedParameterCount0 == fixedParameterCount) &&
                 (signature->m_variableParameter == NULL)) {
-                zen_ErrorHandler_handleSemanticalError(errorHandler, listener,
+                k_ErrorHandler_handleSemanticalError(errorHandler, listener,
                     ZEN_ERROR_CODE_DUPLICATE_FUNCTION_OVERLOAD, identifierToken);
                 error = true;
                 break;
@@ -294,7 +294,7 @@ void zen_SymbolDefinitionListener_declareOverloadedFunction(
                         /* NOTE: The error report does not point to the actual error.
                          * Instead it points to the function currently being declared.
                          */
-                        zen_ErrorHandler_handleSemanticalError(errorHandler, listener,
+                        k_ErrorHandler_handleSemanticalError(errorHandler, listener,
                             ZEN_ERROR_CODE_FUNCTION_DECLARATION_CAUSES_ANOTHER_FUNCTION_TO_EXCEED_PARAMETER_THRESHOLD,
                             reference);
                         error = true;
@@ -306,7 +306,7 @@ void zen_SymbolDefinitionListener_declareOverloadedFunction(
                      * that the function obliges the parameter threshold.
                      */
                     if ((parameterThreshold >= 0) && (fixedParameterCount >= parameterThreshold)) {
-                        zen_ErrorHandler_handleSemanticalError(errorHandler, listener,
+                        k_ErrorHandler_handleSemanticalError(errorHandler, listener,
                             ZEN_ERROR_CODE_FUNCTION_DECLARATION_EXCEEDS_PARAMETER_THRESHOLD,
                             reference);
                         error = true;
@@ -321,38 +321,38 @@ void zen_SymbolDefinitionListener_declareOverloadedFunction(
         /* The function being declared is an overload of an existing
          * function. Add the signature of the function.
          */
-        zen_FunctionSignature_t* signature = zen_FunctionSignature_new(fixedParameters, variableParameter, modifiers);
-        zen_FunctionSymbol_addSignature(functionSymbol, signature);
+        k_FunctionSignature_t* signature = k_FunctionSignature_new(fixedParameters, variableParameter, modifiers);
+        k_FunctionSymbol_addSignature(functionSymbol, signature);
     }
 }
 
-zen_Symbol_t* zen_SymbolDefinitionListener_declareFunction(zen_SymbolTable_t* symbolTable,
-    zen_ASTNode_t* identifier, jtk_ArrayList_t* fixedParameters,
-    zen_ASTNode_t* variableParameter, uint16_t modifiers) {
+k_Symbol_t* k_SymbolDefinitionListener_declareFunction(k_SymbolTable_t* symbolTable,
+    k_ASTNode_t* identifier, jtk_ArrayList_t* fixedParameters,
+    k_ASTNode_t* variableParameter, uint16_t modifiers) {
     /* Create a member function symbol to store in the symbol table. */
-    zen_Symbol_t* symbol = zen_Symbol_forFunction(identifier, symbolTable->m_currentScope);
-    zen_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
+    k_Symbol_t* symbol = k_Symbol_forFunction(identifier, symbolTable->m_currentScope);
+    k_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
     if (variableParameter != NULL) {
         int32_t parameterThreshold = jtk_ArrayList_getSize(fixedParameters);
-        zen_FunctionSymbol_setParameterThreshold(functionSymbol, parameterThreshold);
+        k_FunctionSymbol_setParameterThreshold(functionSymbol, parameterThreshold);
     }
     /* In order to enable the symbol table to store overloaded functions,
      * we employ function signatures. Add the function signature
      * corresponding to the function being declared to the newly
      * created member function symbol.
      */
-    zen_FunctionSignature_t* signature = zen_FunctionSignature_new(fixedParameters,
+    k_FunctionSignature_t* signature = k_FunctionSignature_new(fixedParameters,
         variableParameter, modifiers);
-    zen_FunctionSymbol_addSignature(functionSymbol, signature);
+    k_FunctionSymbol_addSignature(functionSymbol, signature);
 
     /* Define the symbol in the symbol table. */
-    zen_SymbolTable_define(symbolTable, symbol);
+    k_SymbolTable_define(symbolTable, symbol);
 
     return symbol;
 }
 
-void zen_SymbolDefinitionListener_initializeClassName(zen_SymbolDefinitionListener_t* listener) {
-    zen_Compiler_t* compiler = listener->m_compiler;
+void k_SymbolDefinitionListener_initializeClassName(k_SymbolDefinitionListener_t* listener) {
+    k_Compiler_t* compiler = listener->m_compiler;
     const uint8_t* fileName = (const uint8_t*)jtk_ArrayList_getValue(
         compiler->m_inputFiles, compiler->m_currentFileIndex);
     int32_t size = jtk_CString_getSize(fileName);
@@ -363,50 +363,50 @@ void zen_SymbolDefinitionListener_initializeClassName(zen_SymbolDefinitionListen
     listener->m_classNameSize = dotIndex - (slashIndex + 1);
 }
 
-void zen_SymbolDefinitionListener_defineClass(zen_SymbolDefinitionListener_t* listener) {
-    zen_Scope_t* scope = zen_Scope_forClass(listener->m_symbolTable->m_currentScope);
+void k_SymbolDefinitionListener_defineClass(k_SymbolDefinitionListener_t* listener) {
+    k_Scope_t* scope = k_Scope_forClass(listener->m_symbolTable->m_currentScope);
 
-    zen_Symbol_t* symbol = zen_Symbol_forClass(NULL,
+    k_Symbol_t* symbol = k_Symbol_forClass(NULL,
         listener->m_symbolTable->m_currentScope, scope,
         listener->m_className, listener->m_classNameSize,
         listener->m_package, listener->m_packageSize);
-    zen_ClassSymbol_t* classSymbol = &symbol->m_context;
+    k_ClassSymbol_t* classSymbol = &symbol->m_context;
     scope->m_symbol = symbol;
 
-    zen_Scope_defineEx(listener->m_symbolTable->m_currentScope, listener->m_className,
+    k_Scope_defineEx(listener->m_symbolTable->m_currentScope, listener->m_className,
         listener->m_classNameSize, symbol);
-    zen_Compiler_registerSymbol(listener->m_compiler, classSymbol->m_qualifiedName,
+    k_Compiler_registerSymbol(listener->m_compiler, classSymbol->m_qualifiedName,
         classSymbol->m_qualifiedNameSize, symbol);
 
     // TODO: Is the symbol defined here destroyed?
-    zen_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
+    k_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
 
     listener->m_classPrepared = true;
 }
 
-void zen_SymbolDefinitionListener_onEnterFunctionDeclaration(zen_ASTListener_t* astListener,
-    zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterFunctionDeclaration(k_ASTListener_t* astListener,
+    k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_Compiler_t* compiler = listener->m_compiler;
-    zen_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    zen_FunctionDeclarationContext_t* functionDeclarationContext = (zen_FunctionDeclarationContext_t*)node->m_context;
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_Compiler_t* compiler = listener->m_compiler;
+    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_FunctionDeclarationContext_t* functionDeclarationContext = (k_FunctionDeclarationContext_t*)node->m_context;
 
     /* Retrieve the identifier associated with the function declaration. */
-    zen_ASTNode_t* identifier = functionDeclarationContext->m_identifier;
-    zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
+    k_ASTNode_t* identifier = functionDeclarationContext->m_identifier;
+    k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
 
     if ((listener->m_mainComponent != ZEN_AST_NODE_TYPE_CLASS_DECLARATION)
         && !listener->m_classPrepared) {
         /* Pure static classes do not inherit any superclasses. */
-        zen_SymbolDefinitionListener_initializeClassName(listener);
-        zen_SymbolDefinitionListener_defineClass(listener);
+        k_SymbolDefinitionListener_initializeClassName(listener);
+        k_SymbolDefinitionListener_defineClass(listener);
     }
 
-    zen_FunctionParametersContext_t* functionParametersContext =
-        (zen_FunctionParametersContext_t*)functionDeclarationContext->m_functionParameters->m_context;
+    k_FunctionParametersContext_t* functionParametersContext =
+        (k_FunctionParametersContext_t*)functionDeclarationContext->m_functionParameters->m_context;
     /* Retrieve the fixed parameters associated with the context of the
      * function arguments.
      */
@@ -414,23 +414,23 @@ void zen_SymbolDefinitionListener_onEnterFunctionDeclaration(zen_ASTListener_t* 
     /* Retrieve the variable parameter associated with the context of the
      * function arguments, if any.
      */
-    zen_ASTNode_t* variableParameter = functionParametersContext->m_variableParameter;
+    k_ASTNode_t* variableParameter = functionParametersContext->m_variableParameter;
     int32_t fixedParameterCount = jtk_ArrayList_getSize(fixedParameters);
 
     /* Retrieve the symbol table associated with this listener. */
-    zen_SymbolTable_t* symbolTable = listener->m_symbolTable;
+    k_SymbolTable_t* symbolTable = listener->m_symbolTable;
     /* Retrieve the current scope of the symbol table. */
-    zen_Scope_t* currentScope = zen_SymbolTable_getCurrentScope(symbolTable);
+    k_Scope_t* currentScope = k_SymbolTable_getCurrentScope(symbolTable);
 
-    if ((zen_Token_getType(identifierToken) == ZEN_TOKEN_KEYWORD_STATIC) &&
+    if ((k_Token_getType(identifierToken) == ZEN_TOKEN_KEYWORD_STATIC) &&
         ((fixedParameterCount > 0) || (variableParameter != NULL))) {
-        zen_ErrorHandler_handleSemanticalError(errorHandler, listener,
+        k_ErrorHandler_handleSemanticalError(errorHandler, listener,
             ZEN_ERROR_CODE_STATIC_INITIALIZER_WITH_PARAMETERS, identifierToken);
     }
     else {
-        if (zen_Scope_isClassScope(currentScope)) {
+        if (k_Scope_isClassScope(currentScope)) {
             /* Resolve the identifier within the scope of the compilation unit. */
-            zen_Symbol_t* symbol = zen_SymbolTable_resolve(symbolTable, identifierToken->m_text);
+            k_Symbol_t* symbol = k_SymbolTable_resolve(symbolTable, identifierToken->m_text);
             uint32_t modifiers = 0;
 
             /* When functions are declared in the compilation unit, a
@@ -438,14 +438,14 @@ void zen_SymbolDefinitionListener_onEnterFunctionDeclaration(zen_ASTListener_t* 
              * that the class scope is not synthetic.
              */
             if (node->m_parent->m_type == ZEN_AST_NODE_TYPE_CLASS_MEMBER) {
-                zen_ClassMemberContext_t* classMemberContext = (zen_ClassMemberContext_t*)node->m_parent->m_context;
+                k_ClassMemberContext_t* classMemberContext = (k_ClassMemberContext_t*)node->m_parent->m_context;
                 int32_t modifierCount = jtk_ArrayList_getSize(classMemberContext->m_modifiers);
                 int32_t i;
                 for (i = 0; i < modifierCount; i++) {
-                    zen_ASTNode_t* modifier =
-                        (zen_ASTNode_t*)jtk_ArrayList_getValue(classMemberContext->m_modifiers, i);
-                    zen_Token_t* token = (zen_Token_t*)modifier->m_context;
-                    modifiers |= zen_TokenType_toModifiers(token->m_type);
+                    k_ASTNode_t* modifier =
+                        (k_ASTNode_t*)jtk_ArrayList_getValue(classMemberContext->m_modifiers, i);
+                    k_Token_t* token = (k_Token_t*)modifier->m_context;
+                    modifiers |= k_TokenType_toModifiers(token->m_type);
                 }
             }
             else {
@@ -459,23 +459,23 @@ void zen_SymbolDefinitionListener_onEnterFunctionDeclaration(zen_ASTListener_t* 
                 /* If a symbol with the given identifier exists, make sure it is
                  * a function before overloading.
                  */
-                if (zen_Symbol_isFunction(symbol)) {
+                if (k_Symbol_isFunction(symbol)) {
                     /* The resolved symbol is a function. Retrieve the corresponding
                      * function symbol.
                      */
-                    zen_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
-                    zen_SymbolDefinitionListener_declareOverloadedFunction(listener,
+                    k_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
+                    k_SymbolDefinitionListener_declareOverloadedFunction(listener,
                         symbol, fixedParameters, variableParameter, modifiers,
                         identifierToken);
                 }
                 else {
-                    zen_ErrorHandler_handleSemanticalError(errorHandler,
+                    k_ErrorHandler_handleSemanticalError(errorHandler,
                         listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_FUNCTION,
                         identifierToken);
                 }
             }
             else {
-                zen_SymbolDefinitionListener_declareFunction(listener->m_symbolTable, identifier,
+                k_SymbolDefinitionListener_declareFunction(listener->m_symbolTable, identifier,
                     fixedParameters, variableParameter, modifiers);
             }
         }
@@ -486,368 +486,368 @@ void zen_SymbolDefinitionListener_onEnterFunctionDeclaration(zen_ASTListener_t* 
 
     /* A function scope is pushed regardless of the declaration being erroneous. */
 
-    zen_Scope_t* scope = zen_Scope_forFunction(symbolTable->m_currentScope);
-    zen_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
-    zen_ASTAnnotations_put(listener->m_scopes, node, scope);
+    k_Scope_t* scope = k_Scope_forFunction(symbolTable->m_currentScope);
+    k_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
+    k_ASTAnnotations_put(listener->m_scopes, node, scope);
 
     int32_t i;
     for (i = 0; i < fixedParameterCount; i++) {
-        zen_ASTNode_t* parameter = (zen_ASTNode_t*)jtk_ArrayList_getValue(fixedParameters, i);
-        const uint8_t* parameterText = zen_Token_getText((zen_Token_t*)(parameter->m_context));
-        zen_Symbol_t* symbol = zen_SymbolTable_resolve(listener->m_symbolTable, parameterText);
+        k_ASTNode_t* parameter = (k_ASTNode_t*)jtk_ArrayList_getValue(fixedParameters, i);
+        const uint8_t* parameterText = k_Token_getText((k_Token_t*)(parameter->m_context));
+        k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, parameterText);
         if (symbol != NULL) {
-            zen_ErrorHandler_handleSemanticalError(errorHandler,
+            k_ErrorHandler_handleSemanticalError(errorHandler,
                 listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_PARAMETER,
-                (zen_Token_t*)(parameter->m_context));
+                (k_Token_t*)(parameter->m_context));
         }
         else {
-            zen_Symbol_t* symbol = zen_Symbol_forConstant(parameter,
+            k_Symbol_t* symbol = k_Symbol_forConstant(parameter,
                 symbolTable->m_currentScope);
-            zen_SymbolTable_define(listener->m_symbolTable, symbol);
+            k_SymbolTable_define(listener->m_symbolTable, symbol);
         }
     }
 
     if (variableParameter != NULL) {
-        const uint8_t* parameterText = zen_Token_getText((zen_Token_t*)(variableParameter->m_context));
-        zen_Symbol_t* symbol = zen_SymbolTable_resolve(listener->m_symbolTable, parameterText);
+        const uint8_t* parameterText = k_Token_getText((k_Token_t*)(variableParameter->m_context));
+        k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, parameterText);
         if (symbol != NULL) {
-            zen_ErrorHandler_handleSemanticalError(errorHandler,
+            k_ErrorHandler_handleSemanticalError(errorHandler,
                 listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_VARIABLE_PARAMETER,
-                (zen_Token_t*)(variableParameter->m_context));
+                (k_Token_t*)(variableParameter->m_context));
         }
         else {
-            symbol = zen_Symbol_forConstant(variableParameter, symbolTable->m_currentScope);
-            zen_Symbol_addModifiers(symbol, ZEN_MODIFIER_VARIABLE_PARAMETER);
-            zen_SymbolTable_define(listener->m_symbolTable, symbol);
+            symbol = k_Symbol_forConstant(variableParameter, symbolTable->m_currentScope);
+            k_Symbol_addModifiers(symbol, ZEN_MODIFIER_VARIABLE_PARAMETER);
+            k_SymbolTable_define(listener->m_symbolTable, symbol);
         }
     }
 }
 
-void zen_SymbolDefinitionListener_onExitFunctionDeclaration(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onExitFunctionDeclaration(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
 
-    zen_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
+    k_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
 }
 
 /* functionParameters */
 
-void zen_SymbolDefinitionListener_onEnterStatementSuite(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterStatementSuite(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_Scope_t* scope = zen_Scope_forLocal(listener->m_symbolTable->m_currentScope);
-    zen_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
-    zen_ASTAnnotations_put(listener->m_scopes, node, scope);
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_Scope_t* scope = k_Scope_forLocal(listener->m_symbolTable->m_currentScope);
+    k_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
+    k_ASTAnnotations_put(listener->m_scopes, node, scope);
 }
 
-void zen_SymbolDefinitionListener_onExitStatementSuite(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onExitStatementSuite(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
 }
 
-void zen_SymbolDefinitionListener_onEnterVariableDeclaration(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterVariableDeclaration(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_Compiler_t* compiler = listener->m_compiler;
-    zen_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    zen_VariableDeclarationContext_t* variableDeclarationContext = (zen_VariableDeclarationContext_t*)node->m_context;
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_Compiler_t* compiler = listener->m_compiler;
+    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_VariableDeclarationContext_t* variableDeclarationContext = (k_VariableDeclarationContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(variableDeclarationContext->m_variableDeclarators);
     int32_t i;
     for (i = 0; i < size; i++) {
-        zen_ASTNode_t* variableDeclarator = jtk_ArrayList_getValue(variableDeclarationContext->m_variableDeclarators, i);
-        zen_VariableDeclaratorContext_t* variableDeclaratorContext = (zen_VariableDeclaratorContext_t*)variableDeclarator->m_context;
+        k_ASTNode_t* variableDeclarator = jtk_ArrayList_getValue(variableDeclarationContext->m_variableDeclarators, i);
+        k_VariableDeclaratorContext_t* variableDeclaratorContext = (k_VariableDeclaratorContext_t*)variableDeclarator->m_context;
 
-        zen_ASTNode_t* identifier = variableDeclaratorContext->m_identifier;
-        const uint8_t* identifierText = zen_Token_getText((zen_Token_t*)identifier->m_context);
+        k_ASTNode_t* identifier = variableDeclaratorContext->m_identifier;
+        const uint8_t* identifierText = k_Token_getText((k_Token_t*)identifier->m_context);
 
-        zen_Symbol_t* symbol = zen_SymbolTable_resolve(listener->m_symbolTable, identifierText);
+        k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
         if (symbol != NULL) {
-            zen_ErrorHandler_handleSemanticalError(errorHandler,
+            k_ErrorHandler_handleSemanticalError(errorHandler,
                 listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_VARIABLE,
-                (zen_Token_t*)identifier->m_context);
+                (k_Token_t*)identifier->m_context);
         }
         else {
-            zen_Symbol_t* symbol = zen_Symbol_forVariable(identifier,
+            k_Symbol_t* symbol = k_Symbol_forVariable(identifier,
                 listener->m_symbolTable->m_currentScope);
-            zen_SymbolTable_define(listener->m_symbolTable, symbol);
+            k_SymbolTable_define(listener->m_symbolTable, symbol);
         }
     }
 }
 
-void zen_SymbolDefinitionListener_onEnterConstantDeclaration(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterConstantDeclaration(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_Compiler_t* compiler = listener->m_compiler;
-    zen_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    zen_ConstantDeclarationContext_t* constantDeclarationContext = (zen_ConstantDeclarationContext_t*)node->m_context;
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_Compiler_t* compiler = listener->m_compiler;
+    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_ConstantDeclarationContext_t* constantDeclarationContext = (k_ConstantDeclarationContext_t*)node->m_context;
 
     int32_t size = jtk_ArrayList_getSize(constantDeclarationContext->m_constantDeclarators);
     int32_t i;
     for (i = 0; i < size; i++) {
-        zen_ASTNode_t* constantDeclarator = jtk_ArrayList_getValue(constantDeclarationContext->m_constantDeclarators, i);
-        zen_ConstantDeclaratorContext_t* constantDeclaratorContext = (zen_ConstantDeclaratorContext_t*)constantDeclarator->m_context;
+        k_ASTNode_t* constantDeclarator = jtk_ArrayList_getValue(constantDeclarationContext->m_constantDeclarators, i);
+        k_ConstantDeclaratorContext_t* constantDeclaratorContext = (k_ConstantDeclaratorContext_t*)constantDeclarator->m_context;
 
-        zen_ASTNode_t* identifier = constantDeclaratorContext->m_identifier;
-        const uint8_t* identifierText = zen_Token_getText((zen_Token_t*)identifier->m_context);
+        k_ASTNode_t* identifier = constantDeclaratorContext->m_identifier;
+        const uint8_t* identifierText = k_Token_getText((k_Token_t*)identifier->m_context);
 
-        zen_Symbol_t* symbol = zen_SymbolTable_resolve(listener->m_symbolTable, identifierText);
+        k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
         if (symbol != NULL) {
-            zen_ErrorHandler_handleSemanticalError(errorHandler,
+            k_ErrorHandler_handleSemanticalError(errorHandler,
                 listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CONSTANT,
-                (zen_Token_t*)identifier->m_context);
+                (k_Token_t*)identifier->m_context);
         }
         else {
-            zen_Symbol_t* symbol = zen_Symbol_forConstant(identifier, listener->m_symbolTable->m_currentScope);
-            zen_SymbolTable_define(listener->m_symbolTable, symbol);
+            k_Symbol_t* symbol = k_Symbol_forConstant(identifier, listener->m_symbolTable->m_currentScope);
+            k_SymbolTable_define(listener->m_symbolTable, symbol);
         }
     }
 }
 
-void zen_SymbolDefinitionListener_onEnterLabelClause(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterLabelClause(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_Compiler_t* compiler = listener->m_compiler;
-    zen_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    zen_LabelClauseContext_t* LabelClauseContext = (zen_LabelClauseContext_t*)node->m_context;
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_Compiler_t* compiler = listener->m_compiler;
+    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_LabelClauseContext_t* LabelClauseContext = (k_LabelClauseContext_t*)node->m_context;
 
-    zen_ASTNode_t* identifier = LabelClauseContext->m_identifier;
-    const uint8_t* identifierText = zen_Token_getText((zen_Token_t*)identifier->m_context);
+    k_ASTNode_t* identifier = LabelClauseContext->m_identifier;
+    const uint8_t* identifierText = k_Token_getText((k_Token_t*)identifier->m_context);
 
-    zen_Symbol_t* symbol = zen_SymbolTable_resolve(listener->m_symbolTable, identifierText);
+    k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
     if (symbol != NULL) {
-        zen_ErrorHandler_handleSemanticalError(errorHandler,
+        k_ErrorHandler_handleSemanticalError(errorHandler,
             listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_LABEL,
-            (zen_Token_t*)identifier->m_context);
+            (k_Token_t*)identifier->m_context);
     }
     else {
-        zen_Symbol_t* symbol = zen_Symbol_forLabel(identifier,
+        k_Symbol_t* symbol = k_Symbol_forLabel(identifier,
             listener->m_symbolTable->m_currentScope);
-        zen_SymbolTable_define(listener->m_symbolTable, symbol);
+        k_SymbolTable_define(listener->m_symbolTable, symbol);
     }
 }
 
 // TODO: Each for statement should receive its own local scope to define
 // its item variable.
-void zen_SymbolDefinitionListener_onEnterForParameters(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterForParameters(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_Compiler_t* compiler = listener->m_compiler;
-    zen_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    zen_ForParameterContext_t* forParametersContext = (zen_ForParameterContext_t*)node->m_context;
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_Compiler_t* compiler = listener->m_compiler;
+    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_ForParameterContext_t* forParametersContext = (k_ForParameterContext_t*)node->m_context;
 
     if (forParametersContext->m_declaration) {
-        zen_ASTNode_t* identifier = forParametersContext->m_identifier;
-        const uint8_t* identifierText = zen_Token_getText((zen_Token_t*)identifier->m_context);
+        k_ASTNode_t* identifier = forParametersContext->m_identifier;
+        const uint8_t* identifierText = k_Token_getText((k_Token_t*)identifier->m_context);
 
-        zen_Symbol_t* symbol = zen_SymbolTable_resolve(listener->m_symbolTable, identifierText);
+        k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
         if (symbol != NULL) {
-        zen_ErrorHandler_handleSemanticalError(errorHandler,
+        k_ErrorHandler_handleSemanticalError(errorHandler,
             listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_LOOP_PARAMETER,
-            (zen_Token_t*)identifier->m_context);
+            (k_Token_t*)identifier->m_context);
         }
         else {
             if (forParametersContext->m_variable) {
-                symbol = zen_Symbol_forVariable(identifier,
+                symbol = k_Symbol_forVariable(identifier,
                     listener->m_symbolTable->m_currentScope);
             }
             else {
-                symbol = zen_Symbol_forConstant(identifier,
+                symbol = k_Symbol_forConstant(identifier,
                     listener->m_symbolTable->m_currentScope);
             }
-            zen_SymbolTable_define(listener->m_symbolTable, symbol);
+            k_SymbolTable_define(listener->m_symbolTable, symbol);
         }
     }
 }
 
-void zen_SymbolDefinitionListener_onEnterTryStatement(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterTryStatement(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_Compiler_t* compiler = listener->m_compiler;
-    zen_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    zen_TryStatementContext_t* context = (zen_TryStatementContext_t*)node->m_context;
-    zen_ASTWalker_walk(astListener, context->m_tryClause);
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_Compiler_t* compiler = listener->m_compiler;
+    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_TryStatementContext_t* context = (k_TryStatementContext_t*)node->m_context;
+    k_ASTWalker_walk(astListener, context->m_tryClause);
 
     int32_t catchClauseCount = jtk_ArrayList_getSize(context->m_catchClauses);
     int32_t i;
     for (i = 0; i < catchClauseCount; i++) {
-        zen_ASTNode_t* catchClause = (zen_ASTNode_t*)jtk_ArrayList_getValue(context->m_catchClauses, i);
-        zen_CatchClauseContext_t* catchClauseContext = (zen_CatchClauseContext_t*)catchClause->m_context;
+        k_ASTNode_t* catchClause = (k_ASTNode_t*)jtk_ArrayList_getValue(context->m_catchClauses, i);
+        k_CatchClauseContext_t* catchClauseContext = (k_CatchClauseContext_t*)catchClause->m_context;
 
         /* Each catch clause receives its own local scope to define its
          * catch parameter.
          */
-        zen_Scope_t* scope = zen_Scope_forLocal(listener->m_symbolTable->m_currentScope);
-        zen_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
-        zen_ASTAnnotations_put(listener->m_scopes, catchClause, scope);
+        k_Scope_t* scope = k_Scope_forLocal(listener->m_symbolTable->m_currentScope);
+        k_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
+        k_ASTAnnotations_put(listener->m_scopes, catchClause, scope);
 
-        zen_ASTNode_t* identifier = catchClauseContext->m_identifier;
+        k_ASTNode_t* identifier = catchClauseContext->m_identifier;
         int32_t identifierSize;
-        uint8_t* identifierText = zen_ASTNode_toCString(identifier, &identifierSize);
+        uint8_t* identifierText = k_ASTNode_toCString(identifier, &identifierSize);
 
-        zen_Symbol_t* symbol = zen_SymbolTable_resolve(listener->m_symbolTable, identifierText);
+        k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
         if (symbol != NULL) {
-        zen_ErrorHandler_handleSemanticalError(errorHandler,
+        k_ErrorHandler_handleSemanticalError(errorHandler,
             listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CATCH_PARAMETER,
-            (zen_Token_t*)identifier->m_context);
+            (k_Token_t*)identifier->m_context);
         }
         else {
-            symbol = zen_Symbol_forVariable(identifier, scope);
-            zen_SymbolTable_define(listener->m_symbolTable, symbol);
+            symbol = k_Symbol_forVariable(identifier, scope);
+            k_SymbolTable_define(listener->m_symbolTable, symbol);
         }
 
         /* Visit the scopes of the statement suite specified to the
          * catch clause.
          */
-        zen_ASTWalker_walk(astListener, catchClauseContext->m_statementSuite);
+        k_ASTWalker_walk(astListener, catchClauseContext->m_statementSuite);
 
-        zen_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
+        k_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
 
         /* Destroy the identifier text. It is not required anymore. */
         jtk_Memory_deallocate(identifierText);
     }
 
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_SymbolDefinitionListener_onEnterClassDeclaration(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterClassDeclaration(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 
-    zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    zen_Compiler_t* compiler = listener->m_compiler;
-    zen_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    zen_ClassDeclarationContext_t* classDeclarationContext = (zen_ClassDeclarationContext_t*)node->m_context;
+    k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    k_Compiler_t* compiler = listener->m_compiler;
+    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_ClassDeclarationContext_t* classDeclarationContext = (k_ClassDeclarationContext_t*)node->m_context;
 
-    zen_ASTNode_t* identifier = classDeclarationContext->m_identifier;
-    zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
-    const uint8_t* identifierText = zen_Token_getText(identifierToken);
+    k_ASTNode_t* identifier = classDeclarationContext->m_identifier;
+    k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
+    const uint8_t* identifierText = k_Token_getText(identifierToken);
 
-    zen_Symbol_t* classSymbol = zen_SymbolTable_resolve(listener->m_symbolTable, identifierText);
+    k_Symbol_t* classSymbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
     if (classSymbol != NULL) {
-        zen_ErrorHandler_handleSemanticalError(errorHandler,
+        k_ErrorHandler_handleSemanticalError(errorHandler,
             listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CLASS,
-            (zen_Token_t*)identifier->m_context);
+            (k_Token_t*)identifier->m_context);
     }
     else {
-        zen_Scope_t* scope = zen_Scope_forClass(listener->m_symbolTable->m_currentScope);
+        k_Scope_t* scope = k_Scope_forClass(listener->m_symbolTable->m_currentScope);
 
-        zen_Symbol_t* symbol = zen_Symbol_forClass(identifier,
+        k_Symbol_t* symbol = k_Symbol_forClass(identifier,
             listener->m_symbolTable->m_currentScope, scope,
             identifierToken->m_text, identifierToken->m_length,
             listener->m_package, listener->m_packageSize);
-        zen_ClassSymbol_t* classSymbol = &symbol->m_context;
+        k_ClassSymbol_t* classSymbol = &symbol->m_context;
         scope->m_symbol = symbol;
 
-        zen_SymbolTable_define(listener->m_symbolTable, symbol);
-        zen_Compiler_registerSymbol(compiler, classSymbol->m_qualifiedName,
+        k_SymbolTable_define(listener->m_symbolTable, symbol);
+        k_Compiler_registerSymbol(compiler, classSymbol->m_qualifiedName,
             classSymbol->m_qualifiedNameSize, symbol);
 
-        zen_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
-        zen_ASTAnnotations_put(listener->m_scopes, node, scope);
+        k_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
+        k_ASTAnnotations_put(listener->m_scopes, node, scope);
 
-        zen_ASTWalker_walk(astListener, classDeclarationContext->m_classSuite);
+        k_ASTWalker_walk(astListener, classDeclarationContext->m_classSuite);
 
-        zen_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
+        k_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
     }
 
     /* If the definition of a class is duplicate, then do not visit the children
      * nodes.
      */
-    zen_ASTListener_skipChildren(astListener);
+    k_ASTListener_skipChildren(astListener);
 }
 
-void zen_SymbolDefinitionListener_onExitClassDeclaration(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onExitClassDeclaration(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
     jtk_Assert_assertObject(astListener, "The specified AST listener is null.");
     jtk_Assert_assertObject(node, "The specified AST node is null.");
 }
 
-void zen_SymbolDefinitionListener_onEnterEnumerationDeclaration(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterEnumerationDeclaration(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
 
-    // zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    // zen_EnumerationDeclarationContext_t* enumerationDeclarationContext = (zen_EnumerationDeclarationContext_t*)node->m_context;
+    // k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    // k_EnumerationDeclarationContext_t* enumerationDeclarationContext = (k_EnumerationDeclarationContext_t*)node->m_context;
 
-    // zen_ASTNode_t* identifier = enumerationDeclarationContext->m_identifier;
-    // zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
-    // const uint8_t* identifierText = zen_Token_getText(identifierToken);
+    // k_ASTNode_t* identifier = enumerationDeclarationContext->m_identifier;
+    // k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
+    // const uint8_t* identifierText = k_Token_getText(identifierToken);
 
-    // zen_Symbol_t* symbol = zen_SymbolTable_resolve(listener->m_symbolTable, identifierText);
+    // k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
     // if (symbol != NULL) {
-    //     zen_ErrorHandler_reportError(NULL, "Redeclaration of symbol as enumeration", (zen_Token_t*)identifier->m_context);
+    //     k_ErrorHandler_reportError(NULL, "Redeclaration of symbol as enumeration", (k_Token_t*)identifier->m_context);
     // }
     // else {
-    //     zen_EnumerationScope_t* enumerationScope = zen_EnumerationScope_new(listener->m_symbolTable->m_currentScope);
+    //     k_EnumerationScope_t* enumerationScope = k_EnumerationScope_new(listener->m_symbolTable->m_currentScope);
 
-    //     zen_EnumerationSymbol_t* enumerationSymbol = zen_EnumerationSymbol_new(identifier, listener->m_symbolTable->m_currentScope, zen_EnumerationScope_getScope(enumerationScope));
-    //     symbol = zen_EnumerationSymbol_getSymbol(enumerationSymbol);
-    //     zen_SymbolTable_define(listener->m_symbolTable, symbol);
+    //     k_EnumerationSymbol_t* enumerationSymbol = k_EnumerationSymbol_new(identifier, listener->m_symbolTable->m_currentScope, k_EnumerationScope_getScope(enumerationScope));
+    //     symbol = k_EnumerationSymbol_getSymbol(enumerationSymbol);
+    //     k_SymbolTable_define(listener->m_symbolTable, symbol);
 
     //     enumerationScope->m_enumerationSymbol = symbol;
 
-    //     zen_Scope_t* scope = zen_EnumerationScope_getScope(enumerationScope);
+    //     k_Scope_t* scope = k_EnumerationScope_getScope(enumerationScope);
 
-    //     zen_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
-    //     zen_ASTAnnotations_put(listener->m_scopes, node, scope);
+    //     k_SymbolTable_setCurrentScope(listener->m_symbolTable, scope);
+    //     k_ASTAnnotations_put(listener->m_scopes, node, scope);
     // }
 }
 
-void zen_SymbolDefinitionListener_onExitEnumerationDeclaration(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onExitEnumerationDeclaration(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
 
-    // zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    // zen_EnumerationDeclarationContext_t* enumerationDeclarationContext = (zen_EnumerationDeclarationContext_t*)node->m_context;
+    // k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    // k_EnumerationDeclarationContext_t* enumerationDeclarationContext = (k_EnumerationDeclarationContext_t*)node->m_context;
 
-    // zen_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
+    // k_SymbolTable_invalidateCurrentScope(listener->m_symbolTable);
 }
 
-void zen_SymbolDefinitionListener_onEnterEnumerate(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onEnterEnumerate(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
 
-    // zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    // zen_EnumerationDeclarationContext_t* enumerationDeclarationContext = (zen_EnumerationDeclarationContext_t*)node->m_context;
+    // k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    // k_EnumerationDeclarationContext_t* enumerationDeclarationContext = (k_EnumerationDeclarationContext_t*)node->m_context;
 
-    // zen_ASTNode_t* identifier = enumerationDeclarationContext->m_identifier;
-    // zen_Token_t* identifierToken = (zen_Token_t*)identifier->m_context;
-    // const uint8_t* identifierText = zen_Token_getText(identifierToken);
+    // k_ASTNode_t* identifier = enumerationDeclarationContext->m_identifier;
+    // k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
+    // const uint8_t* identifierText = k_Token_getText(identifierToken);
 
-    // zen_Scope_t* currentScope = zen_SymbolTable_getCurrentScope(listener->m_symbolTable);
-    // if (zen_Scope_isEnumerationScope(currentScope)) {
-    //     zen_Symbol_t* symbol = zen_Scope_resolve(currentScope, identifierText);
+    // k_Scope_t* currentScope = k_SymbolTable_getCurrentScope(listener->m_symbolTable);
+    // if (k_Scope_isEnumerationScope(currentScope)) {
+    //     k_Symbol_t* symbol = k_Scope_resolve(currentScope, identifierText);
     //     if (symbol != NULL) {
-    //         zen_ErrorHandler_reportError(NULL, "Duplicate enumerate", (zen_Token_t*)identifier->m_context);
+    //         k_ErrorHandler_reportError(NULL, "Duplicate enumerate", (k_Token_t*)identifier->m_context);
     //     }
     //     else {
-    //         zen_EnumerateSymbol_t* enumerateSymbol = zen_EnumerateSymbol_new(identifier, listener->m_symbolTable->m_currentScope);
-    //         symbol = zen_EnumerateSymbol_getSymbol(enumerateSymbol);
-    //         zen_SymbolTable_define(listener->m_symbolTable, symbol);
+    //         k_EnumerateSymbol_t* enumerateSymbol = k_EnumerateSymbol_new(identifier, listener->m_symbolTable->m_currentScope);
+    //         symbol = k_EnumerateSymbol_getSymbol(enumerateSymbol);
+    //         k_SymbolTable_define(listener->m_symbolTable, symbol);
     //     }
     // }
     // else {
@@ -855,11 +855,11 @@ void zen_SymbolDefinitionListener_onEnterEnumerate(
     // }
 }
 
-void zen_SymbolDefinitionListener_onExitEnumerate(
-    zen_ASTListener_t* astListener, zen_ASTNode_t* node) {
+void k_SymbolDefinitionListener_onExitEnumerate(
+    k_ASTListener_t* astListener, k_ASTNode_t* node) {
 
-    // zen_SymbolDefinitionListener_t* listener = (zen_SymbolDefinitionListener_t*)astListener->m_context;
-    // zen_EnumerationDeclarationContext_t* enumerationDeclarationContext = (zen_EnumerationDeclarationContext_t*)node->m_context;
+    // k_SymbolDefinitionListener_t* listener = (k_SymbolDefinitionListener_t*)astListener->m_context;
+    // k_EnumerationDeclarationContext_t* enumerationDeclarationContext = (k_EnumerationDeclarationContext_t*)node->m_context;
 }
 
 /* When an error occurs in a nested function, it prevents the listener from

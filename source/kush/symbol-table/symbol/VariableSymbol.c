@@ -22,11 +22,11 @@
  * VariableSymbol                                                              *
  *******************************************************************************/
 
-zen_VariableSymbol_t* zen_VariableSymbol_new(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope) {
-    zen_VariableSymbol_t* variableSymbol = zen_Memory_allocate(zen_VariableSymbol_t, 1);
+k_VariableSymbol_t* k_VariableSymbol_new(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope) {
+    k_VariableSymbol_t* variableSymbol = k_Memory_allocate(k_VariableSymbol_t, 1);
 
-    zen_Symbol_t* symbol = zen_Symbol_new(ZEN_SYMBOL_CATEGORY_VARIABLE, identifier, enclosingScope, variableSymbol);
+    k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_VARIABLE, identifier, enclosingScope, variableSymbol);
 
     variableSymbol->m_symbol = symbol;
     variableSymbol->m_index = -1;
@@ -34,14 +34,14 @@ zen_VariableSymbol_t* zen_VariableSymbol_new(zen_ASTNode_t* identifier,
     return variableSymbol;
 }
 
-void zen_VariableSymbol_delete(zen_VariableSymbol_t* symbol) {
+void k_VariableSymbol_delete(k_VariableSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
-    zen_Symbol_delete(symbol->m_symbol);
+    k_Symbol_delete(symbol->m_symbol);
     jtk_Memory_deallocate(symbol);
 }
 
-zen_Symbol_t* zen_VariableSymbol_getSymbol(zen_VariableSymbol_t* symbol) {
+k_Symbol_t* k_VariableSymbol_getSymbol(k_VariableSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     return symbol->m_symbol;

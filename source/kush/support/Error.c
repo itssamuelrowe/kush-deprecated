@@ -22,13 +22,13 @@
 
 // Constructor
 
-zen_Error_t* zen_Error_new(zen_ErrorCode_t code, zen_Token_t* token) {
-    return zen_Error_newEx(code, token, ZEN_TOKEN_UNKNOWN);
+k_Error_t* k_Error_new(k_ErrorCode_t code, k_Token_t* token) {
+    return k_Error_newEx(code, token, ZEN_TOKEN_UNKNOWN);
 }
 
-zen_Error_t* zen_Error_newEx(zen_ErrorCode_t code, zen_Token_t* token,
-    zen_TokenType_t expected) {
-    zen_Error_t* error = jtk_Memory_allocate(zen_Error_t, 1);
+k_Error_t* k_Error_newEx(k_ErrorCode_t code, k_Token_t* token,
+    k_TokenType_t expected) {
+    k_Error_t* error = jtk_Memory_allocate(k_Error_t, 1);
     error->m_code = code;
     error->m_token = token;
     error->m_expected = expected;
@@ -38,7 +38,7 @@ zen_Error_t* zen_Error_newEx(zen_ErrorCode_t code, zen_Token_t* token,
 
 // Destructor
 
-void zen_Error_delete(zen_Error_t* error) {
+void k_Error_delete(k_Error_t* error) {
     jtk_Assert_assertObject(error, "The specified error is null.");
 
     jtk_Memory_deallocate(error);

@@ -39,15 +39,15 @@
     #define NULL 0
 #endif
 
-#define zen_Memory_allocate(type, units) (type*)zen_Memory_allocate0(sizeof (type) * (units))
-#define zen_Memory_deallocate(object) free(object)
-#define zen_Assert_assertObject(object, message) assert((object) != NULL)
-#define zen_Assert_assertTrue(expression, message) assert(expression)
-#define zen_Assert_assertFalse(expression, message) assert(!(expression))
-#define zen_Assert_assertIndex(index, size, message) assert(((index) < (size)) && ((index) >= 0))
-#define zen_Assert_assertRange(startIndex, stopIndex, size, message) puts("TODO: zen_Assert_assertRange");
-#define zen_Assert_assertAddIndex(index, size, message) assert(((index) <= (size)) && ((index) >= 0))
+#define k_Memory_allocate(type, units) (type*)k_Memory_allocate0(sizeof (type) * (units))
+#define k_Memory_deallocate(object) free(object)
+#define k_Assert_assertObject(object, message) assert((object) != NULL)
+#define k_Assert_assertTrue(expression, message) assert(expression)
+#define k_Assert_assertFalse(expression, message) assert(!(expression))
+#define k_Assert_assertIndex(index, size, message) assert(((index) < (size)) && ((index) >= 0))
+#define k_Assert_assertRange(startIndex, stopIndex, size, message) puts("TODO: k_Assert_assertRange");
+#define k_Assert_assertAddIndex(index, size, message) assert(((index) <= (size)) && ((index) >= 0))
 
-void* zen_Memory_allocate0(int32_t size);
+void* k_Memory_allocate0(int32_t size);
 
 #endif /* ZEN_CONFIGURATION_H */

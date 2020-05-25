@@ -39,7 +39,7 @@
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_Compiler_t {
+struct k_Compiler_t {
     bool m_dumpTokens;
     bool m_dumpNodes;
     bool m_footprint;
@@ -47,62 +47,62 @@ struct zen_Compiler_t {
     jtk_Logger_t* m_logger;
     jtk_ArrayList_t* m_inputFiles;
     int32_t m_currentFileIndex;
-    zen_ErrorHandler_t* m_errorHandler;
-    zen_ASTNode_t** m_compilationUnits;
-    zen_SymbolTable_t** m_symbolTables;
-    zen_ASTAnnotations_t** m_scopes;
+    k_ErrorHandler_t* m_errorHandler;
+    k_ASTNode_t** m_compilationUnits;
+    k_SymbolTable_t** m_symbolTables;
+    k_ASTAnnotations_t** m_scopes;
     uint8_t** m_packages;
     int32_t* m_packageSizes;
-    zen_SymbolLoader_t* m_symbolLoader;
+    k_SymbolLoader_t* m_symbolLoader;
     jtk_HashMap_t* m_repository;
     jtk_ArrayList_t* m_trash;
     bool m_coreApi;
-    zen_BinaryEntityDisassembler_t* m_disassembler;
+    k_BinaryEntityDisassembler_t* m_disassembler;
 };
 
 /**
  * @memberof Compiler
  */
-typedef struct zen_Compiler_t zen_Compiler_t;
+typedef struct k_Compiler_t k_Compiler_t;
 
 // Constructor
 
-zen_Compiler_t* zen_Compiler_new();
+k_Compiler_t* k_Compiler_new();
 
 // Destructor
 
-void zen_Compiler_delete(zen_Compiler_t* compiler);
+void k_Compiler_delete(k_Compiler_t* compiler);
 
 // Error
 
-void zen_Compiler_printErrors(zen_Compiler_t* compiler);
+void k_Compiler_printErrors(k_Compiler_t* compiler);
 
 // Phase
 
-void zen_Compiler_initialize(zen_Compiler_t* compiler);
-void zen_Compiler_buildAST(zen_Compiler_t* compiler);
-void zen_Compiler_analyze(zen_Compiler_t* compiler);
-void zen_Compiler_generate(zen_Compiler_t* compiler);
-void zen_Compiler_destroyNestedScopes(zen_ASTAnnotations_t* annotations);
-void zen_Compiler_destroySymbol(zen_Symbol_t* symbol);
-void zen_Compiler_destroyScope(zen_Scope_t* scope);
+void k_Compiler_initialize(k_Compiler_t* compiler);
+void k_Compiler_buildAST(k_Compiler_t* compiler);
+void k_Compiler_analyze(k_Compiler_t* compiler);
+void k_Compiler_generate(k_Compiler_t* compiler);
+void k_Compiler_destroyNestedScopes(k_ASTAnnotations_t* annotations);
+void k_Compiler_destroySymbol(k_Symbol_t* symbol);
+void k_Compiler_destroyScope(k_Scope_t* scope);
 
 // Register
 
-void zen_Compiler_registerSymbol(zen_Compiler_t* compiler, const uint8_t* identifier,
-    int32_t identifierSize, zen_Symbol_t* symbol);
+void k_Compiler_registerSymbol(k_Compiler_t* compiler, const uint8_t* identifier,
+    int32_t identifierSize, k_Symbol_t* symbol);
 
-zen_Symbol_t* zen_Compiler_resolveSymbol(zen_Compiler_t* compiler,
+k_Symbol_t* k_Compiler_resolveSymbol(k_Compiler_t* compiler,
     const uint8_t* name, int32_t nameSize);
 
 // Token
 
-void zen_Compiler_printToken(zen_Token_t* token);
-void zen_Compiler_zen_Compiler_printTokens(zen_Compiler_t* compiler, jtk_ArrayList_t* tokens);
+void k_Compiler_printToken(k_Token_t* token);
+void k_Compiler_k_Compiler_printTokens(k_Compiler_t* compiler, jtk_ArrayList_t* tokens);
 
 // Compiler
 
-bool zen_Compiler_compileEx(zen_Compiler_t* compiler, char** arguments, int32_t length);
-bool zen_Compiler_compile(zen_Compiler_t* compiler);
+bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t length);
+bool k_Compiler_compile(k_Compiler_t* compiler);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_H */

@@ -17,11 +17,11 @@
 #include <jtk/collection/array/Arrays.h>
 #include <kush/lexer/TokenStream.h>
 
-zen_TokenStream_t* zen_TokenStream_new(zen_Compiler_t* compiler,
-    zen_Lexer_t* lexer, zen_TokenChannel_t channel) {
+k_TokenStream_t* k_TokenStream_new(k_Compiler_t* compiler,
+    k_Lexer_t* lexer, k_TokenChannel_t channel) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
 
-    zen_TokenStream_t* stream = zen_Memory_allocate(zen_TokenStream_t, 1);
+    k_TokenStream_t* stream = k_Memory_allocate(k_TokenStream_t, 1);
     stream->m_compiler = compiler;
     stream->m_lexer = lexer;
     stream->m_tokens = jtk_ArrayList_newWithCapacity(128);
@@ -33,18 +33,18 @@ zen_TokenStream_t* zen_TokenStream_new(zen_Compiler_t* compiler,
     return stream;
 }
 
-void zen_TokenStream_destroyStaleTokens(zen_TokenStream_t* stream) {
+void k_TokenStream_destroyStaleTokens(k_TokenStream_t* stream) {
 }
 
 // TODO: The tokens must be destroyed!
-void zen_TokenStream_delete(zen_TokenStream_t* stream) {
+void k_TokenStream_delete(k_TokenStream_t* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
 
     jtk_ArrayList_delete(stream->m_tokens);
     jtk_Memory_deallocate(stream);
 }
 
-void zen_TokenStream_reset(zen_TokenStream_t* stream) {
+void k_TokenStream_reset(k_TokenStream_t* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
 
     jtk_ArrayList_clear(stream->m_tokens);
@@ -52,17 +52,17 @@ void zen_TokenStream_reset(zen_TokenStream_t* stream) {
     stream->m_hitEndOfStream = false;
 }
 
-int32_t zen_TokenStream_getIndex(zen_TokenStream_t* stream) {
+int32_t k_TokenStream_getIndex(k_TokenStream_t* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
     return stream->m_p;
 }
 
-int32_t zen_TokenStream_getSize(zen_TokenStream_t* stream) {
+int32_t k_TokenStream_getSize(k_TokenStream_t* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
     return jtk_ArrayList_getSize(stream->m_tokens);
 }
 
-void zen_TokenStream_consume(zen_TokenStream_t* stream) {
+void k_TokenStream_consume(k_TokenStream_t* stream) {
     bool skip;
     if (stream->m_p >= 0) {
         if (stream->m_hitEndOfStream) {
@@ -81,28 +81,28 @@ void zen_TokenStream_consume(zen_TokenStream_t* stream) {
         skip = false;
     }
 
-    jtk_Assert_assertFalse((!skip && (zen_TokenStream_la(stream, 1) == ZEN_TOKEN_END_OF_STREAM)), "...");
+    jtk_Assert_assertFalse((!skip && (k_TokenStream_la(stream, 1) == ZEN_TOKEN_END_OF_STREAM)), "...");
 
-    bool hasToken = zen_TokenStream_synchronize(stream, stream->m_p + 1);
+    bool hasToken = k_TokenStream_synchronize(stream, stream->m_p + 1);
     if (hasToken) {
-        stream->m_p = zen_TokenStream_getNextTokenOnChannel(stream, stream->m_p + 1, stream->m_channel);
+        stream->m_p = k_TokenStream_getNextTokenOnChannel(stream, stream->m_p + 1, stream->m_channel);
     }
 }
 
-bool zen_TokenStream_synchronize(zen_TokenStream_t* stream, int32_t i) {
+bool k_TokenStream_synchronize(k_TokenStream_t* stream, int32_t i) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
     jtk_Assert_assertTrue(i >= 0, "The specified index is invalid.");
 
     int32_t n = i - jtk_ArrayList_getSize(stream->m_tokens) + 1;
     bool result = true;
     if (n > 0) {
-        int32_t fetched = zen_TokenStream_fetch(stream, n);
+        int32_t fetched = k_TokenStream_fetch(stream, n);
         result = fetched >= n;
     }
     return result;
 }
 
-int32_t zen_TokenStream_fetch(zen_TokenStream_t* stream, int32_t n) {
+int32_t k_TokenStream_fetch(k_TokenStream_t* stream, int32_t n) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     if (stream->m_hitEndOfStream) {
@@ -112,12 +112,12 @@ int32_t zen_TokenStream_fetch(zen_TokenStream_t* stream, int32_t n) {
     int32_t oldSize = jtk_ArrayList_getSize(stream->m_tokens);
     int32_t i;
     for (i = 0; i < n; i++) {
-        zen_Token_t* token = zen_Lexer_nextToken(stream->m_lexer);
-        zen_Token_setIndex(token, oldSize + i);
+        k_Token_t* token = k_Lexer_nextToken(stream->m_lexer);
+        k_Token_setIndex(token, oldSize + i);
         jtk_ArrayList_add(stream->m_tokens, token);
         jtk_ArrayList_add(stream->m_trash, token);
 
-        if (zen_Token_getType(token) == ZEN_TOKEN_END_OF_STREAM) {
+        if (k_Token_getType(token) == ZEN_TOKEN_END_OF_STREAM) {
             stream->m_hitEndOfStream = true;
             return i + 1;
         }
@@ -125,7 +125,7 @@ int32_t zen_TokenStream_fetch(zen_TokenStream_t* stream, int32_t n) {
     return n;
 }
 
-zen_Token_t* zen_TokenStream_getToken(zen_TokenStream_t* stream, int32_t index) {
+k_Token_t* k_TokenStream_getToken(k_TokenStream_t* stream, int32_t index) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Index-out-of-range errors are checked by the
@@ -134,18 +134,18 @@ zen_Token_t* zen_TokenStream_getToken(zen_TokenStream_t* stream, int32_t index) 
     return jtk_ArrayList_getValue(stream->m_tokens, index);
 }
 
-jtk_ArrayList_t* zen_TokenStream_getTokens(zen_TokenStream_t* stream,
+jtk_ArrayList_t* k_TokenStream_getTokens(k_TokenStream_t* stream,
     int32_t startIndex, int32_t stopIndex) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     int32_t size = jtk_ArrayList_getSize(stream->m_tokens);
     jtk_Arrays_checkRange(size, startIndex, stopIndex);
 
-    zen_TokenStream_initialize(stream);
+    k_TokenStream_initialize(stream);
     jtk_ArrayList_t* result = jtk_ArrayList_new();
     int32_t i;
     for (i = startIndex; i < stopIndex; i++) {
-        zen_Token_t* token = (zen_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
         jtk_ArrayList_add(result, token);
     }
     /* The user is responsible for the destruction of
@@ -154,26 +154,26 @@ jtk_ArrayList_t* zen_TokenStream_getTokens(zen_TokenStream_t* stream,
     return result;
 }
 
-zen_TokenType_t zen_TokenStream_la(zen_TokenStream_t* stream, int32_t i) {
-    return zen_TokenStream_lt(stream, i)->m_type;
+k_TokenType_t k_TokenStream_la(k_TokenStream_t* stream, int32_t i) {
+    return k_TokenStream_lt(stream, i)->m_type;
 }
 
-zen_Token_t* zen_TokenStream_lt(zen_TokenStream_t* stream, int32_t k) {
+k_Token_t* k_TokenStream_lt(k_TokenStream_t* stream, int32_t k) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
-    zen_TokenStream_initialize(stream);
-    zen_Token_t* token = NULL;
+    k_TokenStream_initialize(stream);
+    k_Token_t* token = NULL;
     if (k != 0) {
         if (k < 0) {
             if ((stream->m_p - k) >= 0) {
                 int32_t i = stream->m_p;
                 int32_t n = 1;
                 while ((n <= k) && (i > 0)) {
-                    i = zen_TokenStream_getPreviousTokenOnChannel(stream, i - 1, stream->m_channel);
+                    i = k_TokenStream_getPreviousTokenOnChannel(stream, i - 1, stream->m_channel);
                     n++;
                 }
                 if (i >= 0) {
-                    token = (zen_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+                    token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
                 }
             }
         }
@@ -181,35 +181,35 @@ zen_Token_t* zen_TokenStream_lt(zen_TokenStream_t* stream, int32_t k) {
             int32_t i = stream->m_p;
             int32_t n = 1;
             while (n < k) {
-                bool hasToken = zen_TokenStream_synchronize(stream, i + 1);
+                bool hasToken = k_TokenStream_synchronize(stream, i + 1);
                 if (hasToken) {
-                    i = zen_TokenStream_getNextTokenOnChannel(stream, i + 1, stream->m_channel);
+                    i = k_TokenStream_getNextTokenOnChannel(stream, i + 1, stream->m_channel);
                 }
                 n++;
             }
-            token = (zen_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+            token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
         }
     }
     return token;
 }
 
-void zen_TokenStream_initialize(zen_TokenStream_t* stream) {
+void k_TokenStream_initialize(k_TokenStream_t* stream) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     if (stream->m_p == -1) {
-        zen_TokenStream_synchronize(stream, 0);
-        stream->m_p = zen_TokenStream_getNextTokenOnChannel(stream, 0, stream->m_channel);
+        k_TokenStream_synchronize(stream, 0);
+        stream->m_p = k_TokenStream_getNextTokenOnChannel(stream, 0, stream->m_channel);
     }
 }
 
-int32_t zen_TokenStream_getPreviousTokenOnChannel(zen_TokenStream_t* stream,
-    int32_t i, zen_TokenChannel_t channel) {
+int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream,
+    int32_t i, k_TokenChannel_t channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Ensure that the token stream has buffered, at least,
      * tokens till the requested index.
      */
-    zen_TokenStream_synchronize(stream, i);
+    k_TokenStream_synchronize(stream, i);
     int32_t size = jtk_ArrayList_getSize(stream->m_tokens);
     if (i >= size) {
         /* In case the synchronization failed to retrieve the
@@ -220,9 +220,9 @@ int32_t zen_TokenStream_getPreviousTokenOnChannel(zen_TokenStream_t* stream,
     }
 
     while (i >= 0) {
-        zen_Token_t* token = (zen_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
-        if ((zen_Token_getType(token) == ZEN_TOKEN_END_OF_STREAM) ||
-            (zen_Token_getChannel(token) == channel)) {
+        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+        if ((k_Token_getType(token) == ZEN_TOKEN_END_OF_STREAM) ||
+            (k_Token_getChannel(token) == channel)) {
             return i;
         }
         i--;
@@ -231,14 +231,14 @@ int32_t zen_TokenStream_getPreviousTokenOnChannel(zen_TokenStream_t* stream,
     return -1;
 }
 
-int32_t zen_TokenStream_getNextTokenOnChannel(zen_TokenStream_t* stream,
-    int32_t i, zen_TokenChannel_t channel) {
+int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream,
+    int32_t i, k_TokenChannel_t channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Ensure that the token stream has buffered, at least,
      * tokens till the requested index.
      */
-    zen_TokenStream_synchronize(stream, i);
+    k_TokenStream_synchronize(stream, i);
     int32_t size = jtk_ArrayList_getSize(stream->m_tokens);
     if (i >= size) {
         /* In case the synchronization failed to retrieve the
@@ -248,12 +248,12 @@ int32_t zen_TokenStream_getNextTokenOnChannel(zen_TokenStream_t* stream,
         return size - 1;
     }
 
-    zen_Token_t* token = jtk_ArrayList_getValue(stream->m_tokens, i);
-    while (zen_Token_getChannel(token) != channel) {
+    k_Token_t* token = jtk_ArrayList_getValue(stream->m_tokens, i);
+    while (k_Token_getChannel(token) != channel) {
         /* In case the token stream has reached the end-of-stream,
          * return the index of the end-of-stream token.
          */
-        if (zen_Token_getType(token) == ZEN_TOKEN_END_OF_STREAM) {
+        if (k_Token_getType(token) == ZEN_TOKEN_END_OF_STREAM) {
             return i;
         }
 
@@ -265,15 +265,15 @@ int32_t zen_TokenStream_getNextTokenOnChannel(zen_TokenStream_t* stream,
         /* Ensure that the token stream has buffered, at least,
          * tokens till the new index.
          */
-        zen_TokenStream_synchronize(stream, i);
+        k_TokenStream_synchronize(stream, i);
         /* Update the token variable for next iteration. */
-        token = (zen_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+        token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
     }
     return i;
 }
 
-void zen_TokenStream_fill(zen_TokenStream_t* stream) {
-    zen_TokenStream_initialize(stream);
+void k_TokenStream_fill(k_TokenStream_t* stream) {
+    k_TokenStream_initialize(stream);
     /* The token stream tries to buffer a 1000 tokens
      * at each iteration. This is repeated until the token
      * stream fails to fetch the quota, which indicates
@@ -282,25 +282,25 @@ void zen_TokenStream_fill(zen_TokenStream_t* stream) {
     int32_t blockSize = 1000;
     int32_t fetched;
     do {
-        fetched = zen_TokenStream_fetch(stream, blockSize);
+        fetched = k_TokenStream_fetch(stream, blockSize);
     } while (fetched == blockSize);
 }
 
-int32_t zen_TokenStream_getNumberOfTokens(zen_TokenStream_t* stream,
-    zen_TokenChannel_t channel) {
+int32_t k_TokenStream_getNumberOfTokens(k_TokenStream_t* stream,
+    k_TokenChannel_t channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Fetch all the tokens from the input stream before computing
      * the number of tokens on the specified channel.
      */
-    zen_TokenStream_fill(stream);
+    k_TokenStream_fill(stream);
 
     int32_t n = 0;
     int32_t size = jtk_ArrayList_getSize(stream->m_tokens);
     int32_t i;
     for (i = 0; i < size; i++) {
-        zen_Token_t* token = (zen_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
-        if (zen_Token_getChannel(token) == channel) {
+        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+        if (k_Token_getChannel(token) == channel) {
             n++;
         }
     }

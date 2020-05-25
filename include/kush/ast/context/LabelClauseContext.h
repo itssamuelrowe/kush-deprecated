@@ -30,39 +30,39 @@
 
 /**
  * @class LabelClauseContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_LabelClauseContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_identifier;
+struct k_LabelClauseContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_identifier;
 };
 
 /**
  * @memberof LabelClauseContext
  */
-typedef struct zen_LabelClauseContext_t zen_LabelClauseContext_t;
+typedef struct k_LabelClauseContext_t k_LabelClauseContext_t;
 
 // Constructor
 
 /**
  * @memberof LabelClauseContext
  */
-zen_LabelClauseContext_t* zen_LabelClauseContext_new(zen_ASTNode_t* node);
+k_LabelClauseContext_t* k_LabelClauseContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof LabelClauseContext
  */
-void zen_LabelClauseContext_delete(zen_LabelClauseContext_t* context);
+void k_LabelClauseContext_delete(k_LabelClauseContext_t* context);
 
 // Children
 
 /**
  * @memberof LabelClauseContext
  */
-void zen_LabelClauseContext_getChildren(zen_LabelClauseContext_t* context, jtk_ArrayList_t* children);
+void k_LabelClauseContext_getChildren(k_LabelClauseContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_LABEL_CLAUSE_CONTEXT */

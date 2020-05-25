@@ -28,40 +28,40 @@
 
 /**
  * @class AnnotatedComponentDeclarationContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_AnnotatedComponentDeclarationContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_annotations;
-    zen_ASTNode_t* m_componentDeclaration;
+struct k_AnnotatedComponentDeclarationContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_annotations;
+    k_ASTNode_t* m_componentDeclaration;
 };
 
 /**
  * @memberof AnnotatedComponentDeclarationContext
  */
-typedef struct zen_AnnotatedComponentDeclarationContext_t zen_AnnotatedComponentDeclarationContext_t;
+typedef struct k_AnnotatedComponentDeclarationContext_t k_AnnotatedComponentDeclarationContext_t;
 
 // Constructor
 
 /**
  * @memberof AnnotatedComponentDeclarationContext
  */
-zen_AnnotatedComponentDeclarationContext_t* zen_AnnotatedComponentDeclarationContext_new(zen_ASTNode_t* node);
+k_AnnotatedComponentDeclarationContext_t* k_AnnotatedComponentDeclarationContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof AnnotatedComponentDeclarationContext
  */
-void zen_AnnotatedComponentDeclarationContext_delete(zen_AnnotatedComponentDeclarationContext_t* context);
+void k_AnnotatedComponentDeclarationContext_delete(k_AnnotatedComponentDeclarationContext_t* context);
 
 // Children
 
 /**
  * @memberof AnnotatedComponentDeclarationContext
  */
-void zen_AnnotatedComponentDeclarationContext_getChildren(zen_AnnotatedComponentDeclarationContext_t* context, jtk_ArrayList_t* children);
+void k_AnnotatedComponentDeclarationContext_getChildren(k_AnnotatedComponentDeclarationContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ANNOTATED_COMPONENT_DECLARATION_CONTEXT_H */

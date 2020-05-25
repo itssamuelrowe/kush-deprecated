@@ -24,25 +24,25 @@
 
 #warning "TODO: Add ordinal to this symbol."
 
-zen_EnumerateSymbol_t* zen_EnumerateSymbol_new(zen_ASTNode_t* identifier,
-    zen_Scope_t* enclosingScope) {
-    zen_EnumerateSymbol_t* enumerateSymbol = zen_Memory_allocate(zen_EnumerateSymbol_t, 1);
+k_EnumerateSymbol_t* k_EnumerateSymbol_new(k_ASTNode_t* identifier,
+    k_Scope_t* enclosingScope) {
+    k_EnumerateSymbol_t* enumerateSymbol = k_Memory_allocate(k_EnumerateSymbol_t, 1);
 
-    zen_Symbol_t* symbol = zen_Symbol_new(ZEN_SYMBOL_CATEGORY_ENUMERATE, identifier, enclosingScope, enumerateSymbol);
+    k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_ENUMERATE, identifier, enclosingScope, enumerateSymbol);
 
     enumerateSymbol->m_symbol = symbol;
 
     return enumerateSymbol;
 }
 
-void zen_EnumerateSymbol_delete(zen_EnumerateSymbol_t* symbol) {
+void k_EnumerateSymbol_delete(k_EnumerateSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
-    zen_Symbol_delete(symbol->m_symbol);
+    k_Symbol_delete(symbol->m_symbol);
     jtk_Memory_deallocate(symbol);
 }
 
-zen_Symbol_t* zen_EnumerateSymbol_getSymbol(zen_EnumerateSymbol_t* symbol) {
+k_Symbol_t* k_EnumerateSymbol_getSymbol(k_EnumerateSymbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
 
     return symbol->m_symbol;

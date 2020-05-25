@@ -25,70 +25,70 @@
  * ASTHelper                                                                   *
  *******************************************************************************/
 
-bool zen_ASTHelper_isAncestor(zen_ASTNode_t* node, zen_ASTNode_t* subject) {
+bool k_ASTHelper_isAncestor(k_ASTNode_t* node, k_ASTNode_t* subject) {
     jtk_Assert_assertObject(node, "The specified node is null.");
     jtk_Assert_assertObject(subject, "The specified subject is null.");
 
-    zen_ASTNode_t* parent = zen_ASTNode_getParent(subject);
+    k_ASTNode_t* parent = k_ASTNode_getParent(subject);
     bool result = false;
     while (parent != NULL) {
         if (parent == node) {
             result = true;
             break;
         }
-        parent = zen_ASTNode_getParent(parent);
+        parent = k_ASTNode_getParent(parent);
     }
     return result;
 }
 
-zen_ASTNode_t* zen_ASTHelper_getAncestor(zen_ASTNode_t* node, zen_ASTNodeType_t type) {
+k_ASTNode_t* k_ASTHelper_getAncestor(k_ASTNode_t* node, k_ASTNodeType_t type) {
     jtk_Assert_assertObject(node, "The specified node is null.");
 
-    zen_ASTNode_t* parent = zen_ASTNode_getParent(node);
-    zen_ASTNode_t* result = NULL;
+    k_ASTNode_t* parent = k_ASTNode_getParent(node);
+    k_ASTNode_t* result = NULL;
     while (parent != NULL) {
-        if (zen_ASTNode_getType(parent) == type) {
+        if (k_ASTNode_getType(parent) == type) {
             result = parent;
             break;
         }
-        parent = zen_ASTNode_getParent(parent);
+        parent = k_ASTNode_getParent(parent);
     }
     return result;
 }
 
-bool zen_ASTHelper_isDescendant(zen_ASTNode_t* node, zen_ASTNode_t* subject) {
-    return zen_ASTHelper_isAncestor(subject, node);
+bool k_ASTHelper_isDescendant(k_ASTNode_t* node, k_ASTNode_t* subject) {
+    return k_ASTHelper_isAncestor(subject, node);
 }
 
-void zen_ASTHelper_getTokens(zen_ASTNode_t* node, jtk_ArrayList_t* list) {
-    zen_ASTHelper_getNodes(node, list, -1, true, true);
+void k_ASTHelper_getTokens(k_ASTNode_t* node, jtk_ArrayList_t* list) {
+    k_ASTHelper_getNodes(node, list, -1, true, true);
 }
 
-void zen_ASTHelper_getFilteredTokens(zen_ASTNode_t* node, jtk_ArrayList_t* list, zen_TokenType_t type) {
-    zen_ASTHelper_getNodes(node, list, (int32_t)type, true, true);
+void k_ASTHelper_getFilteredTokens(k_ASTNode_t* node, jtk_ArrayList_t* list, k_TokenType_t type) {
+    k_ASTHelper_getNodes(node, list, (int32_t)type, true, true);
 }
 
-void zen_ASTHelper_getTerminalNodes(zen_ASTNode_t* node, jtk_ArrayList_t* list) {
-    zen_ASTHelper_getNodes(node, list, -1, true, false);
+void k_ASTHelper_getTerminalNodes(k_ASTNode_t* node, jtk_ArrayList_t* list) {
+    k_ASTHelper_getNodes(node, list, -1, true, false);
 }
 
-void zen_ASTHelper_getFilteredTerminalNodes(zen_ASTNode_t* node, jtk_ArrayList_t* list, zen_TokenType_t type) {
-    zen_ASTHelper_getNodes(node, list, (int32_t)type, true, false);
+void k_ASTHelper_getFilteredTerminalNodes(k_ASTNode_t* node, jtk_ArrayList_t* list, k_TokenType_t type) {
+    k_ASTHelper_getNodes(node, list, (int32_t)type, true, false);
 }
 
-void zen_ASTHelper_getNodes(zen_ASTNode_t* node, jtk_ArrayList_t* list,
+void k_ASTHelper_getNodes(k_ASTNode_t* node, jtk_ArrayList_t* list,
     int32_t filter, bool captureTerminals, bool strip) {
     jtk_LinkedStack_t* stack = jtk_LinkedStack_new();
     jtk_LinkedStack_push(stack, node);
 
     while (!jtk_LinkedStack_isEmpty(stack)) {
-        zen_ASTNode_t* currentNode = (zen_ASTNode_t*)jtk_LinkedStack_pop(stack);
+        k_ASTNode_t* currentNode = (k_ASTNode_t*)jtk_LinkedStack_pop(stack);
 
-        if (zen_ASTNode_isTerminal(currentNode)) {
+        if (k_ASTNode_isTerminal(currentNode)) {
             if (captureTerminals) {
-                zen_Token_t* token = (zen_Token_t*)currentNode->m_context;
+                k_Token_t* token = (k_Token_t*)currentNode->m_context;
 
-                if ((filter >= 0) && (zen_Token_getType(token) != (zen_TokenType_t)filter)) {
+                if ((filter >= 0) && (k_Token_getType(token) != (k_TokenType_t)filter)) {
                     continue;
                 }
 
@@ -100,9 +100,9 @@ void zen_ASTHelper_getNodes(zen_ASTNode_t* node, jtk_ArrayList_t* list,
                 }
             }
         }
-        else if (zen_ASTNode_isRule(currentNode)) {
+        else if (k_ASTNode_isRule(currentNode)) {
             if (!captureTerminals) {
-                if ((filter >= 0) && (zen_ASTNode_getType(currentNode) != (zen_ASTNodeType_t)filter)) {
+                if ((filter >= 0) && (k_ASTNode_getType(currentNode) != (k_ASTNodeType_t)filter)) {
                     continue;
                 }
 
@@ -115,11 +115,11 @@ void zen_ASTHelper_getNodes(zen_ASTNode_t* node, jtk_ArrayList_t* list,
                 }
             }
 
-            jtk_ArrayList_t* children = zen_ASTNode_getChildren(currentNode);
+            jtk_ArrayList_t* children = k_ASTNode_getChildren(currentNode);
             int32_t size = jtk_ArrayList_getSize(children);
             int32_t i;
             for (i = 0; i < size; i++) {
-                zen_ASTNode_t* child = (zen_ASTNode_t*)jtk_ArrayList_getValue(children, i);
+                k_ASTNode_t* child = (k_ASTNode_t*)jtk_ArrayList_getValue(children, i);
                 jtk_LinkedStack_push(stack, child);
             }
         }

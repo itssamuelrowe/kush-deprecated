@@ -28,41 +28,41 @@
 
 /**
  * @class AssignmentExpressionContext
- * @ingroup zen_compiler_ast
+ * @ingroup k_compiler_ast
  * @author Samuel Rowe
  * @since zen 1.0
  */
-struct zen_AssignmentExpressionContext_t {
-    zen_ASTNode_t* m_node;
-    zen_ASTNode_t* m_conditionalExpression;
-    zen_ASTNode_t* m_assignmentOperator;
-    zen_ASTNode_t* m_assignmentExpression;
+struct k_AssignmentExpressionContext_t {
+    k_ASTNode_t* m_node;
+    k_ASTNode_t* m_conditionalExpression;
+    k_ASTNode_t* m_assignmentOperator;
+    k_ASTNode_t* m_assignmentExpression;
 };
 
 /**
  * @memberof AssignmentExpressionContext
  */
-typedef struct zen_AssignmentExpressionContext_t zen_AssignmentExpressionContext_t;
+typedef struct k_AssignmentExpressionContext_t k_AssignmentExpressionContext_t;
 
 // Constructor
 
 /**
  * @memberof AssignmentExpressionContext
  */
-zen_AssignmentExpressionContext_t* zen_AssignmentExpressionContext_new(zen_ASTNode_t* node);
+k_AssignmentExpressionContext_t* k_AssignmentExpressionContext_new(k_ASTNode_t* node);
 
 // Destructor
 
 /**
  * @memberof AssignmentExpressionContext
  */
-void zen_AssignmentExpressionContext_delete(zen_AssignmentExpressionContext_t* context);
+void k_AssignmentExpressionContext_delete(k_AssignmentExpressionContext_t* context);
 
 // Children
 
 /**
  * @memberof AssignmentExpressionContext
  */
-void zen_AssignmentExpressionContext_getChildren(zen_AssignmentExpressionContext_t* context, jtk_ArrayList_t* children);
+void k_AssignmentExpressionContext_getChildren(k_AssignmentExpressionContext_t* context, jtk_ArrayList_t* children);
 
 #endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_ASSIGNMENT_EXPRESSION_CONTEXT_H */
