@@ -41,102 +41,59 @@ set (
 )
 
 set (
-    KUSH_COMMON_SOURCE
-
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/Configuration.c
-)
-
-set (
     KUSH_COMPILER_SOURCE
 
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/Compiler.c
+    ${PROJECT_SOURCE_DIR}/source/kush/Configuration.c
+    ${PROJECT_SOURCE_DIR}/source/kush/Compiler.c
+    ${PROJECT_SOURCE_DIR}/source/kush/Kush.c
 
     # Abstract Syntax Tree
 
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/ast/AstAnnotation.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/ast/AstAnnotations.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/ast/AstHelper.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/ast/AstListener.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/ast/AstNode.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/ast/AstPrinter.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/ast/AstWalker.c
-
-    # Generator
-
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/generator/BinaryEntityGenerator.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/generator/BinaryEntityBuilder.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/generator/ConstantPoolBuilder.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/generator/DataChannel.c
+    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstAnnotation.c
+    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstAnnotations.c
+    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstHelper.c
+    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstListener.c
+    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstNode.c
+    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstPrinter.c
+    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstWalker.c
 
     # Lexer
 
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/lexer/Lexer.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/lexer/LexerError.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/lexer/Token.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/lexer/TokenStream.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/lexer/TokenType.c
+    ${PROJECT_SOURCE_DIR}/source/kush/lexer/Lexer.c
+    ${PROJECT_SOURCE_DIR}/source/kush/lexer/LexerError.c
+    ${PROJECT_SOURCE_DIR}/source/kush/lexer/Token.c
+    ${PROJECT_SOURCE_DIR}/source/kush/lexer/TokenStream.c
+    ${PROJECT_SOURCE_DIR}/source/kush/lexer/TokenType.c
 
     # Parser
 
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/parser/Context.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/parser/Parser.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/parser/ParserError.c
+    ${PROJECT_SOURCE_DIR}/source/kush/parser/Context.c
+    ${PROJECT_SOURCE_DIR}/source/kush/parser/Parser.c
+    ${PROJECT_SOURCE_DIR}/source/kush/parser/ParserError.c
 
     # Symbol Table
 
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/SymbolDefinitionListener.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/SymbolResolutionListener.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/SymbolTable.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/SymbolLoader.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/Modifier.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/scope/Scope.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/SymbolDefinitionListener.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/SymbolResolutionListener.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/SymbolTable.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/SymbolLoader.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/Modifier.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/scope/Scope.c
 
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/symbol/ClassSymbol.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/symbol/FunctionSignature.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/symbol/FunctionSymbol.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/symbol-table/symbol/Symbol.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/ClassSymbol.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/FunctionSignature.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/FunctionSymbol.c
+    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/Symbol.c
 
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/support/Error.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/compiler/support/ErrorHandler.c
-)
-
-set (
-    KUSH_COMPILER_TOOL_SOURCE
-
-    # Instruction.c is from the virtual machine module. Remove references to it.
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/virtual-machine/feb/Instruction.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/virtual-machine/feb/FieldEntity.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/virtual-machine/feb/FunctionEntity.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/virtual-machine/feb/attribute/InstructionAttribute.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/Kush.c
-)
-
-set (
-    KUSH_COMPILER_TOOL_SOURCE
-
-    # Instruction.c is from the virtual machine module. Remove references to it.
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/virtual-machine/feb/Instruction.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/virtual-machine/feb/FieldEntity.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/virtual-machine/feb/FunctionEntity.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/virtual-machine/feb/attribute/InstructionAttribute.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/disassembler/BinaryEntityDisassembler.c
-    ${PROJECT_SOURCE_DIR}/source/com/onecube/zen/Kush.c
+    ${PROJECT_SOURCE_DIR}/source/kush/support/Error.c
+    ${PROJECT_SOURCE_DIR}/source/kush/support/ErrorHandler.c
 )
 
 # Compile
 
 set(CMAKE_VERBOSE_MAKEFILE off)
-
 link_directories(${JTK_LIBRARY_DIRS})
-
-message(WARNING ${JTK_CFLAGS})
-
-add_executable(zc
-    ${KUSH_PUBLIC_HEADERS}
-    ${KUSH_COMMON_SOURCE}
-    ${KUSH_COMPILER_SOURCE}
-    ${KUSH_COMPILER_TOOL_SOURCE}
-    ${KUSH_PRIVATE_HEADERS}
+add_executable(zc ${KUSH_COMPILER_SOURCE})
 target_link_libraries(zc ${JTK_LIBRARIES} m)
 target_include_directories(zc SYSTEM PUBLIC ${JTK_INCLUDE_DIRS})
 # target_compile_options(zc PUBLIC -Wall -Wswitch)
