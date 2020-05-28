@@ -30,7 +30,7 @@
  * Thus, appropriately destroys only non-null nodes.
  *
  * All children are instances of k_ASTNode_t. This applies to tokens, too.
- * Tokens are marked as ZEN_AST_NODE_TYPE_TERMINAL.
+ * Tokens are marked as KUSH_AST_NODE_TYPE_TERMINAL.
  */
 
 #include <jtk/core/Object.h>
@@ -43,7 +43,7 @@
  * Context                                                                     *
  *******************************************************************************/
 
-void k_Context_initializeNode(
+void k_Context_initialiKUSHode(
     k_ASTNode_t* node,
     k_ASTNodeType_t type,
     void* context,
@@ -65,7 +65,7 @@ k_CompilationUnitContext_t* k_CompilationUnitContext_new(k_ASTNode_t* node) {
     context->m_importDeclarations = jtk_ArrayList_new();
     context->m_annotatedComponentDeclarations = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_COMPILATION_UNIT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_COMPILATION_UNIT, context,
         (k_ContextDestructorFunction_t)k_CompilationUnitContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_CompilationUnitContext_getChildren);
 
@@ -98,7 +98,7 @@ k_ImportDeclarationContext_t* k_ImportDeclarationContext_new(k_ASTNode_t* node) 
     context->m_identifiers = jtk_ArrayList_new();
     context->m_wildcard = false;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_IMPORT_DECLARATION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_IMPORT_DECLARATION, context,
         (k_ContextDestructorFunction_t)k_ImportDeclarationContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ImportDeclarationContext_getChildren);
 
@@ -130,7 +130,7 @@ k_AnnotatedComponentDeclarationContext_t* k_AnnotatedComponentDeclarationContext
     context->m_annotations = NULL;
     context->m_componentDeclaration = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ANNOTATED_COMPONENT_DECLARATION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ANNOTATED_COMPONENT_DECLARATION, context,
         (k_ContextDestructorFunction_t)k_AnnotatedComponentDeclarationContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_AnnotatedComponentDeclarationContext_getChildren);
 
@@ -165,7 +165,7 @@ k_AnnotationsContext_t* k_AnnotationsContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_annotations = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ANNOTATIONS, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ANNOTATIONS, context,
         (k_ContextDestructorFunction_t)k_AnnotationsContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_AnnotationsContext_getChildren);
 
@@ -197,7 +197,7 @@ k_AnnotationContext_t* k_AnnotationContext_new(k_ASTNode_t* node) {
     context->m_annotationType = NULL;
     context->m_annotationAttributes = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ANNOTATION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ANNOTATION, context,
         (k_ContextDestructorFunction_t)k_AnnotationContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_AnnotationContext_getChildren);
 
@@ -229,7 +229,7 @@ k_AnnotationTypeContext_t* k_AnnotationTypeContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_identifiers = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ANNOTATION_TYPE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ANNOTATION_TYPE, context,
         (k_ContextDestructorFunction_t)k_AnnotationTypeContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_AnnotationTypeContext_getChildren);
 
@@ -261,7 +261,7 @@ k_AnnotationAttributeContext_t* k_AnnotationAttributeContext_new(k_ASTNode_t* no
     context->m_identifier = NULL;
     context->m_literal = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ANNOTATION_ATTRIBUTE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ANNOTATION_ATTRIBUTE, context,
         (k_ContextDestructorFunction_t)k_AnnotationAttributeContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_AnnotationAttributeContext_getChildren);
 
@@ -291,7 +291,7 @@ k_ComponentDeclarationContext_t* k_ComponentDeclarationContext_new(k_ASTNode_t* 
     context->m_node = node;
     context->m_component = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_COMPONENT_DECLARATION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_COMPONENT_DECLARATION, context,
         (k_ContextDestructorFunction_t)k_ComponentDeclarationContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ComponentDeclarationContext_getChildren);
 
@@ -322,7 +322,7 @@ k_FunctionDeclarationContext_t* k_FunctionDeclarationContext_new(k_ASTNode_t* no
     context->m_functionParameters = NULL;
     context->m_functionBody = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_FUNCTION_DECLARATION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_FUNCTION_DECLARATION, context,
         (k_ContextDestructorFunction_t)k_FunctionDeclarationContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_FunctionDeclarationContext_getChildren);
 
@@ -356,7 +356,7 @@ k_FunctionParametersContext_t* k_FunctionParametersContext_new(k_ASTNode_t* node
     context->m_fixedParameters = jtk_ArrayList_new();
     context->m_variableParameter = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_FUNCTION_PARAMETERS, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_FUNCTION_PARAMETERS, context,
         (k_ContextDestructorFunction_t)k_FunctionParametersContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_FunctionParametersContext_getChildren);
 
@@ -390,7 +390,7 @@ k_FunctionBodyContext_t* k_FunctionBodyContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_FUNCTION_BODY, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_FUNCTION_BODY, context,
         (k_ContextDestructorFunction_t)k_FunctionBodyContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_FunctionBodyContext_getChildren);
 
@@ -420,7 +420,7 @@ k_StatementSuiteContext_t* k_StatementSuiteContext_new(k_ASTNode_t* node) {
     // context->m_simpleStatement = NULL;
     context->m_statements = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_STATEMENT_SUITE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_STATEMENT_SUITE, context,
         (k_ContextDestructorFunction_t)k_StatementSuiteContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_StatementSuiteContext_getChildren);
 
@@ -457,7 +457,7 @@ k_SimpleStatementContext_t* k_SimpleStatementContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_statement = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_SIMPLE_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_SIMPLE_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_SimpleStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_SimpleStatementContext_getChildren);
 
@@ -487,7 +487,7 @@ k_StatementContext_t* k_StatementContext_new(k_ASTNode_t* node) {
     context->m_simpleStatement = NULL;
     context->m_compoundStatement = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_StatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_StatementContext_getChildren);
 
@@ -521,7 +521,7 @@ k_EmptyStatementContext_t* k_EmptyStatementContext_new(k_ASTNode_t* node) {
     k_EmptyStatementContext_t* context = k_Memory_allocate(k_EmptyStatementContext_t, 1);
     context->m_node = node;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_EMPTY_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_EMPTY_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_EmptyStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_EmptyStatementContext_getChildren);
 
@@ -553,7 +553,7 @@ k_VariableDeclarationContext_t* k_VariableDeclarationContext_new(k_ASTNode_t* no
     context->m_node = node;
     context->m_variableDeclarators = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_VARIABLE_DECLARATION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_VARIABLE_DECLARATION, context,
         (k_ContextDestructorFunction_t)k_VariableDeclarationContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_VariableDeclarationContext_getChildren);
 
@@ -592,7 +592,7 @@ k_VariableDeclaratorContext_t* k_VariableDeclaratorContext_new(k_ASTNode_t* node
     context->m_identifier = NULL;
     context->m_expression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_VARIABLE_DECLARATOR, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_VARIABLE_DECLARATOR, context,
         (k_ContextDestructorFunction_t)k_VariableDeclaratorContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_VariableDeclaratorContext_getChildren);
 
@@ -625,7 +625,7 @@ k_ConstantDeclarationContext_t* k_ConstantDeclarationContext_new(k_ASTNode_t* no
     context->m_node = node;
     context->m_constantDeclarators = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CONSTANT_DECLARATION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CONSTANT_DECLARATION, context,
         (k_ContextDestructorFunction_t)k_ConstantDeclarationContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ConstantDeclarationContext_getChildren);
 
@@ -657,7 +657,7 @@ k_ConstantDeclaratorContext_t* k_ConstantDeclaratorContext_new(k_ASTNode_t* node
     context->m_identifier = NULL;
     context->m_expression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CONSTANT_DECLARATOR, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CONSTANT_DECLARATOR, context,
         (k_ContextDestructorFunction_t)k_ConstantDeclaratorContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ConstantDeclaratorContext_getChildren);
 
@@ -689,7 +689,7 @@ k_AssertStatementContext_t* k_AssertStatementContext_new(k_ASTNode_t* node) {
     context->m_conditionExpression = NULL;
     context->m_messageExpression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ASSERT_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ASSERT_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_AssertStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_AssertStatementContext_getChildren);
 
@@ -720,7 +720,7 @@ k_BreakStatementContext_t* k_BreakStatementContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_identifier = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_BREAK_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_BREAK_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_BreakStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_BreakStatementContext_getChildren);
 
@@ -751,7 +751,7 @@ k_ContinueStatementContext_t* k_ContinueStatementContext_new(k_ASTNode_t* node) 
     context->m_node = node;
     context->m_identifier = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CONTINUE_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CONTINUE_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_ContinueStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ContinueStatementContext_getChildren);
 
@@ -782,7 +782,7 @@ k_ReturnStatementContext_t* k_ReturnStatementContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_expression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_RETURN_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_RETURN_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_ReturnStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ReturnStatementContext_getChildren);
 
@@ -814,7 +814,7 @@ k_ThrowStatementContext_t* k_ThrowStatementContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_expression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_THROW_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_THROW_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_ThrowStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ThrowStatementContext_getChildren);
 
@@ -846,7 +846,7 @@ k_CompoundStatementContext_t* k_CompoundStatementContext_new(k_ASTNode_t* node) 
     context->m_node = node;
     context->m_statement = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_COMPOUND_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_COMPOUND_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_CompoundStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_CompoundStatementContext_getChildren);
 
@@ -878,7 +878,7 @@ k_IfStatementContext_t* k_IfStatementContext_new(k_ASTNode_t* node) {
     context->m_elseIfClauses = jtk_ArrayList_new();
     context->m_elseClause = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_IF_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_IF_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_IfStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_IfStatementContext_getChildren);
 
@@ -918,7 +918,7 @@ k_IfClauseContext_t* k_IfClauseContext_new(k_ASTNode_t* node) {
     context->m_expression = NULL;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_IF_CLAUSE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_IF_CLAUSE, context,
         (k_ContextDestructorFunction_t)k_IfClauseContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_IfClauseContext_getChildren);
 
@@ -950,7 +950,7 @@ k_ElseIfClauseContext_t* k_ElseIfClauseContext_new(k_ASTNode_t* node) {
     context->m_expression = NULL;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ELSE_IF_CLAUSE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ELSE_IF_CLAUSE, context,
         (k_ContextDestructorFunction_t)k_ElseIfClauseContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ElseIfClauseContext_getChildren);
 
@@ -981,7 +981,7 @@ k_ElseClauseContext_t* k_ElseClauseContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ELSE_CLAUSE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ELSE_CLAUSE, context,
         (k_ContextDestructorFunction_t)k_ElseClauseContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ElseClauseContext_getChildren);
 
@@ -1012,7 +1012,7 @@ k_IterativeStatementContext_t* k_IterativeStatementContext_new(k_ASTNode_t* node
     context->m_labelClause = NULL;
     context->m_statement = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ITERATIVE_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ITERATIVE_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_IterativeStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_IterativeStatementContext_getChildren);
 
@@ -1045,7 +1045,7 @@ k_LabelClauseContext_t* k_LabelClauseContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_identifier = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_LABEL_CLAUSE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_LABEL_CLAUSE, context,
         (k_ContextDestructorFunction_t)k_LabelClauseContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_LabelClauseContext_getChildren);
 
@@ -1075,7 +1075,7 @@ k_WhileStatementContext_t* k_WhileStatementContext_new(k_ASTNode_t* node) {
     context->m_expression = NULL;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_WHILE_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_WHILE_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_WhileStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_WhileStatementContext_getChildren);
 
@@ -1108,7 +1108,7 @@ k_ForStatementContext_t* k_ForStatementContext_new(k_ASTNode_t* node) {
     context->m_expression = NULL;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_FOR_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_FOR_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_ForStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ForStatementContext_getChildren);
 
@@ -1142,7 +1142,7 @@ k_ForParameterContext_t* k_ForParameterContext_new(k_ASTNode_t* node) {
     context->m_variable = false;
     context->m_identifier = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_FOR_PARAMETER, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_FOR_PARAMETER, context,
         (k_ContextDestructorFunction_t)k_ForParameterContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ForParameterContext_getChildren);
 
@@ -1173,7 +1173,7 @@ k_TryStatementContext_t* k_TryStatementContext_new(k_ASTNode_t* node) {
     context->m_catchClauses = jtk_ArrayList_new();
     context->m_finallyClause = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_TRY_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_TRY_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_TryStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_TryStatementContext_getChildren);
 
@@ -1208,7 +1208,7 @@ k_TryClauseContext_t* k_TryClauseContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_TRY_CLAUSE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_TRY_CLAUSE, context,
         (k_ContextDestructorFunction_t)k_TryClauseContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_TryClauseContext_getChildren);
 
@@ -1240,7 +1240,7 @@ k_CatchClauseContext_t* k_CatchClauseContext_new(k_ASTNode_t* node) {
     context->m_identifier = NULL;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CATCH_CLAUSE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CATCH_CLAUSE, context,
         (k_ContextDestructorFunction_t)k_CatchClauseContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_CatchClauseContext_getChildren);
 
@@ -1272,7 +1272,7 @@ k_CatchFilterContext_t* k_CatchFilterContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_typeNames = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CATCH_FILTER, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CATCH_FILTER, context,
         (k_ContextDestructorFunction_t)k_CatchFilterContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_CatchFilterContext_getChildren);
 
@@ -1303,7 +1303,7 @@ k_TypeNameContext_t* k_TypeNameContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_identifiers = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_TYPE_NAME, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_TYPE_NAME, context,
         (k_ContextDestructorFunction_t)k_TypeNameContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_TypeNameContext_getChildren);
 
@@ -1334,7 +1334,7 @@ k_FinallyClauseContext_t* k_FinallyClauseContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_FINALLY_CLAUSE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_FINALLY_CLAUSE, context,
         (k_ContextDestructorFunction_t)k_FinallyClauseContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_FinallyClauseContext_getChildren);
 
@@ -1365,7 +1365,7 @@ k_SynchronizeStatementContext_t* k_SynchronizeStatementContext_new(k_ASTNode_t* 
     context->m_expression = NULL;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_SYNCHRONIZE_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_SYNCHRONIZE_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_SynchronizeStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_SynchronizeStatementContext_getChildren);
 
@@ -1397,7 +1397,7 @@ k_WithStatementContext_t* k_WithStatementContext_new(k_ASTNode_t* node) {
     context->m_withParameters = NULL;
     context->m_statementSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_WITH_STATEMENT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_WITH_STATEMENT, context,
         (k_ContextDestructorFunction_t)k_WithStatementContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_WithStatementContext_getChildren);
 
@@ -1428,7 +1428,7 @@ k_WithParametersContext_t* k_WithParametersContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_withParameters = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_WITH_PARAMETERS, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_WITH_PARAMETERS, context,
         (k_ContextDestructorFunction_t)k_WithParametersContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_WithParametersContext_getChildren);
 
@@ -1461,7 +1461,7 @@ k_WithParameterContext_t* k_WithParameterContext_new(k_ASTNode_t* node) {
     context->m_identifier = NULL;
     context->m_expression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_WITH_PARAMETER, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_WITH_PARAMETER, context,
         (k_ContextDestructorFunction_t)k_WithParameterContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_WithParameterContext_getChildren);
 
@@ -1494,7 +1494,7 @@ k_ClassDeclarationContext_t* k_ClassDeclarationContext_new(k_ASTNode_t* node) {
     context->m_classExtendsClause = NULL;
     context->m_classSuite = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CLASS_DECLARATION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CLASS_DECLARATION, context,
         (k_ContextDestructorFunction_t)k_ClassDeclarationContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ClassDeclarationContext_getChildren);
 
@@ -1528,7 +1528,7 @@ k_ClassExtendsClauseContext_t* k_ClassExtendsClauseContext_new(k_ASTNode_t* node
     context->m_node = node;
     context->m_typeNames = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_EXTENDS_CLAUSE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_EXTENDS_CLAUSE, context,
         (k_ContextDestructorFunction_t)k_ClassExtendsClauseContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ClassExtendsClauseContext_getChildren);
 
@@ -1559,7 +1559,7 @@ k_ClassSuiteContext_t* k_ClassSuiteContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_classMembers = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CLASS_SUITE, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CLASS_SUITE, context,
         (k_ContextDestructorFunction_t)k_ClassSuiteContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ClassSuiteContext_getChildren);
 
@@ -1592,7 +1592,7 @@ k_ClassMemberContext_t* k_ClassMemberContext_new(k_ASTNode_t* node) {
     context->m_modifiers = jtk_ArrayList_new();
     context->m_declaration = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CLASS_MEMBER, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CLASS_MEMBER, context,
         (k_ContextDestructorFunction_t)k_ClassMemberContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ClassMemberContext_getChildren);
 
@@ -1627,7 +1627,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 //     context->m_functionParameters = NULL;
 //     context->m_statementSuite = NULL;
 
-//     k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CONSTRUCTOR_DECLARATION, context,
+//     k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CONSTRUCTOR_DECLARATION, context,
 //         (k_ContextDestructorFunction_t)k_ConstructorDeclarationContext_delete,
 //         (k_EnumerateContextChildrenFunction_t)k_ConstructorDeclarationContext_getChildren);
 
@@ -1664,7 +1664,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 //     context->m_enumerationBaseClause = NULL;
 //     context->m_enumerationSuite = NULL;
 
-//     k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ENUMERATION_DECLARATION, context,
+//     k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ENUMERATION_DECLARATION, context,
 //         (k_ContextDestructorFunction_t)k_EnumerationDeclarationContext_delete,
 //         (k_EnumerateContextChildrenFunction_t)k_EnumerationDeclarationContext_getChildren);
 
@@ -1698,7 +1698,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 //     context->m_node = node;
 //     context->m_typeName = NULL;
 
-//     k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ENUMERATION_BASE_CLAUSE, context,
+//     k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ENUMERATION_BASE_CLAUSE, context,
 //         (k_ContextDestructorFunction_t)k_EnumerationBaseClauseContext_delete,
 //         (k_EnumerateContextChildrenFunction_t)k_EnumerationBaseClauseContext_getChildren);
 
@@ -1728,7 +1728,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 //     context->m_node = node;
 //     context->m_enumerates = jtk_ArrayList_new();
 
-//     k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ENUMERATION_SUITE, context,
+//     k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ENUMERATION_SUITE, context,
 //         (k_ContextDestructorFunction_t)k_EnumerationSuiteContext_delete,
 //         (k_EnumerateContextChildrenFunction_t)k_EnumerationSuiteContext_getChildren);
 
@@ -1760,7 +1760,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 //     context->m_identifier = NULL;
 //     context->m_functionArguments = NULL;
 
-//     k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ENUMERATE, context,
+//     k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ENUMERATE, context,
 //         (k_ContextDestructorFunction_t)k_EnumerateContext_delete,
 //         (k_EnumerateContextChildrenFunction_t)k_EnumerateContext_getChildren);
 
@@ -1793,7 +1793,7 @@ k_ExpressionsContext_t* k_ExpressionsContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_expressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_EXPRESSIONS, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_EXPRESSIONS, context,
         (k_ContextDestructorFunction_t)k_ExpressionsContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ExpressionsContext_getChildren);
 
@@ -1824,7 +1824,7 @@ k_ExpressionContext_t* k_ExpressionContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_assignmentExpression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_ExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ExpressionContext_getChildren);
 
@@ -1856,7 +1856,7 @@ k_AssignmentExpressionContext_t* k_AssignmentExpressionContext_new(k_ASTNode_t* 
     context->m_assignmentOperator = NULL;
     context->m_assignmentExpression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ASSIGNMENT_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ASSIGNMENT_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_AssignmentExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_AssignmentExpressionContext_getChildren);
 
@@ -1892,7 +1892,7 @@ k_ConditionalExpressionContext_t* k_ConditionalExpressionContext_new(k_ASTNode_t
     context->m_thenExpression = NULL;
     context->m_elseExpression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_CONDITIONAL_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_CONDITIONAL_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_ConditionalExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ConditionalExpressionContext_getChildren);
 
@@ -1927,7 +1927,7 @@ k_LogicalOrExpressionContext_t* k_LogicalOrExpressionContext_new(k_ASTNode_t* no
     context->m_logicalAndExpression = NULL;
     context->m_logicalAndExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_LOGICAL_OR_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_LOGICAL_OR_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_LogicalOrExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_LogicalOrExpressionContext_getChildren);
 
@@ -1960,7 +1960,7 @@ k_LogicalAndExpressionContext_t* k_LogicalAndExpressionContext_new(k_ASTNode_t* 
     context->m_inclusiveOrExpression = NULL;
     context->m_inclusiveOrExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_LOGICAL_AND_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_LOGICAL_AND_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_LogicalAndExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_LogicalAndExpressionContext_getChildren);
 
@@ -1993,7 +1993,7 @@ k_InclusiveOrExpressionContext_t* k_InclusiveOrExpressionContext_new(k_ASTNode_t
     context->m_exclusiveOrExpression = NULL;
     context->m_exclusiveOrExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_INCLUSIVE_OR_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_INCLUSIVE_OR_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_InclusiveOrExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_InclusiveOrExpressionContext_getChildren);
 
@@ -2026,7 +2026,7 @@ k_ExclusiveOrExpressionContext_t* k_ExclusiveOrExpressionContext_new(k_ASTNode_t
     context->m_andExpression = NULL;
     context->m_andExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_EXCLUSIVE_OR_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_EXCLUSIVE_OR_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_ExclusiveOrExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ExclusiveOrExpressionContext_getChildren);
 
@@ -2059,7 +2059,7 @@ k_AndExpressionContext_t* k_AndExpressionContext_new(k_ASTNode_t* node) {
     context->m_equalityExpression = NULL;
     context->m_equalityExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_AND_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_AND_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_AndExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_AndExpressionContext_getChildren);
 
@@ -2092,7 +2092,7 @@ k_EqualityExpressionContext_t* k_EqualityExpressionContext_new(k_ASTNode_t* node
     context->m_relationalExpression = NULL;
     context->m_relationalExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_EQUALITY_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_EQUALITY_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_EqualityExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_EqualityExpressionContext_getChildren);
 
@@ -2138,7 +2138,7 @@ k_RelationalExpressionContext_t* k_RelationalExpressionContext_new(k_ASTNode_t* 
     context->m_shiftExpression = NULL;
     context->m_shiftExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_RELATIONAL_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_RELATIONAL_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_RelationalExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_RelationalExpressionContext_getChildren);
 
@@ -2185,7 +2185,7 @@ k_ShiftExpressionContext_t* k_ShiftExpressionContext_new(k_ASTNode_t* node) {
     context->m_additiveExpression = NULL;
     context->m_additiveExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_SHIFT_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_SHIFT_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_ShiftExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ShiftExpressionContext_getChildren);
 
@@ -2232,7 +2232,7 @@ k_AdditiveExpressionContext_t* k_AdditiveExpressionContext_new(k_ASTNode_t* node
     context->m_multiplicativeExpression = NULL;
     context->m_multiplicativeExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_ADDITIVE_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_ADDITIVE_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_AdditiveExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_AdditiveExpressionContext_getChildren);
 
@@ -2279,7 +2279,7 @@ k_MultiplicativeExpressionContext_t* k_MultiplicativeExpressionContext_new(k_AST
     context->m_unaryExpression = NULL;
     context->m_unaryExpressions = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_MULTIPLICATIVE_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_MULTIPLICATIVE_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_MultiplicativeExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_MultiplicativeExpressionContext_getChildren);
 
@@ -2326,7 +2326,7 @@ k_UnaryExpressionContext_t* k_UnaryExpressionContext_new(k_ASTNode_t* node) {
     context->m_unaryExpression = NULL;
     context->m_postfixExpression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_UNARY_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_UNARY_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_UnaryExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_UnaryExpressionContext_getChildren);
 
@@ -2363,7 +2363,7 @@ k_PostfixExpressionContext_t* k_PostfixExpressionContext_new(k_ASTNode_t* node) 
     context->m_primaryExpression = NULL;
     context->m_postfixParts = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_POSTFIX_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_POSTFIX_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_PostfixExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_PostfixExpressionContext_getChildren);
 
@@ -2395,7 +2395,7 @@ k_SubscriptContext_t* k_SubscriptContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_expression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_SUBSCRIPT, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_SUBSCRIPT, context,
         (k_ContextDestructorFunction_t)k_SubscriptContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_SubscriptContext_getChildren);
 
@@ -2425,7 +2425,7 @@ k_FunctionArgumentsContext_t* k_FunctionArgumentsContext_new(k_ASTNode_t* node) 
     context->m_node = node;
     context->m_expressions = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_FUNCTION_ARGUMENTS, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_FUNCTION_ARGUMENTS, context,
         (k_ContextDestructorFunction_t)k_FunctionArgumentsContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_FunctionArgumentsContext_getChildren);
 
@@ -2457,7 +2457,7 @@ k_MemberAccessContext_t* k_MemberAccessContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_identifier = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_MEMBER_ACCESS, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_MEMBER_ACCESS, context,
         (k_ContextDestructorFunction_t)k_MemberAccessContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_MemberAccessContext_getChildren);
 
@@ -2487,7 +2487,7 @@ k_PostfixOperatorContext_t* k_PostfixOperatorContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_postfixOperator = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_POSTFIX_OPERATOR, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_POSTFIX_OPERATOR, context,
         (k_ContextDestructorFunction_t)k_PostfixOperatorContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_PostfixOperatorContext_getChildren);
 
@@ -2516,7 +2516,7 @@ k_PrimaryExpressionContext_t* k_PrimaryExpressionContext_new(k_ASTNode_t* node) 
     context->m_node = node;
     context->m_expression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_PRIMARY_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_PRIMARY_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_PrimaryExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_PrimaryExpressionContext_getChildren);
     return context;
@@ -2543,7 +2543,7 @@ k_MapExpressionContext_t* k_MapExpressionContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_mapEntries = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_MAP_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_MAP_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_MapExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_MapExpressionContext_getChildren);
 
@@ -2573,7 +2573,7 @@ k_MapEntriesContext_t* k_MapEntriesContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_mapEntries = jtk_ArrayList_new();
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_MAP_ENTRIES, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_MAP_ENTRIES, context,
         (k_ContextDestructorFunction_t)k_MapEntriesContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_MapEntriesContext_getChildren);
 
@@ -2605,7 +2605,7 @@ k_MapEntryContext_t* k_MapEntryContext_new(k_ASTNode_t* node) {
     context->m_keyExpression = NULL;
     context->m_valueExpression = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_MAP_ENTRY, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_MAP_ENTRY, context,
         (k_ContextDestructorFunction_t)k_MapEntryContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_MapEntryContext_getChildren);
 
@@ -2636,7 +2636,7 @@ k_ListExpressionContext_t* k_ListExpressionContext_new(k_ASTNode_t* node) {
     context->m_node = node;
     context->m_expressions = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_LIST_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_LIST_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_ListExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_ListExpressionContext_getChildren);
 
@@ -2667,7 +2667,7 @@ k_NewExpressionContext_t* k_NewExpressionContext_new(k_ASTNode_t* node) {
     context->m_typeName = NULL;
     context->m_functionArguments = NULL;
 
-    k_Context_initializeNode(node, ZEN_AST_NODE_TYPE_NEW_EXPRESSION, context,
+    k_Context_initialiKUSHode(node, KUSH_AST_NODE_TYPE_NEW_EXPRESSION, context,
         (k_ContextDestructorFunction_t)k_NewExpressionContext_delete,
         (k_EnumerateContextChildrenFunction_t)k_NewExpressionContext_getChildren);
 

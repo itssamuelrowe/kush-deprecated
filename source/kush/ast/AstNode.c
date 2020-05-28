@@ -25,7 +25,7 @@
 
 k_ASTNode_t* k_ASTNode_new(k_ASTNode_t* parent) {
     k_ASTNode_t* node = k_Memory_allocate(k_ASTNode_t, 1);
-    node->m_type = ZEN_AST_NODE_TYPE_UNKNOWN;
+    node->m_type = KUSH_AST_NODE_TYPE_UNKNOWN;
     node->m_context = NULL;
     node->m_parent = parent;
     node->m_children = NULL;
@@ -79,12 +79,12 @@ bool k_ASTNode_isErroneous(k_ASTNode_t* node) {
 
 bool k_ASTNode_isTerminal(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
-    return node->m_type == ZEN_AST_NODE_TYPE_TERMINAL;
+    return node->m_type == KUSH_AST_NODE_TYPE_TERMINAL;
 }
 
 bool k_ASTNode_isRule(k_ASTNode_t* node) {
     jtk_Assert_assertObject(node, "The specified node is null.");
-    return /* !node->m_erroneous && */ (node->m_type != ZEN_AST_NODE_TYPE_TERMINAL);
+    return /* !node->m_erroneous && */ (node->m_type != KUSH_AST_NODE_TYPE_TERMINAL);
 }
 
 int32_t k_ASTNode_getDepth(k_ASTNode_t* node) {
@@ -113,7 +113,7 @@ jtk_ArrayList_t* k_ASTNode_getChildren(k_ASTNode_t* node) {
 void k_ASTNode_toString0(k_ASTNode_t* node, jtk_StringBuilder_t* builder) {
     jtk_Assert_assertObject(node, "The specified node is null.");
 
-    if (node->m_type == ZEN_AST_NODE_TYPE_TERMINAL) {
+    if (node->m_type == KUSH_AST_NODE_TYPE_TERMINAL) {
         k_Token_t* token = (k_Token_t*)node->m_context;
         jtk_StringBuilder_appendEx_z(builder, token->m_text, token->m_length);
     }
@@ -123,11 +123,11 @@ void k_ASTNode_toString0(k_ASTNode_t* node, jtk_StringBuilder_t* builder) {
         int32_t i;
         for (i = 0; i < size; i++) {
             k_ASTNode_t* child = jtk_ArrayList_getValue(nodes, i);
-            if (child->m_type == ZEN_AST_NODE_TYPE_TERMINAL) {
+            if (child->m_type == KUSH_AST_NODE_TYPE_TERMINAL) {
                 k_Token_t* token = (k_Token_t*)child->m_context;
                 jtk_StringBuilder_appendEx_z(builder, token->m_text, token->m_length);
             }
-            else if (child->m_type == ZEN_AST_NODE_TYPE_UNKNOWN) {
+            else if (child->m_type == KUSH_AST_NODE_TYPE_UNKNOWN) {
                 jtk_StringBuilder_appendEx_z(builder, "<unknown>", 9);
             }
             else {

@@ -109,7 +109,7 @@ k_SymbolResolutionListener_t* k_SymbolResolutionListener_new(
     listener->m_astListener = k_ASTListener_newWithContext(listener);
     listener->m_symbolTable = NULL;
     listener->m_scopes = NULL;
-    listener->m_label = ZEN_EXPRESSION_ANNOTATION_UNKNOWN;
+    listener->m_label = KUSH_EXPRESSION_ANNOTATION_UNKNOWN;
     listener->m_functionIndex = 0;
     listener->m_fieldIndex = 0;
 
@@ -371,7 +371,7 @@ void k_SymbolResolutionListener_reset(k_SymbolResolutionListener_t* listener,
 
     listener->m_symbolTable = symbolTable;
     listener->m_scopes = scopes;
-    listener->m_label = ZEN_EXPRESSION_ANNOTATION_UNKNOWN;
+    listener->m_label = KUSH_EXPRESSION_ANNOTATION_UNKNOWN;
     listener->m_fieldIndex = 0;
     listener->m_functionIndex = 0;
 }
@@ -396,7 +396,7 @@ void k_SymbolResolutionListener_onExitEveryRule(k_ASTListener_t* astListener, k_
 
 void k_SymbolResolutionListener_applyDefaultImports(k_SymbolResolutionListener_t* listener) {
     k_Compiler_t* compiler = listener->m_compiler;
-    k_Symbol_t* symbol = k_Compiler_resolveSymbol(compiler, "zen.core.ZenKernel", 18);
+    k_Symbol_t* symbol = k_Compiler_resolveSymbol(compiler, "KUSH.core.KUSHKernel", 18);
     k_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
     k_Scope_t* currentScope = listener->m_symbolTable->m_currentScope;
 
@@ -444,7 +444,7 @@ k_Symbol_t* k_SymbolResolutionListener_createExternalSymbol(
         sizeof (k_Symbol_t));
     externalSymbol->m_enclosingScope = enclosingScope;
     externalSymbol->m_identifier = identifier;
-    externalSymbol->m_flags |= ZEN_SYMBOL_FLAG_EXTERNAL;
+    externalSymbol->m_flags |= KUSH_SYMBOL_FLAG_EXTERNAL;
 
     return externalSymbol;
 }
@@ -484,7 +484,7 @@ void k_SymbolResolutionListener_onEnterImportDeclaration(
             qualifiedNameSize);
         if (symbol == NULL) {
             k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-                ZEN_ERROR_CODE_UNKNOWN_CLASS, lastIdentifierToken);
+                KUSH_ERROR_CODE_UNKNOWN_CLASS, lastIdentifierToken);
         }
         else {
             k_Symbol_t* localSymbol = k_SymbolTable_resolve(listener->m_symbolTable,
@@ -496,7 +496,7 @@ void k_SymbolResolutionListener_onEnterImportDeclaration(
             }
             else {
                 k_ErrorHandler_handleSemanticalError(errorHandler,
-                    listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_PREVIOUSLY_IMPORTED,
+                    listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_PREVIOUSLY_IMPORTED,
                     (k_Token_t*)localSymbol->m_identifier->m_context);
             }
         }
@@ -1219,10 +1219,10 @@ void k_SymbolResolutionListener_onEnterAssignmentExpression(k_ASTListener_t* ast
     k_ASTNode_t* assignmentOperator = context->m_assignmentOperator;
     if (assignmentOperator != NULL) {
         k_ASTWalker_walk(astListener, context->m_conditionalExpression);
-        if (listener->m_label == ZEN_EXPRESSION_ANNOTATION_VALUE) {
+        if (listener->m_label == KUSH_EXPRESSION_ANNOTATION_VALUE) {
             k_Token_t* assignmentOperatorToken = (k_Token_t*)assignmentOperator->m_context;
             k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-            ZEN_ERROR_CODE_INVALID_LVALUE, assignmentOperatorToken);
+            KUSH_ERROR_CODE_INVALID_LVALUE, assignmentOperatorToken);
         }
         else {
             /* Do not walk through the assignment expression when the left value
@@ -1242,7 +1242,7 @@ void k_SymbolResolutionListener_onExitConditionalExpression(k_ASTListener_t* ast
     k_ConditionalExpressionContext_t* context = (k_ConditionalExpressionContext_t*)node->m_context;
 
     if (context->m_thenExpression != NULL) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1258,7 +1258,7 @@ void k_SymbolResolutionListener_onExitLogicalOrExpression(k_ASTListener_t* astLi
     k_LogicalOrExpressionContext_t* context = (k_LogicalOrExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_logicalAndExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1274,7 +1274,7 @@ void k_SymbolResolutionListener_onExitLogicalAndExpression(k_ASTListener_t* astL
     k_LogicalAndExpressionContext_t* context = (k_LogicalAndExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_inclusiveOrExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1290,7 +1290,7 @@ void k_SymbolResolutionListener_onExitInclusiveOrExpression(k_ASTListener_t* ast
     k_InclusiveOrExpressionContext_t* context = (k_InclusiveOrExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_exclusiveOrExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1306,7 +1306,7 @@ void k_SymbolResolutionListener_onExitExclusiveOrExpression(k_ASTListener_t* ast
     k_ExclusiveOrExpressionContext_t* context = (k_ExclusiveOrExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_andExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1322,7 +1322,7 @@ void k_SymbolResolutionListener_onExitAndExpression(k_ASTListener_t* astListener
     k_AndExpressionContext_t* context = (k_AndExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_equalityExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1338,7 +1338,7 @@ void k_SymbolResolutionListener_onExitEqualityExpression(k_ASTListener_t* astLis
     k_EqualityExpressionContext_t* context = (k_EqualityExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_relationalExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1354,7 +1354,7 @@ void k_SymbolResolutionListener_onExitRelationalExpression(k_ASTListener_t* astL
     k_RelationalExpressionContext_t* context = (k_RelationalExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_shiftExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1370,7 +1370,7 @@ void k_SymbolResolutionListener_onExitShiftExpression(k_ASTListener_t* astListen
     k_ShiftExpressionContext_t* context = (k_ShiftExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_additiveExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1386,7 +1386,7 @@ void k_SymbolResolutionListener_onExitAdditiveExpression(k_ASTListener_t* astLis
     k_AdditiveExpressionContext_t* context = (k_AdditiveExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_multiplicativeExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1402,7 +1402,7 @@ void k_SymbolResolutionListener_onExitMultiplicativeExpression(k_ASTListener_t* 
     k_MultiplicativeExpressionContext_t* context = (k_MultiplicativeExpressionContext_t*)node->m_context;
 
     if (!jtk_ArrayList_isEmpty(context->m_unaryExpressions)) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1418,7 +1418,7 @@ void k_SymbolResolutionListener_onExitUnaryExpression(k_ASTListener_t* astListen
     k_UnaryExpressionContext_t* context = (k_UnaryExpressionContext_t*)node->m_context;
 
     if (context->m_unaryOperator != NULL) {
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1463,7 +1463,7 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
         token = (k_Token_t*)expression->m_context;
 
         switch (k_Token_getType(token)) {
-            case ZEN_TOKEN_IDENTIFIER: {
+            case KUSH_TOKEN_IDENTIFIER: {
                 /* Retrieve the string equivalent to the identifier node. */
                 const uint8_t* identifierText = k_Token_getText(token);
                 /* Resolve the symbol in the symbol table. */
@@ -1473,7 +1473,7 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
                     k_Scope_t* enclosingScope = k_Symbol_getEnclosingScope(symbol);
                     if (k_Symbol_isVariable(symbol) || k_Symbol_isConstant(symbol)) {
                         /* Annotate the AST node as placeholder. */
-                        listener->m_label = ZEN_EXPRESSION_ANNOTATION_PLACEHOLDER;
+                        listener->m_label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
                     }
                     else {
                         /* Pass the reference to the symbol to the next phase. */
@@ -1484,39 +1484,39 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
                         k_Token_t* symbolToken = (k_Token_t*)symbol->m_identifier->m_context;
                         if (token->m_startIndex <= symbolToken->m_startIndex) {
                             k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-                                    ZEN_ERROR_CODE_UNDECLARED_IDENTIFIER, token);
+                                    KUSH_ERROR_CODE_UNDECLARED_IDENTIFIER, token);
                         }
                     }
                 }
                 else {
                     k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-                            ZEN_ERROR_CODE_UNDECLARED_IDENTIFIER, token);
+                            KUSH_ERROR_CODE_UNDECLARED_IDENTIFIER, token);
                 }
 
                 break;
             }
 
-            case ZEN_TOKEN_INTEGER_LITERAL:
-            case ZEN_TOKEN_STRING_LITERAL:
-            case ZEN_TOKEN_KEYWORD_NULL:
-            case ZEN_TOKEN_KEYWORD_FALSE:
-            case ZEN_TOKEN_KEYWORD_THIS:
-            case ZEN_TOKEN_KEYWORD_TRUE: {
+            case KUSH_TOKEN_INTEGER_LITERAL:
+            case KUSH_TOKEN_STRING_LITERAL:
+            case KUSH_TOKEN_KEYWORD_NULL:
+            case KUSH_TOKEN_KEYWORD_FALSE:
+            case KUSH_TOKEN_KEYWORD_THIS:
+            case KUSH_TOKEN_KEYWORD_TRUE: {
                 /* Annotate the AST node as value. */
-                listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+                listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
 
                 break;
             }
         }
     }
-    else if ((expression->m_type == ZEN_AST_NODE_TYPE_MAP_EXPRESSION) ||
-        (expression->m_type == ZEN_AST_NODE_TYPE_LIST_EXPRESSION) ||
-        (expression->m_type == ZEN_AST_NODE_TYPE_EXPRESSION) ||
-        (expression->m_type == ZEN_AST_NODE_TYPE_NEW_EXPRESSION)) {
+    else if ((expression->m_type == KUSH_AST_NODE_TYPE_MAP_EXPRESSION) ||
+        (expression->m_type == KUSH_AST_NODE_TYPE_LIST_EXPRESSION) ||
+        (expression->m_type == KUSH_AST_NODE_TYPE_EXPRESSION) ||
+        (expression->m_type == KUSH_AST_NODE_TYPE_NEW_EXPRESSION)) {
         k_ASTWalker_walk(astListener, expression);
 
         /* Annotate the AST node as value. */
-        listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+        listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 
     int32_t i;
@@ -1526,9 +1526,9 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
         k_ASTNodeType_t type = k_ASTNode_getType(postfixPart);
 
         switch (type) {
-            case ZEN_AST_NODE_TYPE_SUBSCRIPT: {
+            case KUSH_AST_NODE_TYPE_SUBSCRIPT: {
                 /* Annotate the AST node as placeholder. */
-                listener->m_label = ZEN_EXPRESSION_ANNOTATION_PLACEHOLDER;
+                listener->m_label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
 
                 k_SubscriptContext_t* subscriptContext = (k_SubscriptContext_t*)postfixPart->m_context;
 
@@ -1547,9 +1547,9 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
                 break;
             }
 
-            case ZEN_AST_NODE_TYPE_FUNCTION_ARGUMENTS: {
+            case KUSH_AST_NODE_TYPE_FUNCTION_ARGUMENTS: {
                 /* Annotate the AST node as value. */
-                listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+                listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
 
                 k_FunctionArgumentsContext_t* functionArgumentsContext =
                     (k_FunctionArgumentsContext_t*)postfixPart->m_context;
@@ -1557,7 +1557,7 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
                 if (i == 0) {
                     if (primarySymbol == NULL) {
                         k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-                            ZEN_ERROR_CODE_VARIABLE_TREATED_AS_FUNCTION, token);
+                            KUSH_ERROR_CODE_VARIABLE_TREATED_AS_FUNCTION, token);
                     }
                     else if (k_Symbol_isFunction(primarySymbol)) {
                         k_FunctionSymbol_t* functionSymbol = &primarySymbol->m_context.m_asFunction;
@@ -1589,7 +1589,7 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
                 break;
             }
 
-            case ZEN_AST_NODE_TYPE_MEMBER_ACCESS: {
+            case KUSH_AST_NODE_TYPE_MEMBER_ACCESS: {
                 k_MemberAccessContext_t* memberAccessContext =
                     (k_MemberAccessContext_t*)postfixPart->m_context;
                 k_ASTNode_t* identifier = memberAccessContext->m_identifier;
@@ -1598,13 +1598,13 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
                 k_ASTNode_t* functionArguments = NULL;
 
                 /* Annotate the AST node as placeholder. */
-                listener->m_label = ZEN_EXPRESSION_ANNOTATION_PLACEHOLDER;
+                listener->m_label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
 
                 if ((i + 1) < postfixPartCount) {
                     k_ASTNode_t* nextPostfixPart = (k_ASTNode_t*)jtk_ArrayList_getValue(
                         context->m_postfixParts, i + 1);
                     k_ASTNodeType_t nextPostfixPartType = k_ASTNode_getType(nextPostfixPart);
-                    if (nextPostfixPartType == ZEN_AST_NODE_TYPE_FUNCTION_ARGUMENTS) {
+                    if (nextPostfixPartType == KUSH_AST_NODE_TYPE_FUNCTION_ARGUMENTS) {
                         functionArguments = nextPostfixPart;
                         i++;
                     }
@@ -1612,7 +1612,7 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
 
                 if (functionArguments != NULL) {
                     /* Annotate the AST node as placeholder. */
-                    listener->m_label = ZEN_EXPRESSION_ANNOTATION_VALUE;
+                    listener->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
 
                     k_FunctionArgumentsContext_t* functionArgumentsContext =
                         (k_FunctionArgumentsContext_t*)functionArguments->m_context;
@@ -1638,7 +1638,7 @@ void k_SymbolResolutionListener_onExitPostfixExpression(k_ASTListener_t* astList
             }
 
             /*
-            case ZEN_AST_NODE_TYPE_POSTFIX_OPERATOR: {
+            case KUSH_AST_NODE_TYPE_POSTFIX_OPERATOR: {
 
                 break;
             }
@@ -1658,7 +1658,7 @@ void k_SymbolResolutionListener_onEnterSubscript(k_ASTListener_t* astListener,
     k_SymbolResolutionListener_t* listener = (k_SymbolResolutionListener_t*)astListener->m_context;
     k_ExpressionContext_t* context = (k_ExpressionContext_t*)node->m_context;
 
-    // listener->m_label = ZEN_EXPRESSION_ANNOTATION_PLACEHOLDER;
+    // listener->m_label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
 }
 
 void k_SymbolResolutionListener_onExitSubscript(k_ASTListener_t* astListener,
@@ -1764,7 +1764,7 @@ void k_SymbolResolutionListener_onEnterNewExpression(k_ASTListener_t* astListene
 
     if (symbol == NULL) {
         k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-            ZEN_ERROR_CODE_UNDECLARED_CLASS, lastIdentifierToken);
+            KUSH_ERROR_CODE_UNDECLARED_CLASS, lastIdentifierToken);
     }
     else {
         if (k_Symbol_isExternal(symbol)) {
@@ -1782,7 +1782,7 @@ void k_SymbolResolutionListener_onEnterNewExpression(k_ASTListener_t* astListene
                 if ((constructorSymbol == NULL) ||
                     (k_Symbol_getEnclosingScope(constructorSymbol) != scope)) {
                     k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-                        ZEN_ERROR_CODE_NO_SUITABLE_CONSTRUCTOR, lastIdentifierToken);
+                        KUSH_ERROR_CODE_NO_SUITABLE_CONSTRUCTOR, lastIdentifierToken);
                 }
                 else {
                     if (!k_Symbol_isFunction(constructorSymbol)) {
@@ -1798,7 +1798,7 @@ void k_SymbolResolutionListener_onEnterNewExpression(k_ASTListener_t* astListene
         }
         else {
             k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-                ZEN_ERROR_CODE_INSTANTIATION_OF_NON_CLASS_SYMBOL, lastIdentifierToken);
+                KUSH_ERROR_CODE_INSTANTIATION_OF_NON_CLASS_SYMBOL, lastIdentifierToken);
         }
     }
 

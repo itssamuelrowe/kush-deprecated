@@ -23,7 +23,7 @@
 // Constructor
 
 k_Error_t* k_Error_new(k_ErrorCode_t code, k_Token_t* token) {
-    return k_Error_newEx(code, token, ZEN_TOKEN_UNKNOWN);
+    return k_Error_newEx(code, token, k_TOKEN_UNKNOWN);
 }
 
 k_Error_t* k_Error_newEx(k_ErrorCode_t code, k_Token_t* token,

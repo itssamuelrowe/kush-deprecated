@@ -81,7 +81,7 @@ void k_TokenStream_consume(k_TokenStream_t* stream) {
         skip = false;
     }
 
-    jtk_Assert_assertFalse((!skip && (k_TokenStream_la(stream, 1) == ZEN_TOKEN_END_OF_STREAM)), "...");
+    jtk_Assert_assertFalse((!skip && (k_TokenStream_la(stream, 1) == KUSH_TOKEN_END_OF_STREAM)), "...");
 
     bool hasToken = k_TokenStream_synchronize(stream, stream->m_p + 1);
     if (hasToken) {
@@ -117,7 +117,7 @@ int32_t k_TokenStream_fetch(k_TokenStream_t* stream, int32_t n) {
         jtk_ArrayList_add(stream->m_tokens, token);
         jtk_ArrayList_add(stream->m_trash, token);
 
-        if (k_Token_getType(token) == ZEN_TOKEN_END_OF_STREAM) {
+        if (k_Token_getType(token) == KUSH_TOKEN_END_OF_STREAM) {
             stream->m_hitEndOfStream = true;
             return i + 1;
         }
@@ -221,7 +221,7 @@ int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream,
 
     while (i >= 0) {
         k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
-        if ((k_Token_getType(token) == ZEN_TOKEN_END_OF_STREAM) ||
+        if ((k_Token_getType(token) == KUSH_TOKEN_END_OF_STREAM) ||
             (k_Token_getChannel(token) == channel)) {
             return i;
         }
@@ -253,7 +253,7 @@ int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream,
         /* In case the token stream has reached the end-of-stream,
          * return the index of the end-of-stream token.
          */
-        if (k_Token_getType(token) == ZEN_TOKEN_END_OF_STREAM) {
+        if (k_Token_getType(token) == KUSH_TOKEN_END_OF_STREAM) {
             return i;
         }
 

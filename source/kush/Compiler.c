@@ -23,7 +23,7 @@
  * make sure it is included before any other file which may
  * include Logger.h!
  */
-#include <com/onecube/zen/Configuration.h>
+#include <com/onecube/k/Configuration.h>
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/array/Arrays.h>
@@ -56,7 +56,7 @@
 
 #include <kush/support/ErrorHandler.h>
 
-#include <com/onecube/zen/virtual-machine/feb/Instruction.h>
+#include <com/onecube/k/virtual-machine/feb/Instruction.h>
 
 // Register
 
@@ -84,10 +84,10 @@ k_Symbol_t* k_Compiler_resolveSymbol(k_Compiler_t* compiler,
 // Token
 
 void k_Compiler_printToken(k_Token_t* token) {
-    printf("[%d-%d:%d-%d:%s:%s]", token->m_startLine, token->m_stopLine, token->m_startColumn + 1, token->m_stopColumn + 1, token->m_channel == ZEN_TOKEN_CHANNEL_DEFAULT? "default" : "hidden", k_Lexer_getLiteralName(token->m_type));
+    printf("[%d-%d:%d-%d:%s:%s]", token->m_startLine, token->m_stopLine, token->m_startColumn + 1, token->m_stopColumn + 1, token->m_channel == k_TOKEN_CHANNEL_DEFAULT? "default" : "hidden", k_Lexer_getLiteralName(token->m_type));
     k_TokenType_t type = k_Token_getType(token);
-    if ((type == ZEN_TOKEN_IDENTIFIER) || (type == ZEN_TOKEN_INTEGER_LITERAL) ||
-        (type == ZEN_TOKEN_STRING_LITERAL)) {
+    if ((type == k_TOKEN_IDENTIFIER) || (type == k_TOKEN_INTEGER_LITERAL) ||
+        (type == k_TOKEN_STRING_LITERAL)) {
         printf(" %.*s", token->m_length, token->m_text);
     }
     puts("");
@@ -103,10 +103,10 @@ void k_Compiler_k_Compiler_printTokens(k_Compiler_t* compiler, jtk_ArrayList_t* 
     for (i = 0; i < limit; i++) {
         k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(tokens, i);
         k_TokenChannel_t channel = k_Token_getChannel(token);
-        if (channel == ZEN_TOKEN_CHANNEL_DEFAULT) {
+        if (channel == k_TOKEN_CHANNEL_DEFAULT) {
             defaultChannel++;
         }
-        else if (channel == ZEN_TOKEN_CHANNEL_HIDDEN) {
+        else if (channel == k_TOKEN_CHANNEL_HIDDEN) {
             hiddenChannel++;
         }
         else {
@@ -343,7 +343,7 @@ void k_Compiler_printErrors(k_Compiler_t* compiler) {
             sprintf(lineNumbers, "%d", token->m_startLine);
         }
 
-        if (error->m_expected != ZEN_TOKEN_UNKNOWN) {
+        if (error->m_expected != k_TOKEN_UNKNOWN) {
             const uint8_t* expectedName = k_Lexer_getLiteralName(error->m_expected);
             const uint8_t* actualName = k_Lexer_getLiteralName(token->m_type);
             sprintf(message0, "Expected token '%s', encountered token '%s'",
@@ -367,7 +367,7 @@ void k_Compiler_initialize(k_Compiler_t* compiler) {
 
 void k_Compiler_buildAST(k_Compiler_t* compiler) {
     k_Lexer_t* lexer = k_Lexer_new(compiler);
-    k_TokenStream_t* tokens = k_TokenStream_new(compiler, lexer, ZEN_TOKEN_CHANNEL_DEFAULT);
+    k_TokenStream_t* tokens = k_TokenStream_new(compiler, lexer, k_TOKEN_CHANNEL_DEFAULT);
     k_Parser_t* parser = k_Parser_new(compiler, tokens);
     k_ASTPrinter_t* astPrinter = k_ASTPrinter_new();
     k_ASTListener_t* astPrinterASTListener = k_ASTPrinter_getASTListener(astPrinter);
@@ -585,7 +585,7 @@ jtk_ArrayList_t* k_CString_split_c(const uint8_t* sequence, int32_t size,
     return result;
 }
 
-int32_t k_ZenVirtualMachine_main(char** arguments, int32_t length);
+int32_t k_kVirtualMachine_main(char** arguments, int32_t length);
 
 void k_Compiler_printHelp() {
     printf(
@@ -690,7 +690,7 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
                     }
 
                     #ifdef JTK_LOGGER_DISABLE
-                        printf("[warning] The logger was disabled at compile time. Please consider building Zen without the `JTK_LOGGER_DISABLE` constant in 'Configuration.h'.\n");
+                        printf("[warning] The logger was disabled at compile time. Please consider building k without the `JTK_LOGGER_DISABLE` constant in 'Configuration.h'.\n");
                     #else
                         jtk_Logger_setLevel(compiler->m_logger, level);
                     #endif
@@ -756,7 +756,7 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
     }
 
     if ((vmArguments != NULL) && noErrors) {
-        k_ZenVirtualMachine_main(vmArguments, vmArgumentsSize);
+        k_kVirtualMachine_main(vmArguments, vmArgumentsSize);
     }
 
     // TODO: Return true only if the compilation suceeded.

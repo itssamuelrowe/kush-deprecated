@@ -22,14 +22,14 @@
  * DataChannel                                                                 *
  *******************************************************************************/
 
-#define ZEN_BYTE_CODE_CHANNEL_DEFAULT_CAPACITY 1024
+#define k_BYTE_CODE_CHANNEL_DEFAULT_CAPACITY 1024
 
 // Constructor
 
 k_DataChannel_t* k_DataChannel_new(int32_t identifier) {
     k_DataChannel_t* channel = k_Memory_allocate(k_DataChannel_t, 1);
-    channel->m_bytes = k_Memory_allocate(uint8_t, ZEN_BYTE_CODE_CHANNEL_DEFAULT_CAPACITY);
-    channel->m_capacity = ZEN_BYTE_CODE_CHANNEL_DEFAULT_CAPACITY;
+    channel->m_bytes = k_Memory_allocate(uint8_t, k_BYTE_CODE_CHANNEL_DEFAULT_CAPACITY);
+    channel->m_capacity = k_BYTE_CODE_CHANNEL_DEFAULT_CAPACITY;
     channel->m_index = 0;
     channel->m_identifier = identifier;
 
