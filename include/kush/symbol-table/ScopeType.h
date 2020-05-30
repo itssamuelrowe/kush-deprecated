@@ -27,7 +27,7 @@
  * @class ScopeType
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 enum k_ScopeType_t {
     KUSH_SCOPE_COMPILATION_UNIT,

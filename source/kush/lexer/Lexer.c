@@ -1929,29 +1929,14 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         lexer->m_type = KUSH_TOKEN_IDENTIFIER;
                         switch (length) {
                             case 2 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_DO], 2)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_DO;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IF], 2)) {
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IF], 2)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_IF;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IN], 2)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_IN;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IS], 2)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_IS;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_OR], 2)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_OR;
                                 }
                                 break;
                             }
 
                             case 3 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_AND], 3)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_AND;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FOR], 3)) {
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FOR], 3)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_FOR;
                                 }/*
                                 else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NAN], 3)) {
@@ -1970,20 +1955,11 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                             }
 
                             case 4 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_CASE], 4)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_CASE;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ELSE], 4)) {
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ELSE], 4)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_ELSE;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ENUM], 4)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_ENUM;
                                 }
                                 else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NULL], 4)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_NULL;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_THEN], 4)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_THEN;
                                 }
                                 else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_THIS], 4)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_THIS;
@@ -2004,14 +1980,8 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                                 else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_CATCH], 5)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_CATCH;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_CLASS], 5)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_CLASS;
-                                }
                                 else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FALSE], 5)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_FALSE;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FINAL], 5)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_FINAL;
                                 }
                                 else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_THROW], 5)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_THROW;
@@ -2023,65 +1993,21 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                             }
 
                             case 6 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ASSERT], 6)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_ASSERT;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IMPORT], 6)) {
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IMPORT], 6)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_IMPORT;
                                 }
                                 else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NATIVE], 6)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_NATIVE;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_PUBLIC], 6)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_PUBLIC;
-                                }
                                 else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_RETURN], 6)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_RETURN;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_SECRET], 6)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_SECRET;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_STATIC], 6)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_STATIC;
-                                }/*
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_SWITCH], 6)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_SWITCH;
-                                }*/
                                 break;
                             }
 
                             case 7 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ABSTRACT], 7)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_ABSTRACT;
-                                }/*
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_DEFAULT], 7)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_DEFAULT;
-                                }*/
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FINALLY], 7)) {
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FINALLY], 7)) {
                                     lexer->m_type = KUSH_TOKEN_KEYWORD_FINALLY;
-                                }/*
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_PACKAGE], 7)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_PACKAGE;
-                                }*/
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_PRIVATE], 7)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_PRIVATE;
-                                }
-                                break;
-                            }
-
-                            case 8 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_CONTINUE], 8)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_CONTINUE;
-                                }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FUNCTION], 8)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_FUNCTION;
-                                }
-                                break;
-                            }
-
-                            case 11 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_SYNCHRONIZE], 11)) {
-                                    lexer->m_type = KUSH_TOKEN_KEYWORD_SYNCHRONIZE;
                                 }
                                 break;
                             }

@@ -31,7 +31,7 @@ typedef struct k_Scope_t k_Scope_t;
  * @class ClassSymbol
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_ClassSymbol_t {
     /* The superclasses are added in the resolution phase. */

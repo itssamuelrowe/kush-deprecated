@@ -38,7 +38,7 @@ enum k_SymbolFlag_t {
  * @class Symbol
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_Symbol_t {
     k_SymbolCategory_t m_category;

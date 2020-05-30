@@ -829,7 +829,7 @@ typedef void (*k_OnExitNewExpressionFunction_t)(k_ASTListener_t* listener, k_AST
  * @class ASTListener
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_ASTListener_t {
     k_OnVisitErrorNodeFunction_t m_onVisitErrorNode;

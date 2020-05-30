@@ -30,7 +30,7 @@
  * @class WithParameterContext
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_WithParameterContext_t {
     k_ASTNode_t* m_node;

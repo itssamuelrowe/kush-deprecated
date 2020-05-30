@@ -12,7 +12,7 @@
 /**
  * @ingroup 
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 enum k_ExpressionAnnotation_t {
     KUSH_EXPRESSION_ANNOTATION_UNKNOWN,

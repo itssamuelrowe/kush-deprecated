@@ -53,7 +53,7 @@ typedef void (*k_EnumerateContextChildrenFunction_t)(void* context, jtk_ArrayLis
  * @class ASTNode
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_ASTNode_t {
     k_ASTNodeType_t m_type;

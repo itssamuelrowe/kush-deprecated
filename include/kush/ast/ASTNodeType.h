@@ -29,7 +29,7 @@
  * @class ASTNodeType
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 enum k_ASTNodeType_t {
 

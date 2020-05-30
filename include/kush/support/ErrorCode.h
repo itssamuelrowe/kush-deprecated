@@ -27,7 +27,7 @@
  * @class ErrorCode
  * @ingroup k_compiler_support
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 enum k_ErrorCode_t {
     KUSH_ERROR_CODE_NONE = 0,

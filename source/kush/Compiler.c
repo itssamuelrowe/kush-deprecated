@@ -23,7 +23,7 @@
  * make sure it is included before any other file which may
  * include Logger.h!
  */
-#include <com/onecube/k/Configuration.h>
+#include <kush/Configuration.h>
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/array/Arrays.h>
@@ -45,9 +45,6 @@
 #include <kush/ast/ASTWalker.h>
 #include <kush/ast/ASTAnnotations.h>
 #include <kush/ast/ASTPrinter.h>
-#include <kush/generator/BinaryEntityBuilder.h>
-#include <kush/generator/BinaryEntityGenerator.h>
-
 
 #include <kush/symbol-table/SymbolResolutionListener.h>
 #include <kush/symbol-table/FunctionSymbol.h>
@@ -55,8 +52,6 @@
 #include <kush/symbol-table/SymbolTable.h>
 
 #include <kush/support/ErrorHandler.h>
-
-#include <kush/virtual-machine/feb/Instruction.h>
 
 // Register
 
@@ -84,10 +79,10 @@ k_Symbol_t* k_Compiler_resolveSymbol(k_Compiler_t* compiler,
 // Token
 
 void k_Compiler_printToken(k_Token_t* token) {
-    printf("[%d-%d:%d-%d:%s:%s]", token->m_startLine, token->m_stopLine, token->m_startColumn + 1, token->m_stopColumn + 1, token->m_channel == k_TOKEN_CHANNEL_DEFAULT? "default" : "hidden", k_Lexer_getLiteralName(token->m_type));
+    printf("[%d-%d:%d-%d:%s:%s]", token->m_startLine, token->m_stopLine, token->m_startColumn + 1, token->m_stopColumn + 1, token->m_channel == KUSH_TOKEN_CHANNEL_DEFAULT? "default" : "hidden", k_Lexer_getLiteralName(token->m_type));
     k_TokenType_t type = k_Token_getType(token);
-    if ((type == k_TOKEN_IDENTIFIER) || (type == k_TOKEN_INTEGER_LITERAL) ||
-        (type == k_TOKEN_STRING_LITERAL)) {
+    if ((type == KUSH_TOKEN_IDENTIFIER) || (type == KUSH_TOKEN_INTEGER_LITERAL) ||
+        (type == KUSH_TOKEN_STRING_LITERAL)) {
         printf(" %.*s", token->m_length, token->m_text);
     }
     puts("");
@@ -103,10 +98,10 @@ void k_Compiler_k_Compiler_printTokens(k_Compiler_t* compiler, jtk_ArrayList_t* 
     for (i = 0; i < limit; i++) {
         k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(tokens, i);
         k_TokenChannel_t channel = k_Token_getChannel(token);
-        if (channel == k_TOKEN_CHANNEL_DEFAULT) {
+        if (channel == KUSH_TOKEN_CHANNEL_DEFAULT) {
             defaultChannel++;
         }
-        else if (channel == k_TOKEN_CHANNEL_HIDDEN) {
+        else if (channel == KUSH_TOKEN_CHANNEL_HIDDEN) {
             hiddenChannel++;
         }
         else {
@@ -200,7 +195,6 @@ k_Compiler_t* k_Compiler_new() {
     compiler->m_repository = jtk_HashMap_new(stringObjectAdapter, NULL);
     compiler->m_trash = NULL;
     compiler->m_coreApi = false;
-    compiler->m_disassembler = k_BinaryEntityDisassembler_new(NULL);
 #ifdef JTK_LOGGER_DISABLE
     compiler->m_logger = NULL;
 #else
@@ -343,7 +337,7 @@ void k_Compiler_printErrors(k_Compiler_t* compiler) {
             sprintf(lineNumbers, "%d", token->m_startLine);
         }
 
-        if (error->m_expected != k_TOKEN_UNKNOWN) {
+        if (error->m_expected != KUSH_TOKEN_UNKNOWN) {
             const uint8_t* expectedName = k_Lexer_getLiteralName(error->m_expected);
             const uint8_t* actualName = k_Lexer_getLiteralName(token->m_type);
             sprintf(message0, "Expected token '%s', encountered token '%s'",
@@ -367,7 +361,7 @@ void k_Compiler_initialize(k_Compiler_t* compiler) {
 
 void k_Compiler_buildAST(k_Compiler_t* compiler) {
     k_Lexer_t* lexer = k_Lexer_new(compiler);
-    k_TokenStream_t* tokens = k_TokenStream_new(compiler, lexer, k_TOKEN_CHANNEL_DEFAULT);
+    k_TokenStream_t* tokens = k_TokenStream_new(compiler, lexer, KUSH_TOKEN_CHANNEL_DEFAULT);
     k_Parser_t* parser = k_Parser_new(compiler, tokens);
     k_ASTPrinter_t* astPrinter = k_ASTPrinter_new();
     k_ASTListener_t* astPrinterASTListener = k_ASTPrinter_getASTListener(astPrinter);
@@ -488,8 +482,7 @@ void k_Compiler_analyze(k_Compiler_t* compiler) {
 }
 
 void k_Compiler_generate(k_Compiler_t* compiler) {
-    k_BinaryEntityGenerator_t* generator = k_BinaryEntityGenerator_new(compiler);
-
+    /*
     int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
@@ -508,11 +501,7 @@ void k_Compiler_generate(k_Compiler_t* compiler) {
 
         jtk_Logger_info(compiler->m_logger, "The code generation phase is complete.");
     }
-
-    /* The binary entity generator is not required anymore. Therefore, destroy
-    * it and release the resources it holds.
     */
-    k_BinaryEntityGenerator_delete(generator);
 }
 
 void k_Compiler_destroyNestedScopes(k_ASTAnnotations_t* scopes) {
@@ -608,7 +597,6 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
 
     // TODO: Add the --path flag
     k_SymbolLoader_addDirectory(compiler->m_symbolLoader, ".");
-    k_BinaryEntityDisassembler_addDirectory(compiler->m_disassembler, ".", 1);
 
     char** vmArguments = NULL;
     int32_t vmArgumentsSize = 0;

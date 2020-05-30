@@ -29,6 +29,7 @@
 #include <kush/Compiler.h>
 #include <kush/lexer/LexerError.h>
 #include <kush/lexer/Token.h>
+#include <kush/lexer/TokenType.h>
 #include <kush/lexer/TokenChannel.h>
 
 #define KUSH_LEXER_DEFAULT_CHANNEL 0

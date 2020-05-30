@@ -27,7 +27,7 @@
  * @class TokenChannel
  * @ingroup k_compiler_lexer
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 enum k_TokenChannel_t {
     KUSH_TOKEN_CHANNEL_DEFAULT,

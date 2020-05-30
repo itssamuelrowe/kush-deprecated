@@ -31,7 +31,7 @@
  * @class FunctionSymbol
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_FunctionSymbol_t {
     /* Signatures are destroyed by the destructor. */

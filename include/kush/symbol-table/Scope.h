@@ -39,7 +39,7 @@ typedef struct k_Scope_t k_Scope_t;
  * @class Scope
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_Scope_t {
     uint8_t* m_name;

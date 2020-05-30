@@ -30,7 +30,7 @@
  * @class ASTPrinter
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_ASTPrinter_t {
     k_ASTListener_t* m_astListener;

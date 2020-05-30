@@ -25,7 +25,7 @@
  * @class ASTWalker
  * @ingroup k_compiler_ast
  * @author Samuel Rowe <samuelrowe1999@gmail.com>
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 enum k_ASTWalkerState_t {
     KUSH_AST_WALKER_STATE_INVALID,

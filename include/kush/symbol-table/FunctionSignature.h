@@ -32,7 +32,7 @@
  * @class FunctionSignature
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_FunctionSignature_t {
     jtk_ArrayList_t* m_fixedParameters;

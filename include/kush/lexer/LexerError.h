@@ -29,7 +29,7 @@
  * @class LexerError
  * @ingroup k_compiler_lexer
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_LexerError_t {
     char* m_message;

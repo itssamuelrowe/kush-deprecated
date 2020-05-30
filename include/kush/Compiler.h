@@ -25,7 +25,6 @@
 #include <kush/symbol-table/SymbolTable.h>
 #include <kush/symbol-table/SymbolLoader.h>
 #include <kush/support/ErrorHandler.h>
-#include <kush/disassembler/BinaryEntityDisassembler.h>
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
@@ -37,7 +36,7 @@
 
 /**
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_Compiler_t {
     bool m_dumpTokens;
@@ -57,7 +56,6 @@ struct k_Compiler_t {
     jtk_HashMap_t* m_repository;
     jtk_ArrayList_t* m_trash;
     bool m_coreApi;
-    k_BinaryEntityDisassembler_t* m_disassembler;
 };
 
 /**

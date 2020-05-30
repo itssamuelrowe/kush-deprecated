@@ -28,7 +28,7 @@
  * @class Error
  * @ingroup k_compiler_support
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_Error_t {
     k_ErrorCode_t m_code;

@@ -33,7 +33,7 @@ typedef struct k_Compiler_t k_Compiler_t;
  * @class SymbolTable
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_SymbolTable_t {
     k_Scope_t* m_currentScope;

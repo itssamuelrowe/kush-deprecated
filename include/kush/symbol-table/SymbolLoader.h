@@ -25,7 +25,6 @@
 
 #include <kush/Configuration.h>
 #include <kush/symbol-table/Symbol.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPool.h>
 
 #include <jtk/collection/Iterator.h>
 #include <jtk/collection/map/HashMap.h>
@@ -54,7 +53,7 @@ typedef struct k_Compiler_t k_Compiler_t;
  * @class SymbolLoader
  * @ingroup k_virtual_machine_loader
  * @author Samuel Rowe
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_SymbolLoader_t {
 
@@ -76,7 +75,6 @@ struct k_SymbolLoader_t {
     int32_t m_index;
     uint8_t* m_bytes;
     int32_t m_size;
-    k_ConstantPool_t m_constantPool;
     k_Symbol_t* m_symbol;
 };
 

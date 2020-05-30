@@ -28,41 +28,6 @@
 uint32_t k_TokenType_toModifiers(k_TokenType_t type) {
     uint32_t modifiers = 0;
     switch (type) {
-        case KUSH_TOKEN_KEYWORD_PUBLIC: {
-            modifiers |= KUSH_MODIFIER_PUBLIC;
-            break;
-        }
-
-        case KUSH_TOKEN_KEYWORD_PRIVATE: {
-            modifiers |= KUSH_MODIFIER_PRIVATE;
-            break;
-        }
-
-        case KUSH_TOKEN_KEYWORD_SECRET: {
-            modifiers |= KUSH_MODIFIER_SECRET;
-            break;
-        }
-
-        case KUSH_TOKEN_KEYWORD_ABSTRACT: {
-            modifiers |= KUSH_MODIFIER_ABSTRACT;
-            break;
-        }
-
-        /* NOTE: Functions in KUSH cannot be declared as final. In other words,
-         * a function declared in a superclass cannot be overriden in a subclass.
-         */
-        /*
-        case KUSH_TOKEN_KEYWORD_FINAL: {
-            modifiers |= KUSH_MODIFIER_FINAL;
-            break;
-        }
-        */
-
-        case KUSH_TOKEN_KEYWORD_STATIC: {
-            modifiers |= KUSH_MODIFIER_STATIC;
-            break;
-        }
-
         case KUSH_TOKEN_KEYWORD_NATIVE: {
             modifiers |= KUSH_MODIFIER_NATIVE;
             break;

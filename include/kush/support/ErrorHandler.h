@@ -78,7 +78,7 @@ typedef void (*k_ErrorHandler_OnGeneralErrorFunction_t)(void* context, void* ori
  * @class ErrorHandler
  * @author Samuel Rowe
  * @ingroup k_compiler
- * @since KUSH 1.0
+ * @since Kush 0.1
  */
 struct k_ErrorHandler_t {
     k_ErrorHandler_HandleLexicalErrorFunction_t m_handleLexicalError;
