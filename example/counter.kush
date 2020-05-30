@@ -11,4 +11,5 @@ void main() {
 	while i < 10 {
 		print_i(next());
 	}
+	delete next;
 }
