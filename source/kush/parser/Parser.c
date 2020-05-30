@@ -25,6 +25,115 @@
  * Parser                                                                      *
  *******************************************************************************/
 
+// Match
+
+void match(k_Parser_t* parser, k_TokenType_t type);
+k_Token_t* matchAndYield(k_Parser_t* parser, k_TokenType_t type);
+
+// Recovery
+
+void pushFollowToken(k_Parser_t* parser, k_TokenType_t type);
+void popFollowToken(k_Parser_t* parser);
+void recover(k_Parser_t* parser);
+
+// Rules
+
+bool isStatementFollow(k_TokenType_t type);
+bool isSimpleStatementFollow(k_TokenType_t type);
+bool isLiteral(k_TokenType_t type);
+bool isLiteralFollow(k_TokenType_t type);
+bool isCompoundStatementFollow(k_TokenType_t type);
+bool isClassMemberFollow(k_TokenType_t type);
+bool isClassMemberModifier(k_TokenType_t type);
+bool isExpressionFollow(k_TokenType_t type);
+bool isAssignmentOperator(k_TokenType_t type);
+bool isEqualityOperator(k_TokenType_t type);
+bool isRelationalOperator(k_TokenType_t type);
+bool isShiftOperator(k_TokenType_t type);
+bool isAdditiveOperator(k_TokenType_t type);
+bool isMultiplicativeOperator(k_TokenType_t type);
+bool isUnaryExpressionFollow(k_TokenType_t type);
+bool isUnaryOperator(k_TokenType_t type);
+bool isPostfixExpressionFollow(k_TokenType_t type);
+bool isPostfixPartFollow(k_TokenType_t type);
+bool isPrimaryExpressionFollow(k_TokenType_t type);
+
+void compilationUnit(k_Parser_t* parser, k_ASTNode_t* node);
+void importDeclaration(k_Parser_t* parser, k_ASTNode_t* node);
+void annotatedComponentDeclaration(k_Parser_t* parser, k_ASTNode_t* node);
+void annotations(k_Parser_t* parser, k_ASTNode_t* node);
+void annotation(k_Parser_t* parser, k_ASTNode_t* node);
+void annotationType(k_Parser_t* parser, k_ASTNode_t* node);
+void annotationAttribute(k_Parser_t* parser, k_ASTNode_t* node);
+void componentDeclaration(k_Parser_t* parser, k_ASTNode_t* node);
+void functionDeclaration(k_Parser_t* parser, k_ASTNode_t* node, uint32_t modifiers);
+void functionParameters(k_Parser_t* parser, k_ASTNode_t* node);
+void functionBody(k_Parser_t* parser, k_ASTNode_t* node);
+void statementSuite(k_Parser_t* parser, k_ASTNode_t* node);
+void simpleStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void statement(k_Parser_t* parser, k_ASTNode_t* node);
+void emptyStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void variableDeclaration(k_Parser_t* parser, k_ASTNode_t* node);
+void variableDeclarator(k_Parser_t* parser, k_ASTNode_t* node);
+void constantDeclaration(k_Parser_t* parser, k_ASTNode_t* node);
+void constantDeclarator(k_Parser_t* parser, k_ASTNode_t* node);
+void assertStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void breakStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void returnStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void throwStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void compoundStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void ifStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void ifClause(k_Parser_t* parser, k_ASTNode_t* node);
+void elseIfClause(k_Parser_t* parser, k_ASTNode_t* node);
+void elseClause(k_Parser_t* parser, k_ASTNode_t* node);
+void iterativeStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void labelClause(k_Parser_t* parser, k_ASTNode_t* node);
+void whileStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void forStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void tryStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void tryClause(k_Parser_t* parser, k_ASTNode_t* node);
+void catchClause(k_Parser_t* parser, k_ASTNode_t* node);
+void catchFilter(k_Parser_t* parser, k_ASTNode_t* node);
+void typeName(k_Parser_t* parser, k_ASTNode_t* node);
+void finallyClause(k_Parser_t* parser, k_ASTNode_t* node);
+void withStatement(k_Parser_t* parser, k_ASTNode_t* node);
+void classDeclaration(k_Parser_t* parser, k_ASTNode_t* node);
+void classExtendsClause(k_Parser_t* parser, k_ASTNode_t* node);
+void classSuite(k_Parser_t* parser, k_ASTNode_t* node);
+void classMember(k_Parser_t* parser, k_ASTNode_t* node);
+void enumerationDeclaration(k_Parser_t* parser, k_ASTNode_t* node);
+void enumerationBaseClause(k_Parser_t* parser, k_ASTNode_t* node);
+void enumerationSuite(k_Parser_t* parser, k_ASTNode_t* node);
+void enumerate(k_Parser_t* paresr, k_ASTNode_t* node);
+void expressions(k_Parser_t* parser, k_ASTNode_t* node);
+void expression(k_Parser_t* parser, k_ASTNode_t* node);
+void assignmentExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void conditionalExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void logicalOrExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void logicalAndExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void inclusiveOrExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void exclusiveOrExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void andExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void equalityExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void relationalExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void shiftExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void additiveExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void multiplicativeExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void unaryExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void postfixExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void subscript(k_Parser_t* parser, k_ASTNode_t* node);
+void functionArguments(k_Parser_t* parser, k_ASTNode_t* node);
+void memberAccess(k_Parser_t* parser, k_ASTNode_t* node);
+void postfixOperator(k_Parser_t* parser, k_ASTNode_t* node);
+void primaryExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void identifier(k_Parser_t* parser, k_ASTNode_t* node);
+void literal(k_Parser_t* parser, k_ASTNode_t* node);
+void mapExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void mapEntries(k_Parser_t* parser, k_ASTNode_t* node);
+void mapEntry(k_Parser_t* parser, k_ASTNode_t* node);
+void listExpression(k_Parser_t* parser, k_ASTNode_t* node);
+void newExpression(k_Parser_t* parser, k_ASTNode_t* node);
+
 const char k_Parser_ruleNames[][50] = {
     "<unknown>",
     "<terminal>",
