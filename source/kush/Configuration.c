@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <com/onecube/zen/Configuration.h>
+#include <com/onecube/k/Configuration.h>
 
 static int32_t s_footprint = 0;
 

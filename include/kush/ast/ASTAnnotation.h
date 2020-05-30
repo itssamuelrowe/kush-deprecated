@@ -16,8 +16,8 @@
 
 // Sunday, April 28, 2018
 
-#ifndef COM_ONECUBE_COM_ONECUBE_COM_ONECUBE_ZEN_COMPILER_COMPILER_COMPILER_AST_AST_ANNOTATION_H
-#define COM_ONECUBE_COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_ANNOTATION_H
+#ifndef KUSH_COMPILER_COMPILER_COMPILER_AST_AST_ANNOTATION_H
+#define KUSH_COMPILER_COMPILER_AST_AST_ANNOTATION_H
 
 #include <kush/Configuration.h>
 #include <kush/ast/ASTAnnotationType.h>
@@ -40,4 +40,4 @@ typedef struct k_ASTAnnotation_t k_ASTAnnotation_t;
 k_ASTAnnotation_t* k_ASTAnnotation_new(k_ASTAnnotationType_t type, void* bundle);
 void k_ASTAnnotation_delete(k_ASTAnnotation_t* annotation);
 
-#endif /* COM_ONECUBE_COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_ANNOTATION_H */
+#endif /* KUSH_COMPILER_COMPILER_AST_AST_ANNOTATION_H */

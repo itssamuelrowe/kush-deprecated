@@ -42,19 +42,19 @@ k_Scope_t* k_Scope_new(const uint8_t* name, int32_t nameSize,
 }
 
 k_Scope_t* k_Scope_forCompilationUnit() {
-    return k_Scope_new(NULL, 0, ZEN_SCOPE_COMPILATION_UNIT, NULL, NULL);
+    return k_Scope_new(NULL, 0, KUSH_SCOPE_COMPILATION_UNIT, NULL, NULL);
 }
 
 k_Scope_t* k_Scope_forFunction(k_Scope_t* enclosingScope) {
-    return k_Scope_new(NULL, 0, ZEN_SCOPE_FUNCTION, enclosingScope, NULL);
+    return k_Scope_new(NULL, 0, KUSH_SCOPE_FUNCTION, enclosingScope, NULL);
 }
 
 k_Scope_t* k_Scope_forLocal(k_Scope_t* enclosingScope) {
-    return k_Scope_new(NULL, 0, ZEN_SCOPE_LOCAL, enclosingScope, NULL);
+    return k_Scope_new(NULL, 0, KUSH_SCOPE_LOCAL, enclosingScope, NULL);
 }
 
 k_Scope_t* k_Scope_forClass(k_Scope_t* enclosingScope) {
-    return k_Scope_new(NULL, 0, ZEN_SCOPE_CLASS, enclosingScope, NULL);
+    return k_Scope_new(NULL, 0, KUSH_SCOPE_CLASS, enclosingScope, NULL);
 }
 
 void k_Scope_delete(k_Scope_t* scope) {
@@ -77,23 +77,23 @@ void k_Scope_getChildrenSymbols(k_Scope_t* scope, jtk_ArrayList_t* childrenSymbo
 }
 
 bool k_Scope_isEnumerationScope(k_Scope_t* scope) {
-    return scope->m_type == ZEN_SCOPE_ENUMERATION;
+    return scope->m_type == KUSH_SCOPE_ENUMERATION;
 }
 
 bool k_Scope_isClassScope(k_Scope_t* scope) {
-    return scope->m_type == ZEN_SCOPE_CLASS;
+    return scope->m_type == KUSH_SCOPE_CLASS;
 }
 
 bool k_Scope_isFunctionScope(k_Scope_t* scope) {
-    return scope->m_type == ZEN_SCOPE_FUNCTION;
+    return scope->m_type == KUSH_SCOPE_FUNCTION;
 }
 
 bool k_Scope_isCompilationUnitScope(k_Scope_t* scope) {
-    return scope->m_type == ZEN_SCOPE_COMPILATION_UNIT;
+    return scope->m_type == KUSH_SCOPE_COMPILATION_UNIT;
 }
 
 bool k_Scope_isLocalScope(k_Scope_t* scope) {
-    return scope->m_type == ZEN_SCOPE_LOCAL;
+    return scope->m_type == KUSH_SCOPE_LOCAL;
 }
 
 k_Scope_t* k_Scope_getEnclosingScope(k_Scope_t* scope) {
@@ -172,14 +172,14 @@ k_Symbol_t* k_Scope_resolveClassMember(k_Scope_t* scope,
 k_Symbol_t* k_Scope_resolve(k_Scope_t* scope, uint8_t* identifier) {
     k_Symbol_t* result = NULL;
     switch (scope->m_type) {
-        case ZEN_SCOPE_COMPILATION_UNIT:
-        case ZEN_SCOPE_FUNCTION:
-        case ZEN_SCOPE_LOCAL: {
+        case KUSH_SCOPE_COMPILATION_UNIT:
+        case KUSH_SCOPE_FUNCTION:
+        case KUSH_SCOPE_LOCAL: {
             result = jtk_HashMap_getValue(scope->m_symbols, (void*)identifier);
             break;
         }
 
-        case ZEN_SCOPE_CLASS: {
+        case KUSH_SCOPE_CLASS: {
             result = k_Scope_resolveClassMember(scope, identifier);
             break;
         }

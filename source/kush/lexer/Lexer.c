@@ -209,13 +209,13 @@ k_Lexer_t* k_Lexer_new(k_Compiler_t* compiler) {
     lexer->m_startColumn = 0;
     lexer->m_hitEndOfStream = false;
     lexer->m_token = NULL;
-    lexer->m_channel = ZEN_TOKEN_CHANNEL_DEFAULT;
+    lexer->m_channel = KUSH_TOKEN_CHANNEL_DEFAULT;
     lexer->m_text = jtk_StringBuilder_new();
-    lexer->m_type = ZEN_TOKEN_UNKNOWN;
+    lexer->m_type = KUSH_TOKEN_UNKNOWN;
     lexer->m_tokens = jtk_ArrayQueue_new();
     lexer->m_indentations = jtk_ArrayStack_new();
     lexer->m_enclosures = 0;
-    lexer->m_errorCode = ZEN_ERROR_CODE_NONE;
+    lexer->m_errorCode = KUSH_ERROR_CODE_NONE;
 
     return lexer;
 }
@@ -302,7 +302,7 @@ void k_Lexer_consume(k_Lexer_t* lexer) {
      * may be subjected to changes.
      */
     if (!jtk_InputStream_isAvailable(lexer->m_inputStream)) {
-        lexer->m_la1 = ZEN_END_OF_STREAM;
+        lexer->m_la1 = KUSH_END_OF_STREAM;
     }
     else {
         lexer->m_la1 = jtk_InputStream_read(lexer->m_inputStream);
@@ -462,14 +462,14 @@ void k_Lexer_binaryIntegerLiteral(k_Lexer_t* lexer) {
             }
 
             if (previous == '_') {
-                lexer->m_errorCode = ZEN_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 k_Lexer_consume(lexer);
             }
         }
     }
     else {
-        lexer->m_errorCode = ZEN_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+        lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
         /* Consume and discard the invalid character. */
         k_Lexer_consume(lexer);
     }
@@ -495,14 +495,14 @@ void k_Lexer_octalIntegerLiteral(k_Lexer_t* lexer) {
             }
 
             if (previous == '_') {
-                lexer->m_errorCode = ZEN_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 k_Lexer_consume(lexer);
             }
         }
     }
     else {
-        lexer->m_errorCode = ZEN_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+        lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
         /* Consume and discard the invalid character. */
         k_Lexer_consume(lexer);
     }
@@ -528,14 +528,14 @@ void k_Lexer_hexadecimalIntegerLiteral(k_Lexer_t* lexer) {
             }
 
             if (previous == '_') {
-                lexer->m_errorCode = ZEN_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 k_Lexer_consume(lexer);
             }
         }
     }
     else {
-        lexer->m_errorCode = ZEN_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+        lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
         /* Consume and discard the invalid character. */
         k_Lexer_consume(lexer);
     }
@@ -561,7 +561,7 @@ void k_Lexer_decimalIntegerLiteral(k_Lexer_t* lexer) {
             }
 
             if (previous == '_') {
-                lexer->m_errorCode = ZEN_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 k_Lexer_consume(lexer);
             }
@@ -586,13 +586,13 @@ void k_Lexer_decimalIntegerLiteral(k_Lexer_t* lexer) {
             }
 
                 if (previous == '_') {
-                    lexer->m_errorCode = ZEN_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                    lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                     /* Consume and discard the invalid character. */
                     k_Lexer_consume(lexer);
                 }
         }
         else {
-            lexer->m_errorCode = ZEN_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+            lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
             /* Consume and discard the invalid character. */
             k_Lexer_consume(lexer);
         }
@@ -698,7 +698,7 @@ void k_Lexer_decimalIntegerLiteral(k_Lexer_t* lexer) {
  */
 void k_Lexer_integerLiteral(k_Lexer_t* lexer) {
     /* The lexer has recognized an integer literal. */
-    lexer->m_type = ZEN_TOKEN_INTEGER_LITERAL;
+    lexer->m_type = KUSH_TOKEN_INTEGER_LITERAL;
 
     if (lexer->m_la1 == '0') {
         /* Consume and discard the '0' character. */
@@ -717,7 +717,7 @@ void k_Lexer_integerLiteral(k_Lexer_t* lexer) {
             k_Lexer_decimalIntegerLiteral(lexer);
         }
         else if (k_Lexer_isLetter(lexer->m_la1)) {
-            lexer->m_errorCode = ZEN_ERROR_CODE_INVALID_INTEGER_LITERAL_PREFIX;
+            lexer->m_errorCode = KUSH_ERROR_CODE_INVALID_INTEGER_LITERAL_PREFIX;
         }
     }
     else {
@@ -790,17 +790,17 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
          */
         loopEntry : {
             lexer->m_token = NULL;
-            lexer->m_type = ZEN_TOKEN_UNKNOWN;
+            lexer->m_type = KUSH_TOKEN_UNKNOWN;
             jtk_StringBuilder_clear(lexer->m_text);
-            lexer->m_channel = ZEN_TOKEN_CHANNEL_DEFAULT;
+            lexer->m_channel = KUSH_TOKEN_CHANNEL_DEFAULT;
             lexer->m_startIndex = lexer->m_index;
             lexer->m_startLine = lexer->m_line;
             lexer->m_startColumn = lexer->m_column;
-            lexer->m_errorCode = ZEN_ERROR_CODE_NONE;
+            lexer->m_errorCode = KUSH_ERROR_CODE_NONE;
 
 
             switch (lexer->m_la1) {
-                case ZEN_END_OF_STREAM : {
+                case KUSH_END_OF_STREAM : {
                     if (!jtk_ArrayStack_isEmpty(lexer->m_indentations)) {
                         /* It appears that the lexer has reached the end of
                          * the stream inside a block. In order to prevent sytax
@@ -813,8 +813,8 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                          *       Therefore, we directly invoke k_Token_new().
                          */
                         k_Token_t* newlineToken = k_Token_new(
-                            ZEN_TOKEN_CHANNEL_DEFAULT,
-                            ZEN_TOKEN_NEWLINE,
+                            KUSH_TOKEN_CHANNEL_DEFAULT,
+                            KUSH_TOKEN_NEWLINE,
                             "\n",
                             1,
                             lexer->m_startIndex,    /* inclusive */
@@ -833,8 +833,8 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                              *       Therefore, we directly invoke k_Token_new().
                              */
                             k_Token_t* dedentationToken = k_Token_new(
-                                    ZEN_TOKEN_CHANNEL_DEFAULT,
-                                    ZEN_TOKEN_DEDENTATION,
+                                    KUSH_TOKEN_CHANNEL_DEFAULT,
+                                    KUSH_TOKEN_DEDENTATION,
                                     "",
                                     0,
                                     lexer->m_startIndex,    /* inclusive */
@@ -851,7 +851,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     }
                     /* The data required for the creating the end-of-stream token.
                      */
-                    lexer->m_type = ZEN_TOKEN_END_OF_STREAM;
+                    lexer->m_type = KUSH_TOKEN_END_OF_STREAM;
                     lexer->m_hitEndOfStream = true;
                     break;
                 }
@@ -869,8 +869,8 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
 
                         if (!k_Lexer_isInputStart(lexer)) {
                             /* This token belongs to the WHITESPACE rule. */
-                            lexer->m_type = ZEN_TOKEN_WHITESPACE;
-                            lexer->m_channel = ZEN_TOKEN_CHANNEL_HIDDEN;
+                            lexer->m_type = KUSH_TOKEN_WHITESPACE;
+                            lexer->m_channel = KUSH_TOKEN_CHANNEL_HIDDEN;
                         }
                     }
                     else {
@@ -903,14 +903,14 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         }
                     }
 
-                    if (lexer->m_type != ZEN_TOKEN_WHITESPACE) {
+                    if (lexer->m_type != KUSH_TOKEN_WHITESPACE) {
                         int32_t la1 = lexer->m_la1;
                         if ((lexer->m_enclosures > 0) || (la1 == '\r') || (la1 == '\n')) {
                             /* If the lexer is within the context of a collection
                              * or a blank line it ignores all the indentations,
                              * dedentations, and newlines.
                              */
-                            // k_Logger_log(ZEN_LOG_PRIORITY_INFO, "Skipping a character (line=%d, column=%d)", lexer->m_startIndex + 1, lexer->m_startColumn + 1);
+                            // k_Logger_log(KUSH_LOG_PRIORITY_INFO, "Skipping a character (line=%d, column=%d)", lexer->m_startIndex + 1, lexer->m_startColumn + 1);
                             goto loopEntry;
                         }
                         else {
@@ -919,8 +919,8 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                              *       Therefore, we directly invoke k_Token_new().
                              */
                             k_Token_t* newlineToken = k_Token_new(
-                                ZEN_TOKEN_CHANNEL_DEFAULT,
-                                ZEN_TOKEN_NEWLINE,
+                                KUSH_TOKEN_CHANNEL_DEFAULT,
+                                KUSH_TOKEN_NEWLINE,
                                 "\n",
                                 1,
                                 lexer->m_startIndex,    /* inclusive */
@@ -955,8 +955,8 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                                  *       Therefore, we directly invoke k_Token_new().
                                  */
                                 k_Token_t* indentationToken = k_Token_new(
-                                        ZEN_TOKEN_CHANNEL_DEFAULT,
-                                        ZEN_TOKEN_INDENTATION,
+                                        KUSH_TOKEN_CHANNEL_DEFAULT,
+                                        KUSH_TOKEN_INDENTATION,
                                         "",
                                         0,
                                         lexer->m_startIndex,    /* inclusive */
@@ -986,8 +986,8 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                                      *       Therefore, we directly invoke k_Token_new().
                                      */
                                     k_Token_t* dedentationToken = k_Token_new(
-                                        ZEN_TOKEN_CHANNEL_DEFAULT,
-                                        ZEN_TOKEN_DEDENTATION,
+                                        KUSH_TOKEN_CHANNEL_DEFAULT,
+                                        KUSH_TOKEN_DEDENTATION,
                                         "",
                                         0,
                                         lexer->m_startIndex,    /* inclusive */
@@ -1025,10 +1025,10 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
 
                     if (lexer->m_la1 == '=') {
                         k_Lexer_consume(lexer);
-                        lexer->m_type = ZEN_TOKEN_EXCLAMATION_MARK_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_EXCLAMATION_MARK_EQUAL;
                     }
                     else {
-                        lexer->m_type = ZEN_TOKEN_EXCLAMATION_MARK;
+                        lexer->m_type = KUSH_TOKEN_EXCLAMATION_MARK;
                     }
 
                     break;
@@ -1042,7 +1042,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the '@' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the '@' token. */
-                    lexer->m_type = ZEN_TOKEN_AT;
+                    lexer->m_type = KUSH_TOKEN_AT;
                     break;
                 }
 
@@ -1054,7 +1054,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the '#' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the '#' token. */
-                    lexer->m_type = ZEN_TOKEN_HASH;
+                    lexer->m_type = KUSH_TOKEN_HASH;
 
                     break;
                 }
@@ -1072,10 +1072,10 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
 
                     if (lexer->m_la1 == '=') {
                         k_Lexer_consume(lexer);
-                        lexer->m_type = ZEN_TOKEN_MODULUS_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_MODULUS_EQUAL;
                     }
                     else {
-                        lexer->m_type = ZEN_TOKEN_MODULUS;
+                        lexer->m_type = KUSH_TOKEN_MODULUS;
                     }
 
                     break;
@@ -1098,14 +1098,14 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
 
                     if (lexer->m_la1 == '&') {
                         k_Lexer_consume(lexer);
-                        lexer->m_type = ZEN_TOKEN_AMPERSAND_2;
+                        lexer->m_type = KUSH_TOKEN_AMPERSAND_2;
                     }
                     else if (lexer->m_la1 == '=') {
                         k_Lexer_consume(lexer);
-                        lexer->m_type = ZEN_TOKEN_AMPERSAND_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_AMPERSAND_EQUAL;
                     }
                     else {
-                        lexer->m_type = ZEN_TOKEN_AMPERSAND;
+                        lexer->m_type = KUSH_TOKEN_AMPERSAND;
                     }
 
                     break;
@@ -1119,7 +1119,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the '(' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the '(' token. */
-                    lexer->m_type = ZEN_TOKEN_LEFT_PARENTHESIS;
+                    lexer->m_type = KUSH_TOKEN_LEFT_PARENTHESIS;
                     /* The lexer is inside an enclosure. The parser will fail
                      * if newline or indentation tokens are generated. Therefore,
                      * mark this enclosure.
@@ -1136,7 +1136,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the '(' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the '(' token. */
-                    lexer->m_type = ZEN_TOKEN_RIGHT_PARENTHESIS;
+                    lexer->m_type = KUSH_TOKEN_RIGHT_PARENTHESIS;
                     /* The lexer is outside an enclosure. The parser will fail
                      * if newline or indentation tokens are not generated
                      * appropriately. Therefore, unmark this enclosure.
@@ -1173,21 +1173,21 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                             /* Consume and discard the '=' character. */
                             k_Lexer_consume(lexer);
                             /* The lexer has recognized the '**=' token. */
-                            lexer->m_type = ZEN_TOKEN_ASTERISK_2_EQUAL;
+                            lexer->m_type = KUSH_TOKEN_ASTERISK_2_EQUAL;
                         }
                         else {
                             /* The lexer has recognized the '**' token. */
-                            lexer->m_type = ZEN_TOKEN_ASTERISK_2;
+                            lexer->m_type = KUSH_TOKEN_ASTERISK_2;
                         }
                     }
                     else if (lexer->m_la1 == '=') {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '*=' token. */
-                        lexer->m_type = ZEN_TOKEN_ASTERISK_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_ASTERISK_EQUAL;
                     }
                     else {
-                        lexer->m_type = ZEN_TOKEN_ASTERISK;
+                        lexer->m_type = KUSH_TOKEN_ASTERISK;
                     }
 
                     break;
@@ -1213,16 +1213,16 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         /* Consume and discard the '+' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '++' token. */
-                        lexer->m_type = ZEN_TOKEN_PLUS_2;
+                        lexer->m_type = KUSH_TOKEN_PLUS_2;
                     }
                     else if (lexer->m_la1 == '=') {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '+=' token. */
-                        lexer->m_type = ZEN_TOKEN_PLUS_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_PLUS_EQUAL;
                     }
                     else {
-                        lexer->m_type = ZEN_TOKEN_PLUS;
+                        lexer->m_type = KUSH_TOKEN_PLUS;
                     }
 
                     break;
@@ -1236,7 +1236,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the ',' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the ',' token. */
-                    lexer->m_type = ZEN_TOKEN_COMMA;
+                    lexer->m_type = KUSH_TOKEN_COMMA;
                     break;
                 }
 
@@ -1264,23 +1264,23 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         /* Consume and discard the '-' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '--' token. */
-                        lexer->m_type = ZEN_TOKEN_DASH_2;
+                        lexer->m_type = KUSH_TOKEN_DASH_2;
                     }
                     else if (lexer->m_la1 == '>') {
                         /* Consume and discard the '>' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '->' token. */
-                        lexer->m_type = ZEN_TOKEN_ARROW;
+                        lexer->m_type = KUSH_TOKEN_ARROW;
                     }
                     else if (lexer->m_la1 == '=') {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '-=' token. */
-                        lexer->m_type = ZEN_TOKEN_DASH_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_DASH_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '-' token. */
-                        lexer->m_type = ZEN_TOKEN_DASH;
+                        lexer->m_type = KUSH_TOKEN_DASH;
                     }
 
                     break;
@@ -1310,16 +1310,16 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                             /* Consume and discard the '.' character. */
                             k_Lexer_consume(lexer);
                             /* The lexer has recognized the '...' token. */
-                            lexer->m_type = ZEN_TOKEN_ELLIPSIS;
+                            lexer->m_type = KUSH_TOKEN_ELLIPSIS;
                         }
                         else {
                             /* The lexer has recognized the '..' token. */
-                            lexer->m_type = ZEN_TOKEN_DOT_2;
+                            lexer->m_type = KUSH_TOKEN_DOT_2;
                         }
                     }
                     else {
                         /* The lexer has recognized the '.' token. */
-                        lexer->m_type = ZEN_TOKEN_DOT;
+                        lexer->m_type = KUSH_TOKEN_DOT;
                     }
 
                     break;
@@ -1349,7 +1349,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         /* Consume and discard the '/' character. */
                         k_Lexer_consume(lexer);
 
-                        while ((lexer->m_la1 != '\n') && (lexer->m_la1 != ZEN_END_OF_STREAM)) {
+                        while ((lexer->m_la1 != '\n') && (lexer->m_la1 != KUSH_END_OF_STREAM)) {
                             /* Consume and discard the unknown character. */
                             k_Lexer_consume(lexer);
                         }
@@ -1367,12 +1367,12 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         }
 
                         /* The lexer has recognized a single line comment. */
-                        lexer->m_type = ZEN_TOKEN_SINGLE_LINE_COMMENT;
+                        lexer->m_type = KUSH_TOKEN_SINGLE_LINE_COMMENT;
                         /* The single-line comment token should be produced on the
                          * hidden channel. Otherwise, the parser will have a hard
                          * time ignoring redundant single-line comment tokens.
                          */
-                        lexer->m_channel = ZEN_TOKEN_CHANNEL_HIDDEN;
+                        lexer->m_channel = KUSH_TOKEN_CHANNEL_HIDDEN;
                     }
                     else if (lexer->m_la1 == '*') {
                         /* Consume and discard the '*' token. */
@@ -1380,8 +1380,8 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
 
                         do {
                             while (lexer->m_la1 != '*') {
-                                if (lexer->m_la1 == ZEN_END_OF_STREAM) {
-                                    lexer->m_errorCode = ZEN_ERROR_CODE_UNTERMINATED_MULTI_LINE_COMMENT;
+                                if (lexer->m_la1 == KUSH_END_OF_STREAM) {
+                                    lexer->m_errorCode = KUSH_ERROR_CODE_UNTERMINATED_MULTI_LINE_COMMENT;
                                     break;
                                 }
 
@@ -1400,7 +1400,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                              * outer loop. We do not have to report the error.
                              * Because the error was reported in the inner loop.
                              */
-                            if (lexer->m_la1 == ZEN_END_OF_STREAM) {
+                            if (lexer->m_la1 == KUSH_END_OF_STREAM) {
                                 break;
                             }
 
@@ -1424,22 +1424,22 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         */
 
                         /* The lexer has recognized the multi-line comment. */
-                        lexer->m_type = ZEN_TOKEN_MULTI_LINE_COMMENT;
+                        lexer->m_type = KUSH_TOKEN_MULTI_LINE_COMMENT;
                         /* The multi-line comment token should be produced on the
                          * hidden channel. Otherwise, the parser will have a hard
                          * time ignoring redundant multi-line comment tokens.
                          */
-                        lexer->m_channel = ZEN_TOKEN_CHANNEL_HIDDEN;
+                        lexer->m_channel = KUSH_TOKEN_CHANNEL_HIDDEN;
                     }
                     else if (lexer->m_la1 == '=') {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '/=' token. */
-                        lexer->m_type = ZEN_TOKEN_FORWARD_SLASH_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_FORWARD_SLASH_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '/' token. */
-                        lexer->m_type = ZEN_TOKEN_FORWARD_SLASH;
+                        lexer->m_type = KUSH_TOKEN_FORWARD_SLASH;
                     }
 
                     break;
@@ -1462,11 +1462,11 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         k_Lexer_consume(lexer);
 
                         /* The lexer has recognized the '::' token. */
-                        lexer->m_type = ZEN_TOKEN_COLON_2;
+                        lexer->m_type = KUSH_TOKEN_COLON_2;
                     }
                     else {
                         /* The lexer has recognized the ':' token. */
-                        lexer->m_type = ZEN_TOKEN_COLON;
+                        lexer->m_type = KUSH_TOKEN_COLON;
                     }
 
                     break;
@@ -1480,7 +1480,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the ';' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the ';' token. */
-                    lexer->m_type = ZEN_TOKEN_SEMICOLON;
+                    lexer->m_type = KUSH_TOKEN_SEMICOLON;
                     break;
                 }
 
@@ -1512,22 +1512,22 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                             /* Consume and discard the '=' character. */
                             k_Lexer_consume(lexer);
                             /* The lexer has recognized the '<<=' token. */
-                            lexer->m_type = ZEN_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL;
+                            lexer->m_type = KUSH_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL;
                         }
                         else {
                             /* The lexer has recognized the '<<' token. */
-                            lexer->m_type = ZEN_TOKEN_LEFT_ANGLE_BRACKET_2;
+                            lexer->m_type = KUSH_TOKEN_LEFT_ANGLE_BRACKET_2;
                         }
                     }
                     else if (lexer->m_la1 == '=') {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '<=' token. */
-                        lexer->m_type = ZEN_TOKEN_LEFT_ANGLE_BRACKET_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_LEFT_ANGLE_BRACKET_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '<' token. */
-                        lexer->m_type = ZEN_TOKEN_LEFT_ANGLE_BRACKET;
+                        lexer->m_type = KUSH_TOKEN_LEFT_ANGLE_BRACKET;
                     }
 
                     break;
@@ -1573,33 +1573,33 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                                 /* Consume and discard the '=' character. */
                                 k_Lexer_consume(lexer);
                                 /* The lexer has recognized the '>>>=' token. */
-                                lexer->m_type = ZEN_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL;
+                                lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL;
                             }
                             else {
                                 /* The lexer has recognized the '>>>' token. */
-                                lexer->m_type = ZEN_TOKEN_RIGHT_ANGLE_BRACKET_3;
+                                lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3;
                             }
                         }
                         else if (lexer->m_la1 == '=') {
                             /* Consume and discard the '=' character. */
                             k_Lexer_consume(lexer);
                             /* The lexer has recognized the '>>=' token. */
-                            lexer->m_type = ZEN_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL;
+                            lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL;
                         }
                         else {
                             /* The lexer has recognized the '>>' token. */
-                            lexer->m_type = ZEN_TOKEN_RIGHT_ANGLE_BRACKET_2;
+                            lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2;
                         }
                     }
                     else if (lexer->m_la1 == '=') {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '>=' token. */
-                        lexer->m_type = ZEN_TOKEN_RIGHT_ANGLE_BRACKET_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '>' token. */
-                        lexer->m_type = ZEN_TOKEN_RIGHT_ANGLE_BRACKET;
+                        lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET;
                     }
 
                     break;
@@ -1621,11 +1621,11 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '==' token. */
-                        lexer->m_type = ZEN_TOKEN_EQUAL_2;
+                        lexer->m_type = KUSH_TOKEN_EQUAL_2;
                     }
                     else {
                         /* The lexer has recognized the '=' token. */
-                        lexer->m_type = ZEN_TOKEN_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_EQUAL;
                     }
 
                     break;
@@ -1639,7 +1639,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the '?' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the '?' token. */
-                    lexer->m_type = ZEN_TOKEN_HOOK;
+                    lexer->m_type = KUSH_TOKEN_HOOK;
                     break;
                 }
 
@@ -1651,7 +1651,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the '{' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the '{' token. */
-                    lexer->m_type = ZEN_TOKEN_LEFT_BRACE;
+                    lexer->m_type = KUSH_TOKEN_LEFT_BRACE;
                     /* The lexer is inside an enclosure. The parser will fail
                      * if newline or indentation tokens are generated. Therefore,
                      * mark this enclosure.
@@ -1668,7 +1668,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the '}' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the '}' token. */
-                    lexer->m_type = ZEN_TOKEN_RIGHT_BRACE;
+                    lexer->m_type = KUSH_TOKEN_RIGHT_BRACE;
                     /* The lexer is outside an enclosure. The parser will fail
                      * if newline or indentation tokens are not generated
                      * appropriately. Therefore, unmark this enclosure.
@@ -1685,7 +1685,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the '[' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the '[' token. */
-                    lexer->m_type = ZEN_TOKEN_LEFT_SQUARE_BRACKET;
+                    lexer->m_type = KUSH_TOKEN_LEFT_SQUARE_BRACKET;
                     /* The lexer is inside an enclosure. The parser will fail
                      * if newline or indentation tokens are generated. Therefore,
                      * mark this enclosure.
@@ -1702,7 +1702,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Consume and discard the ']' character. */
                     k_Lexer_consume(lexer);
                     /* The lexer has recognized the ']' token. */
-                    lexer->m_type = ZEN_TOKEN_RIGHT_SQUARE_BRACKET;
+                    lexer->m_type = KUSH_TOKEN_RIGHT_SQUARE_BRACKET;
                     /* The lexer is outside an enclosure. The parser will fail
                      * if newline or indentation tokens are not generated
                      * appropriately. Therefore, unmark this enclosure.
@@ -1727,11 +1727,11 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '^=' token. */
-                        lexer->m_type = ZEN_TOKEN_CARET_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_CARET_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '^' token. */
-                        lexer->m_type = ZEN_TOKEN_CARET;
+                        lexer->m_type = KUSH_TOKEN_CARET;
                     }
 
                     break;
@@ -1757,17 +1757,17 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         /* Consume and discard the '|' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '||' token. */
-                        lexer->m_type = ZEN_TOKEN_VERTICAL_BAR_2;
+                        lexer->m_type = KUSH_TOKEN_VERTICAL_BAR_2;
                     }
                     else if (lexer->m_la1 == '=') {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '|=' token. */
-                        lexer->m_type = ZEN_TOKEN_VERTICAL_BAR_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_VERTICAL_BAR_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '|' token. */
-                        lexer->m_type = ZEN_TOKEN_VERTICAL_BAR;
+                        lexer->m_type = KUSH_TOKEN_VERTICAL_BAR;
                     }
 
                     break;
@@ -1789,11 +1789,11 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         /* Consume and discard the '=' character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has recognized the '~=' token. */
-                        lexer->m_type = ZEN_TOKEN_TILDE_EQUAL;
+                        lexer->m_type = KUSH_TOKEN_TILDE_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '~' token. */
-                        lexer->m_type = ZEN_TOKEN_TILDE;
+                        lexer->m_type = KUSH_TOKEN_TILDE;
                     }
 
                     break;
@@ -1828,8 +1828,8 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     k_Lexer_consume(lexer);
 
                     while (lexer->m_la1 != terminator) {
-                        if ((lexer->m_la1 == ZEN_END_OF_STREAM) || (lexer->m_la1 == '\n')) {
-                            lexer->m_errorCode = ZEN_ERROR_CODE_UNTERMINATED_STRING_LITERAL;
+                        if ((lexer->m_la1 == KUSH_END_OF_STREAM) || (lexer->m_la1 == '\n')) {
+                            lexer->m_errorCode = KUSH_ERROR_CODE_UNTERMINATED_STRING_LITERAL;
                             break;
                         }
                         else if (lexer->m_la1 == '\\') {
@@ -1853,13 +1853,13 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                                         k_Lexer_consume(lexer);
                                     }
                                     else {
-                                        lexer->m_errorCode = ZEN_ERROR_CODE_MALFORMED_UNICODE_CHARACTER_SEQUENCE;
+                                        lexer->m_errorCode = KUSH_ERROR_CODE_MALFORMED_UNICODE_CHARACTER_SEQUENCE;
                                         break;
                                     }
                                 }
                             }
                             else {
-                                lexer->m_errorCode = ZEN_ERROR_CODE_INVALID_ESCAPE_SEQUENCE;
+                                lexer->m_errorCode = KUSH_ERROR_CODE_INVALID_ESCAPE_SEQUENCE;
 
                                 /* Consume and discard the unknown escape sequence. */
                                 k_Lexer_consume(lexer);
@@ -1883,7 +1883,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     }
 
                     /* The lexer has recognized a string literal. */
-                    lexer->m_type = ZEN_TOKEN_STRING_LITERAL;
+                    lexer->m_type = KUSH_TOKEN_STRING_LITERAL;
 
                     break;
                 }
@@ -1926,162 +1926,162 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                          * reduce the worst case scenario for number of comparisons
                          * from 40 to 7.
                          */
-                        lexer->m_type = ZEN_TOKEN_IDENTIFIER;
+                        lexer->m_type = KUSH_TOKEN_IDENTIFIER;
                         switch (length) {
                             case 2 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_DO], 2)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_DO;
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_DO], 2)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_DO;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_IF], 2)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_IF;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IF], 2)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_IF;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_IN], 2)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_IN;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IN], 2)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_IN;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_IS], 2)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_IS;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IS], 2)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_IS;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_OR], 2)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_OR;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_OR], 2)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_OR;
                                 }
                                 break;
                             }
 
                             case 3 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_AND], 3)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_AND;
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_AND], 3)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_AND;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_FOR], 3)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_FOR;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FOR], 3)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_FOR;
                                 }/*
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_NAN], 3)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_NAN;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NAN], 3)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_NAN;
                                 }*/
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_NEW], 3)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_NEW;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NEW], 3)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_NEW;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_TRY], 3)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_TRY;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_TRY], 3)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_TRY;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_VAR], 3)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_VAR;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_VAR], 3)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_VAR;
                                 }
                                 break;
                             }
 
                             case 4 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_CASE], 4)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_CASE;
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_CASE], 4)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_CASE;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_ELSE], 4)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_ELSE;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ELSE], 4)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_ELSE;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_ENUM], 4)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_ENUM;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ENUM], 4)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_ENUM;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_NULL], 4)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_NULL;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NULL], 4)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_NULL;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_THEN], 4)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_THEN;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_THEN], 4)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_THEN;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_THIS], 4)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_THIS;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_THIS], 4)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_THIS;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_TRUE], 4)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_TRUE;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_TRUE], 4)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_TRUE;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_WITH], 4)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_WITH;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_WITH], 4)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_WITH;
                                 }
                                 break;
                             }
 
                             case 5 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_BREAK], 5)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_BREAK;
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_BREAK], 5)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_BREAK;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_CATCH], 5)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_CATCH;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_CATCH], 5)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_CATCH;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_CLASS], 5)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_CLASS;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_CLASS], 5)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_CLASS;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_FALSE], 5)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_FALSE;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FALSE], 5)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_FALSE;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_FINAL], 5)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_FINAL;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FINAL], 5)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_FINAL;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_THROW], 5)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_THROW;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_THROW], 5)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_THROW;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_WHILE], 5)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_WHILE;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_WHILE], 5)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_WHILE;
                                 }
                                 break;
                             }
 
                             case 6 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_ASSERT], 6)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_ASSERT;
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ASSERT], 6)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_ASSERT;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_IMPORT], 6)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_IMPORT;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IMPORT], 6)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_IMPORT;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_NATIVE], 6)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_NATIVE;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NATIVE], 6)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_NATIVE;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_PUBLIC], 6)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_PUBLIC;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_PUBLIC], 6)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_PUBLIC;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_RETURN], 6)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_RETURN;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_RETURN], 6)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_RETURN;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_SECRET], 6)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_SECRET;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_SECRET], 6)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_SECRET;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_STATIC], 6)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_STATIC;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_STATIC], 6)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_STATIC;
                                 }/*
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_SWITCH], 6)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_SWITCH;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_SWITCH], 6)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_SWITCH;
                                 }*/
                                 break;
                             }
 
                             case 7 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_ABSTRACT], 7)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_ABSTRACT;
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ABSTRACT], 7)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_ABSTRACT;
                                 }/*
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_DEFAULT], 7)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_DEFAULT;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_DEFAULT], 7)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_DEFAULT;
                                 }*/
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_FINALLY], 7)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_FINALLY;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FINALLY], 7)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_FINALLY;
                                 }/*
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_PACKAGE], 7)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_PACKAGE;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_PACKAGE], 7)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_PACKAGE;
                                 }*/
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_PRIVATE], 7)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_PRIVATE;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_PRIVATE], 7)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_PRIVATE;
                                 }
                                 break;
                             }
 
                             case 8 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_CONTINUE], 8)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_CONTINUE;
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_CONTINUE], 8)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_CONTINUE;
                                 }
-                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_FUNCTION], 8)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_FUNCTION;
+                                else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FUNCTION], 8)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_FUNCTION;
                                 }
                                 break;
                             }
 
                             case 11 : {
-                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)ZEN_TOKEN_KEYWORD_SYNCHRONIZE], 11)) {
-                                    lexer->m_type = ZEN_TOKEN_KEYWORD_SYNCHRONIZE;
+                                if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_SYNCHRONIZE], 11)) {
+                                    lexer->m_type = KUSH_TOKEN_KEYWORD_SYNCHRONIZE;
                                 }
                                 break;
                             }
@@ -2095,7 +2095,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
 
                         /* Check for integer type suffix. */
 
-                        /* All integers in Zen occupy 64-bits. */
+                        /* All integers in KUSH occupy 64-bits. */
                         // if (k_Lexer_isIntegerSuffix(lexer->m_la1)) {
                             /* Consume and discard the integer suffix character. */
                             // k_Lexer_consume(lexer);
@@ -2108,12 +2108,12 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                         // }
                     }
                     else {
-                        lexer->m_errorCode = ZEN_ERROR_CODE_UNKNOWN_CHARACTER;
+                        lexer->m_errorCode = KUSH_ERROR_CODE_UNKNOWN_CHARACTER;
 
                         /* Consume and discard the unknown character. */
                         k_Lexer_consume(lexer);
                         /* The lexer has encountered an unrecognized character. */
-                        lexer->m_type = ZEN_TOKEN_UNKNOWN;
+                        lexer->m_type = KUSH_TOKEN_UNKNOWN;
                     }
                     break;
                 }
@@ -2126,7 +2126,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
         /* Unlike the parser, the lexer does not support error recovery strategies.
          * Therefore, all types of errors are collectively recorded at this point.
          */
-        if (lexer->m_errorCode != ZEN_ERROR_CODE_NONE) {
+        if (lexer->m_errorCode != KUSH_ERROR_CODE_NONE) {
             k_ErrorHandler_handleLexicalError(lexer->m_compiler->m_errorHandler,
                 lexer, lexer->m_errorCode, newToken);
         }
@@ -2155,10 +2155,10 @@ void k_Lexer_reset(k_Lexer_t* lexer, jtk_InputStream_t* inputStream) {
     lexer->m_startColumn = 0;
     lexer->m_hitEndOfStream = false;
     lexer->m_token = NULL;
-    lexer->m_channel = ZEN_TOKEN_CHANNEL_DEFAULT;
-    lexer->m_type = ZEN_TOKEN_UNKNOWN;
+    lexer->m_channel = KUSH_TOKEN_CHANNEL_DEFAULT;
+    lexer->m_type = KUSH_TOKEN_UNKNOWN;
     lexer->m_enclosures = 0;
-    lexer->m_errorCode = ZEN_ERROR_CODE_NONE;
+    lexer->m_errorCode = KUSH_ERROR_CODE_NONE;
 
     jtk_StringBuilder_clear(lexer->m_text);
     jtk_ArrayQueue_clear(lexer->m_tokens);

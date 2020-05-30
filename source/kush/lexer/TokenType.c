@@ -28,43 +28,43 @@
 uint32_t k_TokenType_toModifiers(k_TokenType_t type) {
     uint32_t modifiers = 0;
     switch (type) {
-        case ZEN_TOKEN_KEYWORD_PUBLIC: {
-            modifiers |= ZEN_MODIFIER_PUBLIC;
+        case KUSH_TOKEN_KEYWORD_PUBLIC: {
+            modifiers |= KUSH_MODIFIER_PUBLIC;
             break;
         }
 
-        case ZEN_TOKEN_KEYWORD_PRIVATE: {
-            modifiers |= ZEN_MODIFIER_PRIVATE;
+        case KUSH_TOKEN_KEYWORD_PRIVATE: {
+            modifiers |= KUSH_MODIFIER_PRIVATE;
             break;
         }
 
-        case ZEN_TOKEN_KEYWORD_SECRET: {
-            modifiers |= ZEN_MODIFIER_SECRET;
+        case KUSH_TOKEN_KEYWORD_SECRET: {
+            modifiers |= KUSH_MODIFIER_SECRET;
             break;
         }
 
-        case ZEN_TOKEN_KEYWORD_ABSTRACT: {
-            modifiers |= ZEN_MODIFIER_ABSTRACT;
+        case KUSH_TOKEN_KEYWORD_ABSTRACT: {
+            modifiers |= KUSH_MODIFIER_ABSTRACT;
             break;
         }
 
-        /* NOTE: Functions in Zen cannot be declared as final. In other words,
+        /* NOTE: Functions in KUSH cannot be declared as final. In other words,
          * a function declared in a superclass cannot be overriden in a subclass.
          */
         /*
-        case ZEN_TOKEN_KEYWORD_FINAL: {
-            modifiers |= ZEN_MODIFIER_FINAL;
+        case KUSH_TOKEN_KEYWORD_FINAL: {
+            modifiers |= KUSH_MODIFIER_FINAL;
             break;
         }
         */
 
-        case ZEN_TOKEN_KEYWORD_STATIC: {
-            modifiers |= ZEN_MODIFIER_STATIC;
+        case KUSH_TOKEN_KEYWORD_STATIC: {
+            modifiers |= KUSH_MODIFIER_STATIC;
             break;
         }
 
-        case ZEN_TOKEN_KEYWORD_NATIVE: {
-            modifiers |= ZEN_MODIFIER_NATIVE;
+        case KUSH_TOKEN_KEYWORD_NATIVE: {
+            modifiers |= KUSH_MODIFIER_NATIVE;
             break;
         }
     }
@@ -74,16 +74,16 @@ uint32_t k_TokenType_toModifiers(k_TokenType_t type) {
 // Assignment Operator
 
 bool k_TokenType_isAssignmentOperator(k_TokenType_t type) {
-    return (type == ZEN_TOKEN_EQUAL) ||
-           (type == ZEN_TOKEN_MODULUS_EQUAL) ||
-           (type == ZEN_TOKEN_AMPERSAND_EQUAL) ||
-           (type == ZEN_TOKEN_ASTERISK_2_EQUAL) ||
-           (type == ZEN_TOKEN_ASTERISK_EQUAL) ||
-           (type == ZEN_TOKEN_PLUS_EQUAL) ||
-           (type == ZEN_TOKEN_DASH_EQUAL) ||
-           (type == ZEN_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) ||
-           (type == ZEN_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) ||
-           (type == ZEN_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL) ||
-           (type == ZEN_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL) ||
-           (type == ZEN_TOKEN_VERTICAL_BAR_EQUAL);
+    return (type == KUSH_TOKEN_EQUAL) ||
+           (type == KUSH_TOKEN_MODULUS_EQUAL) ||
+           (type == KUSH_TOKEN_AMPERSAND_EQUAL) ||
+           (type == KUSH_TOKEN_ASTERISK_2_EQUAL) ||
+           (type == KUSH_TOKEN_ASTERISK_EQUAL) ||
+           (type == KUSH_TOKEN_PLUS_EQUAL) ||
+           (type == KUSH_TOKEN_DASH_EQUAL) ||
+           (type == KUSH_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) ||
+           (type == KUSH_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) ||
+           (type == KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL) ||
+           (type == KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL) ||
+           (type == KUSH_TOKEN_VERTICAL_BAR_EQUAL);
 }

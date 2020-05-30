@@ -32,16 +32,16 @@
  * into multiple files. The symbols defined in these source files can be imported
  * and exported outside a given source file or compilation unit as needed.
  *
- * In Zen, the import statement allows a compilation unit to refer to external
+ * In KUSH, the import statement allows a compilation unit to refer to external
  * entities such as functions and classes. Without the use of the import statement,
  * the only way to refer to an entity outside the current compilatiin unit is to
- * use a fully qualified name. Further, all top-level entities declared in Zen
+ * use a fully qualified name. Further, all top-level entities declared in KUSH
  * are exported by default. As of this writing, there is no way to override this
  * behaviour.
  *
  * Albeit the import/export mechanism is complicated, it is an interesting topic.
  * The following article describes the import/export mechanism employed by the
- * Zen compiler behind the scenes.
+ * KUSH compiler behind the scenes.
  *
  * ## Entity Forms
  *
@@ -89,10 +89,10 @@
  *    that is considered as an external symbol to the global symbol cache. This allows
  *    compilation units in the current compilation batch to reference symbols
  *    declared in another compilation unit. For example, consider two compilation
- *    units `BirdWatch.zen` and `Sparrow.zen` in the current compilation batch which
+ *    units `BirdWatch.KUSH` and `Sparrow.KUSH` in the current compilation batch which
  *    declare the `BirdWatch` and `Sparrow` classes, respectively.
- *    Further, assume that `BirdWatch.zen` imports `Sparrow`. During the definition
- *    phase corresponding to `Sparrow.zen`, a class symbol for `Sparrow` is registered
+ *    Further, assume that `BirdWatch.KUSH` imports `Sparrow`. During the definition
+ *    phase corresponding to `Sparrow.KUSH`, a class symbol for `Sparrow` is registered
  *    in the global cache. This allows `BirdWatch` to refer to the external entity
  *    `Sparrow` which is part of the current compilation batch.
  *
@@ -126,7 +126,7 @@ k_SymbolDefinitionListener_t* k_SymbolDefinitionListener_new(
     listener->m_scopes = NULL;
     listener->m_package = NULL;
     listener->m_packageSize = -1;
-    listener->m_mainComponent = ZEN_AST_NODE_TYPE_UNKNOWN;
+    listener->m_mainComponent = KUSH_AST_NODE_TYPE_UNKNOWN;
     listener->m_classPrepared = false;
     listener->m_className = NULL;
     listener->m_classNameSize = 0;
@@ -174,7 +174,7 @@ void k_SymbolDefinitionListener_reset(
     listener->m_scopes = scopes;
     listener->m_package = package;
     listener->m_packageSize = packageSize;
-    listener->m_mainComponent = ZEN_AST_NODE_TYPE_UNKNOWN;
+    listener->m_mainComponent = KUSH_AST_NODE_TYPE_UNKNOWN;
     listener->m_classPrepared = false;
 
     if (listener->m_className != NULL) {
@@ -266,7 +266,7 @@ void k_SymbolDefinitionListener_declareOverloadedFunction(
         k_FunctionSignature_t* signature = (k_FunctionSignature_t*)jtk_ArrayList_getValue(signatures, i);
         if ((signature->m_variableParameter != NULL) && (variableParameter != NULL)) {
             k_ErrorHandler_handleSemanticalError(errorHandler,
-                listener, ZEN_ERROR_CODE_MULTIPLE_FUNCTION_OVERLOADS_WITH_VARIABLE_PARAMETER,
+                listener, KUSH_ERROR_CODE_MULTIPLE_FUNCTION_OVERLOADS_WITH_VARIABLE_PARAMETER,
                 (k_Token_t*)(variableParameter->m_context));
 
             error = true;
@@ -279,7 +279,7 @@ void k_SymbolDefinitionListener_declareOverloadedFunction(
             if ((fixedParameterCount0 == fixedParameterCount) &&
                 (signature->m_variableParameter == NULL)) {
                 k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-                    ZEN_ERROR_CODE_DUPLICATE_FUNCTION_OVERLOAD, identifierToken);
+                    KUSH_ERROR_CODE_DUPLICATE_FUNCTION_OVERLOAD, identifierToken);
                 error = true;
                 break;
             }
@@ -295,7 +295,7 @@ void k_SymbolDefinitionListener_declareOverloadedFunction(
                          * Instead it points to the function currently being declared.
                          */
                         k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-                            ZEN_ERROR_CODE_FUNCTION_DECLARATION_CAUSES_ANOTHER_FUNCTION_TO_EXCEED_PARAMETER_THRESHOLD,
+                            KUSH_ERROR_CODE_FUNCTION_DECLARATION_CAUSES_ANOTHER_FUNCTION_TO_EXCEED_PARAMETER_THRESHOLD,
                             reference);
                         error = true;
                     }
@@ -307,7 +307,7 @@ void k_SymbolDefinitionListener_declareOverloadedFunction(
                      */
                     if ((parameterThreshold >= 0) && (fixedParameterCount >= parameterThreshold)) {
                         k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-                            ZEN_ERROR_CODE_FUNCTION_DECLARATION_EXCEEDS_PARAMETER_THRESHOLD,
+                            KUSH_ERROR_CODE_FUNCTION_DECLARATION_EXCEEDS_PARAMETER_THRESHOLD,
                             reference);
                         error = true;
                         break;
@@ -398,7 +398,7 @@ void k_SymbolDefinitionListener_onEnterFunctionDeclaration(k_ASTListener_t* astL
     k_ASTNode_t* identifier = functionDeclarationContext->m_identifier;
     k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
 
-    if ((listener->m_mainComponent != ZEN_AST_NODE_TYPE_CLASS_DECLARATION)
+    if ((listener->m_mainComponent != KUSH_AST_NODE_TYPE_CLASS_DECLARATION)
         && !listener->m_classPrepared) {
         /* Pure static classes do not inherit any superclasses. */
         k_SymbolDefinitionListener_initializeClassName(listener);
@@ -422,10 +422,10 @@ void k_SymbolDefinitionListener_onEnterFunctionDeclaration(k_ASTListener_t* astL
     /* Retrieve the current scope of the symbol table. */
     k_Scope_t* currentScope = k_SymbolTable_getCurrentScope(symbolTable);
 
-    if ((k_Token_getType(identifierToken) == ZEN_TOKEN_KEYWORD_STATIC) &&
+    if ((k_Token_getType(identifierToken) == KUSH_TOKEN_KEYWORD_STATIC) &&
         ((fixedParameterCount > 0) || (variableParameter != NULL))) {
         k_ErrorHandler_handleSemanticalError(errorHandler, listener,
-            ZEN_ERROR_CODE_STATIC_INITIALIZER_WITH_PARAMETERS, identifierToken);
+            KUSH_ERROR_CODE_STATIC_INITIALIZER_WITH_PARAMETERS, identifierToken);
     }
     else {
         if (k_Scope_isClassScope(currentScope)) {
@@ -437,7 +437,7 @@ void k_SymbolDefinitionListener_onEnterFunctionDeclaration(k_ASTListener_t* astL
              * synthetic class symbol is generated. Therefore, make sure
              * that the class scope is not synthetic.
              */
-            if (node->m_parent->m_type == ZEN_AST_NODE_TYPE_CLASS_MEMBER) {
+            if (node->m_parent->m_type == KUSH_AST_NODE_TYPE_CLASS_MEMBER) {
                 k_ClassMemberContext_t* classMemberContext = (k_ClassMemberContext_t*)node->m_parent->m_context;
                 int32_t modifierCount = jtk_ArrayList_getSize(classMemberContext->m_modifiers);
                 int32_t i;
@@ -452,7 +452,7 @@ void k_SymbolDefinitionListener_onEnterFunctionDeclaration(k_ASTListener_t* astL
                 /* NOTE: Functions declared in the compilation unit cannot have modifiers
                  * specified explicitly. However, by default they are all static.
                  */
-                modifiers |= ZEN_TOKEN_KEYWORD_STATIC;
+                modifiers |= KUSH_TOKEN_KEYWORD_STATIC;
             }
 
             if (symbol != NULL) {
@@ -470,7 +470,7 @@ void k_SymbolDefinitionListener_onEnterFunctionDeclaration(k_ASTListener_t* astL
                 }
                 else {
                     k_ErrorHandler_handleSemanticalError(errorHandler,
-                        listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_FUNCTION,
+                        listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_FUNCTION,
                         identifierToken);
                 }
             }
@@ -497,7 +497,7 @@ void k_SymbolDefinitionListener_onEnterFunctionDeclaration(k_ASTListener_t* astL
         k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, parameterText);
         if (symbol != NULL) {
             k_ErrorHandler_handleSemanticalError(errorHandler,
-                listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_PARAMETER,
+                listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_PARAMETER,
                 (k_Token_t*)(parameter->m_context));
         }
         else {
@@ -512,12 +512,12 @@ void k_SymbolDefinitionListener_onEnterFunctionDeclaration(k_ASTListener_t* astL
         k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, parameterText);
         if (symbol != NULL) {
             k_ErrorHandler_handleSemanticalError(errorHandler,
-                listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_VARIABLE_PARAMETER,
+                listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_VARIABLE_PARAMETER,
                 (k_Token_t*)(variableParameter->m_context));
         }
         else {
             symbol = k_Symbol_forConstant(variableParameter, symbolTable->m_currentScope);
-            k_Symbol_addModifiers(symbol, ZEN_MODIFIER_VARIABLE_PARAMETER);
+            k_Symbol_addModifiers(symbol, KUSH_MODIFIER_VARIABLE_PARAMETER);
             k_SymbolTable_define(listener->m_symbolTable, symbol);
         }
     }
@@ -577,7 +577,7 @@ void k_SymbolDefinitionListener_onEnterVariableDeclaration(
         k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
         if (symbol != NULL) {
             k_ErrorHandler_handleSemanticalError(errorHandler,
-                listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_VARIABLE,
+                listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_VARIABLE,
                 (k_Token_t*)identifier->m_context);
         }
         else {
@@ -610,7 +610,7 @@ void k_SymbolDefinitionListener_onEnterConstantDeclaration(
         k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
         if (symbol != NULL) {
             k_ErrorHandler_handleSemanticalError(errorHandler,
-                listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CONSTANT,
+                listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CONSTANT,
                 (k_Token_t*)identifier->m_context);
         }
         else {
@@ -636,7 +636,7 @@ void k_SymbolDefinitionListener_onEnterLabelClause(
     k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
     if (symbol != NULL) {
         k_ErrorHandler_handleSemanticalError(errorHandler,
-            listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_LABEL,
+            listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_LABEL,
             (k_Token_t*)identifier->m_context);
     }
     else {
@@ -665,7 +665,7 @@ void k_SymbolDefinitionListener_onEnterForParameters(
         k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
         if (symbol != NULL) {
         k_ErrorHandler_handleSemanticalError(errorHandler,
-            listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_LOOP_PARAMETER,
+            listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_LOOP_PARAMETER,
             (k_Token_t*)identifier->m_context);
         }
         else {
@@ -713,7 +713,7 @@ void k_SymbolDefinitionListener_onEnterTryStatement(
         k_Symbol_t* symbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
         if (symbol != NULL) {
         k_ErrorHandler_handleSemanticalError(errorHandler,
-            listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CATCH_PARAMETER,
+            listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CATCH_PARAMETER,
             (k_Token_t*)identifier->m_context);
         }
         else {
@@ -752,7 +752,7 @@ void k_SymbolDefinitionListener_onEnterClassDeclaration(
     k_Symbol_t* classSymbol = k_SymbolTable_resolve(listener->m_symbolTable, identifierText);
     if (classSymbol != NULL) {
         k_ErrorHandler_handleSemanticalError(errorHandler,
-            listener, ZEN_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CLASS,
+            listener, KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CLASS,
             (k_Token_t*)identifier->m_context);
     }
     else {

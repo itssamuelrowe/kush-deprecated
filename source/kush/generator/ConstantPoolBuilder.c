@@ -51,7 +51,7 @@ void k_ConstantPoolBuilder_delete(k_ConstantPoolBuilder_t* builder) {
         /* If the entry is a constant pool UTF8 entry, then it needs to be destroyed
          * specially.
          */
-        if (entry->m_tag == ZEN_CONSTANT_POOL_TAG_UTF8) {
+        if (entry->m_tag == k_CONSTANT_POOL_TAG_UTF8) {
             /* Convert the entry to k_ConstantPoolUtf8_t, to destroy the bytes. */
             k_ConstantPoolUtf8_t* entry0 = (k_ConstantPoolUtf8_t*)entry;
             /* Destroy the memory used by the entry. */
@@ -80,7 +80,7 @@ void k_ConstantPoolBuilder_clear(k_ConstantPoolBuilder_t* builder) {
         /* If the entry is a constant pool UTF8 entry, then it needs to be destroyed
          * specially.
          */
-        if (entry->m_tag == ZEN_CONSTANT_POOL_TAG_UTF8) {
+        if (entry->m_tag == k_CONSTANT_POOL_TAG_UTF8) {
             /* Convert the entry to k_ConstantPoolUtf8_t, to destroy the bytes. */
             k_ConstantPoolUtf8_t* entry0 = (k_ConstantPoolUtf8_t*)entry;
             /* Destroy the memory used by the entry. */
@@ -159,8 +159,8 @@ int32_t k_ConstantPoolBuilder_getClassEntryIndexEx(
         /* Retrieve the constant pool entry to test during this iteration. */
         k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)jtk_ArrayList_getValue(
             builder->m_entries, i);
-        /* Test the entry only if it is tagged with ZEN_CONSTANT_POOL_TAG_FUNCTION. */
-        if (entry->m_tag == ZEN_CONSTANT_POOL_TAG_CLASS) {
+        /* Test the entry only if it is tagged with k_CONSTANT_POOL_TAG_FUNCTION. */
+        if (entry->m_tag == k_CONSTANT_POOL_TAG_CLASS) {
             /* Convert the entry to k_ConstantPoolClass_t, to extract the index
              * of the UTF-8 entry.
              */
@@ -183,8 +183,8 @@ int32_t k_ConstantPoolBuilder_getClassEntryIndexEx(
     if (result < 0) {
         /* Create the constant pool class entry. */
         k_ConstantPoolClass_t* constantPoolClass = k_Memory_allocate(k_ConstantPoolClass_t, 1);
-        /* Mark the constant pool entry with ZEN_CONSTANT_POOL_TAG_CLASS. */
-        constantPoolClass->m_tag = ZEN_CONSTANT_POOL_TAG_CLASS;
+        /* Mark the constant pool entry with k_CONSTANT_POOL_TAG_CLASS. */
+        constantPoolClass->m_tag = k_CONSTANT_POOL_TAG_CLASS;
         /* Update the class index of the class entry to point to the UTF-8
          * entry which holds its content.
          */
@@ -268,8 +268,8 @@ int32_t k_ConstantPoolBuilder_getFieldEntryIndexEx(
         /* Retrieve the constant pool entry to test during this iteration. */
         k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)jtk_ArrayList_getValue(
             builder->m_entries, i);
-        /* Test the entry only if it is tagged with ZEN_CONSTANT_POOL_TAG_FIELD. */
-        if (entry->m_tag == ZEN_CONSTANT_POOL_TAG_FIELD) {
+        /* Test the entry only if it is tagged with k_CONSTANT_POOL_TAG_FIELD. */
+        if (entry->m_tag == k_CONSTANT_POOL_TAG_FIELD) {
             /* Convert the entry to k_ConstantPoolField_t, to extract the index
              * of the UTF-8 entries.
              */
@@ -296,8 +296,8 @@ int32_t k_ConstantPoolBuilder_getFieldEntryIndexEx(
     if (result < 0) {
         /* Create the constant pool field entry. */
         k_ConstantPoolField_t* constantPoolField = k_Memory_allocate(k_ConstantPoolField_t, 1);
-        /* Mark the constant pool entry with ZEN_CONSTANT_POOL_TAG_FIELD. */
-        constantPoolField->m_tag = ZEN_CONSTANT_POOL_TAG_FIELD;
+        /* Mark the constant pool entry with k_CONSTANT_POOL_TAG_FIELD. */
+        constantPoolField->m_tag = k_CONSTANT_POOL_TAG_FIELD;
         /* Update the class index of the field entry to point to the class
          * entry which holds the class details.
          */
@@ -389,8 +389,8 @@ int32_t k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         /* Retrieve the constant pool entry to test during this iteration. */
         k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)jtk_ArrayList_getValue(
             builder->m_entries, i);
-        /* Test the entry only if it is tagged with ZEN_CONSTANT_POOL_TAG_STRING. */
-        if (entry->m_tag == ZEN_CONSTANT_POOL_TAG_FUNCTION) {
+        /* Test the entry only if it is tagged with k_CONSTANT_POOL_TAG_STRING. */
+        if (entry->m_tag == k_CONSTANT_POOL_TAG_FUNCTION) {
             /* Convert the entry to k_ConstantPoolFunction_t, to extract the index
              * of the UTF-8 entries.
              */
@@ -417,8 +417,8 @@ int32_t k_ConstantPoolBuilder_getFunctionEntryIndexEx(
     if (result < 0) {
         /* Create the constant pool function entry. */
         k_ConstantPoolFunction_t* constantPoolFunction = k_Memory_allocate(k_ConstantPoolFunction_t, 1);
-        /* Mark the constant pool entry with ZEN_CONSTANT_POOL_TAG_FUNCTION. */
-        constantPoolFunction->m_tag = ZEN_CONSTANT_POOL_TAG_FUNCTION;
+        /* Mark the constant pool entry with k_CONSTANT_POOL_TAG_FUNCTION. */
+        constantPoolFunction->m_tag = k_CONSTANT_POOL_TAG_FUNCTION;
         /* Update the class index of the function entry to point to the class
          * entry which holds the class details.
          */
@@ -469,8 +469,8 @@ int32_t k_ConstantPoolBuilder_getIntegerEntryIndex(
         /* Retrieve the constant pool entry to test during this iteration. */
         k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)jtk_ArrayList_getValue(
             builder->m_entries, i);
-        /* Test the entry only if it is tagged with ZEN_CONSTANT_POOL_TAG_INTEGER. */
-        if (entry->m_tag == ZEN_CONSTANT_POOL_TAG_INTEGER) {
+        /* Test the entry only if it is tagged with k_CONSTANT_POOL_TAG_INTEGER. */
+        if (entry->m_tag == k_CONSTANT_POOL_TAG_INTEGER) {
             /* Convert the entry to k_ConstantPoolInteger_t, to extract the bytes. */
             k_ConstantPoolInteger_t* constantPoolInteger = (k_ConstantPoolInteger_t*)entry;
             /* Compare the entry bytes to the bytes of the given integer value. */
@@ -490,7 +490,7 @@ int32_t k_ConstantPoolBuilder_getIntegerEntryIndex(
     if (result < 0) {
         k_ConstantPoolInteger_t* constantPoolInteger = k_Memory_allocate(
             k_ConstantPoolInteger_t, 1);
-        constantPoolInteger->m_tag = ZEN_CONSTANT_POOL_TAG_INTEGER;
+        constantPoolInteger->m_tag = k_CONSTANT_POOL_TAG_INTEGER;
 
         // TODO: Am I doing it right here?!!!
         union {
@@ -542,8 +542,8 @@ int32_t k_ConstantPoolBuilder_getLongEntryIndex(
         /* Retrieve the constant pool entry to test during this iteration. */
         k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)jtk_ArrayList_getValue(
             builder->m_entries, i);
-        /* Test the entry only if it is tagged with ZEN_CONSTANT_POOL_TAG_LONG. */
-        if (entry->m_tag == ZEN_CONSTANT_POOL_TAG_LONG) {
+        /* Test the entry only if it is tagged with k_CONSTANT_POOL_TAG_LONG. */
+        if (entry->m_tag == k_CONSTANT_POOL_TAG_LONG) {
             /* Convert the entry to k_ConstantPoolLong_t, to extract the bytes. */
             k_ConstantPoolLong_t* constantPoolLong = (k_ConstantPoolLong_t*)entry;
             /* Compare the entry bytes to the bytes of the given integer value. */
@@ -564,7 +564,7 @@ int32_t k_ConstantPoolBuilder_getLongEntryIndex(
     if (result < 0) {
         k_ConstantPoolLong_t* constantPoolLong = k_Memory_allocate(
             k_ConstantPoolLong_t, 1);
-        constantPoolLong->m_tag = ZEN_CONSTANT_POOL_TAG_LONG;
+        constantPoolLong->m_tag = k_CONSTANT_POOL_TAG_LONG;
 
         constantPoolLong->m_highBytes = (converter.x & 0xFFFFFFFF00000000ULL) >> 32;
         constantPoolLong->m_lowBytes = converter.x & 0x00000000FFFFFFFFULL;
@@ -621,8 +621,8 @@ int32_t k_ConstantPoolBuilder_getStringEntryIndexEx(
         /* Retrieve the constant pool entry to test during this iteration. */
         k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)jtk_ArrayList_getValue(
             builder->m_entries, i);
-        /* Test the entry only if it is tagged with ZEN_CONSTANT_POOL_TAG_STRING. */
-        if (entry->m_tag == ZEN_CONSTANT_POOL_TAG_STRING) {
+        /* Test the entry only if it is tagged with k_CONSTANT_POOL_TAG_STRING. */
+        if (entry->m_tag == k_CONSTANT_POOL_TAG_STRING) {
             /* Convert the entry to k_ConstantPoolString_t, to extract the index
              * of the UTF-8 entry.
              */
@@ -645,8 +645,8 @@ int32_t k_ConstantPoolBuilder_getStringEntryIndexEx(
     if (result < 0) {
         /* Create the constant pool string entry. */
         k_ConstantPoolString_t* constantPoolString = k_Memory_allocate(k_ConstantPoolString_t, 1);
-        /* Mark the constant pool entry with ZEN_CONSTANT_POOL_TAG_STRING. */
-        constantPoolString->m_tag = ZEN_CONSTANT_POOL_TAG_STRING;
+        /* Mark the constant pool entry with k_CONSTANT_POOL_TAG_STRING. */
+        constantPoolString->m_tag = k_CONSTANT_POOL_TAG_STRING;
         /* Update the string index of the string entry to point to the UTF-8
          * entry which holds its content.
          */
@@ -687,8 +687,8 @@ int32_t k_ConstantPoolBuilder_getUtf8EntryIndexEx(
         /* Retrieve the constant pool entry to test during this iteration. */
         k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)jtk_ArrayList_getValue(
             builder->m_entries, i);
-        /* Test the entry only if it is tagged with ZEN_CONSTANT_POOL_TAG_UTF8. */
-        if (entry->m_tag == ZEN_CONSTANT_POOL_TAG_UTF8) {
+        /* Test the entry only if it is tagged with k_CONSTANT_POOL_TAG_UTF8. */
+        if (entry->m_tag == k_CONSTANT_POOL_TAG_UTF8) {
             /* Convert the entry to k_ConstantPoolUtf8_t, to extract the bytes. */
             k_ConstantPoolUtf8_t* entry0 = (k_ConstantPoolUtf8_t*)entry;
             /* Compare the entry bytes to the bytes of the given string. */
@@ -708,7 +708,7 @@ int32_t k_ConstantPoolBuilder_getUtf8EntryIndexEx(
      */
     if (result < 0) {
         k_ConstantPoolUtf8_t* entry0 = k_Memory_allocate(k_ConstantPoolUtf8_t, 1);
-        entry0->m_tag = ZEN_CONSTANT_POOL_TAG_UTF8;
+        entry0->m_tag = k_CONSTANT_POOL_TAG_UTF8;
         entry0->m_length = bytesSize;
         entry0->m_bytes = jtk_Arrays_clone_b(bytes, bytesSize);
 

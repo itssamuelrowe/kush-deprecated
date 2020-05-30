@@ -36,22 +36,22 @@
 #include <kush/symbol-table/Symbol.h>
 #include <kush/symbol-table/Scope.h>
 #include <kush/generator/BinaryEntityGenerator.h>
-#include <com/onecube/zen/virtual-machine/feb/EntityType.h>
-#include <com/onecube/zen/virtual-machine/feb/attribute/InstructionAttribute.h>
-#include <com/onecube/zen/virtual-machine/feb/attribute/PredefinedAttribute.h>
+#include <com/onecube/k/virtual-machine/feb/EntityType.h>
+#include <com/onecube/k/virtual-machine/feb/attribute/InstructionAttribute.h>
+#include <com/onecube/k/virtual-machine/feb/attribute/PredefinedAttribute.h>
 
 /* TODO: Move the variable to k_BinaryEntityGenerator_t. */
 bool lhs = false;
 
 // Initialize
 
-#define ZEN_BINARY_ENTITY_GENERATOR_CPF_COUNT 6
-#define ZEN_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE 0
-#define ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_EVALUATE 1
-#define ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_STORE_FIELD 2
-#define ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_INVOKE 3
-#define ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_INVOKE_EX 4
-#define ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_LOAD_FIELD 5
+#define k_BINARY_ENTITY_GENERATOR_CPF_COUNT 6
+#define k_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE 0
+#define k_BINARY_ENTITY_GENERATOR_k_KERNEL_EVALUATE 1
+#define k_BINARY_ENTITY_GENERATOR_k_KERNEL_STORE_FIELD 2
+#define k_BINARY_ENTITY_GENERATOR_k_KERNEL_INVOKE 3
+#define k_BINARY_ENTITY_GENERATOR_k_KERNEL_INVOKE_EX 4
+#define k_BINARY_ENTITY_GENERATOR_k_KERNEL_LOAD_FIELD 5
 
 uint16_t k_Symbol_findFunctionIndex(k_ConstantPoolBuilder_t* builder,
     k_Symbol_t* symbol,
@@ -80,34 +80,34 @@ uint16_t k_Symbol_findFunctionIndex(k_ConstantPoolBuilder_t* builder,
 }
 
 void k_BinaryEntityGenerator_initializeCPFCache(k_BinaryEntityGenerator_t* generator) {
-    generator->m_cpfIndexes = jtk_Memory_allocate(uint16_t, ZEN_BINARY_ENTITY_GENERATOR_CPF_COUNT);
+    generator->m_cpfIndexes = jtk_Memory_allocate(uint16_t, k_BINARY_ENTITY_GENERATOR_CPF_COUNT);
 
     // Boolean
     k_Symbol_t* booleanClass = k_Compiler_resolveSymbol(generator->m_compiler,
-        "zen.core.Boolean", 16);
+        "k.core.Boolean", 16);
      // TODO: "z:v", 3
-    generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE] =
+    generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE] =
         k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
-            booleanClass, "getValue", 8, "(zen/core/Object):v", 19);
+            booleanClass, "getValue", 8, "(k/core/Object):v", 19);
 
-    // ZenKernel
-    k_Symbol_t* zenKernelClass = k_Compiler_resolveSymbol(generator->m_compiler,
-        "zen.core.ZenKernel", 18);
-    generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_EVALUATE] =
+    // kKernel
+    k_Symbol_t* kKernelClass = k_Compiler_resolveSymbol(generator->m_compiler,
+        "k.core.kKernel", 18);
+    generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_k_KERNEL_EVALUATE] =
         k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
-            zenKernelClass, "evaluate", 8, "(zen/core/Object):(zen/core/Object)(zen/core/Object)(zen/core/Object)", 69);
-    generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_STORE_FIELD] =
+            kKernelClass, "evaluate", 8, "(k/core/Object):(k/core/Object)(k/core/Object)(k/core/Object)", 69);
+    generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_k_KERNEL_STORE_FIELD] =
         k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
-            zenKernelClass, "storeField", 10, "(zen/core/Object):(zen/core/Object)(zen/core/Object)(zen/core/Object)", 69);
-    generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_INVOKE] =
+            kKernelClass, "storeField", 10, "(k/core/Object):(k/core/Object)(k/core/Object)(k/core/Object)", 69);
+    generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_k_KERNEL_INVOKE] =
         k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
-            zenKernelClass, "invoke", 6, "(zen/core/Object):(zen/core/Object)(zen/core/Object)", 52);
-    generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_INVOKE_EX] =
+            kKernelClass, "invoke", 6, "(k/core/Object):(k/core/Object)(k/core/Object)", 52);
+    generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_k_KERNEL_INVOKE_EX] =
         k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
-            zenKernelClass, "invokeEx", 8, "(zen/core/Object):(zen/core/Object)(zen/core/Object)@(zen/core/Object)", 70);
-    generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_LOAD_FIELD] =
+            kKernelClass, "invokeEx", 8, "(k/core/Object):(k/core/Object)(k/core/Object)@(k/core/Object)", 70);
+    generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_k_KERNEL_LOAD_FIELD] =
         k_Symbol_findFunctionIndex(generator->m_constantPoolBuilder,
-            zenKernelClass, "loadField", 9, "(zen/core/Object):(zen/core/Object)(zen/core/Object)", 52);
+            kKernelClass, "loadField", 9, "(k/core/Object):(k/core/Object)(k/core/Object)", 52);
 }
 
 // Constructor
@@ -138,7 +138,7 @@ k_BinaryEntityGenerator_t* k_BinaryEntityGenerator_new(
     generator->m_nextLoopLabel = 0;
     generator->m_currentLoopLabel = -1;
 
-    generator->m_mainComponent = ZEN_AST_NODE_TYPE_UNKNOWN;
+    generator->m_mainComponent = k_AST_NODE_TYPE_UNKNOWN;
     generator->m_classPrepared = false;
     generator->m_className = NULL;
     generator->m_classNameSize = -1;
@@ -491,7 +491,7 @@ void k_BinaryEntityGenerator_reset(k_BinaryEntityGenerator_t* generator,
     generator->m_package = package;
     generator->m_packageSize = packageSize;
     generator->m_outputStream = outputStream;
-    generator->m_mainComponent = ZEN_AST_NODE_TYPE_UNKNOWN;
+    generator->m_mainComponent = k_AST_NODE_TYPE_UNKNOWN;
     generator->m_classPrepared = false;
     generator->m_className = NULL;
     generator->m_classNameSize = -1;
@@ -536,7 +536,7 @@ void k_BinaryEntityGenerator_onEnterCompilationUnit(k_ASTListener_t* astListener
     /* Set the minor version of the target binary entity format. */
     generator->m_entityFile->m_version.m_minorVersion = 0x0001;
 
-    generator->m_mainComponent = ZEN_AST_NODE_TYPE_UNKNOWN;
+    generator->m_mainComponent = k_AST_NODE_TYPE_UNKNOWN;
 }
 
 void k_BinaryEntityGenerator_onExitCompilationUnit(k_ASTListener_t* astListener,
@@ -547,7 +547,7 @@ void k_BinaryEntityGenerator_onExitCompilationUnit(k_ASTListener_t* astListener,
     /* Invalidate the current scope in the symbol table. */
     k_SymbolTable_invalidateCurrentScope(generator->m_symbolTable);
 
-    if (generator->m_mainComponent != ZEN_AST_NODE_TYPE_CLASS_DECLARATION) {
+    if (generator->m_mainComponent != k_AST_NODE_TYPE_CLASS_DECLARATION) {
         k_BinaryEntityGenerator_writeEntity(generator);
     }
 }
@@ -687,7 +687,7 @@ void k_BinaryEntityGenerator_writeEntity(k_BinaryEntityGenerator_t* generator) {
              * the instruction attribute and write to the data channel.
              */
             if (jtk_CString_equals(name->m_bytes, name->m_length,
-                ZEN_PREDEFINED_ATTRIBUTE_INSTRUCTION, ZEN_PREDEFINED_ATTRIBUTE_INSTRUCTION_SIZE)) {
+                k_PREDEFINED_ATTRIBUTE_INSTRUCTION, k_PREDEFINED_ATTRIBUTE_INSTRUCTION_SIZE)) {
                 /* Cast to k_InstructionAttribute_t to extract further information. */
                 k_InstructionAttribute_t* instructionAttribute =
                     (k_InstructionAttribute_t*)attribute;
@@ -868,7 +868,7 @@ void k_BinaryEntityGenerator_prepareClass(k_BinaryEntityGenerator_t* generator,
     }
 
     k_Entity_t* entity = &generator->m_entityFile->m_entity;
-    entity->m_type = ZEN_ENTITY_TYPE_CLASS;
+    entity->m_type = k_ENTITY_TYPE_CLASS;
     entity->m_flags = 0;
     entity->m_reference = referenceIndex;
     entity->m_superclassCount = superclassCount;
@@ -907,17 +907,17 @@ void k_BinaryEntityGenerator_onEnterFunctionDeclaration(
     k_FunctionDeclarationContext_t* context = (k_FunctionDeclarationContext_t*)node->m_context;
     k_FunctionParametersContext_t* functionParameters = (k_FunctionParametersContext_t*)context->m_functionParameters->m_context;
 
-    if ((generator->m_mainComponent != ZEN_AST_NODE_TYPE_CLASS_DECLARATION)
+    if ((generator->m_mainComponent != k_AST_NODE_TYPE_CLASS_DECLARATION)
         && !generator->m_classPrepared) {
         /* The extends clause has not been explicitly written. Therefore,
          * the compiler generates the default extends clause which inherits
-         * the zen.core.Object class.
+         * the k.core.Object class.
          */
 
         int32_t superclassCount = 1;
         uint16_t* superclassIndexes = jtk_Memory_allocate(uint16_t, 1);
         superclassIndexes[0] = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
-            generator->m_constantPoolBuilder, "zen/core/Object", 15);
+            generator->m_constantPoolBuilder, "k/core/Object", 15);
 
         k_BinaryEntityGenerator_initializeClassName(generator);
         k_BinaryEntityGenerator_prepareClass(generator, generator->m_className,
@@ -935,7 +935,7 @@ void k_BinaryEntityGenerator_onEnterFunctionDeclaration(
     k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
     k_Symbol_t* symbol = k_SymbolTable_resolve(generator->m_symbolTable,
         identifierToken->m_text);
-    bool constructor = k_Token_getType(identifierToken) == ZEN_TOKEN_KEYWORD_NEW;
+    bool constructor = k_Token_getType(identifierToken) == k_TOKEN_KEYWORD_NEW;
     generator->m_descriptor = k_BinaryEntityGenerator_getDescriptorEx(
         context->m_functionParameters, constructor,
         &generator->m_descriptorSize);
@@ -1002,7 +1002,7 @@ void k_BinaryEntityGenerator_onEnterFunctionDeclaration(
  * function printf(format, ...arguments)
  *
  * The function descriptor for this function is shown below.
- * (zen/core/Object):(zen/core/Object)@(zen/core/Object)
+ * (k/core/Object):(k/core/Object)@(k/core/Object)
  */
 uint8_t* k_BinaryEntityGenerator_getDescriptorEx(k_ASTNode_t* functionParameters,
     bool constructor, int32_t* descriptorSize) {
@@ -1010,16 +1010,16 @@ uint8_t* k_BinaryEntityGenerator_getDescriptorEx(k_ASTNode_t* functionParameters
         (k_FunctionParametersContext_t*)functionParameters->m_context;
 
     jtk_StringBuilder_t* builder = jtk_StringBuilder_new();
-    jtk_StringBuilder_append_z(builder, constructor? "v:" : "(zen/core/Object):");
+    jtk_StringBuilder_append_z(builder, constructor? "v:" : "(k/core/Object):");
 
     int32_t fixedParameterCount = jtk_ArrayList_getSize(functionParametersContext->m_fixedParameters);
     int32_t i;
     for (i = 0; i < fixedParameterCount; i++) {
-        jtk_StringBuilder_append_z(builder, "(zen/core/Object)");
+        jtk_StringBuilder_append_z(builder, "(k/core/Object)");
     }
 
     if (functionParametersContext->m_variableParameter != NULL) {
-        jtk_StringBuilder_append_z(builder, "@(zen/core/Object)");
+        jtk_StringBuilder_append_z(builder, "@(k/core/Object)");
     }
 
     if ((fixedParameterCount == 0) &&
@@ -1054,8 +1054,8 @@ k_InstructionAttribute_t* k_BinaryEntityGenerator_makeInstructionAttribute(
      * represents "vm/primary/Instruction".
      */
     uint16_t attributeNameIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
-        generator->m_constantPoolBuilder, ZEN_PREDEFINED_ATTRIBUTE_INSTRUCTION,
-        ZEN_PREDEFINED_ATTRIBUTE_INSTRUCTION_SIZE);
+        generator->m_constantPoolBuilder, k_PREDEFINED_ATTRIBUTE_INSTRUCTION,
+        k_PREDEFINED_ATTRIBUTE_INSTRUCTION_SIZE);
     /* Load the maximum stack size. */
     uint16_t maxStackSize = generator->m_maxStackSize;
     /* Load the number of local variables. */
@@ -1128,7 +1128,7 @@ void k_BinaryEntityGenerator_onExitFunctionDeclaration(
     k_ASTNode_t* identifier = context->m_identifier;
     k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
 
-    bool constructor = k_Token_getType(identifierToken) == ZEN_TOKEN_KEYWORD_NEW;
+    bool constructor = k_Token_getType(identifierToken) == k_TOKEN_KEYWORD_NEW;
 
     uint8_t* temporary = jtk_CString_newEx(identifierToken->m_text, identifierToken->m_length);
     k_Symbol_t* symbol = k_SymbolTable_resolve(generator->m_symbolTable, temporary);
@@ -1260,7 +1260,7 @@ void k_BinaryEntityGenerator_onExitSimpleStatement(k_ASTListener_t* astListener,
     k_Compiler_t* compiler = generator->m_compiler;
     jtk_Logger_t* logger = compiler->m_logger;
 
-    if (context->m_statement->m_type == ZEN_AST_NODE_TYPE_EXPRESSION) {
+    if (context->m_statement->m_type == k_AST_NODE_TYPE_EXPRESSION) {
         /* Emit the pop2 instruction to clear the operand stack. Without the generation
         * of this instruction, the operand stack will overflow.
         */
@@ -1340,7 +1340,7 @@ void k_BinaryEntityGenerator_onEnterVariableDeclaration(k_ASTListener_t* astList
 
             uint16_t descriptorIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
                 generator->m_constantPoolBuilder,
-                "zen/core/Object", 15);
+                "k/core/Object", 15);
 
             /* Create an instance of the field entity that represents the variable
              * declared.
@@ -1458,7 +1458,7 @@ void k_BinaryEntityGenerator_onEnterConstantDeclaration(k_ASTListener_t* astList
                 identifierToken->m_text, identifierToken->m_length);
 
             uint16_t descriptorIndex = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
-                generator->m_constantPoolBuilder, "zen/core/Object", 15);
+                generator->m_constantPoolBuilder, "k/core/Object", 15);
 
             /* Create an instance of the field entity that represents the variable
              * declared.
@@ -1551,7 +1551,7 @@ void k_BinaryEntityGenerator_onExitConstantDeclarator(k_ASTListener_t* astListen
  * 6. Otherwise, execute the instructions corresponding to the message expression
  *    specified to the assert statement.
  * 7. Generate the instructions required to create and throw an exception.
- *    The exception is an instance of the zen.core.AssertionError class.
+ *    The exception is an instance of the k.core.AssertionError class.
  */
 void k_BinaryEntityGenerator_onEnterAssertStatement(k_ASTListener_t* astListener,
     k_ASTNode_t* node) {
@@ -1593,11 +1593,11 @@ void k_BinaryEntityGenerator_onExitAssertStatement(k_ASTListener_t* astListener,
         generator->m_constantPoolBuilder, className, classNameSize,
         descriptor, descriptorSize, name, nameSize);
 
-    const uint8_t* booleanClassName = "zen/core/Boolean";
+    const uint8_t* booleanClassName = "k/core/Boolean";
     int32_t booleanClassNameSize = 16;
     // const uint8_t* getValueDescriptor = "z:v";
     // int32_t getValueDescriptorSize = 3;
-    const uint8_t* getValueDescriptor = "(zen/core/Object):v";
+    const uint8_t* getValueDescriptor = "(k/core/Object):v";
     int32_t getValueDescriptorSize = 19;
     const uint8_t* getValueName = "getValue";
     int32_t getValueNameSize = 8;
@@ -1606,13 +1606,13 @@ void k_BinaryEntityGenerator_onExitAssertStatement(k_ASTListener_t* astListener,
         getValueDescriptor, getValueDescriptorSize, getValueName,
         getValueNameSize, 0);
 
-    const uint8_t* assertionErrorClassName = "zen/core/AssertionError";
+    const uint8_t* assertionErrorClassName = "k/core/AssertionError";
     int32_t assertionErrorClassNameSize = 26;
     uint16_t assertionErrorClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, assertionErrorClassName,
         assertionErrorClassNameSize);
 
-    const uint8_t* constructor1Descriptor = "v:@(zen/core/Object)";
+    const uint8_t* constructor1Descriptor = "v:@(k/core/Object)";
     int32_t constructor1DescriptorSize = 20;
     const uint8_t* constructorName = "<initialize>";
     int32_t constructorNameSize = 10;
@@ -1706,12 +1706,12 @@ void k_BinaryEntityGenerator_onExitAssertStatement(k_ASTListener_t* astListener,
 
 // breakStatement
 
-#define ZEN_BREAK_RECORDS_BUFFER_INCREMENT 8
+#define k_BREAK_RECORDS_BUFFER_INCREMENT 8
 
 void k_BinaryEntityGenerator_recordBreak(k_BinaryEntityGenerator_t* generator,
     int32_t loopIdentifier, int32_t updateIndex) {
     if (generator->m_breakRecordsCount + 1 >= generator->m_breakRecordsCapacity) {
-        int32_t newCapacity = generator->m_breakRecordsCapacity + ZEN_BREAK_RECORDS_BUFFER_INCREMENT;
+        int32_t newCapacity = generator->m_breakRecordsCapacity + k_BREAK_RECORDS_BUFFER_INCREMENT;
         int32_t* newBuffer = jtk_Memory_allocate(int32_t, newCapacity * 2);
 
         /* Copy the values in the old buffer and destroy it. */
@@ -1884,7 +1884,7 @@ void k_BinaryEntityGenerator_onExitIfStatement(k_ASTListener_t* astListener,
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
     k_IfStatementContext_t* context = (k_IfStatementContext_t*)node->m_context;
 
-    uint16_t getValueIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE];
+    uint16_t getValueIndex = generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE];
 
     int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
          generator->m_builder);
@@ -2152,7 +2152,7 @@ void k_BinaryEntityGenerator_onExitWhileStatement(k_ASTListener_t* astListener,
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
     k_WhileStatementContext_t* context = (k_WhileStatementContext_t*)node->m_context;
 
-    uint16_t getValueIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE];
+    uint16_t getValueIndex = generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE];
 
     int32_t parentChannelIndex = k_BinaryEntityBuilder_getActiveChannelIndex(
         generator->m_builder);
@@ -2222,9 +2222,9 @@ void k_BinaryEntityGenerator_onExitForStatement(k_ASTListener_t* astListener,
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
     k_ForStatementContext_t* context = (k_ForStatementContext_t*)node->m_context;
 
-    const uint8_t* iterableClassName = "zen/core/Iterable";
+    const uint8_t* iterableClassName = "k/core/Iterable";
     int32_t iterableClassNameSize = 17;
-    const uint8_t* getIteratorDescriptor = "(zen/core/Object):v";
+    const uint8_t* getIteratorDescriptor = "(k/core/Object):v";
     int32_t getIteratorDescriptorSize = 19;
     const uint8_t* getIteratorName = "getIterator";
     int32_t getIteratorNameSize = 11;
@@ -2238,9 +2238,9 @@ void k_BinaryEntityGenerator_onExitForStatement(k_ASTListener_t* astListener,
     k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
         generator->m_builder, parentChannelIndex);
 
-    const uint8_t* iteratorClassName = "zen/core/Iterator";
+    const uint8_t* iteratorClassName = "k/core/Iterator";
     int32_t iteratorClassNameSize = 17;
-    const uint8_t* hasNextDescriptor = "(zen/core/Object):v";
+    const uint8_t* hasNextDescriptor = "(k/core/Object):v";
     int32_t hasNextDescriptorSize = 19;
     const uint8_t* hasNextName = "hasNext";
     int32_t hasNextNameSize = 7;
@@ -2249,7 +2249,7 @@ void k_BinaryEntityGenerator_onExitForStatement(k_ASTListener_t* astListener,
         hasNextDescriptor, hasNextDescriptorSize, hasNextName,
         hasNextNameSize, 0);
 
-    const uint8_t* getNextDescriptor = "(zen/core/Object):v";
+    const uint8_t* getNextDescriptor = "(k/core/Object):v";
     int32_t getNextDescriptorSize = 19;
     const uint8_t* getNextName = "getNext";
     int32_t getNextNameSize = 7;
@@ -2258,7 +2258,7 @@ void k_BinaryEntityGenerator_onExitForStatement(k_ASTListener_t* astListener,
         getNextDescriptor, getNextDescriptorSize, getNextName,
         getNextNameSize, 0);
 
-    uint16_t getValueIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE];
+    uint16_t getValueIndex = generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_BOOLEAN_GET_VALUE];
 
     k_ASTNode_t* forParameter = context->m_forParameter;
     k_ForParameterContext_t* forParameterContext =
@@ -2925,7 +2925,7 @@ void k_BinaryEntityGenerator_onExitSynchronizeStatement(k_ASTListener_t* astList
     k_DataChannel_t* parentChannel = k_BinaryEntityBuilder_getChannel(
         generator->m_builder, parentChannelIndex);
 
-    const uint8_t* lockClassName = "zen/concurrency/lock/Lock";
+    const uint8_t* lockClassName = "k/concurrency/lock/Lock";
     int32_t lockClassNameSize = 25;
 
     const uint8_t* acquireDescriptor = "v:v";
@@ -3206,7 +3206,7 @@ void k_BinaryEntityGenerator_onEnterWithStatement(k_ASTListener_t* astListener,
     k_ASTListener_skipChildren(astListener);
 }
 
-#define ZEN_BINARY_ENTITY_GENERATOR_MAX_LOCAL_VARIABLES 255
+#define k_BINARY_ENTITY_GENERATOR_MAX_LOCAL_VARIABLES 255
 
 int32_t k_BinaryEntityGenerator_allocateLocalVariables(k_BinaryEntityGenerator_t*
     generator, int32_t count) {
@@ -3214,7 +3214,7 @@ int32_t k_BinaryEntityGenerator_allocateLocalVariables(k_BinaryEntityGenerator_t
     jtk_Assert_assertTrue(count > 0, "The specified local variable count is invalid.");
 
     int32_t result = -1;
-    if (generator->m_localVariableCount + count <= ZEN_BINARY_ENTITY_GENERATOR_MAX_LOCAL_VARIABLES) {
+    if (generator->m_localVariableCount + count <= k_BINARY_ENTITY_GENERATOR_MAX_LOCAL_VARIABLES) {
         result = generator->m_localVariableCount;
         generator->m_localVariableCount += count;
     }
@@ -3225,7 +3225,7 @@ int32_t k_BinaryEntityGenerator_allocateLocalVariables(k_BinaryEntityGenerator_t
 }
 
 /* As of version 1.0.0, the wide instruction is only part of the virtual machine
- * design. This goes to say that certain features of Zen are limited. One such
+ * design. This goes to say that certain features of k are limited. One such
  * example is that local variables are limited to a maximum of 255 per function.
  * In other words, you cannot declare more than 255 local variables in a function.
  * Remember this includes all the implicit variables generated by the code
@@ -3241,7 +3241,7 @@ int32_t k_BinaryEntityGenerator_allocateLocalVariables(k_BinaryEntityGenerator_t
  *
  * [EXAMPLE]
  *
- * Consider the following program written in Zen.
+ * Consider the following program written in k.
  *
  * function main()
  *     with 1, 2
@@ -3337,7 +3337,7 @@ void k_BinaryEntityGenerator_onExitWithStatement(k_ASTListener_t* astListener,
     /* Retrieve the context of the AST node. */
     k_WithStatementContext_t* context = (k_WithStatementContext_t*)node->m_context;
 
-    const uint8_t* closeableClassName = "zen/core/Closeable";
+    const uint8_t* closeableClassName = "k/core/Closeable";
     int32_t closeableClassNameSize = 18;
     const uint8_t* closeDescriptor = "v:v";
     int32_t closeDescriptorSize = 3;
@@ -3347,9 +3347,9 @@ void k_BinaryEntityGenerator_onExitWithStatement(k_ASTListener_t* astListener,
         generator->m_constantPoolBuilder, closeableClassName, closeableClassNameSize,
         closeDescriptor, closeDescriptorSize, closeName, closeNameSize, 0);
 
-    const uint8_t* throwableClassName = "zen/core/Throwable";
+    const uint8_t* throwableClassName = "k/core/Throwable";
     int32_t throwableClassNameSize = 18;
-    const uint8_t* suppressDescriptor = "v:(zen/core/Throwable)";
+    const uint8_t* suppressDescriptor = "v:(k/core/Throwable)";
     int32_t suppressDescriptorSize = 22;
     const uint8_t* suppressName = "suppress";
     int32_t suppressNameSize = 8;
@@ -3624,7 +3624,7 @@ void k_BinaryEntityGenerator_onEnterClassDeclaration(k_ASTListener_t* astListene
     /* Update the current scope in the symbol table. */
     k_SymbolTable_setCurrentScope(generator->m_symbolTable, scope);
 
-    generator->m_mainComponent = ZEN_AST_NODE_TYPE_CLASS_DECLARATION;
+    generator->m_mainComponent = k_AST_NODE_TYPE_CLASS_DECLARATION;
 
     k_ASTNode_t* identifier = context->m_identifier;
     k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
@@ -3658,7 +3658,7 @@ void k_BinaryEntityGenerator_onEnterClassDeclaration(k_ASTListener_t* astListene
             int32_t qualifiedNameSize;
 
             /* Retrieve the symbol for the current superclass. Do not begin the resolution
-             * from the current scope, which is this class. In the future, if Zen allows
+             * from the current scope, which is this class. In the future, if k allows
              * inner classes, this would allow inner classes to be inherited by their enclosing
              * classes!
              */
@@ -3680,13 +3680,13 @@ void k_BinaryEntityGenerator_onEnterClassDeclaration(k_ASTListener_t* astListene
     else {
         /* The extends clause has not been explicitly written. Therefore,
          * the compiler generates the default extends clause which inherits
-         * the zen.core.Object class.
+         * the k.core.Object class.
          */
 
         superclassCount = 1;
         superclassIndexes = jtk_Memory_allocate(uint16_t, 1);
         superclassIndexes[0] = k_ConstantPoolBuilder_getUtf8EntryIndexEx(
-            generator->m_constantPoolBuilder, "zen/core/Object", 15);
+            generator->m_constantPoolBuilder, "k/core/Object", 15);
     }
 
     k_BinaryEntityGenerator_initializeClassName(generator);
@@ -3889,52 +3889,52 @@ void k_BinaryEntityGenerator_onExitAssignmentExpression(k_ASTListener_t* astList
              * special implementation.
              *
             /*
-            case ZEN_TOKEN_EQUAL: {
+            case k_TOKEN_EQUAL: {
                 break;
             }
             *
 
-            case ZEN_TOKEN_ASTERISK_EQUAL: {
+            case k_TOKEN_ASTERISK_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_FORWARD_SLASH_EQUAL: {
+            case k_TOKEN_FORWARD_SLASH_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_MODULUS_EQUAL: {
+            case k_TOKEN_MODULUS_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_PLUS_EQUAL: {
+            case k_TOKEN_PLUS_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_DASH_EQUAL: {
+            case k_TOKEN_DASH_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL: {
+            case k_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL: {
+            case k_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL: {
+            case k_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_AMPERSAND_EQUAL: {
+            case k_TOKEN_AMPERSAND_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_CARET_EQUAL: {
+            case k_TOKEN_CARET_EQUAL: {
                 break;
             }
 
-            case ZEN_TOKEN_VERTICAL_BAR_EQUAL: {
+            case k_TOKEN_VERTICAL_BAR_EQUAL: {
                 break;
             }
 
@@ -3991,13 +3991,13 @@ void k_BinaryEntityGenerator_onExitLogicalOrExpression(k_ASTListener_t* astListe
          * logical OR expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for logical OR
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, logicalAndExpressions);
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * logical OR operation is delegated to functions annotated with the
          * Operator annotation.
@@ -4036,13 +4036,13 @@ void k_BinaryEntityGenerator_onExitLogicalAndExpression(k_ASTListener_t* astList
          * logical AND expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for logical AND
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, inclusiveOrExpression);
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * logical AND operation is delegated to functions annotated with the
          * Operator annotation.
@@ -4081,13 +4081,13 @@ void k_BinaryEntityGenerator_onExitInclusiveOrExpression(k_ASTListener_t* astLis
          * inclusive or expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for inclusive or
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, exclusiveOrExpression);
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * bitwise and operation is delegated to functions annotated with the
          * Operator annotation.
@@ -4124,13 +4124,13 @@ void k_BinaryEntityGenerator_onExitExclusiveOrExpression(k_ASTListener_t* astLis
          * and expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for and
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, andExpression);
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * bitwise and operation is delegated to functions annotated with the
          * Operator annotation.
@@ -4167,13 +4167,13 @@ void k_BinaryEntityGenerator_onExitAndExpression(k_ASTListener_t* astListener,
          * shift expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for shift
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, equalityExpression);
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * bitwise and operation is delegated to functions annotated with the
          * Operator annotation.
@@ -4212,7 +4212,7 @@ void k_BinaryEntityGenerator_onExitEqualityExpression(k_ASTListener_t* astListen
          * equality expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for equality
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
@@ -4233,7 +4233,7 @@ void k_BinaryEntityGenerator_onExitEqualityExpression(k_ASTListener_t* astListen
         int32_t symbolSize = 2;
 
         switch (equalityOperatorTokenType) {
-            case ZEN_TOKEN_EQUAL_2: {
+            case k_TOKEN_EQUAL_2: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '==' symbol.
                  */
@@ -4242,7 +4242,7 @@ void k_BinaryEntityGenerator_onExitEqualityExpression(k_ASTListener_t* astListen
                 break;
             }
 
-            case ZEN_TOKEN_EXCLAMATION_MARK_EQUAL: {
+            case k_TOKEN_EXCLAMATION_MARK_EQUAL: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '!=' symbol.
                  */
@@ -4258,7 +4258,7 @@ void k_BinaryEntityGenerator_onExitEqualityExpression(k_ASTListener_t* astListen
         }
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * the addition and subtraction operations are delegated to
          * functions annotated with the Operator annotation.
@@ -4305,7 +4305,7 @@ void k_BinaryEntityGenerator_onExitRelationalExpression(k_ASTListener_t* astList
          * relational expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for relational
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
@@ -4317,7 +4317,7 @@ void k_BinaryEntityGenerator_onExitRelationalExpression(k_ASTListener_t* astList
         /* Retrieve the type of the relational operator. */
         k_TokenType_t relationalOperatorTokenType = k_Token_getType(relationalOperatorToken);
 
-        if (relationalOperatorTokenType == ZEN_TOKEN_KEYWORD_IS) {
+        if (relationalOperatorTokenType == k_TOKEN_KEYWORD_IS) {
 
         }
         else {
@@ -4330,7 +4330,7 @@ void k_BinaryEntityGenerator_onExitRelationalExpression(k_ASTListener_t* astList
             int32_t symbolSize = 1;
 
             switch (relationalOperatorTokenType) {
-                case ZEN_TOKEN_LEFT_ANGLE_BRACKET: {
+                case k_TOKEN_LEFT_ANGLE_BRACKET: {
                     /* The kernel should find a function annotated with the Operator
                      * annotation that handles the '+' symbol.
                      */
@@ -4339,7 +4339,7 @@ void k_BinaryEntityGenerator_onExitRelationalExpression(k_ASTListener_t* astList
                     break;
                 }
 
-                case ZEN_TOKEN_RIGHT_ANGLE_BRACKET: {
+                case k_TOKEN_RIGHT_ANGLE_BRACKET: {
                     /* The kernel should find a function annotated with the Operator
                      * annotation that handles the '>' symbol.
                      */
@@ -4348,7 +4348,7 @@ void k_BinaryEntityGenerator_onExitRelationalExpression(k_ASTListener_t* astList
                     break;
                 }
 
-                case ZEN_TOKEN_LEFT_ANGLE_BRACKET_EQUAL: {
+                case k_TOKEN_LEFT_ANGLE_BRACKET_EQUAL: {
                     /* The kernel should find a function annotated with the Operator
                      * annotation that handles the '<=' symbol.
                      */
@@ -4361,7 +4361,7 @@ void k_BinaryEntityGenerator_onExitRelationalExpression(k_ASTListener_t* astList
                     break;
                 }
 
-                case ZEN_TOKEN_RIGHT_ANGLE_BRACKET_EQUAL: {
+                case k_TOKEN_RIGHT_ANGLE_BRACKET_EQUAL: {
                     /* The kernel should find a function annotated with the Operator
                      * annotation that handles the '>=' symbol.
                      */
@@ -4381,7 +4381,7 @@ void k_BinaryEntityGenerator_onExitRelationalExpression(k_ASTListener_t* astList
             }
 
             /* Generate the instructions corresponding to invoking the
-             * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+             * kKernel.evaluate() function. Since, k is dynamically typed
              * the compiler cannot determine the type of the operands. Therefore,
              * the left shift, right shift, and extended right shift operations are
              * delegated to functions annotated with the Operator annotation.
@@ -4421,7 +4421,7 @@ void k_BinaryEntityGenerator_onExitShiftExpression(k_ASTListener_t* astListener,
          * shift expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for shift
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
@@ -4442,7 +4442,7 @@ void k_BinaryEntityGenerator_onExitShiftExpression(k_ASTListener_t* astListener,
         int32_t symbolSize = 2;
 
         switch (shiftOperatorTokenType) {
-            case ZEN_TOKEN_LEFT_ANGLE_BRACKET_2: {
+            case k_TOKEN_LEFT_ANGLE_BRACKET_2: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '+' symbol.
                  */
@@ -4451,7 +4451,7 @@ void k_BinaryEntityGenerator_onExitShiftExpression(k_ASTListener_t* astListener,
                 break;
             }
 
-            case ZEN_TOKEN_RIGHT_ANGLE_BRACKET_2: {
+            case k_TOKEN_RIGHT_ANGLE_BRACKET_2: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '-' symbol.
                  */
@@ -4460,7 +4460,7 @@ void k_BinaryEntityGenerator_onExitShiftExpression(k_ASTListener_t* astListener,
                 break;
             }
 
-            case ZEN_TOKEN_RIGHT_ANGLE_BRACKET_3: {
+            case k_TOKEN_RIGHT_ANGLE_BRACKET_3: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '-' symbol.
                  */
@@ -4480,7 +4480,7 @@ void k_BinaryEntityGenerator_onExitShiftExpression(k_ASTListener_t* astListener,
         }
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * the left shift, right shift, and extended right shift operations are
          * delegated to functions annotated with the Operator annotation.
@@ -4519,7 +4519,7 @@ void k_BinaryEntityGenerator_onExitAdditiveExpression(k_ASTListener_t* astListen
          * additive expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for additive
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
@@ -4540,7 +4540,7 @@ void k_BinaryEntityGenerator_onExitAdditiveExpression(k_ASTListener_t* astListen
         int32_t symbolSize = 1;
 
         switch (additiveOperatorTokenType) {
-            case ZEN_TOKEN_PLUS: {
+            case k_TOKEN_PLUS: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '+' symbol.
                  */
@@ -4549,7 +4549,7 @@ void k_BinaryEntityGenerator_onExitAdditiveExpression(k_ASTListener_t* astListen
                 break;
             }
 
-            case ZEN_TOKEN_DASH: {
+            case k_TOKEN_DASH: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '-' symbol.
                  */
@@ -4565,7 +4565,7 @@ void k_BinaryEntityGenerator_onExitAdditiveExpression(k_ASTListener_t* astListen
         }
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * the addition and subtraction operations are delegated to
          * functions annotated with the Operator annotation.
@@ -4604,7 +4604,7 @@ void k_BinaryEntityGenerator_onExitMultiplicativeExpression(k_ASTListener_t* ast
          * multiplicative expressions follow the order: operand1 operand2 operator.
          * In other words, the compiler generates instructions for multiplicative
          * expressions in postfix order. Therefore, generate the instructions for
-         * the right operand and invoking the ZenKernel.evaluate(...) function,
+         * the right operand and invoking the kKernel.evaluate(...) function,
          * which takes care of *aggregating* the result.
          */
         k_ASTWalker_walk(astListener, (k_ASTNode_t*)pair->m_right);
@@ -4625,7 +4625,7 @@ void k_BinaryEntityGenerator_onExitMultiplicativeExpression(k_ASTListener_t* ast
         int32_t symbolSize = 1;
 
         switch (multiplicativeOperatorTokenType) {
-            case ZEN_TOKEN_ASTERISK: {
+            case k_TOKEN_ASTERISK: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '*' symbol.
                  */
@@ -4634,7 +4634,7 @@ void k_BinaryEntityGenerator_onExitMultiplicativeExpression(k_ASTListener_t* ast
                 break;
             }
 
-            case ZEN_TOKEN_FORWARD_SLASH: {
+            case k_TOKEN_FORWARD_SLASH: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '/' symbol.
                  */
@@ -4643,7 +4643,7 @@ void k_BinaryEntityGenerator_onExitMultiplicativeExpression(k_ASTListener_t* ast
                 break;
             }
 
-            case ZEN_TOKEN_MODULUS: {
+            case k_TOKEN_MODULUS: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '%' symbol.
                  */
@@ -4659,7 +4659,7 @@ void k_BinaryEntityGenerator_onExitMultiplicativeExpression(k_ASTListener_t* ast
         }
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * the multiplication/division/modulus operations are delegated to
          * functions annotated with the Operator annotation.
@@ -4698,7 +4698,7 @@ void k_BinaryEntityGenerator_onEnterUnaryExpression(k_ASTListener_t* astListener
         int32_t symbolSize = 1;
 
         switch (unaryOperatorType) {
-            case ZEN_TOKEN_PLUS: {
+            case k_TOKEN_PLUS: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '1+' symbol.
                  */
@@ -4708,7 +4708,7 @@ void k_BinaryEntityGenerator_onEnterUnaryExpression(k_ASTListener_t* astListener
                 break;
             }
 
-            case ZEN_TOKEN_DASH: {
+            case k_TOKEN_DASH: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '1-' symbol.
                  */
@@ -4718,7 +4718,7 @@ void k_BinaryEntityGenerator_onEnterUnaryExpression(k_ASTListener_t* astListener
                 break;
             }
 
-            case ZEN_TOKEN_TILDE: {
+            case k_TOKEN_TILDE: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '~' symbol.
                  */
@@ -4727,7 +4727,7 @@ void k_BinaryEntityGenerator_onEnterUnaryExpression(k_ASTListener_t* astListener
                 break;
             }
 
-            case ZEN_TOKEN_EXCLAMATION_MARK: {
+            case k_TOKEN_EXCLAMATION_MARK: {
                 /* The kernel should find a function annotated with the Operator
                  * annotation that handles the '!' symbol.
                  */
@@ -4737,9 +4737,9 @@ void k_BinaryEntityGenerator_onEnterUnaryExpression(k_ASTListener_t* astListener
             }
 
             /*
-            case ZEN_TOKEN_PLUS_2:
-            case ZEN_TOKEN_DASH_2: {
-                if (unaryOperatorType == ZEN_TOKEN_PLUS_2) {
+            case k_TOKEN_PLUS_2:
+            case k_TOKEN_DASH_2: {
+                if (unaryOperatorType == k_TOKEN_PLUS_2) {
                     /* The onPreIncrement() function is invoked against the object whose internal
                      * state has to be "incremented by 1". It returns an object with its internal
                      * state "incremented by 1".
@@ -4772,7 +4772,7 @@ void k_BinaryEntityGenerator_onEnterUnaryExpression(k_ASTListener_t* astListener
         // TODO: I don't think unary operators work.
 
         /* Generate the instructions corresponding to invoking the
-         * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+         * kKernel.evaluate() function. Since, k is dynamically typed
          * the compiler cannot determine the type of the operands. Therefore,
          * the multiplication/division/modulus operations are delegated to
          * functions annotated with the Operator annotation.
@@ -4797,15 +4797,15 @@ void k_BinaryEntityGenerator_invokeEvaluate(k_BinaryEntityGenerator_t* generator
     /* Retrieve the logger from the compiler. */
     jtk_Logger_t* logger = generator->m_compiler->m_logger;
 
-    // ZenKernel.evaluate(Object operand, String symbol)
-    // ZenKernel.evaluate(Object operand1, Object operand2, String symbol)
+    // kKernel.evaluate(Object operand, String symbol)
+    // kKernel.evaluate(Object operand1, Object operand2, String symbol)
 
     uint16_t symbolIndex = k_ConstantPoolBuilder_getStringEntryIndexEx(
         generator->m_constantPoolBuilder, symbol, symbolSize);
     k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, symbolIndex);
     jtk_Logger_debug(logger, "Emitted load_cpr %d", symbolIndex);
 
-    uint16_t evaluateIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_EVALUATE];
+    uint16_t evaluateIndex = generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_k_KERNEL_EVALUATE];
 
     /* Invoke the static function to evaluate the expression. */
     k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder,
@@ -5124,14 +5124,14 @@ void k_BinaryEntityGenerator_loadInteger(k_BinaryEntityGenerator_t* generator,
 }
 
 /*
- * Zen allows operator overriding through a combination of functions and
+ * k allows operator overriding through a combination of functions and
  * annotations.
  *
- * All the operators in Zen are dispatched to a function call.
- * The ZenKernel.evaluate(...) function finds a suitable handler for the
+ * All the operators in k are dispatched to a function call.
+ * The kKernel.evaluate(...) function finds a suitable handler for the
  * operator defined within the operand object and dispatches it. In other words,
  * the compiler translates expressions with operators to equivalent
- * ZenKernel.evaluate(...) calls.
+ * kKernel.evaluate(...) calls.
  *
  * For example, in the HashMap class the following annotation
  * overrides the subscript operator.
@@ -5154,7 +5154,7 @@ void k_BinaryEntityGenerator_loadInteger(k_BinaryEntityGenerator_t* generator,
  *     'Samuel Rowe' : 'samuelrowe1999@gmail.com',
  *     'Joel E. Rego' : 'joelerego@gmail.com'
  * }
- * var myEmailAddress = ZenKernel.evaluate(emailAddresses, 'Samuel Rowe', '[]')
+ * var myEmailAddress = kKernel.evaluate(emailAddresses, 'Samuel Rowe', '[]')
  *
  * In fact, when you compile the former code snippet the compiler generates
  * instructions as if the code was written in the latter form.
@@ -5162,7 +5162,7 @@ void k_BinaryEntityGenerator_loadInteger(k_BinaryEntityGenerator_t* generator,
 
 void k_BinaryEntityGenerator_handleIntegerLiteral(k_BinaryEntityGenerator_t* generator,
     k_Token_t* token) {
-    const uint8_t* integerClassName = "zen/core/Integer";
+    const uint8_t* integerClassName = "k/core/Integer";
     int32_t integerClassNameSize = 16;
     uint16_t integerClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, integerClassName,
@@ -5222,7 +5222,7 @@ void k_BinaryEntityGenerator_handleIntegerLiteral(k_BinaryEntityGenerator_t* gen
     const uint8_t* constructorName = "<initialize>";
     int32_t constructorNameSize = 12;
     // const uint8_t* constructorDescriptor = "v:i";
-    const uint8_t* constructorDescriptor = "v:(zen/core/Object)";
+    const uint8_t* constructorDescriptor = "v:(k/core/Object)";
     int32_t constructorDescriptorSize = 19;
     uint16_t constructorIndex = k_ConstantPoolBuilder_getFunctionEntryIndexEx(
         generator->m_constantPoolBuilder, integerClassName,
@@ -5362,7 +5362,7 @@ void k_BinaryEntityGenerator_handleDirectField(k_BinaryEntityGenerator_t* genera
         // TODO: Add table indexes to fields!
         uint16_t cpIndex = k_ConstantPoolBuilder_getFieldEntryIndexEx(
             generator->m_constantPoolBuilder, classSymbolContext->m_descriptor,
-                classSymbolContext->m_descriptorSize, "(zen/core/Object)", 17,
+                classSymbolContext->m_descriptorSize, "(k/core/Object)", 17,
                 targetSymbol->m_name, targetSymbol->m_nameSize);
         bool instance = !k_Symbol_isStatic(targetSymbol);
         if (last && lhs) {
@@ -5415,36 +5415,36 @@ void k_BinaryEntityGenerator_handleDirectAccess(k_BinaryEntityGenerator_t* gener
     k_Symbol_t* targetSymbol = NULL;
     k_Symbol_t* classSymbol = NULL;
     switch (primaryToken->m_type) {
-        case ZEN_TOKEN_IDENTIFIER: {
+        case k_TOKEN_IDENTIFIER: {
             classSymbol = primarySymbol;
             break;
         }
 
-        case ZEN_TOKEN_INTEGER_LITERAL: {
+        case k_TOKEN_INTEGER_LITERAL: {
             classSymbol = k_Compiler_resolveSymbol(
-                generator->m_compiler, "zen.core.Integer", 16);
+                generator->m_compiler, "k.core.Integer", 16);
 
             break;
         }
 
-        case ZEN_TOKEN_STRING_LITERAL: {
+        case k_TOKEN_STRING_LITERAL: {
             classSymbol = k_Compiler_resolveSymbol(generator->m_compiler,
-                "zen.core.String", 15);
+                "k.core.String", 15);
             break;
         }
 
-        case ZEN_TOKEN_KEYWORD_TRUE:
-        case ZEN_TOKEN_KEYWORD_FALSE: {
+        case k_TOKEN_KEYWORD_TRUE:
+        case k_TOKEN_KEYWORD_FALSE: {
             classSymbol = k_Compiler_resolveSymbol(
-                generator->m_compiler, "zen.core.Boolean", 16);
+                generator->m_compiler, "k.core.Boolean", 16);
         }
 
-        case ZEN_TOKEN_KEYWORD_NULL: {
+        case k_TOKEN_KEYWORD_NULL: {
             printf("[error] Why would you access a member of the null literal?\n");
             break;
         }
 
-        case ZEN_TOKEN_KEYWORD_THIS: {
+        case k_TOKEN_KEYWORD_THIS: {
             classSymbol = generator->m_symbolTable->m_currentScope->m_enclosingScope->m_symbol;
             break;
         }
@@ -5459,7 +5459,7 @@ void k_BinaryEntityGenerator_handleDirectAccess(k_BinaryEntityGenerator_t* gener
             postfixParts, *index + 1);
         k_ASTNodeType_t nextPostfixPartType = k_ASTNode_getType(nextPostfixPart);
 
-        if (nextPostfixPartType == ZEN_AST_NODE_TYPE_FUNCTION_ARGUMENTS) {
+        if (nextPostfixPartType == k_AST_NODE_TYPE_FUNCTION_ARGUMENTS) {
             k_ASTNode_t* functionArguments = nextPostfixPart;
             *index++;
 
@@ -5495,7 +5495,7 @@ void k_BinaryEntityGenerator_handleDirectAccess(k_BinaryEntityGenerator_t* gener
  *
  * Methods and fields handled by this function cannot be static. The generator
  * ensures this assertion based on the fact that nested classes and
- * static methods and fields cannot be referenced via objects in Zen.
+ * static methods and fields cannot be referenced via objects in k.
  */
 void k_BinaryEntityGenerator_handleDynamicAccess(k_BinaryEntityGenerator_t* generator,
     k_MemberAccessContext_t* memberAccessContext, jtk_ArrayList_t* postfixParts,
@@ -5514,7 +5514,7 @@ void k_BinaryEntityGenerator_handleDynamicAccess(k_BinaryEntityGenerator_t* gene
         k_ASTNode_t* nextPostfixPart = (k_ASTNode_t*)jtk_ArrayList_getValue(
             postfixParts, *index + 1);
         k_ASTNodeType_t nextPostfixPartType = k_ASTNode_getType(nextPostfixPart);
-        if (nextPostfixPartType == ZEN_AST_NODE_TYPE_FUNCTION_ARGUMENTS) {
+        if (nextPostfixPartType == k_AST_NODE_TYPE_FUNCTION_ARGUMENTS) {
             *index++;
             k_ASTNode_t* functionArguments = nextPostfixPart;
             k_FunctionArgumentsContext_t* functionArgumentsContext = (k_FunctionArgumentsContext_t*)functionArguments->m_context;
@@ -5549,7 +5549,7 @@ void k_BinaryEntityGenerator_handleDynamicAccess(k_BinaryEntityGenerator_t* gene
             targetNameIndex);
 
         if ((*index + 1 == postfixPartCount) && lhs) {
-            uint16_t storeFieldIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_STORE_FIELD];
+            uint16_t storeFieldIndex = generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_k_KERNEL_STORE_FIELD];
             k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, storeFieldIndex);
         }
         else {
@@ -5557,7 +5557,7 @@ void k_BinaryEntityGenerator_handleDynamicAccess(k_BinaryEntityGenerator_t* gene
              * but it does not matter because at this point a field or method
              * reference should be loaded.
              */
-            uint16_t loadFieldIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_LOAD_FIELD];
+            uint16_t loadFieldIndex = generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_k_KERNEL_LOAD_FIELD];
             k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, loadFieldIndex);
         }
     }
@@ -5569,7 +5569,7 @@ void k_BinaryEntityGenerator_handleIdentifier(k_BinaryEntityGenerator_t* generat
     k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
     k_Scope_t* enclosingScope = k_Symbol_getEnclosingScope(symbol);
 
-    uint16_t storeFieldIndex = generator->m_cpfIndexes[ZEN_BINARY_ENTITY_GENERATOR_ZEN_KERNEL_STORE_FIELD];
+    uint16_t storeFieldIndex = generator->m_cpfIndexes[k_BINARY_ENTITY_GENERATOR_k_KERNEL_STORE_FIELD];
     if (k_Symbol_isVariable(symbol) || k_Symbol_isConstant(symbol)) {
         if (lhs) {
             if (k_Scope_isClassScope(enclosingScope)) {
@@ -5589,7 +5589,7 @@ void k_BinaryEntityGenerator_handleIdentifier(k_BinaryEntityGenerator_t* generat
                     k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
                     /* Load the name of the field. */
                     k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, identifierIndex);
-                    /* Invoke the ZenKernel.storeField() function to update
+                    /* Invoke the kKernel.storeField() function to update
                      * the field.
                      */
                     k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, storeFieldIndex);
@@ -5601,7 +5601,7 @@ void k_BinaryEntityGenerator_handleIdentifier(k_BinaryEntityGenerator_t* generat
                     k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, 0);
                     /* Load the name of the field. */
                     k_BinaryEntityBuilder_emitLoadCPR(generator->m_builder, identifierIndex);
-                    /* Invoke the ZenKernel.storeField() function to update
+                    /* Invoke the kKernel.storeField() function to update
                     * the field.
                     */
                     k_BinaryEntityBuilder_emitInvokeStatic(generator->m_builder, storeFieldIndex);
@@ -5661,7 +5661,7 @@ void k_BinaryEntityGenerator_handleSubscript(k_BinaryEntityGenerator_t* generato
     k_ASTWalker_walk(generator->m_astListener, subscriptContext->m_expression);
 
     /* Generate the instructions corresponding to invoking the
-     * ZenKernel.evaluate() function. Since, Zen is dynamically typed
+     * kKernel.evaluate() function. Since, k is dynamically typed
      * the compiler cannot determine the type of the operands. Therefore,
      * the subscript operation is delegated to the function annotated
      * with the Operator annotation.
@@ -5728,13 +5728,13 @@ void k_BinaryEntityGenerator_handleSubscript(k_BinaryEntityGenerator_t* generato
  *    generate the instructions corresponding to the primary expression and the
  *    postfix parts prior to the current postfix part. The second operand should
  *    be evaluated by walking over the tree of the expression specified inside
- *    the square brackets. After which, the ZenKernel.evaluate(operand1, operand2, '[]')
- *    or ZenKernel.evaluate(operand1, operand2, operand3, '[]=') call should be
+ *    the square brackets. After which, the kKernel.evaluate(operand1, operand2, '[]')
+ *    or kKernel.evaluate(operand1, operand2, operand3, '[]=') call should be
  *    made.
  * 2. For function arguments
  *    a. If function arguments is the very first postfix part, then use the
  *       function symbol resolved in the previous phase. Generate instructions
- *       to invoke the ZenKernel.dispatch() function to simulate the function
+ *       to invoke the kKernel.dispatch() function to simulate the function
  *       call.
  *    b. When function arguments postfix part occurs at a position other than the
  *       beginning of the list of postfix parts, it is processed along with the
@@ -5744,14 +5744,14 @@ void k_BinaryEntityGenerator_handleSubscript(k_BinaryEntityGenerator_t* generato
  *    from left to right.
  * 3. For member access postfix parts, the subsequent postfix part is checked to
  *    see if it is a function arguments postfix part. If true, the algorithm
- *    generates instructions to invoke the ZenKernel.dispatch() function to
+ *    generates instructions to invoke the kKernel.dispatch() function to
  *    simulate the function call.
  *    However, if the subsequent postfix part is not a function arguments postfix
  *    part, then either the load_static_field or  the load_instance_field instruction
  *    is generated.
  *    It should be noted that the identifiers in the member access are not resolved
  *    for their declaration in the symbol table. They are intended to be verified
- *    at runtime due to the dynamic nature of Zen.
+ *    at runtime due to the dynamic nature of k.
  */
 void k_BinaryEntityGenerator_onExitPostfixExpression(k_ASTListener_t* astListener,
     k_ASTNode_t* node) {
@@ -5764,7 +5764,7 @@ void k_BinaryEntityGenerator_onExitPostfixExpression(k_ASTListener_t* astListene
     k_Symbol_t* primarySymbol = NULL;
     int32_t postfixPartCount = jtk_ArrayList_getSize(context->m_postfixParts);
     k_Token_t* primaryToken = NULL;
-    k_TokenType_t primaryTokenType = ZEN_TOKEN_UNKNOWN;
+    k_TokenType_t primaryTokenType = k_TOKEN_UNKNOWN;
 
     if (k_ASTNode_isTerminal(expression)) {
         /* Retrieve the token that the primary expression represents. */
@@ -5772,64 +5772,64 @@ void k_BinaryEntityGenerator_onExitPostfixExpression(k_ASTListener_t* astListene
 
         primaryTokenType = k_Token_getType(primaryToken);
         switch (primaryTokenType) {
-            case ZEN_TOKEN_IDENTIFIER: {
+            case k_TOKEN_IDENTIFIER: {
                 /* Resolve the symbol and pass it to the next phase. */
                 primarySymbol = k_SymbolTable_resolve(generator->m_symbolTable,
                     primaryToken->m_text);
                 break;
             }
 
-            case ZEN_TOKEN_INTEGER_LITERAL: {
+            case k_TOKEN_INTEGER_LITERAL: {
                 k_BinaryEntityGenerator_handleIntegerLiteral(generator, primaryToken);
                 break;
             }
 
-            case ZEN_TOKEN_KEYWORD_TRUE: {
+            case k_TOKEN_KEYWORD_TRUE: {
                 /* Emit push_i1. In the operand stack, 1 represents true. */
                 k_BinaryEntityBuilder_emitPushInteger1(generator->m_builder);
                 break;
             }
 
-            case ZEN_TOKEN_KEYWORD_FALSE: {
+            case k_TOKEN_KEYWORD_FALSE: {
                 /* Emit push_i0 instruction. In the operand stack, 0 represents false. */
                 k_BinaryEntityBuilder_emitPushInteger0(generator->m_builder);
                 break;
             }
 
-            case ZEN_TOKEN_STRING_LITERAL: {
+            case k_TOKEN_STRING_LITERAL: {
                 k_BinaryEntityGenerator_handleStringLiteral(generator, primaryToken);
                 break;
             }
 
-            case ZEN_TOKEN_KEYWORD_NULL: {
+            case k_TOKEN_KEYWORD_NULL: {
                 /* Emit the push_null instruction. */
                 k_BinaryEntityBuilder_emitPushNull(generator->m_builder);
                 break;
             }
 
-            case ZEN_TOKEN_KEYWORD_THIS: {
+            case k_TOKEN_KEYWORD_THIS: {
                 /* Emit the load_a instruction. */
                 k_BinaryEntityBuilder_emitLoadReference(generator->m_builder, 0);
                 break;
             }
         }
     }
-    else if ((expression->m_type == ZEN_AST_NODE_TYPE_MAP_EXPRESSION) ||
-        (expression->m_type == ZEN_AST_NODE_TYPE_LIST_EXPRESSION) ||
-        (expression->m_type == ZEN_AST_NODE_TYPE_EXPRESSION) ||
-        (expression->m_type == ZEN_AST_NODE_TYPE_NEW_EXPRESSION)) {
+    else if ((expression->m_type == k_AST_NODE_TYPE_MAP_EXPRESSION) ||
+        (expression->m_type == k_AST_NODE_TYPE_LIST_EXPRESSION) ||
+        (expression->m_type == k_AST_NODE_TYPE_EXPRESSION) ||
+        (expression->m_type == k_AST_NODE_TYPE_NEW_EXPRESSION)) {
         k_ASTWalker_walk(astListener, expression);
     }
     else {
         printf("[internal error] What node do we have here?\n");
     }
 
-    const uint8_t* objectClassName = "zen/core/Object";
+    const uint8_t* objectClassName = "k/core/Object";
     int32_t objectClassNameSize = 15;
     uint16_t objectClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, objectClassName, objectClassNameSize);
 
-    if ((postfixPartCount == 0) && (primaryTokenType == ZEN_TOKEN_IDENTIFIER)) {
+    if ((postfixPartCount == 0) && (primaryTokenType == k_TOKEN_IDENTIFIER)) {
         k_BinaryEntityGenerator_handleIdentifier(generator, primarySymbol);
     }
     else {
@@ -5840,7 +5840,7 @@ void k_BinaryEntityGenerator_onExitPostfixExpression(k_ASTListener_t* astListene
             k_ASTNodeType_t type = k_ASTNode_getType(postfixPart);
 
             /* When code written in a statically typed ZVM language is integrated
-             * with code written in a dynamically typed ZVM language, such as Zen,
+             * with code written in a dynamically typed ZVM language, such as k,
              * special care should be taken. The operand stack is vulnerable to
              * pollution. For example, assume the following function written in a
              * hypothetical ZVM language that is statically typed.
@@ -5848,22 +5848,22 @@ void k_BinaryEntityGenerator_onExitPostfixExpression(k_ASTListener_t* astListene
              * int getIndex()
              *     ...
              *
-             * Now, consider the following code written in Zen.
+             * Now, consider the following code written in k.
              *
              * function main(...arguments)
              *     var index = getIndex()
              *     index += 1
              *
-             * When getIndex() function is invoked from Zen, the primitive value
+             * When getIndex() function is invoked from k, the primitive value
              * is passed around the code. The compound assignment operator causes
-             * the invocation of ZenEnvironment.invokeOperator(...) against a primitive
+             * the invocation of kEnvironment.invokeOperator(...) against a primitive
              * value, given the operand stack does not store the type of its entries.
              * Therefore, the compiler of the dynamically typed language should take
              * care of wrapping and unwrapping primitive values to their corresponding
              * wrapper class objects.
              */
             switch (type) {
-                case ZEN_AST_NODE_TYPE_SUBSCRIPT: {
+                case k_AST_NODE_TYPE_SUBSCRIPT: {
                     k_SubscriptContext_t* subscriptContext = (k_SubscriptContext_t*)postfixPart->m_context;
                     k_BinaryEntityGenerator_handleSubscript(generator, (k_SubscriptContext_t*)postfixPart->m_context,
                         i + 1 == postfixPartCount);
@@ -5871,7 +5871,7 @@ void k_BinaryEntityGenerator_onExitPostfixExpression(k_ASTListener_t* astListene
                     break;
                 }
 
-                case ZEN_AST_NODE_TYPE_FUNCTION_ARGUMENTS: {
+                case k_AST_NODE_TYPE_FUNCTION_ARGUMENTS: {
                     k_FunctionArgumentsContext_t* functionArgumentsContext =
                         (k_FunctionArgumentsContext_t*)postfixPart->m_context;
                     k_BinaryEntityGenerator_handleDirectFunction(generator,
@@ -5880,7 +5880,7 @@ void k_BinaryEntityGenerator_onExitPostfixExpression(k_ASTListener_t* astListene
                     break;
                 }
 
-                case ZEN_AST_NODE_TYPE_MEMBER_ACCESS: {
+                case k_AST_NODE_TYPE_MEMBER_ACCESS: {
                     k_MemberAccessContext_t* memberAccessContext =
                         (k_MemberAccessContext_t*)postfixPart->m_context;
 
@@ -6011,7 +6011,7 @@ void k_BinaryEntityGenerator_onEnterMapExpression(k_ASTListener_t* astListener,
      */
     k_BinaryEntityGenerator_loadInteger(generator, size);
 
-    const uint8_t* objectClassName = "zen/core/Object";
+    const uint8_t* objectClassName = "k/core/Object";
     int32_t objectClassNameSize = 15;
     uint16_t objectClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, objectClassName, objectClassNameSize);
@@ -6104,7 +6104,7 @@ void k_BinaryEntityGenerator_onEnterMapExpression(k_ASTListener_t* astListener,
         jtk_Logger_debug(logger, "Emitted store_aa");
     }
 
-    const uint8_t* hashMapClassName = "zen/collection/map/HashMap";
+    const uint8_t* hashMapClassName = "k/collection/map/HashMap";
     int32_t hashMapClassNameSize = 26;
     uint16_t hashMapClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, hashMapClassName, hashMapClassNameSize);
@@ -6121,7 +6121,7 @@ void k_BinaryEntityGenerator_onEnterMapExpression(k_ASTListener_t* astListener,
     /* Log the emission of the duplicate instruction. */
     jtk_Logger_debug(logger, "Emitted duplicate");
 
-    const uint8_t* constructorDescriptor = "v:@(zen/core/Object)@(zen/core/Object)";
+    const uint8_t* constructorDescriptor = "v:@(k/core/Object)@(k/core/Object)";
     int32_t constructorDescriptorSize = 38;
     const uint8_t* constructorName = "<constructor>";
     int32_t constructorNameSize = 13;
@@ -6200,7 +6200,7 @@ void k_BinaryEntityGenerator_onEnterListExpression(k_ASTListener_t* astListener,
     /* Push the size of the list onto the operand stack. */
     k_BinaryEntityGenerator_loadInteger(generator, size);
 
-    const uint8_t* objectClassName = "zen/core/Object";
+    const uint8_t* objectClassName = "k/core/Object";
     int32_t objectClassNameSize = 15;
     uint16_t objectClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, objectClassName, objectClassNameSize);
@@ -6241,7 +6241,7 @@ void k_BinaryEntityGenerator_onEnterListExpression(k_ASTListener_t* astListener,
         jtk_Logger_debug(logger, "Emitted store_aa");
     }
 
-    const uint8_t* arrayListClassName = "zen.collection.list.ArrayList";
+    const uint8_t* arrayListClassName = "k.collection.list.ArrayList";
     int32_t arrayListClassNameSize = 29;
     uint16_t arrayListClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
         generator->m_constantPoolBuilder, arrayListClassName, arrayListClassNameSize);
@@ -6258,7 +6258,7 @@ void k_BinaryEntityGenerator_onEnterListExpression(k_ASTListener_t* astListener,
     /* Log the emission of the duplicate instruction. */
     jtk_Logger_debug(logger, "Emitted duplicate");
 
-    const uint8_t* constructorDescriptor = "v:@(zen/core/Object)";
+    const uint8_t* constructorDescriptor = "v:@(k/core/Object)";
     int32_t constructorDescriptorSize = 20;
     const uint8_t* constructorName = "<constructor>";
     int32_t constructorNameSize = 13;
@@ -6411,7 +6411,7 @@ void k_BinaryEntityGenerator_onEnterNewExpression(k_ASTListener_t* astListener,
             }
 
             for (j = 0; j < numberOfFixedArguments; j++) {
-                jtk_StringBuilder_appendEx_z(builder, "(zen/core/Object)", 17);
+                jtk_StringBuilder_appendEx_z(builder, "(k/core/Object)", 17);
 
                 k_ASTNode_t* argument = (k_ASTNode_t*)jtk_ArrayList_getValue(
                     expressionsContext->m_expressions, j);
@@ -6423,7 +6423,7 @@ void k_BinaryEntityGenerator_onEnterNewExpression(k_ASTListener_t* astListener,
              */
             if ((parameterThreshold != -1) && (numberOfArguments >= parameterThreshold)) {
                 // Generate the array for the variable argument.
-                jtk_StringBuilder_appendEx_z(builder, "@(zen/core/Object)", 18);
+                jtk_StringBuilder_appendEx_z(builder, "@(k/core/Object)", 18);
 
                 /* Evaluate the number of the variable arguments. */
                 int32_t size = numberOfArguments - parameterThreshold;
@@ -6431,7 +6431,7 @@ void k_BinaryEntityGenerator_onEnterNewExpression(k_ASTListener_t* astListener,
                 /* Push the size of the list onto the operand stack. */
                 k_BinaryEntityGenerator_loadInteger(generator, size);
 
-                const uint8_t* objectClassName = "zen/core/Object";
+                const uint8_t* objectClassName = "k/core/Object";
                 int32_t objectClassNameSize = 15;
                 uint16_t objectClassIndex = k_ConstantPoolBuilder_getClassEntryIndexEx(
                     generator->m_constantPoolBuilder, objectClassName, objectClassNameSize);

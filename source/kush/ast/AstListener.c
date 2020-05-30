@@ -24,8 +24,8 @@
 
 k_ASTListener_t* k_ASTListener_newWithContext(void* context) {
     k_ASTListener_t* listener = k_Memory_allocate(k_ASTListener_t, 1);
-    // listener->m_walkerState = ZEN_AST_WALKER_STATE_INVALID;
-    listener->m_walkerState = ZEN_AST_WALKER_STATE_VISIT_CHILDREN;
+    // listener->m_walkerState = KUSH_AST_WALKER_STATE_INVALID;
+    listener->m_walkerState = KUSH_AST_WALKER_STATE_VISIT_CHILDREN;
     listener->m_context = context;
 
     listener->m_onVisitErrorNode = k_ASTListener_onVisitErrorNode;
@@ -914,13 +914,13 @@ void k_ASTListener_onExitNewExpression(k_ASTListener_t* listener, k_ASTNode_t* n
 void k_ASTListener_skipChildren(k_ASTListener_t* listener) {
     jtk_Assert_assertObject(listener, "The specified listener is null.");
 
-    listener->m_walkerState = ZEN_AST_WALKER_STATE_SKIP_CHILDREN;
+    listener->m_walkerState = KUSH_AST_WALKER_STATE_SKIP_CHILDREN;
 }
 
 void k_ASTListener_visitChildren(k_ASTListener_t* listener) {
     jtk_Assert_assertObject(listener, "The specified listener is null.");
 
-    listener->m_walkerState = ZEN_AST_WALKER_STATE_VISIT_CHILDREN;
+    listener->m_walkerState = KUSH_AST_WALKER_STATE_VISIT_CHILDREN;
 }
 
 // First Child
@@ -928,5 +928,5 @@ void k_ASTListener_visitChildren(k_ASTListener_t* listener) {
 void k_ASTListener_visitFirstChild(k_ASTListener_t* listener) {
     jtk_Assert_assertObject(listener, "The specified listener is null.");
 
-    listener->m_walkerState = ZEN_AST_WALKER_STATE_VISIT_FIRST_CHILD;
+    listener->m_walkerState = KUSH_AST_WALKER_STATE_VISIT_FIRST_CHILD;
 }
