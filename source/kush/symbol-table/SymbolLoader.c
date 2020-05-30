@@ -29,18 +29,18 @@
 #include <jtk/core/CString.h>
 #include <jtk/core/CStringObjectAdapter.h>
 
-#include <com/onecube/KUSH/virtual-machine/feb/BinaryEntityFormat.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPool.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolClass.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolDouble.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolField.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolFloat.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolFunction.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolInteger.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolLong.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolString.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolTag.h>
-#include <com/onecube/KUSH/virtual-machine/feb/constant-pool/ConstantPoolUtf8.h>
+#include <kush/virtual-machine/feb/BinaryEntityFormat.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPool.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolClass.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolDouble.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolField.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolFloat.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolFunction.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolInteger.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolLong.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolString.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolTag.h>
+#include <kush/virtual-machine/feb/constant-pool/ConstantPoolUtf8.h>
 
 #include <kush/symbol-table/SymbolLoader.h>
 #include <kush/Compiler.h>
