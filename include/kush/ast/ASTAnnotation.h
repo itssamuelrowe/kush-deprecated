@@ -28,7 +28,7 @@
 
 /**
  * @author Samuel Rowe
- * @since  zen 1.0
+ * @since  KUSH 1.0
  */
 struct k_ASTAnnotation_t {
     k_ASTAnnotationType_t m_type;

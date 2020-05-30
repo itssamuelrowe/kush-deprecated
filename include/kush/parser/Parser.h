@@ -16,8 +16,8 @@
 
 // Sunday, November 05, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_PARSER_PARSER_H
-#define COM_ONECUBE_ZEN_COMPILER_PARSER_PARSER_H
+#ifndef KUSH_COMPILER_PARSER_PARSER_H
+#define KUSH_COMPILER_PARSER_PARSER_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -33,7 +33,7 @@
  * @class Parser
  * @ingroup k_compiler_parser
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_Parser_t {
     k_Compiler_t* m_compiler;
@@ -595,4 +595,4 @@ void k_Parser_listExpression(k_Parser_t* parser, k_ASTNode_t* node);
  */
 void k_Parser_newExpression(k_Parser_t* parser, k_ASTNode_t* node);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_PARSER_PARSER_H */
+#endif /* KUSH_COMPILER_PARSER_PARSER_H */

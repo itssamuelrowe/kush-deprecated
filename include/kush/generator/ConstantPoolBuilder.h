@@ -16,8 +16,8 @@
 
 // Monday, October 07, 2019
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_GENERATOR_CONSTANT_POOL_BUILDER_H
-#define COM_ONECUBE_ZEN_COMPILER_GENERATOR_CONSTANT_POOL_BUILDER_H
+#ifndef KUSH_COMPILER_GENERATOR_CONSTANT_POOL_BUILDER_H
+#define KUSH_COMPILER_GENERATOR_CONSTANT_POOL_BUILDER_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -145,4 +145,4 @@ int32_t k_ConstantPoolBuilder_getLongEntryIndex(
 int32_t k_ConstantPoolBuilder_getUtf8EntryIndexEx(
     k_ConstantPoolBuilder_t* builder, uint8_t* bytes, int32_t bytesSize);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_GENERATOR_CONSTANT_POOL_BUILDER_H */
+#endif /* KUSH_COMPILER_GENERATOR_CONSTANT_POOL_BUILDER_H */

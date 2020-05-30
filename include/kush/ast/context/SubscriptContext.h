@@ -16,8 +16,8 @@
 
 // Tuesday, July 16, 2019
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_SUBSCRIPT_CONTEXT_H
-#define COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_SUBSCRIPT_CONTEXT_H
+#ifndef KUSH_COMPILER_AST_CONTEXT_SUBSCRIPT_CONTEXT_H
+#define KUSH_COMPILER_AST_CONTEXT_SUBSCRIPT_CONTEXT_H
 
 #include <kush/Configuration.h>
 #include <kush/ast/ASTNode.h>
@@ -30,7 +30,7 @@
  * @class SubscriptContext
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_SubscriptContext_t {
     k_ASTNode_t* m_node;
@@ -63,4 +63,4 @@ void k_SubscriptContext_delete(k_SubscriptContext_t* context);
  */
 void k_SubscriptContext_getChildren(k_SubscriptContext_t* context, jtk_ArrayList_t* children);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_SUBSCRIPT_CONTEXT_H */
+#endif /* KUSH_COMPILER_AST_CONTEXT_SUBSCRIPT_CONTEXT_H */

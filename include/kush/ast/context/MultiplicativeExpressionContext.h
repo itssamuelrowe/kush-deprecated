@@ -16,8 +16,8 @@
 
 // Wednesday, July 17, 2019
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_MULTIPLICATIVE_EXPRESSION_CONTEXT_H
-#define COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_MULTIPLICATIVE_EXPRESSION_CONTEXT_H
+#ifndef KUSH_COMPILER_AST_CONTEXT_MULTIPLICATIVE_EXPRESSION_CONTEXT_H
+#define KUSH_COMPILER_AST_CONTEXT_MULTIPLICATIVE_EXPRESSION_CONTEXT_H
 
 #include <jtk/collection/list/ArrayList.h>
 #include <kush/Configuration.h>
@@ -31,7 +31,7 @@
  * @class MultiplicativeExpressionContext
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_MultiplicativeExpressionContext_t {
     k_ASTNode_t* m_node;
@@ -62,4 +62,4 @@ void k_MultiplicativeExpressionContext_delete(k_MultiplicativeExpressionContext_
  */
 void k_MultiplicativeExpressionContext_getChildren(k_MultiplicativeExpressionContext_t* context, jtk_ArrayList_t* children);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_MULTIPLICATIVE_EXPRESSION_CONTEXT_H */
+#endif /* KUSH_COMPILER_AST_CONTEXT_MULTIPLICATIVE_EXPRESSION_CONTEXT_H */

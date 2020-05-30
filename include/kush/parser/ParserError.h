@@ -16,8 +16,8 @@
 
 // Sunday, December 03, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_PARSER_PARSER_ERROR_H
-#define COM_ONECUBE_ZEN_COMPILER_PARSER_PARSER_ERROR_H
+#ifndef KUSH_COMPILER_PARSER_PARSER_ERROR_H
+#define KUSH_COMPILER_PARSER_PARSER_ERROR_H
 
 #include <kush/Configuration.h>
 
@@ -29,7 +29,7 @@
  * @class ParserError
  * @ingroup k_compiler_parser
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_ParserError_t {
     char* m_message;
@@ -54,4 +54,4 @@ k_ParserError_t* k_ParserError_new();
  */
 void k_ParserError_delete(k_ParserError_t* error);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_PARSER_PARSER_ERROR_H */
+#endif /* KUSH_COMPILER_PARSER_PARSER_ERROR_H */

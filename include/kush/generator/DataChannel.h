@@ -16,8 +16,8 @@
 
 // Saturday, April 28, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_GENERATOR_DATA_CHANNEL_H
-#define COM_ONECUBE_ZEN_COMPILER_GENERATOR_DATA_CHANNEL_H
+#ifndef KUSH_COMPILER_GENERATOR_DATA_CHANNEL_H
+#define KUSH_COMPILER_GENERATOR_DATA_CHANNEL_H
 
 #include <kush/Configuration.h>
 
@@ -70,4 +70,4 @@ void k_DataChannel_requestCapacity(k_DataChannel_t* channel, int32_t capacity);
 
 int32_t k_DataChannel_getSize(k_DataChannel_t* channel);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_GENERATOR_DATA_CHANNEL_H */
+#endif /* KUSH_COMPILER_GENERATOR_DATA_CHANNEL_H */

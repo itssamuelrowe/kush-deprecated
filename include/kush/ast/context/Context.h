@@ -16,8 +16,8 @@
 
 // Friday, November 24, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_CONTEXT_CONTEXT_H
-#define COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_CONTEXT_CONTEXT_H
+#ifndef KUSH_COMPILER_COMPILER_AST_CONTEXT_CONTEXT_H
+#define KUSH_COMPILER_COMPILER_AST_CONTEXT_CONTEXT_H
 
 /*
  * According to my knowledge, I had two options to implement the
@@ -125,7 +125,7 @@
 #include <kush/ast/context/NewExpressionContext.h>
 #include <kush/ast/context/TypeNameContext.h>
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_CONTEXT_CONTEXT_H */
+#endif /* KUSH_COMPILER_COMPILER_AST_CONTEXT_CONTEXT_H */
 
 /*******************************************************************************
  * ConstructorDeclarationContext                                               *

@@ -16,8 +16,8 @@
 
 // Wednesday, July 17, 2019
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_SIMPLE_STATEMENT_CONTEXT_H
-#define COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_SIMPLE_STATEMENT_CONTEXT_H
+#ifndef KUSH_COMPILER_AST_CONTEXT_SIMPLE_STATEMENT_CONTEXT_H
+#define KUSH_COMPILER_AST_CONTEXT_SIMPLE_STATEMENT_CONTEXT_H
 
 #include <kush/Configuration.h>
 #include <kush/ast/ASTNode.h>
@@ -30,7 +30,7 @@
  * @class SimpleStatementContext
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_SimpleStatementContext_t {
     k_ASTNode_t* m_node;
@@ -63,4 +63,4 @@ void k_SimpleStatementContext_delete(k_SimpleStatementContext_t* context);
  */
 void k_SimpleStatementContext_getChildren(k_SimpleStatementContext_t* context, jtk_ArrayList_t* children);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_SIMPLE_STATEMENT_CONTEXT_H */
+#endif /* KUSH_COMPILER_AST_CONTEXT_SIMPLE_STATEMENT_CONTEXT_H */

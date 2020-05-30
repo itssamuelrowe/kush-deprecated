@@ -16,8 +16,8 @@
 
 // Wednesday, July 17, 2019
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_POSTFIX_EXPRESSION_CONTEXT_H
-#define COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_POSTFIX_EXPRESSION_CONTEXT_H
+#ifndef KUSH_COMPILER_AST_CONTEXT_POSTFIX_EXPRESSION_CONTEXT_H
+#define KUSH_COMPILER_AST_CONTEXT_POSTFIX_EXPRESSION_CONTEXT_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -32,7 +32,7 @@
  * @class PostfixExpressionContext
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_PostfixExpressionContext_t {
     k_ASTNode_t* m_node;
@@ -66,4 +66,4 @@ void k_PostfixExpressionContext_delete(k_PostfixExpressionContext_t* context);
  */
 void k_PostfixExpressionContext_getChildren(k_PostfixExpressionContext_t* context, jtk_ArrayList_t* children);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_POSTFIX_EXPRESSION_CONTEXT_H */
+#endif /* KUSH_COMPILER_AST_CONTEXT_POSTFIX_EXPRESSION_CONTEXT_H */

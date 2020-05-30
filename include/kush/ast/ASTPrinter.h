@@ -16,8 +16,8 @@
 
 // Saturday, March 10, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_PRINTER_H
-#define COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_PRINTER_H
+#ifndef KUSH_COMPILER_COMPILER_AST_AST_PRINTER_H
+#define KUSH_COMPILER_COMPILER_AST_AST_PRINTER_H
 
 #include <kush/Configuration.h>
 #include <kush/ast/ASTListener.h>
@@ -30,7 +30,7 @@
  * @class ASTPrinter
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_ASTPrinter_t {
     k_ASTListener_t* m_astListener;
@@ -72,4 +72,4 @@ void k_ASTPrinter_onExitEveryRule(k_ASTListener_t* listener, k_ASTNode_t* node);
  */
 void k_ASTPrinter_onVisitTerminal(k_ASTListener_t* listener, k_ASTNode_t* node);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_PRINTER_H */
+#endif /* KUSH_COMPILER_COMPILER_AST_AST_PRINTER_H */

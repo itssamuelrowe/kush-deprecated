@@ -16,8 +16,8 @@
 
 // Sunday, November 26, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_LISTENER_H
-#define COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_LISTENER_H
+#ifndef KUSH_COMPILER_COMPILER_AST_LISTENER_H
+#define KUSH_COMPILER_COMPILER_AST_LISTENER_H
 
 #include <kush/Configuration.h>
 #include <kush/ast/ASTNode.h>
@@ -829,7 +829,7 @@ typedef void (*k_OnExitNewExpressionFunction_t)(k_ASTListener_t* listener, k_AST
  * @class ASTListener
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_ASTListener_t {
     k_OnVisitErrorNodeFunction_t m_onVisitErrorNode;
@@ -1891,4 +1891,4 @@ void k_ASTListener_skipChildren(k_ASTListener_t* listener);
 
 void k_ASTListener_visitChildren(k_ASTListener_t* listener);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_LISTENER_H */
+#endif /* KUSH_COMPILER_COMPILER_AST_LISTENER_H */

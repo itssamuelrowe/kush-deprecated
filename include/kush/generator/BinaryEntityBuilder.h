@@ -16,8 +16,8 @@
 
 // Tuesday, July 16, 2019
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_GENERATOR_BINARY_ENTITY_BUILDER_H
-#define COM_ONECUBE_ZEN_COMPILER_GENERATOR_BINARY_ENTITY_BUILDER_H
+#ifndef KUSH_COMPILER_GENERATOR_BINARY_ENTITY_BUILDER_H
+#define KUSH_COMPILER_GENERATOR_BINARY_ENTITY_BUILDER_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -1341,4 +1341,4 @@ void k_BinaryEntityBuilder_emitThrow(k_BinaryEntityBuilder_t* builder);
  */
 void k_BinaryEntityBuilder_emitWide(k_BinaryEntityBuilder_t* builder);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_GENERATOR_BINARY_ENTITY_BUILDER_H */
+#endif /* KUSH_COMPILER_GENERATOR_BINARY_ENTITY_BUILDER_H */

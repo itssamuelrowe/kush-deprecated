@@ -16,8 +16,8 @@
 
 // Sunday, November 26, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_WALKER_H
-#define COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_WALKER_H
+#ifndef KUSH_COMPILER_COMPILER_AST_WALKER_H
+#define KUSH_COMPILER_COMPILER_AST_WALKER_H
 
 #include <kush/Configuration.h>
 #include <kush/ast/ASTListener.h>
@@ -42,4 +42,4 @@ void k_ASTWalker_enterRule(k_ASTListener_t* listener, k_ASTNode_t* node);
  */
 void k_ASTWalker_exitRule(k_ASTListener_t* listener, k_ASTNode_t* node);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_WALKER_H */
+#endif /* KUSH_COMPILER_COMPILER_AST_WALKER_H */

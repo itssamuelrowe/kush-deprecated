@@ -16,8 +16,8 @@
 
 // Wedensday, October 18, 2017
 
-#ifndef ZEN_CONFIGURATION_H
-#define ZEN_CONFIGURATION_H
+#ifndef KUSH_CONFIGURATION_H
+#define KUSH_CONFIGURATION_H
 
 #include <assert.h>
 #include <stdbool.h>
@@ -50,4 +50,4 @@
 
 void* k_Memory_allocate0(int32_t size);
 
-#endif /* ZEN_CONFIGURATION_H */
+#endif /* KUSH_CONFIGURATION_H */

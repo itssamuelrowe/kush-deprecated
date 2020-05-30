@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_NODE_H
-#define COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_NODE_H
+#ifndef KUSH_COMPILER_COMPILER_AST_NODE_H
+#define KUSH_COMPILER_COMPILER_AST_NODE_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -53,7 +53,7 @@ typedef void (*k_EnumerateContextChildrenFunction_t)(void* context, jtk_ArrayLis
  * @class ASTNode
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_ASTNode_t {
     k_ASTNodeType_t m_type;
@@ -143,4 +143,4 @@ k_ASTNodeType_t k_ASTNode_getType(k_ASTNode_t* node);
 
 uint8_t* k_ASTNode_toCString(k_ASTNode_t* node, int32_t* size);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_NODE_H */
+#endif /* KUSH_COMPILER_COMPILER_AST_NODE_H */

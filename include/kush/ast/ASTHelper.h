@@ -16,8 +16,8 @@
 
 // Saturday, April 28, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_HELPER_H
-#define COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_HELPER_H
+#ifndef KUSH_COMPILER_COMPILER_AST_AST_HELPER_H
+#define KUSH_COMPILER_COMPILER_AST_AST_HELPER_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -79,4 +79,4 @@ void k_ASTHelper_getTerminalNodes(k_ASTNode_t* node, jtk_ArrayList_t* list);
  */
 void k_ASTHelper_getFilteredTerminalNodes(k_ASTNode_t* node, jtk_ArrayList_t* list, k_TokenType_t type);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_HELPER_H */
+#endif /* KUSH_COMPILER_COMPILER_AST_AST_HELPER_H */

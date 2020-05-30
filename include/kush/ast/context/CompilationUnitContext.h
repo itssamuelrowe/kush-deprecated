@@ -16,8 +16,8 @@
 
 // Wednesday, July 17, 2019
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_COMPILATION_UNIT_CONTEXT_H
-#define COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_COMPILATION_UNIT_CONTEXT_H
+#ifndef KUSH_COMPILER_AST_CONTEXT_COMPILATION_UNIT_CONTEXT_H
+#define KUSH_COMPILER_AST_CONTEXT_COMPILATION_UNIT_CONTEXT_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -32,7 +32,7 @@
  * @class CompilationUnitContext
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_CompilationUnitContext_t {
     /**
@@ -69,4 +69,4 @@ void k_CompilationUnitContext_delete(k_CompilationUnitContext_t* context);
  */
 void k_CompilationUnitContext_getChildren(k_CompilationUnitContext_t* context, jtk_ArrayList_t* children);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_COMPILATION_UNIT_CONTEXT_H */
+#endif /* KUSH_COMPILER_AST_CONTEXT_COMPILATION_UNIT_CONTEXT_H */

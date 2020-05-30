@@ -16,8 +16,8 @@
 
 // Tuesday, July 16, 2019
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_MAP_EXPRESSION_CONTEXT_H
-#define COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_MAP_EXPRESSION_CONTEXT_H
+#ifndef KUSH_COMPILER_AST_CONTEXT_MAP_EXPRESSION_CONTEXT_H
+#define KUSH_COMPILER_AST_CONTEXT_MAP_EXPRESSION_CONTEXT_H
 
 #include <kush/Configuration.h>
 #include <kush/ast/ASTNode.h>
@@ -30,7 +30,7 @@
  * @class MapExpressionContext
  * @ingroup k_compiler_ast
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_MapExpressionContext_t {
     k_ASTNode_t* m_node;
@@ -43,4 +43,4 @@ k_MapExpressionContext_t* k_MapExpressionContext_new(k_ASTNode_t* node);
 void k_MapExpressionContext_delete(k_MapExpressionContext_t* context);
 void k_MapExpressionContext_getChildren(k_MapExpressionContext_t* context, jtk_ArrayList_t* children);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_AST_CONTEXT_MAP_EXPRESSION_CONTEXT_H */
+#endif /* KUSH_COMPILER_AST_CONTEXT_MAP_EXPRESSION_CONTEXT_H */

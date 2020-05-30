@@ -16,8 +16,8 @@
 
 // Monday, March 16, 2020
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_COMPILER_H
-#define COM_ONECUBE_ZEN_COMPILER_COMPILER_H
+#ifndef KUSH_COMPILER_COMPILER_H
+#define KUSH_COMPILER_COMPILER_H
 
 #include <kush/Configuration.h>
 #include <kush/ast/ASTNode.h>
@@ -37,7 +37,7 @@
 
 /**
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_Compiler_t {
     bool m_dumpTokens;
@@ -105,4 +105,4 @@ void k_Compiler_k_Compiler_printTokens(k_Compiler_t* compiler, jtk_ArrayList_t* 
 bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t length);
 bool k_Compiler_compile(k_Compiler_t* compiler);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_COMPILER_H */
+#endif /* KUSH_COMPILER_COMPILER_H */

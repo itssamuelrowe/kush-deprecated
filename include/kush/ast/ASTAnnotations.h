@@ -16,8 +16,8 @@
 
 // Saturday, March 10, 2018
 
-#ifndef COM_ONECUBE_COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_ANNOTATIONS_H
-#define COM_ONECUBE_COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_ANNOTATIONS_H
+#ifndef KUSH_COMPILER_COMPILER_AST_AST_ANNOTATIONS_H
+#define KUSH_COMPILER_COMPILER_AST_AST_ANNOTATIONS_H
 
 #include <jtk/collection/map/HashMap.h>
 #include <kush/ast/ASTNode.h>
@@ -38,4 +38,4 @@ void* k_ASTAnnotations_get(k_ASTAnnotations_t* annotations, k_ASTNode_t* node);
 void k_ASTAnnotations_put(k_ASTAnnotations_t* annotations, k_ASTNode_t* node, void* value);
 void k_ASTAnnotations_remove(k_ASTAnnotations_t* annotations, k_ASTNode_t* node);
 
-#endif /* COM_ONECUBE_COM_ONECUBE_ZEN_COMPILER_COMPILER_AST_AST_ANNOTATIONS_H */
+#endif /* KUSH_COMPILER_COMPILER_AST_AST_ANNOTATIONS_H */

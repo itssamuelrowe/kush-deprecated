@@ -16,8 +16,8 @@
 
 // Friday, March 20, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_GENERATOR_BINARY_ENTITY_GENERATOR_H
-#define COM_ONECUBE_ZEN_COMPILER_GENERATOR_BINARY_ENTITY_GENERATOR_H
+#ifndef KUSH_COMPILER_GENERATOR_BINARY_ENTITY_GENERATOR_H
+#define KUSH_COMPILER_GENERATOR_BINARY_ENTITY_GENERATOR_H
 
 // #include <jtk/collection/map/DualHashMap.h>
 #include <jtk/collection/list/ArrayList.h>
@@ -945,4 +945,4 @@ void k_BinaryEntityGenerator_onEnterNewExpression(k_ASTListener_t* listener, k_A
  */
 void k_BinaryEntityGenerator_onExitNewExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_GENERATOR_BINARY_ENTITY_GENERATOR_H */
+#endif /* KUSH_COMPILER_GENERATOR_BINARY_ENTITY_GENERATOR_H */

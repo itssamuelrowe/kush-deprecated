@@ -16,8 +16,8 @@
 
 // Sunday, April 28, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_AST_AST_ANNOTATION_TYPE_H
-#define COM_ONECUBE_ZEN_COMPILER_AST_AST_ANNOTATION_TYPE_H
+#ifndef KUSH_COMPILER_AST_AST_ANNOTATION_TYPE_H
+#define KUSH_COMPILER_AST_AST_ANNOTATION_TYPE_H
 
 /*******************************************************************************
  * ASTAnnotationType                                                           *
@@ -25,7 +25,7 @@
 
 /**
  * @author Samuel Rowe
- * @since  zen 1.0
+ * @since  KUSH 1.0
  */
 enum k_ASTAnnotationType_t {
 
@@ -48,4 +48,4 @@ enum k_ASTAnnotationType_t {
 
 typedef enum k_ASTAnnotationType_t k_ASTAnnotationType_t;
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_AST_AST_ANNOTATION_TYPE_H */
+#endif /* KUSH_COMPILER_AST_AST_ANNOTATION_TYPE_H */
