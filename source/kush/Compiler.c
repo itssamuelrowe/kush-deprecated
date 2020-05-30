@@ -56,7 +56,7 @@
 
 #include <kush/support/ErrorHandler.h>
 
-#include <com/onecube/k/virtual-machine/feb/Instruction.h>
+#include <kush/virtual-machine/feb/Instruction.h>
 
 // Register
 

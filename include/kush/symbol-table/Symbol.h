@@ -16,8 +16,8 @@
 
 // Saturday, November 25, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_H
+#define KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_H
 
 #include <kush/ast/ASTNode.h>
 #include <kush/symbol-table/Scope.h>
@@ -27,7 +27,7 @@
 #include <kush/symbol-table/Modifier.h>
 
 enum k_SymbolFlag_t {
-    ZEN_SYMBOL_FLAG_EXTERNAL = (1 << 0)
+    KUSH_SYMBOL_FLAG_EXTERNAL = (1 << 0)
 };
 
 /*******************************************************************************
@@ -38,7 +38,7 @@ enum k_SymbolFlag_t {
  * @class Symbol
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_Symbol_t {
     k_SymbolCategory_t m_category;
@@ -175,4 +175,4 @@ k_FunctionSignature_t* k_Symbol_getFunctionSignatureEx(k_Symbol_t* symbol,
 k_FunctionSignature_t* k_Symbol_getFunctionSignature(k_Symbol_t* symbol,
     int32_t argumentCount);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_H */

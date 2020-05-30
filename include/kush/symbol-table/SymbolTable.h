@@ -16,8 +16,8 @@
 
 // Satuday, November 25, 2017
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_TABLE_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_TABLE_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_TABLE_H
+#define KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_TABLE_H
 
 #include <kush/symbol-table/Scope.h>
 #include <kush/symbol-table/Symbol.h>
@@ -33,7 +33,7 @@ typedef struct k_Compiler_t k_Compiler_t;
  * @class SymbolTable
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_SymbolTable_t {
     k_Scope_t* m_currentScope;
@@ -95,4 +95,4 @@ void k_SymbolTable_defineClassMember(k_SymbolTable_t* symbolTable, k_Scope_t* cl
  */
 k_Symbol_t* k_SymbolTable_resolve(k_SymbolTable_t* symbolTable, const uint8_t* identifier);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_TABLE_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_TABLE_H */

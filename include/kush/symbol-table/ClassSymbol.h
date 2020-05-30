@@ -16,8 +16,8 @@
 
 // Sunday, January 07, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_CLASS_SYMBOL_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_CLASS_SYMBOL_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_CLASS_SYMBOL_H
+#define KUSH_COMPILER_SYMBOL_TABLE_CLASS_SYMBOL_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -31,7 +31,7 @@ typedef struct k_Scope_t k_Scope_t;
  * @class ClassSymbol
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_ClassSymbol_t {
     /* The superclasses are added in the resolution phase. */
@@ -53,4 +53,4 @@ void k_ClassSymbol_initialize(k_ClassSymbol_t* symbol);
 
 void k_ClassSymbol_destroy(k_ClassSymbol_t* symbol);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_CLASS_SYMBOL_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_CLASS_SYMBOL_H */

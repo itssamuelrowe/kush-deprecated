@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SUPPORT_ERROR_H
-#define COM_ONECUBE_ZEN_COMPILER_SUPPORT_ERROR_H
+#ifndef KUSH_COMPILER_SUPPORT_ERROR_H
+#define KUSH_COMPILER_SUPPORT_ERROR_H
 
 #include <kush/lexer/Token.h>
 #include <kush/support/ErrorCode.h>
@@ -28,7 +28,7 @@
  * @class Error
  * @ingroup k_compiler_support
  * @author Samuel Rowe
- * @since Zen 1.0
+ * @since KUSH 1.0
  */
 struct k_Error_t {
     k_ErrorCode_t m_code;
@@ -50,4 +50,4 @@ k_Error_t* k_Error_newEx(k_ErrorCode_t errorCode, k_Token_t* token, k_TokenType_
 
 void k_Error_delete(k_Error_t* error);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SUPPORT_ERROR_H */
+#endif /* KUSH_COMPILER_SUPPORT_ERROR_H */

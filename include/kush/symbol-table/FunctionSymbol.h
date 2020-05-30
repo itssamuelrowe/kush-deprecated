@@ -16,8 +16,8 @@
 
 // Sunday, January 07, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_MEMBER_FUNCTION_SYMBOL_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_MEMBER_FUNCTION_SYMBOL_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_MEMBER_FUNCTION_SYMBOL_H
+#define KUSH_COMPILER_SYMBOL_TABLE_MEMBER_FUNCTION_SYMBOL_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -31,7 +31,7 @@
  * @class FunctionSymbol
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_FunctionSymbol_t {
     /* Signatures are destroyed by the destructor. */
@@ -76,4 +76,4 @@ int32_t k_FunctionSymbol_getParameterThreshold(k_FunctionSymbol_t* symbol);
  */
 void k_FunctionSymbol_setParameterThreshold(k_FunctionSymbol_t* symbol, int32_t parameterThreshold);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_MEMBER_FUNCTION_SYMBOL_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_MEMBER_FUNCTION_SYMBOL_H */

@@ -16,8 +16,8 @@
 
 // Saturday, March 10, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_RESOLUTION_LISTENER_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_RESOLUTION_LISTENER_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_RESOLUTION_LISTENER_H
+#define KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_RESOLUTION_LISTENER_H
 
 #include <kush/Compiler.h>
 #include <kush/ast/ASTAnnotations.h>
@@ -33,7 +33,7 @@
  * @class SymbolResolutionListener
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_SymbolResolutionListener_t {
     k_Compiler_t* m_compiler;
@@ -851,4 +851,4 @@ void k_SymbolResolutionListener_onEnterNewExpression(k_ASTListener_t* listener, 
  */
 void k_SymbolResolutionListener_onExitNewExpression(k_ASTListener_t* listener, k_ASTNode_t* node);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_RESOLUTION_LISTENER_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_RESOLUTION_LISTENER_H */

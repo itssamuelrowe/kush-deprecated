@@ -36,9 +36,9 @@
 #include <kush/symbol-table/Symbol.h>
 #include <kush/symbol-table/Scope.h>
 #include <kush/generator/BinaryEntityGenerator.h>
-#include <com/onecube/k/virtual-machine/feb/EntityType.h>
-#include <com/onecube/k/virtual-machine/feb/attribute/InstructionAttribute.h>
-#include <com/onecube/k/virtual-machine/feb/attribute/PredefinedAttribute.h>
+#include <kush/virtual-machine/feb/EntityType.h>
+#include <kush/virtual-machine/feb/attribute/InstructionAttribute.h>
+#include <kush/virtual-machine/feb/attribute/PredefinedAttribute.h>
 
 /* TODO: Move the variable to k_BinaryEntityGenerator_t. */
 bool lhs = false;

@@ -16,8 +16,8 @@
 
 // Sunday, March 04, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_MODIFIER_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_MODIFIER_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_MODIFIER_H
+#define KUSH_COMPILER_SYMBOL_TABLE_MODIFIER_H
 
 #include <kush/Configuration.h>
 
@@ -29,31 +29,31 @@
  * @class Modifier
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 enum k_Modifier_t {
 
-    ZEN_MODIFIER_PUBLIC = 1 << 0,
+    KUSH_MODIFIER_PUBLIC = 1 << 0,
 
-    ZEN_MODIFIER_PRIVATE = 1 << 1,
+    KUSH_MODIFIER_PRIVATE = 1 << 1,
 
-    ZEN_MODIFIER_SECRET = 1 << 2,
+    KUSH_MODIFIER_SECRET = 1 << 2,
 
-    ZEN_MODIFIER_SYNTHETIC = 1 << 3,
+    KUSH_MODIFIER_SYNTHETIC = 1 << 3,
 
-    ZEN_MODIFIER_ABSTRACT = 1 << 4,
+    KUSH_MODIFIER_ABSTRACT = 1 << 4,
 
-    ZEN_MODIFIER_FINAL = 1 << 5,
+    KUSH_MODIFIER_FINAL = 1 << 5,
 
-    ZEN_MODIFIER_STATIC = 1 << 6,
+    KUSH_MODIFIER_STATIC = 1 << 6,
 
-    ZEN_MODIFIER_NATIVE = 1 << 7,
+    KUSH_MODIFIER_NATIVE = 1 << 7,
 
-    ZEN_MODIFIER_ANNOTATION = 1 << 8,
+    KUSH_MODIFIER_ANNOTATION = 1 << 8,
 
-    ZEN_MODIFIER_ENUMERATION = 1 << 9,
+    KUSH_MODIFIER_ENUMERATION = 1 << 9,
 
-    ZEN_MODIFIER_VARIABLE_PARAMETER = 1 << 10
+    KUSH_MODIFIER_VARIABLE_PARAMETER = 1 << 10
 };
 
 /**
@@ -63,4 +63,4 @@ typedef enum k_Modifier_t k_Modifier_t;
 
 
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_MODIFIER_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_MODIFIER_H */

@@ -16,8 +16,8 @@
 
 // Monday, January 08, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_FUNCTION_SIGNATURE_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_FUNCTION_SIGNATURE_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_FUNCTION_SIGNATURE_H
+#define KUSH_COMPILER_SYMBOL_TABLE_FUNCTION_SIGNATURE_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -32,7 +32,7 @@
  * @class FunctionSignature
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_FunctionSignature_t {
     jtk_ArrayList_t* m_fixedParameters;
@@ -68,4 +68,4 @@ k_FunctionSignature_t* k_FunctionSignature_newEx(const uint8_t* descriptor,
  */
 void k_FunctionSignature_delete(k_FunctionSignature_t* signature);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_FUNCTION_SIGNATURE_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_FUNCTION_SIGNATURE_H */

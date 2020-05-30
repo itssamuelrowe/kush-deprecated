@@ -16,8 +16,8 @@
 
 // Sunday, January 07, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H
+#define KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H
 
 #include <kush/Configuration.h>
 #include <kush/Compiler.h>
@@ -36,7 +36,7 @@
  * @class SymbolDefinitionListener
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_SymbolDefinitionListener_t {
     k_Compiler_t* m_compiler;
@@ -176,4 +176,4 @@ void k_SymbolDefinitionListener_declareOverloadedFunction(
     jtk_ArrayList_t* fixedParameters, k_ASTNode_t* variableParameter,
     uint32_t modifiers, k_Token_t* reference);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H */

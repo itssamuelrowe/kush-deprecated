@@ -16,8 +16,8 @@
 
 // Saturday, April 06, 2019
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_LOADER_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_LOADER_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_LOADER_H
+#define KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_LOADER_H
 
 /*******************************************************************************
  * SymbolLoader                                                                *
@@ -32,21 +32,21 @@
 #include <jtk/collection/list/DoublyLinkedList.h>
 #include <jtk/fs/Path.h>
 
-#define ZEN_ENTITY_LOADER_FLAG_PRIORITIZE_DIRECTORIES (1 << 0)
-#define ZEN_ENTITY_LOADER_FLAG_IGNORE_CORRUPT_ENTITY (1 << 1)
+#define KUSH_ENTITY_LOADER_FLAG_PRIORITIZE_DIRECTORIES (1 << 0)
+#define KUSH_ENTITY_LOADER_FLAG_IGNORE_CORRUPT_ENTITY (1 << 1)
 
 /*******************************************************************************
  * SymbolLoader                                                                *
  *******************************************************************************/
 
-#define ZEN_ENTITY_LOADER_DEFAULT_ENTITIES_MAP_CAPCITY 128
+#define KUSH_ENTITY_LOADER_DEFAULT_ENTITIES_MAP_CAPCITY 128
 
 /* A small experiment on a deployed project written in a certain virtual
  * machine powered language revealed that on an average most binary files
  * are 3 kilobytes in size. The buffer size was evaluated to reduce the cache
  * misses and increase the cache hits in the buffered input stream.
  */
-#define ZEN_ENTITY_LOADER_BUFFER_SIZE (3 * 1024)
+#define KUSH_ENTITY_LOADER_BUFFER_SIZE (3 * 1024)
 
 typedef struct k_Compiler_t k_Compiler_t;
 
@@ -54,7 +54,7 @@ typedef struct k_Compiler_t k_Compiler_t;
  * @class SymbolLoader
  * @ingroup k_virtual_machine_loader
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_SymbolLoader_t {
 
@@ -149,4 +149,4 @@ k_Symbol_t* k_SymbolLoader_parse(k_SymbolLoader_t* symbolLoader, uint8_t* bytes,
 bool k_SymbolLoader_shouldIgnoreCorruptEntity(k_SymbolLoader_t* loader);
 void k_SymbolLoader_setIgnoreCorruptEntity(k_SymbolLoader_t* loader, bool ignoreCorruptEntity);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SYMBOL_LOADER_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_LOADER_H */

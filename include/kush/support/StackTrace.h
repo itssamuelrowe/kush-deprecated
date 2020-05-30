@@ -16,8 +16,8 @@
 
 // Friday, January 05, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SUPPORT_STACK_TRACE_H
-#define COM_ONECUBE_ZEN_COMPILER_SUPPORT_STACK_TRACE_H
+#ifndef KUSH_COMPILER_SUPPORT_STACK_TRACE_H
+#define KUSH_COMPILER_SUPPORT_STACK_TRACE_H
 
 /*******************************************************************************
  * StackTrace                                                                  *
@@ -26,7 +26,7 @@
 void k_StackTrace_enter0(const char* file, const char* name);
 void k_StackTrace_exit0(const char* file, const char* name);
 
-#ifdef ZEN_STACK_TRACE_ENABLE
+#ifdef KUSH_STACK_TRACE_ENABLE
     #define k_StackTrace_enter() k_StackTrace_enter0(__FILE__, __FUNCTION__)
     #define k_StackTrace_exit() k_StackTrace_exit0(__FILE__, __FUNCTION__)
 #else
@@ -34,4 +34,4 @@ void k_StackTrace_exit0(const char* file, const char* name);
     #define k_StackTrace_exit()
 #endif
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SUPPORT_STACK_TRACE_H */
+#endif /* KUSH_COMPILER_SUPPORT_STACK_TRACE_H */

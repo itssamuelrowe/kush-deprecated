@@ -16,8 +16,8 @@
 
 // Sunday, January 07, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SCOPE_TYPE_H
-#define COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SCOPE_TYPE_H
+#ifndef KUSH_COMPILER_SYMBOL_TABLE_SCOPE_TYPE_H
+#define KUSH_COMPILER_SYMBOL_TABLE_SCOPE_TYPE_H
 
 /*******************************************************************************
  * ScopeType                                                                   *
@@ -27,15 +27,15 @@
  * @class ScopeType
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 enum k_ScopeType_t {
-    ZEN_SCOPE_COMPILATION_UNIT,
-    ZEN_SCOPE_ANNOTATION,
-    ZEN_SCOPE_CLASS,
-    ZEN_SCOPE_FUNCTION,
-    ZEN_SCOPE_ENUMERATION,
-    ZEN_SCOPE_LOCAL
+    KUSH_SCOPE_COMPILATION_UNIT,
+    KUSH_SCOPE_ANNOTATION,
+    KUSH_SCOPE_CLASS,
+    KUSH_SCOPE_FUNCTION,
+    KUSH_SCOPE_ENUMERATION,
+    KUSH_SCOPE_LOCAL
 };
 
 /**
@@ -43,4 +43,4 @@ enum k_ScopeType_t {
  */
 typedef enum k_ScopeType_t k_ScopeType_t;
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SYMBOL_TABLE_SCOPE_TYPE_H */
+#endif /* KUSH_COMPILER_SYMBOL_TABLE_SCOPE_TYPE_H */

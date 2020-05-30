@@ -16,8 +16,8 @@
 
 // Saturday, November 25, 2017
 
-#ifndef ZEN_SCOPE_H
-#define ZEN_SCOPE_H
+#ifndef KUSH_SCOPE_H
+#define KUSH_SCOPE_H
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
@@ -39,7 +39,7 @@ typedef struct k_Scope_t k_Scope_t;
  * @class Scope
  * @ingroup k_compiler_symbolTable
  * @author Samuel Rowe
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_Scope_t {
     uint8_t* m_name;
@@ -168,4 +168,4 @@ k_Scope_t* k_Scope_resolveQualifiedSymbol(k_Scope_t* scope,
  */
 k_ScopeType_t k_Scope_getType(k_Scope_t* scope);
 
-#endif /* ZEN_SCOPE_H */
+#endif /* KUSH_SCOPE_H */

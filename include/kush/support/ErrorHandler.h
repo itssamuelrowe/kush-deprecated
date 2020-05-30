@@ -16,8 +16,8 @@
 
 // Monday, March 12, 2018
 
-#ifndef COM_ONECUBE_ZEN_COMPILER_SUPPORT_ERROR_HANDLER_H
-#define COM_ONECUBE_ZEN_COMPILER_SUPPORT_ERROR_HANDLER_H
+#ifndef KUSH_COMPILER_SUPPORT_ERROR_HANDLER_H
+#define KUSH_COMPILER_SUPPORT_ERROR_HANDLER_H
 
 #include <jtk/collection/list/ArrayList.h>
 
@@ -78,7 +78,7 @@ typedef void (*k_ErrorHandler_OnGeneralErrorFunction_t)(void* context, void* ori
  * @class ErrorHandler
  * @author Samuel Rowe
  * @ingroup k_compiler
- * @since zen 1.0
+ * @since KUSH 1.0
  */
 struct k_ErrorHandler_t {
     k_ErrorHandler_HandleLexicalErrorFunction_t m_handleLexicalError;
@@ -204,4 +204,4 @@ int32_t k_ErrorHandler_getErrorCount(k_ErrorHandler_t* handler);
 
 bool k_ErrorHandler_hasErrors(k_ErrorHandler_t* handler);
 
-#endif /* COM_ONECUBE_ZEN_COMPILER_SUPPORT_ERROR_HANDLER_H */
+#endif /* KUSH_COMPILER_SUPPORT_ERROR_HANDLER_H */
