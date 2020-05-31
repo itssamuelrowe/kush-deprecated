@@ -36,7 +36,7 @@
  */
 struct k_VariableDeclarationContext_t {
     k_ASTNode_t* m_node;
-    jtk_ArrayList_t* m_variableDeclarators;
+    jtk_ArrayList_t* m_declarators;
 };
 
 /**

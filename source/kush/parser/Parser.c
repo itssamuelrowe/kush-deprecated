@@ -72,7 +72,7 @@ static void parseSimpleStatement(k_Parser_t* parser, k_ASTNode_t* node);
 static void parseStatement(k_Parser_t* parser, k_ASTNode_t* node);
 static void parseEmptyStatement(k_Parser_t* parser, k_ASTNode_t* node);
 static void parseVariableDeclaration(k_Parser_t* parser, k_ASTNode_t* node);
-static void parseVariableDeclarator(k_Parser_t* parser, k_ASTNode_t* node);
+static void parseStorageDeclarator(k_Parser_t* parser, k_ASTNode_t* node);
 static void parseBreakStatement(k_Parser_t* parser, k_ASTNode_t* node);
 static void parseReturnStatement(k_Parser_t* parser, k_ASTNode_t* node);
 static void parseThrowStatement(k_Parser_t* parser, k_ASTNode_t* node);
@@ -458,6 +458,46 @@ bool isType(k_TokenType_t token) {
         (token == KUSH_TOKEN_IDENTIFIER);
 }
 
+bool isSimpleStatementFollow(k_TokenType_t type) {
+    return (type == KUSH_TOKEN_SEMICOLON) || // emptyStatement
+        (type == KUSH_TOKEN_KEYWORD_VAR) || // variableDeclaration
+        (type == KUSH_TOKEN_KEYWORD_LET) || // variableDeclaration
+        (type == KUSH_TOKEN_KEYWORD_BREAK) || // breakStatement
+        (type == KUSH_TOKEN_KEYWORD_RETURN) || // returnStatement
+        (type == KUSH_TOKEN_KEYWORD_THROW) || // throwStatement
+        isExpressionFollow(type); // expressionStatement (includes IDENTIFIER, which may lead to variableDeclaration, too!)
+}
+
+bool isCompoundStatementFollow(k_TokenType_t type) {
+    return (type == KUSH_TOKEN_KEYWORD_IF) || // ifStatement
+		(type == KUSH_TOKEN_HASH) || // iterativeStatement
+		(type == KUSH_TOKEN_KEYWORD_WHILE) || // whileStatement
+		(type == KUSH_TOKEN_KEYWORD_FOR) || // forStatement
+		(type == KUSH_TOKEN_KEYWORD_TRY); // tryStatement
+}
+
+/* The parser needs to look ahead 3 tokens to differentiate between variable
+ * declarations and expressions, recognizing an LL(3) grammar.
+ *
+ * followVariableDeclaration
+ * :    'let'
+ * |    'var'
+ * |    IDENTIFIER (('[' ']') | IDENTIFIER)
+ * ;
+ */
+bool followVariableDeclaration(k_Parser_t* parser) {
+    k_TokenType_t la1 = la(parser, 1);
+    return (la1 == KUSH_TOKEN_KEYWORD_LET) ||
+           (la1 == KUSH_TOKEN_KEYWORD_VAR) ||
+           ((la1 == KUSH_TOKEN_IDENTIFIER) &&
+            (((la(parser, 2) == KUSH_TOKEN_LEFT_SQUARE_BRACKET) && (la(parser, 3) == KUSH_TOKEN_RIGHT_SQUARE_BRACKET)) ||
+            (la(parser, 2) == KUSH_TOKEN_IDENTIFIER)));
+}
+
+bool isStatementFollow(k_TokenType_t type) {
+    return isSimpleStatementFollow(type) || isCompoundStatementFollow(type);
+}
+
 static k_TokenType_t returnTypes[] = {
     KUSH_TOKEN_KEYWORD_BOOLEAN,
     KUSH_TOKEN_KEYWORD_I8,
@@ -725,13 +765,13 @@ void parseFunctionDeclaration(k_Parser_t* parser, k_ASTNode_t* node,
     popFollowToken(parser);
     popFollowToken(parser);
 
-    if (!k_Modifier_hasNative(modifiers)) {
-        k_ASTNode_t* body = k_ASTNode_new(node);
-        context->m_functionBody = body;
-        parseFunctionBody(parser, body);
+    if (k_Modifier_hasNative(modifiers)) {
+        match(parser, KUSH_TOKEN_SEMICOLON);
     }
     else {
-        match(parser, KUSH_TOKEN_SEMICOLON);
+        k_ASTNode_t* blockStatement = k_ASTNode_new(node);
+	    context->m_functionBody = blockStatement;
+        parseBlockStatement(parser, blockStatement);
     }
 
     k_StackTrace_exit();
@@ -805,124 +845,97 @@ void parseFunctionParameters(k_Parser_t* parser, k_ASTNode_t* node) {
     k_StackTrace_exit();
 }
 
-/* TODO: Merge this with parseFunctionDeclaration()
- *
- * functionBody
- * :    statementSuite
- * ;
- */
-void parseFunctionBody(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-	k_FunctionBodyContext_t* context = k_FunctionBodyContext_new(node);
-
-	k_ASTNode_t* statementSuite = k_ASTNode_new(node);
-	context->m_statementSuite = statementSuite;
-    blockStatement(parser, statementSuite);
-
-    k_StackTrace_exit();
-}
-
-/* In order to help the users read code easily, the simple statements were
- * removed from statement suites. Previously, a statement suite was either
- * a simple statement or a block consisting of a newline at the begining,
- * indentation and dedentation.
- */
 /*
  * blockStatement
  * |    '{' statement+ '}'
  * ;
+ *
+ * statement
+ * :    simpleStatement
+ * |    compoundStatement
+ * ;
+ *
+ * The following function combines the above mentioned rules. This measure was
+ * taken to avoid redundant nodes in the AST.
  */
 void blockStatement(k_Parser_t* parser, k_ASTNode_t* node) {
     k_StackTrace_enter();
 
 	k_StatementSuiteContext_t* context = k_StatementSuiteContext_new(node);
 
-    /* Consume and discard the dedent token. */
+    /* Consume and discard the '{' token. */
     match(parser, KUSH_TOKEN_LEFT_BRACE);
-
-    /* If statement fails, discard tokens until the dedentation token is
-        * encountered.
-        */
-    pushFollowToken(parser, KUSH_TOKEN_DEDENTATION);
+    /* If statement fails, discard tokens until the '}' token is
+     * encountered.
+     */
+    pushFollowToken(parser, KUSH_TOKEN_RIGHT_BRACE);
 
     do {
-        k_ASTNode_t* node = k_ASTNode_new(node);
-        jtk_ArrayList_add(context->m_statements, node);
-        parseStatement(parser, node);
+        k_ASTNode_t* statement = k_ASTNode_new(node);
+        jtk_ArrayList_add(context->m_statements, statement);
+
+        k_TokenType_t la1 = la(parser, 1);
+        if (isSimpleStatementFollow(la1)) {
+            parseSimpleStatement(parser, statement);
+        }
+        else if (isCompoundStatementFollow(la1)) {
+            parseCompoundStatement(parser, statement);
+        }
+        else {
+            // TODO: Expected simple or compound statement
+            reportAndRecover(parser, KUSH_TOKEN_KEYWORD_VAR);
+        }
     }
     while (isStatementFollow(la(parser, 1)));
 
-    /* Pop the dedentation token from the follow set. */
+    /* Pop the '}' token from the follow set. */
     popFollowToken(parser);
-
-    /* Consume and discard the dedent token. */
+    /* Consume and discard the '}' token. */
     match(parser, KUSH_TOKEN_RIGHT_BRACE);
 
     k_StackTrace_exit();
 }
 
-bool isSimpleStatementFollow(k_TokenType_t type) {
-    bool result = false;
-    switch (type) {
-        case KUSH_TOKEN_SEMICOLON: /* simpleStatement -> emptyStatement */
-        case KUSH_TOKEN_KEYWORD_VAR: /* simpleStatement -> variableDeclaration */
-        case KUSH_TOKEN_KEYWORD_LET: /* simpleStatement -> variableDeclaration */
-        case KUSH_TOKEN_KEYWORD_BREAK: /* simpleStatement -> breakStatement */
-        case KUSH_TOKEN_KEYWORD_RETURN: /* simpleStatement -> returnStatement */
-        case KUSH_TOKEN_KEYWORD_THROW: /* simpleStatement -> throwStatement */
-        {
-            result = true;
-            break;
-        }
-
-        default: {
-            result = k_Parser_isExpressionFollow(type); /* simpleStatement -> expressionStatement */
-            break;
-        }
-    }
-    return result;
-}
-
 /*
  * simpleStatement
- * :    unterminatedSimpleStatement NEWLINE
+ * :    unterminatedSimpleStatement SEMICOLON
  * ;
  *
  * unterminatedSimpleStatement
- * :    expressionStatement
- * |    emptyStatement
- * |    variableDeclaration
- * |    constantDeclaration
- * |    assertStatement
- * |    breakStatement
- * |    continueStatement
- * |    returnStatement
- * |    throwStatement
+ * :   expressionStatement
+ * |   emptyStatement
+ * |   storageDeclaration
+ * |   breakStatement
+ * |   returnStatement
+ * |   throwStatement
  * ;
  *
  * expressionStatement
  * :    expression
  * ;
  *
- *
- * The following function combines both the rules. This measure was
+ * The following function combines the above mentioned rules. This measure was
  * taken to avoid redundant nodes in the AST.
  */
+
 void parseSimpleStatement(k_Parser_t* parser, k_ASTNode_t* node) {
     k_StackTrace_enter();
 
 	k_SimpleStatementContext_t* context = k_SimpleStatementContext_new(node);
 
     /* If expressionStatement, emptyStatement, variableDeclaration,
-     * constantDeclaration, assertStatement, breakStatement, continueStatement,
-     * returnStatement, or throwStatement fails, discard tokens until the newline
-     * token is encountered.
+     * breakStatement, returnStatement, or throwStatement fails, discard tokens
+     * until the semicolon token is encountered.
      */
     pushFollowToken(parser, KUSH_TOKEN_SEMICOLON);
 
     k_TokenType_t la1 = la(parser, 1);
-    if (k_Parser_isExpressionFollow(la1)) {
+    if (followVariableDeclaration(parser)) {
+        k_ASTNode_t* variableDeclaration = k_ASTNode_new(node);
+        context->m_statement = variableDeclaration;
+        parseVariableDeclaration(parser, variableDeclaration);
+    }
+    else if (isExpressionFollow(la1)) {
         k_ASTNode_t* expression = k_ASTNode_new(node);
         context->m_statement = expression;
         parseExpression(parser, expression);
@@ -930,19 +943,10 @@ void parseSimpleStatement(k_Parser_t* parser, k_ASTNode_t* node) {
     else {
         switch (la1) {
             case KUSH_TOKEN_SEMICOLON: {
-                k_ASTNode_t* emptyStatement = k_ASTNode_new(node);
-                context->m_statement = emptyStatement;
-                parseEmptyStatement(parser, emptyStatement);
-                break;
-            }
-
-            // TODO: Look ahead and determine if it's a declaration or expression
-            case KUSH_TOKEN_IDENTIFIER:
-            case KUSH_TOKEN_KEYWORD_VAR:
-            case KUSH_TOKEN_KEYWORD_LET: {
-                k_ASTNode_t* variableDeclaration = k_ASTNode_new(node);
-                context->m_statement = variableDeclaration;
-                parseVariableDeclaration(parser, variableDeclaration);
+                /* Match and discard the ';' token. An empty statement is not part
+                 * of the AST.
+                 */
+                match(parser, KUSH_TOKEN_SEMICOLON);
                 break;
             }
 
@@ -969,77 +973,28 @@ void parseSimpleStatement(k_Parser_t* parser, k_ASTNode_t* node) {
         }
     }
 
-    /* Pop the newline token from the follow set. */
+    /* Pop the ';' token from the follow set. */
     popFollowToken(parser);
-
     /* Match and discard the newline token. */
 	match(parser, KUSH_TOKEN_SEMICOLON);
 
     k_StackTrace_exit();
 }
 
-/*
- * statement
- * :    simpleStatement
- * |    compoundStatement
- * ;
- */
-void parseStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+struct k_StorageDeclarator_t {
+    bool m_infer;
+    bool m_constant;
+    k_Token_t* m_typeName;
+    int32_t m_dimensions;
+    k_Token_t* m_identifier;
+    k_ASTNode_t* m_expression;
+};
 
-    k_StatementContext_t* context = k_StatementContext_new(node);
-
-    k_TokenType_t la1 = la(parser, 1);
-    if (isSimpleStatementFollow(la1)) {
-        k_ASTNode_t* simpleStatement = k_ASTNode_new(node);
-        context->m_simpleStatement = simpleStatement;
-        parseSimpleStatement(parser, simpleStatement);
-    }
-    else if (isCompoundStatementFollow(la1)) {
-        k_ASTNode_t* compoundStatement = k_ASTNode_new(node);
-        context->m_compoundStatement = compoundStatement;
-        parseCompoundStatement(parser, compoundStatement);
-    }
-    else {
-        // TODO: Expected simple or compound statement
-        reportAndRecover(parser, KUSH_TOKEN_KEYWORD_VAR);
-    }
-
-    k_StackTrace_exit();
-}
-
-bool isStatementFollow(k_TokenType_t type) {
-    return isSimpleStatementFollow(type) || isCompoundStatementFollow(type);
-}
-
-/*
- * emptyStatement
- * :    ';'
- * ;
- */
-void parseEmptyStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    /* k_EmptyStatementContext_t* context = */ k_EmptyStatementContext_new(node);
-
-    /* The empty statement rule has no context. */
-    /* Match and discard the ';' token. */
-	match(parser, KUSH_TOKEN_SEMICOLON);
-
-    k_StackTrace_exit();
-}
-
-int32_t matchEx(k_Parser_t* parser, k_TokenType_t* types, int32_t n) {
-    int32_t i;
-    for (i = 0; i < n; i++) {
-        // TODO
-    }
-    return i;
-}
+typedef struct k_StorageDeclarator_t k_StorageDeclarator_t;
 
 /*
  * variableDeclaration
- * :    'var' variableDeclarator (',' variableDeclarator)*
+ * :    ('var' | 'let' | type) variableDeclarator (',' variableDeclarator)*
  * ;
  */
 void parseVariableDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
@@ -1047,25 +1002,30 @@ void parseVariableDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
 
 	k_VariableDeclarationContext_t* context = k_VariableDeclarationContext_new(node);
 
-    /* Match and discard the 'var' token. */
-    k_TokenType_t start = {
-        KUSH_TOKEN_KEYWORD_VAR,
-        KUSH_TOKEN_KEYWORD_LET,
-        KUSH_TOKEN_IDENTIFIER
-    };
-    int32_t keywordUsed = matchEx(parser, start, 3);
+    k_TokenType_t la1 = la(parser, 1);
+    bool infer = (la1 == KUSH_TOKEN_KEYWORD_VAR);
+    bool constant = (la1 == KUSH_TOKEN_KEYWORD_LET);
+    k_Token_t* typeName = NULL;
+    int32_t dimensions = -1;
 
-	k_ASTNode_t* variableDeclarator = k_ASTNode_new(node);
-    jtk_ArrayList_add(context->m_variableDeclarators, variableDeclarator);
-	parseVariableDeclarator(parser, variableDeclarator);
+    if (!infer && !constant) {
+        dimensions = 0;
+        typeName = parseType(parser, &dimensions);
+    }
+
+	k_StorageDeclarator_t* declarator = k_StorageDeclarator_new(infer, constant,
+        typeName, dimensions, NULL);
+    jtk_ArrayList_add(context->m_declarators, declarator);
+	parseStorageDeclarator(parser, declarator);
 
 	while (la(parser, 1) == KUSH_TOKEN_COMMA) {
         /* Consume and discard the ',' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-		variableDeclarator = k_ASTNode_new(node);
-        jtk_ArrayList_add(context->m_variableDeclarators, variableDeclarator);
-		parseVariableDeclarator(parser, variableDeclarator);
+		declarator = k_StorageDeclarator_new(infer, constant,
+        typeName, dimensions, NULL);
+        jtk_ArrayList_add(context->m_declarators, declarator);
+		parseStorageDeclarator(parser, declarator);
 	}
 
     k_StackTrace_exit();
@@ -1076,20 +1036,17 @@ void parseVariableDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
  * :    IDENTIFIER ('=' expression)?
  * ;
  */
-void parseVariableDeclarator(k_Parser_t* parser, k_ASTNode_t* node) {
+void parseStorageDeclarator(k_Parser_t* parser, k_StorageDeclarator_t* declarator) {
     k_StackTrace_enter();
 
-	k_VariableDeclaratorContext_t* context = k_VariableDeclaratorContext_new(node);
-
-    k_Token_t* identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-    context->m_identifier = newTerminalNode(node, identifier);
+    declarator->m_identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
 
 	if (la(parser, 1) == KUSH_TOKEN_EQUAL) {
         /* Consume and discard the '=' token. */
 		k_TokenStream_consume(parser->m_tokens);
 
-		k_ASTNode_t* expression = k_ASTNode_new(node);
-        context->m_expression = expression;
+		k_ASTNode_t* expression = k_ASTNode_new(NULL);
+        declarator->m_expression = expression;
 		parseExpression(parser, expression);
 	}
 
@@ -1150,7 +1107,7 @@ void parseThrowStatement(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the 'throw' token. */
     match(parser, KUSH_TOKEN_KEYWORD_THROW);
 
-    if (k_Parser_isExpressionFollow(la(parser, 1))) {
+    if (isExpressionFollow(la(parser, 1))) {
         k_ASTNode_t* expression = k_ASTNode_new(node);
         context->m_expression = expression;
         parseExpression(parser, expression);
@@ -1202,22 +1159,6 @@ void parseCompoundStatement(k_Parser_t* parser, k_ASTNode_t* node) {
 	}
 
     k_StackTrace_exit();
-}
-
-bool isCompoundStatementFollow(k_TokenType_t type) {
-    bool result = false;
-    switch (type) {
-		case KUSH_TOKEN_KEYWORD_IF: /* compoundStatement -> ifStatement */
-		case KUSH_TOKEN_HASH: /* compoundStatement -> iterativeStatement */
-		case KUSH_TOKEN_KEYWORD_WHILE: /* compoundStatement -> ... -> whileStatement */
-		case KUSH_TOKEN_KEYWORD_FOR: /* compoundStatement -> ... -> forStatement */
-		case KUSH_TOKEN_KEYWORD_TRY: /* compoundStatement -> tryStatement */
-		{
-            result = true;
-			break;
-		}
-	}
-    return result;
 }
 
 /*
@@ -1737,7 +1678,7 @@ void parseExpression(k_Parser_t* parser, k_ASTNode_t* node) {
     parseAssignmentExpression(parser, parseAssignmentExpression);
 }
 
-bool k_Parser_isExpressionFollow(k_TokenType_t type) {
+bool isExpressionFollow(k_TokenType_t type) {
     return isUnaryExpressionFollow(type);
 }
 
@@ -2387,7 +2328,7 @@ void parseFunctionArguments(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the '(' token. */
     match(parser, KUSH_TOKEN_LEFT_PARENTHESIS);
 
-    if (k_Parser_isExpressionFollow(la(parser, 1))) {
+    if (isExpressionFollow(la(parser, 1))) {
         /* If expression fails, discard tokens until the ')' token is
         * encountered.
         */
@@ -2623,7 +2564,7 @@ void parseInitializerExpression(k_Parser_t* parser, k_ASTNode_t* node) {
      */
     pushFollowToken(parser, KUSH_TOKEN_RIGHT_BRACE);
 
-    if (k_Parser_isExpressionFollow(la(parser, 1))) {
+    if (isExpressionFollow(la(parser, 1))) {
         k_ASTNode_t* mapEntries = k_ASTNode_new(node);
         context->m_mapEntries = mapEntries;
         parseInitializerEntries(parser, mapEntries);
@@ -2702,7 +2643,7 @@ void parseArrayExpression(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the '[' token. */
     match(parser, KUSH_TOKEN_LEFT_SQUARE_BRACKET);
 
-    if (k_Parser_isExpressionFollow(la(parser, 1))) {
+    if (isExpressionFollow(la(parser, 1))) {
         /* If expression fails, discard tokens until the ')' token is
         * encountered.
         */
