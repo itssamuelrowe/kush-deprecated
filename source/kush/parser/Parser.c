@@ -1457,9 +1457,20 @@ void parseTryClause(k_Parser_t* parser, k_ASTNode_t* node) {
     k_StackTrace_exit();
 }
 
+struct k_CatchFilter_t {
+    jtk_ArrayList_t* m_captures;
+    k_Token_t* m_identifier;
+};
+
+typedef struct k_CatchFilter_t k_CatchFilter_t;
+
 /*
  * catchClause
- * :	'catch' catchFilter IDENTIFIER statementSuite
+ * :	'catch' catchFilter? IDENTIFIER statementSuite
+ * ;
+ *
+ * catchFilter
+ * :	(STRING_LITERAL | IDENTIFIER) ('|' (STRING_LITERAL | IDENTIFIER))*
  * ;
  */
 void parseCatchClause(k_Parser_t* parser, k_ASTNode_t* node) {
@@ -1470,72 +1481,32 @@ void parseCatchClause(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the 'catch' token. */
     match(parser, KUSH_TOKEN_KEYWORD_CATCH);
 
-    k_ASTNode_t* catchFilter = k_ASTNode_new(node);
-    context->m_catchFilter = catchFilter;
-    parseCatchFilter(parser, catchFilter);
+    k_CatchFilter_t* filter = k_CatchFilter_new();
+    if ((la(parser, 1) == KUSH_TOKEN_STRING_LITERAL) ||
+        ((la(parser, 1) == KUSH_TOKEN_IDENTIFIER) && (la(parser, 2) == KUSH_TOKEN_IDENTIFIER))) {
+        k_TokenType_t validTokens = {
+            KUSH_TOKEN_STRING_LITERAL,
+            KUSH_TOKEN_IDENTIFIER
+        };
+        int32_t index;
+        k_Token_t* capture = matchAndYieldEx(parser, validTokens, 2, &index);
+        jtk_ArrayList_add(filter->m_captures, capture);
 
-    k_Token_t* identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-    context->m_identifier = newTerminalNode(node, identifier);
+        while (la(parser, 1) == KUSH_TOKEN_VERTICAL_BAR) {
+            /* Consume and discard the '|' token. */
+            k_TokenStream_consume(parser->m_tokens);
+
+		    capture = matchAndYieldEx(parser, validTokens, 2, &index);
+            jtk_ArrayList_add(filter->m_captures, capture);
+        }
+	}
+
+    filter->m_identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
+    context->m_catchFilter = filter;
 
     k_ASTNode_t* statementSuite = k_ASTNode_new(node);
     context->m_statementSuite = statementSuite;
     blockStatement(parser, statementSuite);
-
-    k_StackTrace_exit();
-}
-
-/* TODO: Merge catchFilter context with catch clause context.
- *
- * catchFilter
- * :	(STRING_LITERAL | IDENTIFIER) ('|' (STRING_LITERAL | IDENTIFIER))*
- * ;
- */
-void parseCatchFilter(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_CatchFilterContext_t* context = k_CatchFilterContext_new(node);
-
-    // TODO
-
-	k_ASTNode_t* typeName = k_ASTNode_new(node);
-    jtk_ArrayList_add(context->m_typeNames, typeName);
-	k_Parser_typeName(parser, typeName);
-
-	while (la(parser, 1) == KUSH_TOKEN_VERTICAL_BAR) {
-        /* Consume and discard the '|' token. */
-		k_TokenStream_consume(parser->m_tokens);
-
-		typeName = k_ASTNode_new(node);
-        jtk_ArrayList_add(context->m_typeNames, typeName);
-		k_Parser_typeName(parser, typeName);
-	}
-
-    k_StackTrace_exit();
-}
-
-// TODO: Remove this
-/*
- * typeName
- * :    IDENTIFIER ('.' IDENTIFIER)*
- * ;
- */
-void k_Parser_typeName(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_TypeNameContext_t* context = k_TypeNameContext_new(node);
-
-    k_Token_t* identifierToken = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-    k_ASTNode_t* identifier = newTerminalNode(node, identifierToken);
-    jtk_ArrayList_add(context->m_identifiers, identifier);
-
-    while (la(parser, 1) == KUSH_TOKEN_DOT) {
-        /* Consume and discard the '.' token. */
-        k_TokenStream_consume(parser->m_tokens);
-
-        identifierToken = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-        identifier = newTerminalNode(node, identifierToken);
-        jtk_ArrayList_add(context->m_identifiers, identifier);
-    }
 
     k_StackTrace_exit();
 }
@@ -1562,7 +1533,7 @@ void parseFinallyClause(k_Parser_t* parser, k_ASTNode_t* node) {
 
 /*
  * structureDeclaration
- * :	'class' IDENTIFIER extendsClause? structureSuite
+ * :	'struct' IDENTIFIER structureBody
  * ;
  */
 void parseStructureDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
