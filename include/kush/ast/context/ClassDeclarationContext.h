@@ -35,8 +35,7 @@
 struct k_ClassDeclarationContext_t {
     k_ASTNode_t* m_node;
     k_ASTNode_t* m_identifier;
-    k_ASTNode_t* m_classExtendsClause;
-    k_ASTNode_t* m_classSuite;
+    k_ASTNode_t* m_structureSuite;
 };
 
 /**
