@@ -34,9 +34,11 @@
  */
 struct k_FunctionDeclarationContext_t {
     k_ASTNode_t* m_node;
-    k_ASTNode_t* m_identifier;
+    k_Token_t* m_identifier;
     k_ASTNode_t* m_functionParameters;
     k_ASTNode_t* m_functionBody;
+    k_Token_t* m_returnType;
+    int32_t m_returnTypeDimensions;
 };
 
 /**

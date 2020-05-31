@@ -1,5 +1,5 @@
 compilationUnit
-:   importDeclarations*
+:   importDeclaration*
     componentDeclarations*
     EOF
 ;
@@ -9,7 +9,7 @@ componentDeclarations
 |   structureDeclaration
 ;
 
-importDeclarations
+importDeclaration
 :   'import' qualifiedName SEMICOLON
 ;
 

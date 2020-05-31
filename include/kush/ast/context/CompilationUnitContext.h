@@ -39,8 +39,8 @@ struct k_CompilationUnitContext_t {
      * The node which represents this rule context within the AST.
      */
     k_ASTNode_t* m_node;
-	jtk_ArrayList_t* m_importDeclarations; /* <k_ASTNode_t*> */
-	jtk_ArrayList_t* m_annotatedComponentDeclarations; /* <k_ASTNode_t*> */
+	jtk_ArrayList_t* m_imports; /* <k_ASTNode_t*> */
+	jtk_ArrayList_t* m_components; /* <k_ASTNode_t*> */
 };
 
 /**
