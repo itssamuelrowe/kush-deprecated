@@ -22,205 +22,210 @@
 #include <jtk/collection/list/ArrayList.h>
 
 /*******************************************************************************
- * CompilationUnitContext                                                      *
+ * Context                                                                     *
+ *******************************************************************************/
+
+struct k_ASTNode_t {
+    k_ASTNodeType_t m_type;
+};
+
+/*******************************************************************************
+ * CompilationUnit                                                             *
  *******************************************************************************/
 
 /**
- * @class CompilationUnitContext
+ * @class CompilationUnit
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_CompilationUnit_t {
-    /**
-     * The node which represents this rule context within the AST.
-     */
-
+    k_ASTNodeType_t m_type;
 	jtk_ArrayList_t* m_imports;
 	jtk_ArrayList_t* m_functions;
     jtk_ArrayList_t* m_structures;
 };
 
 /**
- * @memberof CompilationUnitContext
+ * @memberof CompilationUnit
  */
 typedef struct k_CompilationUnit_t k_CompilationUnit_t;
 
 /*******************************************************************************
- * AdditiveExpressionContext                                                   *
+ * AdditiveExpression                                                          *
  *******************************************************************************/
 
 /**
- * @class AdditiveExpressionContext
+ * @class AdditiveExpression
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_AdditiveExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_multiplicativeExpression;
     jtk_ArrayList_t* m_multiplicativeExpressions;
 };
 
 /**
- * @memberof AdditiveExpressionContext
+ * @memberof AdditiveExpression
  */
 typedef struct k_AdditiveExpression_t k_AdditiveExpression_t;
 
 /*******************************************************************************
- * AndExpressionContext                                                        *
+ * AndExpression                                                               *
  *******************************************************************************/
 
 /**
- * @class AndExpressionContext
+ * @class AndExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_AndExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_equalityExpression;
     jtk_ArrayList_t* m_equalityExpressions;
 };
 
 /**
- * @memberof AndExpressionContext
+ * @memberof AndExpression
  */
 typedef struct k_AndExpression_t k_AndExpression_t;
 
 /*******************************************************************************
- * VariableDeclarationContext                                                  *
+ * VariableDeclaration                                                         *
  *******************************************************************************/
 
 /**
- * @class VariableDeclarationContext
+ * @class VariableDeclaration
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_VariableDeclaration_t {
-
+    k_ASTNodeType_t m_type;
     jtk_ArrayList_t* m_declarators;
 };
 
 /**
- * @memberof VariableDeclarationContext
+ * @memberof VariableDeclaration
  */
 typedef struct k_VariableDeclaration_t k_VariableDeclaration_t;
 
 /*******************************************************************************
- * VariableDeclaratorContext                                                   *
+ * VariableDeclarator                                                          *
  *******************************************************************************/
 
 /**
- * @class VariableDeclaratorContext
+ * @class VariableDeclarator
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_VariableDeclarator_t {
-
+    k_ASTNodeType_t m_type;
     k_Token_t* m_identifier;
     k_ASTNode_t* m_expression;
 };
 
 /**
- * @memberof VariableDeclaratorContext
+ * @memberof VariableDeclarator
  */
 typedef struct k_VariableDeclarator_t k_VariableDeclarator_t;
 
 /*******************************************************************************
- * TryStatementContext                                                         *
+ * TryStatement                                                                *
  *******************************************************************************/
 
 /**
- * @class TryStatementContext
+ * @class TryStatement
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_TryStatement_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_tryClause;
     jtk_ArrayList_t* m_catchClauses; /* <k_ASTNode_t*> */
     k_ASTNode_t* m_finallyClause;
 };
 
 /**
- * @memberof TryStatementContext
+ * @memberof TryStatement
  */
 typedef struct k_TryStatement_t k_TryStatement_t;
 
 /*******************************************************************************
- * TryClauseContext                                                            *
+ * TryClause                                                                   *
  *******************************************************************************/
 
 /**
- * @class TryClauseContext
+ * @class TryClause
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_TryClause_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_statementSuite;
 };
 
 /**
- * @memberof TryClauseContext
+ * @memberof TryClause
  */
 typedef struct k_TryClause_t k_TryClause_t;
 
 /*******************************************************************************
- * ThrowStatementContext                                                       *
+ * ThrowStatement                                                              *
  *******************************************************************************/
 
 /**
- * @class ThrowStatementContext
+ * @class ThrowStatement
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ThrowStatement_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_expression;
 };
 
 /**
- * @memberof ThrowStatementContext
+ * @memberof ThrowStatement
  */
 typedef struct k_ThrowStatement_t k_ThrowStatement_t;
 
 /*******************************************************************************
- * ReturnStatementContext                                                      *
+ * ReturnStatement                                                             *
  *******************************************************************************/
 
 /**
- * @class ReturnStatementContext
+ * @class ReturnStatement
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ReturnStatement_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_expression;
 };
 
 /**
- * @memberof ReturnStatementContext
+ * @memberof ReturnStatement
  */
 typedef struct k_ReturnStatement_t k_ReturnStatement_t;
 
 /*******************************************************************************
- * StatementSuiteContext                                                       *
+ * StatementSuite                                                              *
  *******************************************************************************/
 
 /**
- * @class StatementSuiteContext
+ * @class StatementSuite
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_StatementSuite_t {
-
+    k_ASTNodeType_t m_type;
     /* In order to help the users read code easily, the simple statements were
      * removed from statement suites. Previously, a statement suite was either
      * a simple statement or a block consisting of a newline at the begining,
@@ -232,292 +237,283 @@ struct k_StatementSuite_t {
 };
 
 /**
- * @memberof StatementSuiteContext
+ * @memberof StatementSuite
  */
 typedef struct k_StatementSuite_t k_StatementSuite_t;
 
 /*******************************************************************************
- * UnaryExpressionContext                                                      *
+ * UnaryExpression                                                             *
  *******************************************************************************/
 
 /**
- * @class UnaryExpressionContext
+ * @class UnaryExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_UnaryExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_unaryOperator;
     k_ASTNode_t* m_unaryExpression;
     k_ASTNode_t* m_postfixExpression;
 };
 
 /**
- * @memberof UnaryExpressionContext
+ * @memberof UnaryExpression
  */
 typedef struct k_UnaryExpression_t k_UnaryExpression_t;
 
 /*******************************************************************************
- * SubscriptContext                                                            *
+ * Subscript                                                                   *
  *******************************************************************************/
 
 /**
- * @class SubscriptContext
+ * @class Subscript
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_Subscript_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_expression;
 };
 
 /**
- * @memberof SubscriptContext
+ * @memberof Subscript
  */
 typedef struct k_Subscript_t k_Subscript_t;
 
 /*******************************************************************************
- * ShiftExpressionContext                                                      *
+ * ShiftExpression                                                             *
  *******************************************************************************/
 
 /**
- * @class ShiftExpressionContext
+ * @class ShiftExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ShiftExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_additiveExpression;
     jtk_ArrayList_t* m_additiveExpressions;
 };
 
 /**
- * @memberof ShiftExpressionContext
+ * @memberof ShiftExpression
  */
 typedef struct k_ShiftExpression_t k_ShiftExpression_t;
 
 /*******************************************************************************
- * RelationalExpressionContext                                                 *
+ * RelationalExpression                                                        *
  *******************************************************************************/
 
 /**
- * @class RelationalExpressionContext
+ * @class RelationalExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_RelationalExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_shiftExpression;
     jtk_ArrayList_t* m_shiftExpressions;
 };
 
 /**
- * @memberof RelationalExpressionContext
+ * @memberof RelationalExpression
  */
 typedef struct k_RelationalExpression_t k_RelationalExpression_t;
 
 /*******************************************************************************
- * PrimaryExpressionContext                                                    *
+ * PrimaryExpression                                                           *
  *******************************************************************************/
 
 /**
- * @class PrimaryExpressionContext
+ * @class PrimaryExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_PrimaryExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_expression;
 };
 
 /*******************************************************************************
- * PostfixOperatorContext                                                      *
+ * PostfixOperator                                                             *
  *******************************************************************************/
 
 /**
- * @class PostfixOperatorContext
+ * @class PostfixOperator
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_PostfixOperator_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_postfixOperator;
 };
 
 /**
- * @memberof PostfixOperatorContext
+ * @memberof PostfixOperator
  */
 typedef struct k_PostfixOperator_t k_PostfixOperator_t;
 
-/**
- * @memberof PostfixOperatorContext
- */
-k_PostfixOperator_t* k_PostfixOperatorContext_new(k_ASTNode_t* node);
-
-/**
- * @memberof PostfixOperatorContext
- */
-void k_PostfixOperatorContext_delete(k_PostfixOperator_t* context);
-
 /*******************************************************************************
- * PostfixExpressionContext                                                    *
+ * PostfixExpression                                                           *
  *******************************************************************************/
 
 /**
- * @class PostfixExpressionContext
+ * @class PostfixExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_PostfixExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_primaryExpression;
     jtk_ArrayList_t* m_postfixParts; /* <k_ASTNode_t*> */
 };
 
 /**
- * @memberof PostfixExpressionContext
+ * @memberof PostfixExpression
  */
 typedef struct k_PostfixExpression_t k_PostfixExpression_t;
 
 /*******************************************************************************
- * MultiplicativeExpressionContext                                             *
+ * MultiplicativeExpression                                                    *
  *******************************************************************************/
 
 /**
- * @class MultiplicativeExpressionContext
+ * @class MultiplicativeExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_MultiplicativeExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_unaryExpression;
     jtk_ArrayList_t* m_unaryExpressions;
 };
 
 /**
- * @memberof MultiplicativeExpressionContext
+ * @memberof MultiplicativeExpression
  */
 typedef struct k_MultiplicativeExpression_t k_MultiplicativeExpression_t;
 
 /*******************************************************************************
- * MemberAccessContext                                                         *
+ * MemberAccess                                                                *
  *******************************************************************************/
 
 /**
- * @class MemberAccessContext
+ * @class MemberAccess
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_MemberAccess_t {
-
+    k_ASTNodeType_t m_type;
     k_Token_t* m_identifier;
 };
 
 /**
- * @memberof MemberAccessContext
+ * @memberof MemberAccess
  */
 typedef struct k_MemberAccess_t k_MemberAccess_t;
 
 /*******************************************************************************
- * MapExpressionContext                                                        *
+ * MapExpression                                                               *
  *******************************************************************************/
 
 /**
- * @class MapExpressionContext
+ * @class MapExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_MapExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_mapEntries;
 };
 
 typedef struct k_MapExpression_t k_MapExpression_t;
 
 /*******************************************************************************
- * MapEntryContext                                                             *
+ * MapEntry                                                                    *
  *******************************************************************************/
 
 /**
- * @class MapEntryContext
+ * @class MapEntry
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_MapEntry_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_keyExpression;
     k_ASTNode_t* m_valueExpression;
 };
 
 /**
- * @memberof MapEntryContext
+ * @memberof MapEntry
  */
 typedef struct k_MapEntry_t k_MapEntry_t;
 
 /*******************************************************************************
- * MapEntriesContext                                                           *
+ * MapEntries                                                                  *
  *******************************************************************************/
 
 /**
- * @class MapEntriesContext
+ * @class MapEntries
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_MapEntries_t {
-
+    k_ASTNodeType_t m_type;
     jtk_ArrayList_t* m_mapEntries;
 };
 
 /**
- * @memberof MapEntriesContext
+ * @memberof MapEntries
  */
 typedef struct k_MapEntries_t k_MapEntries_t;
 
 /*******************************************************************************
- * LogicalOrExpressionContext                                                  *
+ * LogicalOrExpression                                                         *
  *******************************************************************************/
 
 /**
- * @class LogicalOrExpressionContext
+ * @class LogicalOrExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_LogicalOrExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_logicalAndExpression;
     jtk_ArrayList_t* m_logicalAndExpressions;
 };
 
 /**
- * @memberof LogicalOrExpressionContext
+ * @memberof LogicalOrExpression
  */
 typedef struct k_LogicalOrExpression_t k_LogicalOrExpression_t;
 
 /*******************************************************************************
- * LogicalAndExpressionContext                                                 *
+ * LogicalAndExpression                                                        *
  *******************************************************************************/
 
 /**
- * @class LogicalAndExpressionContext
+ * @class LogicalAndExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_LogicalAndExpression_t {
 
+    k_ASTNodeType_t m_type;
 
     /**
      * The inclusiveOrExpression node on the left side of the operator.
@@ -531,82 +527,82 @@ struct k_LogicalAndExpression_t {
 };
 
 /**
- * @memberof LogicalAndExpressionContext
+ * @memberof LogicalAndExpression
  */
 typedef struct k_LogicalAndExpression_t k_LogicalAndExpression_t;
 
 /*******************************************************************************
- * ListExpressionContext                                                       *
+ * ListExpression                                                              *
  *******************************************************************************/
 
 /**
- * @class ListExpressionContext
+ * @class ListExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ListExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_expressions;
 };
 
 typedef struct k_ListExpression_t k_ListExpression_t;
 
 /*******************************************************************************
- * LabelClauseContext                                                          *
+ * LabelClause                                                                 *
  *******************************************************************************/
 
-// TODO: Use the ASTNode of the identifier instead of LabelClauseContext!
+// TODO: Use the ASTNode of the identifier instead of LabelClause       !
 
 /**
- * @class LabelClauseContext
+ * @class LabelClause
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_LabelClause_t {
-
+    k_ASTNodeType_t m_type;
     k_Token_t* m_identifier;
 };
 
 /**
- * @memberof LabelClauseContext
+ * @memberof LabelClause
  */
 typedef struct k_LabelClause_t k_LabelClause_t;
 
 /*******************************************************************************
- * IterativeStatementContext                                                   *
+ * IterativeStatement                                                          *
  *******************************************************************************/
 
 /**
- * @class IterativeStatementContext
+ * @class IterativeStatement
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_IterativeStatement_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_labelClause;
     k_ASTNode_t* m_statement;
 };
 
 /**
- * @memberof IterativeStatementContext
+ * @memberof IterativeStatement
  */
 typedef struct k_IterativeStatement_t k_IterativeStatement_t;
 
 /*******************************************************************************
- * InclusiveOrExpressionContext                                                *
+ * InclusiveOrExpression                                                       *
  *******************************************************************************/
 
 /**
- * @class InclusiveOrExpressionContext
+ * @class InclusiveOrExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_InclusiveOrExpression_t {
-
+    k_ASTNodeType_t m_type;
     /**
      * The expression on the left of the operator.
      */
@@ -619,109 +615,109 @@ struct k_InclusiveOrExpression_t {
 };
 
 /**
- * @memberof InclusiveOrExpressionContext
+ * @memberof InclusiveOrExpression
  */
 typedef struct k_InclusiveOrExpression_t k_InclusiveOrExpression_t;
 
 /*******************************************************************************
- * ImportDeclarationContext                                                    *
+ * ImportDeclaration                                                           *
  *******************************************************************************/
 
 /**
- * @class ImportDeclarationContext
+ * @class ImportDeclaration
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ImportDeclaration_t {
-
+    k_ASTNodeType_t m_type;
     jtk_ArrayList_t* m_identifiers; /* <k_ASTNode_t*> */
     bool m_wildcard;
 };
 
 /**
- * @memberof ImportDeclarationContext
+ * @memberof ImportDeclaration
  */
 typedef struct k_ImportDeclaration_t k_ImportDeclaration_t;
 
 
 /*******************************************************************************
- * IfStatementContext                                                          *
+ * IfStatement                                                                 *
  *******************************************************************************/
 
 /**
- * @class IfStatementContext
+ * @class IfStatement
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_IfStatement_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_ifClause;
     jtk_ArrayList_t* m_elseIfClauses; /* <k_ASTNode_t*> */
     k_ASTNode_t* m_elseClause;
 };
 
 /**
- * @memberof IfStatementContext
+ * @memberof IfStatement
  */
 typedef struct k_IfStatement_t k_IfStatement_t;
 
 
 /*******************************************************************************
- * IfClauseContext                                                             *
+ * IfClause                                                                    *
  *******************************************************************************/
 
 /**
- * @class IfClauseContext
+ * @class IfClause
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_IfClause_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_expression;
     k_ASTNode_t* m_statementSuite;
 };
 
 /**
- * @memberof IfClauseContext
+ * @memberof IfClause
  */
 typedef struct k_IfClause_t k_IfClause_t;
 
 /*******************************************************************************
- * FunctionParametersContext                                                   *
+ * FunctionParameters                                                          *
  *******************************************************************************/
 
 /**
- * @class FunctionParametersContext
+ * @class FunctionParameters
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_FunctionParameters_t {
-
+    k_ASTNodeType_t m_type;
     jtk_ArrayList_t* m_fixedParameters; /* <k_ASTNode_t*> */
     k_ASTNode_t* m_variableParameter;
 };
 
 /**
- * @memberof FunctionParametersContext
+ * @memberof FunctionParameters
  */
 typedef struct k_FunctionParameters_t k_FunctionParameters_t;
 
 /*******************************************************************************
- * FunctionDeclarationContext                                                  *
+ * FunctionDeclaration                                                         *
  *******************************************************************************/
 
 /**
- * @class FunctionDeclarationContext
+ * @class FunctionDeclaration
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_FunctionDeclaration_t {
-
+    k_ASTNodeType_t m_type;
     k_Token_t* m_identifier;
     k_ASTNode_t* m_functionParameters;
     k_ASTNode_t* m_functionBody;
@@ -730,62 +726,62 @@ struct k_FunctionDeclaration_t {
 };
 
 /**
- * @memberof FunctionDeclarationContext
+ * @memberof FunctionDeclaration
  */
 typedef struct k_FunctionDeclaration_t k_FunctionDeclaration_t;
 
 /*******************************************************************************
- * FunctionBodyContext                                                         *
+ * FunctionBody                                                                *
  *******************************************************************************/
 
 /**
- * @class FunctionBodyContext
+ * @class FunctionBody
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_FunctionBody_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_statementSuite;
 };
 
 /**
- * @memberof FunctionBodyContext
+ * @memberof FunctionBody
  */
 typedef struct k_FunctionBody_t k_FunctionBody_t;
 
 /*******************************************************************************
- * FunctionArgumentsContext                                                    *
+ * FunctionArguments                                                           *
  *******************************************************************************/
 
 /**
- * @class FunctionArgumentsContext
+ * @class FunctionArguments
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_FunctionArguments_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_expressions;
 };
 
 /**
- * @memberof FunctionArgumentsContext
+ * @memberof FunctionArguments
  */
 typedef struct k_FunctionArguments_t k_FunctionArguments_t;
 
 /*******************************************************************************
- * ForStatementContext                                                         *
+ * ForStatement                                                                *
  *******************************************************************************/
 
 /**
- * @class ForStatementContext
+ * @class ForStatement
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ForStatement_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_forParameter;
     k_ASTNode_t* m_expression;
     k_ASTNode_t* m_statementSuite;
@@ -793,317 +789,299 @@ struct k_ForStatement_t {
 };
 
 /**
- * @memberof ForStatementContext
+ * @memberof ForStatement
  */
 typedef struct k_ForStatement_t k_ForStatement_t;
 
 /*******************************************************************************
- * ForParameterContext                                                        *
+ * ForParameter                                                               *
  *******************************************************************************/
 
 /**
- * @class ForParameterContext
+ * @class ForParameter
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ForParameter_t {
-
+    k_ASTNodeType_t m_type;
     bool m_declaration;
     bool m_variable;
     k_Token_t* m_identifier;
 };
 
 /**
- * @memberof ForParameterContext
+ * @memberof ForParameter
  */
 typedef struct k_ForParameter_t k_ForParameter_t;
 
 /*******************************************************************************
- * FinallyClauseContext                                                        *
+ * FinallyClause                                                               *
  *******************************************************************************/
 
 /**
- * @class FinallyClauseContext
+ * @class FinallyClause
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_FinallyClause_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_statementSuite;
 };
 
 /**
- * @memberof FinallyClauseContext
+ * @memberof FinallyClause
  */
 typedef struct k_FinallyClause_t k_FinallyClause_t;
 
 /*******************************************************************************
- * ExpressionsContext                                                          *
+ * Expressions                                                                 *
  *******************************************************************************/
 
 /**
- * @class ExpressionsContext
+ * @class Expressions
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_Expressions_t {
-
+    k_ASTNodeType_t m_type;
     jtk_ArrayList_t* m_expressions; /* <k_ASTNode_t*> */
 };
 
 /**
- * @memberof ExpressionsContext
+ * @memberof Expressions
  */
 typedef struct k_Expressions_t k_Expressions_t;
 
 /*******************************************************************************
- * ExpressionContext                                                           *
+ * Expression                                                                  *
  *******************************************************************************/
 
 /**
- * @class ExpressionContext
+ * @class Expression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_Expression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_assignmentExpression;
 };
 
 /**
- * @memberof ExpressionContext
+ * @memberof Expression
  */
 typedef struct k_Expression_t k_Expression_t;
 
 /*******************************************************************************
- * ExclusiveOrExpressionContext                                                *
+ * ExclusiveOrExpression                                                       *
  *******************************************************************************/
 
 /**
- * @class ExclusiveOrExpressionContext
+ * @class ExclusiveOrExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ExclusiveOrExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_andExpression;
     jtk_ArrayList_t* m_andExpressions;
 };
 
 /**
- * @memberof ExclusiveOrExpressionContext
+ * @memberof ExclusiveOrExpression
  */
 typedef struct k_ExclusiveOrExpression_t k_ExclusiveOrExpression_t;
 
 /*******************************************************************************
- * EqualityExpressionContext                                                   *
+ * EqualityExpression                                                          *
  *******************************************************************************/
 
 /**
- * @class EqualityExpressionContext
+ * @class EqualityExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_EqualityExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_relationalExpression;
     jtk_ArrayList_t* m_relationalExpressions;
 };
 
 /**
- * @memberof EqualityExpressionContext
+ * @memberof EqualityExpression
  */
 typedef struct k_EqualityExpression_t k_EqualityExpression_t;
 
 /*******************************************************************************
- * EnumerationSuiteContext                                                     *
+ * ConditionalExpression                                                       *
  *******************************************************************************/
 
 /**
- * @class EnumerationSuiteContext
-
- * @author Samuel Rowe
- * @since Kush 0.1
- */
-struct k_EnumerationSuite_t {
-
-    jtk_ArrayList_t* m_enumerates; /* <k_ASTNode_t*> */
-};
-
-/**
- * @memberof EnumerationSuiteContext
- */
-typedef struct k_EnumerationSuite_t k_EnumerationSuite_t;
-
-/*******************************************************************************
- * ConditionalExpressionContext                                                *
- *******************************************************************************/
-
-/**
- * @class ConditionalExpressionContext
+ * @class ConditionalExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ConditionalExpression_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_logicalOrExpression;
     k_ASTNode_t* m_thenExpression;
     k_ASTNode_t* m_elseExpression;
 };
 
 /**
- * @memberof ConditionalExpressionContext
+ * @memberof ConditionalExpression
  */
 typedef struct k_ConditionalExpression_t k_ConditionalExpression_t;
 
 /*******************************************************************************
- * ClassSuiteContext                                                           *
+ * ClassSuite                                                                  *
  *******************************************************************************/
 
 /**
- * @class ClassSuiteContext
+ * @class ClassSuite
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ClassSuite_t {
-
+    k_ASTNodeType_t m_type;
     jtk_ArrayList_t* m_classMembers; /* <k_ASTNode_t*> */
 };
 
 /**
- * @memberof ClassSuiteContext
+ * @memberof ClassSuite
  */
 typedef struct k_ClassSuite_t k_ClassSuite_t;
 
 /*******************************************************************************
- * ClassMemberContext                                                          *
+ * ClassMember                                                                 *
  *******************************************************************************/
 
 /**
- * @class ClassMemberContext
+ * @class ClassMember
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ClassMember_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_annotations;
     jtk_ArrayList_t* m_modifiers; /* <k_ASTNode_t*> */
     k_ASTNode_t* m_declaration;
 };
 
 /**
- * @memberof ClassMemberContext
+ * @memberof ClassMember
  */
 typedef struct k_ClassMember_t k_ClassMember_t;
 
 /*******************************************************************************
- * ClassDeclarationContext                                                     *
+ * ClassDeclaration                                                            *
  *******************************************************************************/
 
 /**
- * @class ClassDeclarationContext
+ * @class ClassDeclaration
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_ClassDeclaration_t {
-
+    k_ASTNodeType_t m_type;
     k_Token_t* m_identifier;
     k_ASTNode_t* m_structureSuite;
 };
 
 /**
- * @memberof ClassDeclarationContext
+ * @memberof ClassDeclaration
  */
 typedef struct k_ClassDeclaration_t k_ClassDeclaration_t;
 
 /*******************************************************************************
- * CatchFilterContext                                                          *
+ * CatchFilter                                                                 *
  *******************************************************************************/
 
 /**
- * @class CatchFilterContext
+ * @class CatchFilter
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_CatchFilter_t {
-
+    k_ASTNodeType_t m_type;
     jtk_ArrayList_t* m_typeNames; /* <k_ASTNode_t*> */
 };
 
 /**
- * @memberof CatchFilterContext
+ * @memberof CatchFilter
  */
 typedef struct k_CatchFilter_t k_CatchFilter_t;
 
 /*******************************************************************************
- * CatchClauseContext                                                          *
+ * CatchClause                                                                 *
  *******************************************************************************/
 
 /**
- * @class CatchClauseContext
+ * @class CatchClause
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_CatchClause_t {
-
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_catchFilter;
     k_Token_t* m_identifier;
     k_ASTNode_t* m_statementSuite;
 };
 
 /**
- * @memberof CatchClauseContext
+ * @memberof CatchClause
  */
 typedef struct k_CatchClause_t k_CatchClause_t;
 
 /*******************************************************************************
- * BreakStatementContext                                                       *
+ * BreakStatement                                                              *
  *******************************************************************************/
 
 /**
- * @class BreakStatementContext
+ * @class BreakStatement
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_BreakStatement_t {
+    k_ASTNodeType_t m_type;
     k_Token_t* m_identifier;
 };
 
 /**
- * @memberof BreakStatementContext
+ * @memberof BreakStatement
  */
 typedef struct k_BreakStatement_t k_BreakStatement_t;
 
 /*******************************************************************************
- * AssignmentExpressionContext                                                 *
+ * AssignmentExpression                                                        *
  *******************************************************************************/
 
 /**
- * @class AssignmentExpressionContext
+ * @class Assignme0ntExpression
 
  * @author Samuel Rowe
  * @since Kush 0.1
  */
 struct k_AssignmentExpression_t {
+    k_ASTNodeType_t m_type;
     k_ASTNode_t* m_conditionalExpression;
     k_ASTNode_t* m_assignmentOperator;
     k_ASTNode_t* m_assignmentExpression;
 };
 
 /**
- * @memberof AssignmentExpressionContext
+ * @memberof AssignmentExpression
  */
 typedef struct k_AssignmentExpression_t k_AssignmentExpression_t;
 
