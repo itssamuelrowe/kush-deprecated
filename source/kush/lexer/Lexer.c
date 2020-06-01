@@ -1919,12 +1919,6 @@ loopEntry : {
                      *
                      * The following algorithm tries to prevent redundant comparisons
                      * between strings (as many as possible).
-                     * Basically, the code checks if the token length is known.
-                     * If true, then the keywords with the correspoding length
-                     * are compared against the token. The keywords are always
-                     * arranged in ascending lexicographical order. Thus, we
-                     * reduce the worst case scenario for number of comparisons
-                     * from 40 to 7.
                      */
                     lexer->m_type = KUSH_TOKEN_IDENTIFIER;
                     switch (text[0]) {
