@@ -28,10 +28,10 @@
 uint32_t k_TokenType_toModifiers(k_TokenType_t type) {
     uint32_t modifiers = 0;
     switch (type) {
-    case KUSH_TOKEN_KEYWORD_NATIVE: {
-        modifiers |= KUSH_MODIFIER_NATIVE;
-        break;
-    }
+        case KUSH_TOKEN_KEYWORD_NATIVE: {
+            modifiers |= KUSH_MODIFIER_NATIVE;
+            break;
+        }
     }
     return modifiers;
 }

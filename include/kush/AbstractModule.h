@@ -20,6 +20,7 @@ struct k_Module_t {
 	k_Structure_t** m_structures;
 	uint16_t m_functionCount;
 	k_Function_t** m_functions;
+	
 };
 
 typedef struct k_Module_t k_Module_t;
