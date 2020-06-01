@@ -1085,4 +1085,24 @@ struct k_AssignmentExpression_t {
  */
 typedef struct k_AssignmentExpression_t k_AssignmentExpression_t;
 
+struct k_FunctionParameter_t {
+    k_Token_t* m_type;
+    int32_t m_dimensions;
+    k_Token_t* m_identifier;
+    bool m_variable;
+};
+
+typedef struct k_FunctionParameter_t k_FunctionParameter_t;
+
+struct k_StorageDeclarator_t {
+    bool m_infer;
+    bool m_constant;
+    k_Token_t* m_typeName;
+    int32_t m_dimensions;
+    k_Token_t* m_identifier;
+    k_ASTNode_t* m_expression;
+};
+
+typedef struct k_StorageDeclarator_t k_StorageDeclarator_t;
+
 #endif /* KUSH_PARSER_CONTEXT_H */

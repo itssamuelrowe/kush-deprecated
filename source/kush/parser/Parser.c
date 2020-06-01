@@ -25,6 +25,8 @@
  * Parser                                                                      *
  *******************************************************************************/
 
+#define la(parser, count) k_TokenStream_la(parser->m_tokens, count)
+
 // Match
 
 static void match(k_Parser_t* parser, k_TokenType_t type);
@@ -130,7 +132,7 @@ static const char ruleNames[][50] = {
     "functionDeclaration",
     "functionParameters",
     "functionBody",
-    "statementSuite",
+    "blockStatement",
     "simpleStatement",
     "statement",
     "emptyStatement",
@@ -228,7 +230,7 @@ void k_Parser_reset(k_Parser_t* parser, k_TokenStream_t* tokens) {
 /* Terminal Node */
 
 static k_ASTNode_t* newTerminalNode(k_ASTNode_t* node, k_Token_t* token) {
-    k_ASTNode_t* terminalNode = k_ASTNode_new(node);
+    k_ASTNode_t* terminalNode = k_ASTNode_new();
     terminalNode->m_type = KUSH_AST_NODE_TYPE_TERMINAL;
     terminalNode->m_context = token;
     terminalNode->m_contextDestructor = NULL;
@@ -565,16 +567,18 @@ static k_TokenType_t types[] = {
  * compilationUnit
  * :	NEWLINE*
  *      importDeclaration*
- *      annotatedComponentDeclaration*
+ *      componentDeclaration*
  *      EOF
  * ;
  *
+ * componentDeclaration
+ * :    functionDeclaration
+ * |    structureDeclaration
+ * ;
  */
-void parseCompilationUnit(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-	/* Create and attach the context of this rule to the given node. */
-	k_CompilationUnitContext_t* context = k_CompilationUnitContext_new(node);
+k_CompilationUnit_t* parseCompilationUnit(k_Parser_t* parser) {
+	/* Create the context of this rule. */
+	k_CompilationUnit_t* context = k_CompilationUnit_new();
 
 	/* Zero or more import declarations may occur in the source code.
 	 * Therefore, repeatedly parse import declarations as long as
@@ -583,22 +587,25 @@ void parseCompilationUnit(k_Parser_t* parser, k_ASTNode_t* node) {
 	 * The following code represents: importDeclaration*
 	 */
     while (la(parser, 1) == KUSH_TOKEN_KEYWORD_IMPORT) {
-		k_ASTNode_t* importDeclaration = k_ASTNode_new(node);
-        parseImportDeclaration(parser, importDeclaration);
-
+		k_ImportDeclaration_t* importDeclaration = parseImportDeclaration(parser);
 		jtk_ArrayList_add(context->m_imports, importDeclaration);
     }
 
     while (isComponentFollow(la(parser, 1))) {
-        k_ASTNode_t* declaration = k_ASTNode_new(node);
-        jtk_ArrayList_add(context->m_components, declaration);
-        parseComponentDeclaration(parser, declaration);
+        if (la(parser, 1) == KUSH_TOKEN_KEYWORD_STRUCT) {
+            k_StructureDeclaration_t* structure = parseStructureDeclaration(parser);
+            jtk_ArrayList_add(context->m_structures, structure);
+        }
+        else {
+            k_FunctionDeclaration_t* function = parseFunctionDeclaration(parser, 0);
+            jtk_ArrayList_add(context->m_structures, function);
+        }
     }
 
 	/* We are expecting the 'end of stream' token here. */
     match(parser, KUSH_TOKEN_END_OF_STREAM);
 
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
@@ -615,19 +622,15 @@ void parseCompilationUnit(k_Parser_t* parser, k_ASTNode_t* node) {
  * The following function combines both the rules. This measure was
  * taken to avoid redundant nodes in the AST.
  */
-void parseImportDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+k_ImportDeclaration_t* parseImportDeclaration(k_Parser_t* parser) {
 
-	k_ImportDeclarationContext_t* context = k_ImportDeclarationContext_new(node);
+
+	k_ImportDeclaration_t* context = k_ImportDeclaration_new();
 
 	/* An import statement begins with the 'import' keyword. Therefore,
 	 * we are expecting it.
 	 */
     match(parser, KUSH_TOKEN_KEYWORD_IMPORT);
-
-	/* The user is required to specify the symbol he/she wants to
-	 * import. The following code parses the import target.
-	 */
 
     /* We are building an abstract syntax tree (AST). Therefore, we
 	 * discard the '.' '*' tokens and use a boolean variable to mark
@@ -646,9 +649,7 @@ void parseImportDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
 	 * Consume it. The consumed identifier saved for later inspection.
 	 */
     k_Token_t* identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-    k_ASTNode_t* identifierNode = newTerminalNode(node, identifier);
-
-	jtk_ArrayList_add(context->m_identifiers, identifierNode);
+	jtk_ArrayList_add(context->m_identifiers, identifier);
 
 	/* Optionally, the user may specify more identifiers (with each identifier
 	 * separated by the '.' token. Therefore, we repeatedly consume the '.' and
@@ -660,12 +661,9 @@ void parseImportDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
 		/* Consume and discard the '.' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-		/* The consumed identifier is saved for later inspection.
-		 */
-        identifier = k_TokenStream_lt(parser->m_tokens, 1);
-        identifierNode = newTerminalNode(node, identifier);
-        k_TokenStream_consume(parser->m_tokens);
-		jtk_ArrayList_add(context->m_identifiers, identifierNode);
+		/* The consumed identifier is saved for later inspection. */
+        identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
+		jtk_ArrayList_add(context->m_identifiers, identifier);
     }
 
 	/* Optionally, the user may specify a wildcard; recognized when
@@ -679,38 +677,12 @@ void parseImportDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
 
     /* Pop the semicolon token from the follow set. */
     popFollowToken(parser);
-
 	/* The import declaration is terminated with a semicolon.
 	 * Therefore, we are expecting it here.
 	 */
     match(parser, KUSH_TOKEN_SEMICOLON);
 
-    k_StackTrace_exit();
-}
-
-/*
- * componentDeclaration
- * :    functionDeclaration
- * |    structureDeclaration
- * ;
- */
-void parseComponentDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_Compiler_t* compiler = parser->m_compiler;
-    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    k_ComponentDeclarationContext_t* context = k_ComponentDeclarationContext_new(node);
-
-    k_ASTNode_t* declaration = k_ASTNode_new(node);
-    context->m_component = declaration;
-    if (la(parser, 1) == KUSH_TOKEN_KEYWORD_STRUCT) {
-        parseStructureDeclaration(parser, declaration);
-    }
-    else {
-        parseFunctionDeclaration(parser, declaration, 0);
-    }
-
-    k_StackTrace_exit();
+    return context;
 }
 
 k_Token_t* parseTypeEx(k_Parser_t* parser, int32_t* dimensions, bool includeVoid) {
@@ -727,10 +699,31 @@ k_Token_t* parseTypeEx(k_Parser_t* parser, int32_t* dimensions, bool includeVoid
     return token;
 }
 
+/**
+ * componentType
+ * :    'i8'
+ * |    'i16'
+ * |    'i32'
+ * |    'i64'
+ * |    'f32'
+ * |    'f64'
+ * |    'boolean'
+ * ;
+ *
+ * type
+ * :    componentType ('[' ']')*
+ * ;
+ */
 k_Token_t* parseType(k_Parser_t* parser, int32_t* dimensions) {
     return parseTypeEx(parser, dimensions, false);
 }
 
+/**
+ * returnType
+ * :    type
+ * |    'void'
+ * ;
+ */
 k_Token_t* parseReturnType(k_Parser_t* parser, int32_t* dimensions) {
     return parseTypeEx(parser, dimensions, true);
 }
@@ -742,23 +735,15 @@ k_Token_t* parseReturnType(k_Parser_t* parser, int32_t* dimensions) {
  */
 void parseFunctionDeclaration(k_Parser_t* parser, k_ASTNode_t* node,
     uint32_t modifiers) {
-    k_StackTrace_enter();
-
-	k_FunctionDeclarationContext_t* context = k_FunctionDeclarationContext_new(node);
-
-    // returnType
-    context->m_returnType = parseReturnType(parser, &context->m_returnTypeDimensions);
-    // Identifier
-    context->m_identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-
-    /* If function parameters fails, skip tokens until ';', '{', or '}' is found. */
+	/* If function parameters fails, skip tokens until ';', '{', or '}' is found. */
     pushFollowToken(parser, KUSH_TOKEN_SEMICOLON);
     pushFollowToken(parser, KUSH_TOKEN_LEFT_BRACE);
     pushFollowToken(parser, KUSH_TOKEN_RIGHT_BRACE);
 
-    k_ASTNode_t* parameters = k_ASTNode_new(node);
-    context->m_functionParameters = parameters;
-    parseFunctionParameters(parser, parameters);
+    k_FunctionDeclaration_t* context = k_FunctionDeclaration_new();
+    context->m_returnType = parseReturnType(parser, &context->m_returnTypeDimensions);
+    context->m_identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
+    context->m_functionParameters = parseFunctionParameters(parser);
 
     /* Pop the ';', '{', and '}' tokens from the follow set. */
     popFollowToken(parser);
@@ -769,24 +754,9 @@ void parseFunctionDeclaration(k_Parser_t* parser, k_ASTNode_t* node,
         match(parser, KUSH_TOKEN_SEMICOLON);
     }
     else {
-        k_ASTNode_t* blockStatement = k_ASTNode_new(node);
-	    context->m_functionBody = blockStatement;
-        parseBlockStatement(parser, blockStatement);
+	    context->m_functionBody = parseBlockStatement(parser);
     }
-
-    k_StackTrace_exit();
 }
-
-struct k_FunctionParameter_t {
-    k_Token_t* m_type;
-    int32_t m_dimensions;
-    k_Token_t* m_identifier;
-    bool m_variable;
-};
-
-typedef struct k_FunctionParameter_t k_FunctionParameter_t;
-
-#define la(parser, count) k_TokenStream_la(parser->m_tokens, count)
 
 /*
  * functionParameters
@@ -809,10 +779,8 @@ typedef struct k_FunctionParameter_t k_FunctionParameter_t;
  * The following function combines the above mentioned rules. This measure was
  * taken to avoid redundant nodes in the AST.
  */
-void parseFunctionParameters(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-	k_FunctionParametersContext_t* context = k_FunctionParametersContext_new(node);
+void parseFunctionParameters(k_Parser_t* parser) {
+	k_FunctionParameters_t* context = k_FunctionParameters_new();
 
     /* Match and discard the '(' token. */
     match(parser, KUSH_TOKEN_LEFT_PARENTHESIS);
@@ -842,7 +810,7 @@ void parseFunctionParameters(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the ')' token. */
     match(parser, KUSH_TOKEN_RIGHT_PARENTHESIS);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -858,10 +826,8 @@ void parseFunctionParameters(k_Parser_t* parser, k_ASTNode_t* node) {
  * The following function combines the above mentioned rules. This measure was
  * taken to avoid redundant nodes in the AST.
  */
-void blockStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-	k_StatementSuiteContext_t* context = k_StatementSuiteContext_new(node);
+void parseBlockStatementk_Parser_t* parser) {
+	k_StatementSuite_t* context = k_StatementSuite_new();
 
     /* Consume and discard the '{' token. */
     match(parser, KUSH_TOKEN_LEFT_BRACE);
@@ -871,15 +837,14 @@ void blockStatement(k_Parser_t* parser, k_ASTNode_t* node) {
     pushFollowToken(parser, KUSH_TOKEN_RIGHT_BRACE);
 
     do {
-        k_ASTNode_t* statement = k_ASTNode_new(node);
-        jtk_ArrayList_add(context->m_statements, statement);
-
         k_TokenType_t la1 = la(parser, 1);
         if (isSimpleStatementFollow(la1)) {
-            parseSimpleStatement(parser, statement);
+            k_Context_t* statement = parseSimpleStatement(parser);
+            jtk_ArrayList_add(context->m_statements, statement);
         }
         else if (isCompoundStatementFollow(la1)) {
-            parseCompoundStatement(parser, statement);
+            k_Context_t* statement = parseCompoundStatement(parser);
+            jtk_ArrayList_add(context->m_statements, statement);
         }
         else {
             // TODO: Expected simple or compound statement
@@ -892,8 +857,6 @@ void blockStatement(k_Parser_t* parser, k_ASTNode_t* node) {
     popFollowToken(parser);
     /* Consume and discard the '}' token. */
     match(parser, KUSH_TOKEN_RIGHT_BRACE);
-
-    k_StackTrace_exit();
 }
 
 /*
@@ -917,11 +880,8 @@ void blockStatement(k_Parser_t* parser, k_ASTNode_t* node) {
  * The following function combines the above mentioned rules. This measure was
  * taken to avoid redundant nodes in the AST.
  */
-
-void parseSimpleStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-	k_SimpleStatementContext_t* context = k_SimpleStatementContext_new(node);
+k_Context_t* parseSimpleStatement(k_Parser_t* parser) {
+    k_Context_t* result = NULL;
 
     /* If expressionStatement, emptyStatement, variableDeclaration,
      * breakStatement, returnStatement, or throwStatement fails, discard tokens
@@ -931,14 +891,10 @@ void parseSimpleStatement(k_Parser_t* parser, k_ASTNode_t* node) {
 
     k_TokenType_t la1 = la(parser, 1);
     if (followVariableDeclaration(parser)) {
-        k_ASTNode_t* variableDeclaration = k_ASTNode_new(node);
-        context->m_statement = variableDeclaration;
-        parseVariableDeclaration(parser, variableDeclaration);
+        result = parseVariableDeclaration(parser);
     }
     else if (isExpressionFollow(la1)) {
-        k_ASTNode_t* expression = k_ASTNode_new(node);
-        context->m_statement = expression;
-        parseExpression(parser, expression);
+        result = parseExpression(parser);
     }
     else {
         switch (la1) {
@@ -951,23 +907,17 @@ void parseSimpleStatement(k_Parser_t* parser, k_ASTNode_t* node) {
             }
 
             case KUSH_TOKEN_KEYWORD_BREAK: {
-                k_ASTNode_t* breakStatement = k_ASTNode_new(node);
-                context->m_statement = breakStatement;
-                parseBreakStatement(parser, breakStatement);
+                result = parseBreakStatement(parser);
                 break;
             }
 
             case KUSH_TOKEN_KEYWORD_RETURN: {
-                k_ASTNode_t* returnStatement = k_ASTNode_new(node);
-                context->m_statement = returnStatement;
-                parseReturnStatement(parser, returnStatement);
+                result = parseReturnStatement(parser);
                 break;
             }
 
             case KUSH_TOKEN_KEYWORD_THROW: {
-                k_ASTNode_t* throwStatement = k_ASTNode_new(node);
-                context->m_statement = throwStatement;
-                parseThrowStatement(parser, throwStatement);
+                result = parseThrowStatement(parser);
                 break;
             }
         }
@@ -977,30 +927,15 @@ void parseSimpleStatement(k_Parser_t* parser, k_ASTNode_t* node) {
     popFollowToken(parser);
     /* Match and discard the newline token. */
 	match(parser, KUSH_TOKEN_SEMICOLON);
-
-    k_StackTrace_exit();
 }
-
-struct k_StorageDeclarator_t {
-    bool m_infer;
-    bool m_constant;
-    k_Token_t* m_typeName;
-    int32_t m_dimensions;
-    k_Token_t* m_identifier;
-    k_ASTNode_t* m_expression;
-};
-
-typedef struct k_StorageDeclarator_t k_StorageDeclarator_t;
 
 /*
  * variableDeclaration
  * :    ('var' | 'let' | type) variableDeclarator (',' variableDeclarator)*
  * ;
  */
-void parseVariableDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-	k_VariableDeclarationContext_t* context = k_VariableDeclarationContext_new(node);
+k_VariableDeclaration_t* parseVariableDeclaration(k_Parser_t* parser) {
+	k_VariableDeclaration_t* context = k_VariableDeclaration_new();
 
     k_TokenType_t la1 = la(parser, 1);
     bool infer = (la1 == KUSH_TOKEN_KEYWORD_VAR);
@@ -1028,7 +963,7 @@ void parseVariableDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
 		parseStorageDeclarator(parser, declarator);
 	}
 
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
@@ -1037,8 +972,6 @@ void parseVariableDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
  * ;
  */
 void parseStorageDeclarator(k_Parser_t* parser, k_StorageDeclarator_t* declarator) {
-    k_StackTrace_enter();
-
     declarator->m_identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
 
 	if (la(parser, 1) == KUSH_TOKEN_EQUAL) {
@@ -1049,8 +982,6 @@ void parseStorageDeclarator(k_Parser_t* parser, k_StorageDeclarator_t* declarato
         declarator->m_expression = expression;
 		parseExpression(parser, expression);
 	}
-
-    k_StackTrace_exit();
 }
 
 /*
@@ -1058,10 +989,8 @@ void parseStorageDeclarator(k_Parser_t* parser, k_StorageDeclarator_t* declarato
  * :    'break' IDENTIFIER?
  * ;
  */
-void parseBreakStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_BreakStatementContext_t* context = k_BreakStatementContext_new(node);
+k_BreakStatement_t* parseBreakStatement(k_Parser_t* parser) {
+    k_BreakStatement_t* context = k_BreakStatement_new();
 
     /* Match and discard the 'break' token. */
     match(parser, KUSH_TOKEN_KEYWORD_BREAK);
@@ -1072,7 +1001,7 @@ void parseBreakStatement(k_Parser_t* parser, k_ASTNode_t* node) {
         k_TokenStream_consume(parser->m_tokens);
     }
 
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
@@ -1080,20 +1009,15 @@ void parseBreakStatement(k_Parser_t* parser, k_ASTNode_t* node) {
  * :    'return' expression
  * ;
  */
-void parseReturnStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_ReturnStatementContext_t* context = k_ReturnStatementContext_new(node);
+k_ReturnStatement_t* parseReturnStatement(k_Parser_t* parser) {
+    k_ReturnStatement_t* context = k_ReturnStatement_new();
 
     /* Match and discard the 'return' token. */
     match(parser, KUSH_TOKEN_KEYWORD_RETURN);
-
     /* An expression is mandatory after the 'return' keyword. */
-    k_ASTNode_t* expression = k_ASTNode_new(node);
-    context->m_expression = expression;
-    parseExpression(parser, expression);
+    context->m_expression = parseExpression(parser);
 
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
@@ -1101,19 +1025,17 @@ void parseReturnStatement(k_Parser_t* parser, k_ASTNode_t* node) {
  * :    'throw' expression?
  * ;
  */
-void parseThrowStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_ThrowStatementContext_t* context = k_ThrowStatementContext_new(node);
+k_ThrowStatement_t* parseThrowStatement(k_Parser_t* parser) {
+    k_ThrowStatement_t* context = k_ThrowStatement_new();
 
     /* Match and discard the 'throw' token. */
     match(parser, KUSH_TOKEN_KEYWORD_THROW);
 
     if (isExpressionFollow(la(parser, 1))) {
-        k_ASTNode_t* expression = k_ASTNode_new(node);
-        context->m_expression = expression;
-        parseExpression(parser, expression);
+        context->m_expression = parseExpression(parser);
     }
 
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
@@ -1123,32 +1045,24 @@ void parseThrowStatement(k_Parser_t* parser, k_ASTNode_t* node) {
  * |    tryStatement
  * ;
  */
-void parseCompoundStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_CompoundStatementContext_t* context = k_CompoundStatementContext_new(node);
+k_Context_t* parseCompoundStatement(k_Parser_t* parser) {
+    k_Context_t* context = NULL;
 
 	switch (la(parser, 1)) {
 		case KUSH_TOKEN_KEYWORD_IF: {
-			k_ASTNode_t* ifStatement = k_ASTNode_new(node);
-            context->m_statement = ifStatement;
-			parseIfStatement(parser, ifStatement);
+            context = parseIfStatement(parser);
 			break;
 		}
 
 		case KUSH_TOKEN_HASH:
 		case KUSH_TOKEN_KEYWORD_WHILE:
 		case KUSH_TOKEN_KEYWORD_FOR: {
-			k_ASTNode_t* iterativeStatement = k_ASTNode_new(node);
-            context->m_statement = iterativeStatement;
-			parseIterativeStatement(parser, iterativeStatement);
+            context = parseIterativeStatement(parser);
 			break;
 		}
 
 		case KUSH_TOKEN_KEYWORD_TRY: {
-			k_ASTNode_t* tryStatement = k_ASTNode_new(node);
-            context->m_statement = tryStatement;
-			parseTryStatement(parser, tryStatement);
+			context = parseTryStatement(parser);
 			break;
 		}
 
@@ -1158,7 +1072,7 @@ void parseCompoundStatement(k_Parser_t* parser, k_ASTNode_t* node) {
 		}
 	}
 
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
@@ -1166,262 +1080,159 @@ void parseCompoundStatement(k_Parser_t* parser, k_ASTNode_t* node) {
  * :    ifClause elseIfClause* elseClause?
  * ;
  */
-void parseIfStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+k_IfStatement_t* parseIfStatement(k_Parser_t* parser) {
+    k_IfStatement_t* context = k_IfStatement_new();
 
-    k_IfStatementContext_t* context = k_IfStatementContext_new(node);
+    // ifClause
+    context->m_ifClause = parseIfClause(parser, ifClause);
 
-	k_ASTNode_t* ifClause = k_ASTNode_new(node);
-    context->m_ifClause = ifClause;
-	parseIfClause(parser, ifClause);
-
+    // elseIfClause*
 	while ((la(parser, 1) == KUSH_TOKEN_KEYWORD_ELSE) &&
 	       (k_TokenStream_la(parser->m_tokens, 2) == KUSH_TOKEN_KEYWORD_IF)) {
-		k_ASTNode_t* elseIfClause = k_ASTNode_new(node);
+		k_IfClause_t* elseIfClause = parseElseIfClause(parser);
         jtk_ArrayList_add(context->m_elseIfClauses, elseIfClause);
-		parseElseIfClause(parser, elseIfClause);
 	}
 
+    // elseClause?
     if (la(parser, 1) == KUSH_TOKEN_KEYWORD_ELSE) {
-        k_ASTNode_t* elseClause = k_ASTNode_new(node);
-        context->m_elseClause = elseClause;
-        parseElseClause(parser, elseClause);
+        context->m_elseClause = parseElseClause(parser, elseClause);
     }
 
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
  * ifClause
- * :    'if' expression statementSuite
+ * :    'if' expression blockStatement
  * ;
  */
-void parseIfClause(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+k_IfClause_t* parseIfClause(k_Parser_t* parser) {
+    k_IfClause_t* context = k_IfClause_new();
 
-    k_IfClauseContext_t* context = k_IfClauseContext_new(node);
-
-    /* Match and discard the 'if' token. */
 	match(parser, KUSH_TOKEN_KEYWORD_IF);
+    context->m_expression = parseExpression(parser);
+    context->m_blockStatement = parseBlockStatement(parser);
 
-	k_ASTNode_t* expression = k_ASTNode_new(node);
-    context->m_expression = expression;
-	parseExpression(parser, expression);
-
-	k_ASTNode_t* statementSuite = k_ASTNode_new(node);
-    context->m_statementSuite = statementSuite;
-	blockStatement(parser, statementSuite);
-
-    k_StackTrace_exit();
+    return context;
 }
 
-/* TODO: reuse IfClauseContext*
- *
- * elseIfClause
- * :    'else' 'if' expression statementSuite
+/* elseIfClause
+ * :    'else' 'if' expression blockStatement
  * ;
  */
-void parseElseIfClause(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+k_IfClause_t* parseElseIfClause(k_Parser_t* parser) {
+    k_IfClause_t* context = k_IfClause_new();
 
-    k_ElseIfClauseContext_t* context = k_ElseIfClauseContext_new(node);
-
-    /* Match and discard the 'else' 'if' tokens. */
 	match(parser, KUSH_TOKEN_KEYWORD_ELSE);
 	match(parser, KUSH_TOKEN_KEYWORD_IF);
+    context->m_expression = parseExpression(parser);
+    context->m_blockStatement = parseBlockStatement(parser);
 
-	k_ASTNode_t* expression = k_ASTNode_new(node);
-    context->m_expression = expression;
-	parseExpression(parser, expression);
-
-	k_ASTNode_t* statementSuite = k_ASTNode_new(node);
-    context->m_statementSuite = statementSuite;
-	blockStatement(parser, statementSuite);
-
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
  * elseClause
- * :    'else' statementSuite
+ * :    'else' blockStatement
  * ;
  */
-void parseElseClause(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+k_IfClause_t parseElseClause(k_Parser_t* parser) {
+    k_ElseClause_t* context = k_IfClause_new();
 
-    k_ElseClauseContext_t* context = k_ElseClauseContext_new(node);
-
-    /* Match and discard the 'else' token. */
 	match(parser, KUSH_TOKEN_KEYWORD_ELSE);
+    context->m_blockStatement = parseBlockStatement(parser);
 
-	k_ASTNode_t* statementSuite = k_ASTNode_new(node);
-    context->m_statementSuite = statementSuite;
-	blockStatement(parser, statementSuite);
-
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
  * iterativeStatement
  * :    labelClause? (whileStatement | forStatement)
  * ;
- */
-void parseIterativeStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_IterativeStatementContext_t* context = k_IterativeStatementContext_new(node);
-
-	if (la(parser, 1) == KUSH_TOKEN_HASH) {
-		k_ASTNode_t* labelClause = k_ASTNode_new(node);
-        context->m_labelClause = labelClause;
-		k_Parser_parseLabelClause(parser, labelClause);
-	}
-
-	switch (la(parser, 1)) {
-		case KUSH_TOKEN_KEYWORD_WHILE: {
-			k_ASTNode_t* whileStatement = k_ASTNode_new(node);
-            context->m_statement = whileStatement;
-			parseWhileStatement(parser, whileStatement);
-			break;
-		}
-
-		case KUSH_TOKEN_KEYWORD_FOR: {
-			k_ASTNode_t* forStatement = k_ASTNode_new(node);
-            context->m_statement = forStatement;
-			parseForStatement(parser, forStatement);
-			break;
-		}
-	}
-
-    k_StackTrace_exit();
-}
-
-/*
+ *
  * labelClause
  * :    '#' IDENTIFIER
  * ;
- */
-void k_Parser_parseLabelClause(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_LabelClauseContext_t* context = k_LabelClauseContext_new(node);
-
-    /* Match and discard the '#' token. */
-	match(parser, KUSH_TOKEN_HASH);
-
-	k_Token_t* identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-    context->m_identifier = newTerminalNode(node, identifier);
-
-    k_StackTrace_exit();
-}
-
-/*
+ *
  * whileStatement
- * :    'while' expression statementSuite
+ * :    'while' expression blockStatement
  * ;
- */
-void parseWhileStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_WhileStatementContext_t* context = k_WhileStatementContext_new(node);
-
-    /* Match and discard the 'while' token. */
-	match(parser, KUSH_TOKEN_KEYWORD_WHILE);
-
-	k_ASTNode_t* expression = k_ASTNode_new(node);
-    context->m_expression = expression;
-	parseExpression(parser, expression);
-
-	k_ASTNode_t* statementSuite = k_ASTNode_new(node);
-    context->m_statementSuite = statementSuite;
-	blockStatement(parser, statementSuite);
-
-    k_StackTrace_exit();
-}
-
-// TODO: Move this rule to forStatement!
-/*
+ *
+ * forStatement
+ * :    'for' forParameter ':' expression blockStatement
+ * ;
+ *
  * forParameter
  * :    'let' IDENTIFIER
  * ;
  */
-void parseForParameter(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+k_IterativeStatement_t* parseIterativeStatement(k_Parser_t* parser) {
+    k_IterativeStatement_t* context = k_IterativeStatement_new();
 
-    k_ForParameterContext_t* context = k_ForParameterContext_new(node);
+	if (la(parser, 1) == KUSH_TOKEN_HASH) {
+        consume(parser);
+	    context->m_label = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
+	}
 
-    match(parser, KUSH_TOKEN_KEYWORD_LET);
-    k_Token_t* identifierToken = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-    k_ASTNode_t* identifier = newTerminalNode(parser, identifierToken);
-    context->m_identifier = identifier;
+	switch (la(parser, 1)) {
+		case KUSH_TOKEN_KEYWORD_WHILE: {
+            context->m_while = true;
+            consume(parser);
+            context->m_expression = parseExpression(parser);
+            context->m_blockStatement = parseBlockStatement(parser);
 
-    k_StackTrace_exit();
-}
+			break;
+		}
 
-/*
- * forStatement
- * :    'for' forParameter ':' expression statementSuite
- * ;
- *
- * TODO: Remove elseClause!
- */
-void parseForStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+		case KUSH_TOKEN_KEYWORD_FOR: {
+            context->m_while = false;
+            consume(parser);
+            match(parser, KUSH_TOKEN_KEYWORD_LET);
+            context->m_parameter = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
+            match(parser, KUSH_TOKEN_COLON);
+            context->m_expression = parseExpression(parser);
+            context->m_blockStatement = parseBlockStatement(parser);
 
-	k_ForStatementContext_t* context = k_ForStatementContext_new(node);
+			break;
+		}
 
-    /* Match and discard the 'for' token. */
-    match(parser, KUSH_TOKEN_KEYWORD_FOR);
+        default: {
+            // Error: Expected 'for' or 'while'
+            reportAndRecover(parser, KUSH_TOKEN_KEYWORD_WHILE);
+            break;
+        }
+	}
 
-    k_ASTNode_t* forParameter = k_ASTNode_new(node);
-    context->m_forParameter = forParameter;
-    parseForParameter(parser, forParameter);
-
-    /* Match and discard the ':' token. */
-	match(parser, KUSH_TOKEN_COLON);
-
-	k_ASTNode_t* expression = k_ASTNode_new(node);
-    context->m_expression = expression;
-	parseExpression(parser, expression);
-
-	k_ASTNode_t* statementSuite = k_ASTNode_new(node);
-    context->m_statementSuite = statementSuite;
-	blockStatement(parser, statementSuite);
-
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
  * tryStatement
  * :    tryClause catchClause* finallyClause?
  * ;
+ *
+ * finallyClause
+ * :    'finally' blockStatement
+ * ;
  */
-void parseTryStatement(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
-
-    k_TryStatementContext_t* context = k_TryStatementContext_new(node);
-
+k_TryStatement_t* parseTryStatement(k_Parser_t* parser) {
+    k_TryStatement_t* context = k_TryStatement_new();
 	bool hasCatch = false;
 	bool hasFinally = false;
 
-    k_Token_t* tryKeyword = k_TokenStream_lt(parser->m_tokens, 1);
-    k_ASTNode_t* tryClause = k_ASTNode_new(node);
-    context->m_tryClause = tryClause;
-    parseTryClause(parser, tryClause);
+    match(parser->m_tokens, KUSH_TOKEN_KEYWORD_TRY);
+    context->m_tryClause = parseTryClause(parser, tryClause);
 
 	while ((la(parser, 1) == KUSH_TOKEN_KEYWORD_CATCH)) {
 		hasCatch = true;
-
-		k_ASTNode_t* catchClause = k_ASTNode_new(node);
+		k_CatchClause_t* catchClause = parseCatchClause(parser);
         jtk_ArrayList_add(context->m_catchClauses, catchClause);
-		parseCatchClause(parser, catchClause);
 	}
 
 	if (la(parser, 1) == KUSH_TOKEN_KEYWORD_FINALLY) {
 		hasFinally = true;
-		k_ASTNode_t* finallyClause = k_ASTNode_new(node);
-        context->m_finallyClause = finallyClause;
-		parseFinallyClause(parser, finallyClause);
+        consume(parser);
+        context->m_finallyClause = parseBlockStatement(parser);
 	}
 
 	if (!hasCatch && !hasFinally) {
@@ -1434,27 +1245,27 @@ void parseTryStatement(k_Parser_t* parser, k_ASTNode_t* node) {
             tryKeyword, KUSH_TOKEN_UNKNOWN);
 	}
 
-    k_StackTrace_exit();
+    return context;
 }
 
 /*
  * tryClause
- * :    'try' statementSuite
+ * :    'try' blockStatement
  * ;
  */
-void parseTryClause(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseTryClause(k_Parser_t* parser) {
 
-    k_TryClauseContext_t* context = k_TryClauseContext_new(node);
+
+    k_TryClause_t* context = k_TryClause_new();
 
     /* Match and discard the 'try' token. */
 	match(parser, KUSH_TOKEN_KEYWORD_TRY);
 
-	k_ASTNode_t* statementSuite = k_ASTNode_new(node);
-    context->m_statementSuite = statementSuite;
-	blockStatement(parser, statementSuite);
+	k_ASTNode_t* blockStatement = k_ASTNode_new();
+    context->m_blockStatement = blockStatement;
+	parseBlockStatement(parser);
 
-    k_StackTrace_exit();
+
 }
 
 struct k_CatchFilter_t {
@@ -1466,17 +1277,17 @@ typedef struct k_CatchFilter_t k_CatchFilter_t;
 
 /*
  * catchClause
- * :	'catch' catchFilter? IDENTIFIER statementSuite
+ * :	'catch' catchFilter? IDENTIFIER blockStatement
  * ;
  *
  * catchFilter
  * :	(STRING_LITERAL | IDENTIFIER) ('|' (STRING_LITERAL | IDENTIFIER))*
  * ;
  */
-void parseCatchClause(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseCatchClause(k_Parser_t* parser) {
 
-    k_CatchClauseContext_t* context = k_CatchClauseContext_new(node);
+
+    k_CatchClause_t* context = k_CatchClause_new();
 
     /* Match and discard the 'catch' token. */
     match(parser, KUSH_TOKEN_KEYWORD_CATCH);
@@ -1504,31 +1315,31 @@ void parseCatchClause(k_Parser_t* parser, k_ASTNode_t* node) {
     filter->m_identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
     context->m_catchFilter = filter;
 
-    k_ASTNode_t* statementSuite = k_ASTNode_new(node);
-    context->m_statementSuite = statementSuite;
-    blockStatement(parser, statementSuite);
+    k_ASTNode_t* blockStatement = k_ASTNode_new();
+    context->m_blockStatement = blockStatement;
+    parseBlockStatement(parser);
 
-    k_StackTrace_exit();
+
 }
 
 /*
  * finallyClause
- * :	'finally' statementSuite
+ * :	'finally' blockStatement
  * ;
  */
-void parseFinallyClause(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseFinallyClause(k_Parser_t* parser) {
 
-    k_FinallyClauseContext_t* context = k_FinallyClauseContext_new(node);
+
+    k_FinallyClause_t* context = k_FinallyClause_new();
 
     /* Match and discard the 'finally' token. */
 	match(parser, KUSH_TOKEN_KEYWORD_FINALLY);
 
-	k_ASTNode_t* statementSuite = k_ASTNode_new(node);
-    context->m_statementSuite = statementSuite;
-	blockStatement(parser, statementSuite);
+	k_ASTNode_t* blockStatement = k_ASTNode_new();
+    context->m_blockStatement = blockStatement;
+	parseBlockStatement(parser);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1536,10 +1347,10 @@ void parseFinallyClause(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	'struct' IDENTIFIER structureBody
  * ;
  */
-void parseStructureDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseStructureDeclaration(k_Parser_t* parser) {
 
-    k_ClassDeclarationContext_t* context = k_ClassDeclarationContext_new(node);
+
+    k_ClassDeclaration_t* context = k_ClassDeclaration_new();
 
     /* Match and discard the 'struct' token. */
     match(parser, KUSH_TOKEN_KEYWORD_STRUCT);
@@ -1547,11 +1358,11 @@ void parseStructureDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
     k_Token_t* identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
     context->m_identifier = newTerminalNode(node, identifier);
 
-    k_ASTNode_t* structureSuite = k_ASTNode_new(node);
+    k_ASTNode_t* structureSuite = k_ASTNode_new();
     context->m_structureSuite = structureSuite;
     parseStructureSuite(parser, structureSuite);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1559,16 +1370,16 @@ void parseStructureDeclaration(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	'{' structureMember+ '}'
  * ;
  */
-void parseStructureSuite(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseStructureSuite(k_Parser_t* parser) {
 
-    k_ClassSuiteContext_t* context = k_ClassSuiteContext_new(node);
+
+    k_ClassSuite_t* context = k_ClassSuite_new();
 
     /* Match and discard the left brace token. */
     match(parser, KUSH_TOKEN_LEFT_BRACE);
 
     do {
-        k_ASTNode_t* structureMember = k_ASTNode_new(node);
+        k_ASTNode_t* structureMember = k_ASTNode_new();
         jtk_ArrayList_add(context->m_classMembers, structureMember);
         parseStructureMember(parser, structureMember);
     }
@@ -1577,7 +1388,7 @@ void parseStructureSuite(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the right brace token. */
     match(parser, KUSH_TOKEN_RIGHT_BRACE);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1585,16 +1396,16 @@ void parseStructureSuite(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	variableDeclaration ';'
  * ;
  */
-void parseStructureMember(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseStructureMember(k_Parser_t* parser) {
 
-    k_ClassMemberContext_t* context = k_ClassMemberContext_new(node);
+
+    k_ClassMember_t* context = k_ClassMember_new();
 
     /* If parseVariableDeclaration( ) fails, discard tokens until the semicolon token is encountered. */
     pushFollowToken(parser, KUSH_TOKEN_SEMICOLON);
 
     // TODO: variableDeclaration should not accept initializers!
-    k_ASTNode_t* variableDeclaration = k_ASTNode_new(node);
+    k_ASTNode_t* variableDeclaration = k_ASTNode_new();
     context->m_declaration = variableDeclaration;
     parseVariableDeclaration(parser, variableDeclaration);
 
@@ -1604,7 +1415,7 @@ void parseStructureMember(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Pop the newline token from the follow set. */
     popFollowToken(parser);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1612,12 +1423,12 @@ void parseStructureMember(k_Parser_t* parser, k_ASTNode_t* node) {
  * :    expression (',' expression)*
  * ;
  */
-void parseExpressions(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseExpressions(k_Parser_t* parser) {
 
-    k_ExpressionsContext_t* context = k_ExpressionsContext_new(node);
 
-    k_ASTNode_t* expression = k_ASTNode_new(node);
+    k_Expressions_t* context = k_Expressions_new();
+
+    k_ASTNode_t* expression = k_ASTNode_new();
     jtk_ArrayList_add(context->m_expressions, expression);
     parseExpression(parser, expression);
 
@@ -1625,12 +1436,12 @@ void parseExpressions(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume and discard the ',' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        expression = k_ASTNode_new(node);
+        expression = k_ASTNode_new();
         jtk_ArrayList_add(context->m_expressions, expression);
         parseExpression(parser, expression);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1639,12 +1450,12 @@ void parseExpressions(k_Parser_t* parser, k_ASTNode_t* node) {
  * ;
  *
  */
-void parseExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseExpression(k_Parser_t* parser) {
 
-    k_ExpressionContext_t* context = k_ExpressionContext_new(node);
 
-    k_ASTNode_t* assignmentExpression = k_ASTNode_new(node);
+    k_Expression_t* context = k_Expression_new();
+
+    k_ASTNode_t* assignmentExpression = k_ASTNode_new();
     context->m_assignmentExpression = assignmentExpression;
     parseAssignmentExpression(parser, parseAssignmentExpression);
 }
@@ -1658,12 +1469,12 @@ bool isExpressionFollow(k_TokenType_t type) {
  * :	conditionalExpression (assignmentOperator parseAssignmentExpression()?
  * ;
  */
-void parseAssignmentExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseAssignmentExpression(k_Parser_t* parser) {
 
-    k_AssignmentExpressionContext_t* context = k_AssignmentExpressionContext_new(node);
 
-    k_ASTNode_t* conditionalExpression = k_ASTNode_new(node);
+    k_AssignmentExpression_t* context = k_AssignmentExpression_new();
+
+    k_ASTNode_t* conditionalExpression = k_ASTNode_new();
     context->m_conditionalExpression = conditionalExpression;
     parseConditionalExpression(parser, conditionalExpression);
 
@@ -1673,12 +1484,12 @@ void parseAssignmentExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume the assignment operator token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* assignmentExpression = k_ASTNode_new(node);
+        k_ASTNode_t* assignmentExpression = k_ASTNode_new();
         context->m_assignmentExpression = parseAssignmentExpression;
         parseAssignmentExpression(parser, parseAssignmentExpression);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1717,12 +1528,12 @@ bool isAssignmentOperator(k_TokenType_t type) {
  * :	logicalOrExpression ('then' expression 'else' conditionalExpression)?
  * ;
  */
-void parseConditionalExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseConditionalExpression(k_Parser_t* parser) {
 
-    k_ConditionalExpressionContext_t* context = k_ConditionalExpressionContext_new(node);
 
-    k_ASTNode_t* logicalOrExpression = k_ASTNode_new(node);
+    k_ConditionalExpression_t* context = k_ConditionalExpression_new();
+
+    k_ASTNode_t* logicalOrExpression = k_ASTNode_new();
     context->m_logicalOrExpression = logicalOrExpression;
     parseLogicalOrExpression(parser, logicalOrExpression);
 
@@ -1730,19 +1541,19 @@ void parseConditionalExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume and discard the '?' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* expression = k_ASTNode_new(node);
+        k_ASTNode_t* expression = k_ASTNode_new();
         context->m_thenExpression = expression;
         parseExpression(parser, expression);
 
 		/* Consume and discard the ':' token. */
         match(parser, KUSH_TOKEN_COLON);
 
-        k_ASTNode_t* conditionalExpression = k_ASTNode_new(node);
+        k_ASTNode_t* conditionalExpression = k_ASTNode_new();
         context->m_elseExpression = conditionalExpression;
         parseConditionalExpression(parser, conditionalExpression);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1750,12 +1561,12 @@ void parseConditionalExpression(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	logicalAndExpression ('or' logicalAndExpression)*
  * ;
  */
-void parseLogicalOrExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseLogicalOrExpression(k_Parser_t* parser) {
 
-    k_LogicalOrExpressionContext_t* context = k_LogicalOrExpressionContext_new(node);
 
-    k_ASTNode_t* logicalAndExpression = k_ASTNode_new(node);
+    k_LogicalOrExpression_t* context = k_LogicalOrExpression_new();
+
+    k_ASTNode_t* logicalAndExpression = k_ASTNode_new();
     context->m_logicalAndExpression = logicalAndExpression;
     parseLogicalAndExpression(parser, logicalAndExpression);
 
@@ -1763,12 +1574,12 @@ void parseLogicalOrExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume and discard the 'or' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* logicalAndExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* logicalAndExpression0 = k_ASTNode_new();
         jtk_ArrayList_add(context->m_logicalAndExpressions, logicalAndExpression0);
         parseLogicalAndExpression(parser, logicalAndExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1776,13 +1587,13 @@ void parseLogicalOrExpression(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	inclusiveOrExpression ('and' logicalAndExpression)?
  * ;
  */
-void parseLogicalAndExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseLogicalAndExpression(k_Parser_t* parser) {
 
-    k_LogicalAndExpressionContext_t* context = k_LogicalAndExpressionContext_new(node);
+
+    k_LogicalAndExpression_t* context = k_LogicalAndExpression_new();
 
     /* Parse the operand left of the operator. */
-    k_ASTNode_t* inclusiveOrExpression = k_ASTNode_new(node);
+    k_ASTNode_t* inclusiveOrExpression = k_ASTNode_new();
     context->m_inclusiveOrExpression = inclusiveOrExpression;
     parseInclusiveOrExpression(parser, inclusiveOrExpression);
 
@@ -1791,12 +1602,12 @@ void parseLogicalAndExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume and discard the 'and' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* inclusiveOrExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* inclusiveOrExpression0 = k_ASTNode_new();
         jtk_ArrayList_add(context->m_inclusiveOrExpressions, inclusiveOrExpression0);
         parseInclusiveOrExpression(parser, inclusiveOrExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1804,13 +1615,13 @@ void parseLogicalAndExpression(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	exclusiveOrExpression ('|' exclusiveOrExpression)*
  * ;
  */
-void parseInclusiveOrExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseInclusiveOrExpression(k_Parser_t* parser) {
 
-    k_InclusiveOrExpressionContext_t* context = k_InclusiveOrExpressionContext_new(node);
+
+    k_InclusiveOrExpression_t* context = k_InclusiveOrExpression_new();
 
     /* Parse the operand left of the operator. */
-    k_ASTNode_t* exclusiveOrExpression = k_ASTNode_new(node);
+    k_ASTNode_t* exclusiveOrExpression = k_ASTNode_new();
     context->m_exclusiveOrExpression = exclusiveOrExpression;
     parseExclusiveOrExpression(parser, exclusiveOrExpression);
 
@@ -1819,12 +1630,12 @@ void parseInclusiveOrExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume and discard the '|' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* exclusiveOrExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* exclusiveOrExpression0 = k_ASTNode_new();
         jtk_ArrayList_add(context->m_exclusiveOrExpressions, exclusiveOrExpression0);
         parseExclusiveOrExpression(parser, exclusiveOrExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1832,13 +1643,13 @@ void parseInclusiveOrExpression(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	andExpression ('^' andExpression)*
  * ;
  */
-void parseExclusiveOrExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseExclusiveOrExpression(k_Parser_t* parser) {
 
-    k_ExclusiveOrExpressionContext_t* context = k_ExclusiveOrExpressionContext_new(node);
+
+    k_ExclusiveOrExpression_t* context = k_ExclusiveOrExpression_new();
 
     /* Parse the operand left of the operator. */
-    k_ASTNode_t* andExpression = k_ASTNode_new(node);
+    k_ASTNode_t* andExpression = k_ASTNode_new();
     context->m_andExpression = andExpression;
     parseAndExpression(parser, andExpression);
 
@@ -1847,12 +1658,12 @@ void parseExclusiveOrExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume and discard the '^' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* andExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* andExpression0 = k_ASTNode_new();
         jtk_ArrayList_add(context->m_andExpressions, andExpression0);
         parseAndExpression(parser, andExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1860,13 +1671,13 @@ void parseExclusiveOrExpression(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	equalityExpression ('&' equalityExpression)*
  * ;
  */
-void parseAndExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseAndExpression(k_Parser_t* parser) {
 
-    k_AndExpressionContext_t* context = k_AndExpressionContext_new(node);
+
+    k_AndExpression_t* context = k_AndExpression_new();
 
     /* Parse the operand left of the operator. */
-    k_ASTNode_t* equalityExpression = k_ASTNode_new(node);
+    k_ASTNode_t* equalityExpression = k_ASTNode_new();
     context->m_equalityExpression = equalityExpression;
     parseEqualityExpression(parser, equalityExpression);
 
@@ -1876,12 +1687,12 @@ void parseAndExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume and discard the '&' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* equalityExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* equalityExpression0 = k_ASTNode_new();
         jtk_ArrayList_add(context->m_equalityExpressions, equalityExpression0);
         parseEqualityExpression(parser, equalityExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1889,13 +1700,13 @@ void parseAndExpression(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	relationalExpression (equalityOperator relationalExpression)*
  * ;
  */
-void parseEqualityExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseEqualityExpression(k_Parser_t* parser) {
 
-    k_EqualityExpressionContext_t* context = k_EqualityExpressionContext_new(node);
+
+    k_EqualityExpression_t* context = k_EqualityExpression_new();
 
     /* Parse the operand left of the operator. */
-    k_ASTNode_t* relationalExpression = k_ASTNode_new(node);
+    k_ASTNode_t* relationalExpression = k_ASTNode_new();
     context->m_relationalExpression = relationalExpression;
     parseRelationalExpression(parser, relationalExpression);
 
@@ -1910,12 +1721,12 @@ void parseEqualityExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume the equality operator. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* relationalExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* relationalExpression0 = k_ASTNode_new();
         pair->m_right = relationalExpression0;
         parseRelationalExpression(parser, relationalExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1934,13 +1745,13 @@ bool isEqualityOperator(k_TokenType_t type) {
  * :	shiftExpression (relationalOperator shiftExpression)*
  * ;
  */
-void parseRelationalExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseRelationalExpression(k_Parser_t* parser) {
 
-    k_RelationalExpressionContext_t* context = k_RelationalExpressionContext_new(node);
+
+    k_RelationalExpression_t* context = k_RelationalExpression_new();
 
     /* Parse the operand left of the operator. */
-    k_ASTNode_t* shiftExpression = k_ASTNode_new(node);
+    k_ASTNode_t* shiftExpression = k_ASTNode_new();
     context->m_shiftExpression = shiftExpression;
     parseShiftExpression(parser, shiftExpression);
 
@@ -1955,12 +1766,12 @@ void parseRelationalExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume the relational operator. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* shiftExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* shiftExpression0 = k_ASTNode_new();
         pair->m_right = shiftExpression0;
         parseShiftExpression(parser, shiftExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -1984,13 +1795,13 @@ bool isRelationalOperator(k_TokenType_t type) {
  * :	additiveExpression (shiftOperator additiveExpression)*
  * ;
  */
-void parseShiftExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseShiftExpression(k_Parser_t* parser) {
 
-    k_ShiftExpressionContext_t* context = k_ShiftExpressionContext_new(node);
+
+    k_ShiftExpression_t* context = k_ShiftExpression_new();
 
     /* Parse the operand left of the operator. */
-    k_ASTNode_t* additiveExpression = k_ASTNode_new(node);
+    k_ASTNode_t* additiveExpression = k_ASTNode_new();
     context->m_additiveExpression = additiveExpression;
     parseAdditiveExpression(parser, additiveExpression);
 
@@ -2005,12 +1816,12 @@ void parseShiftExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume the shift operator token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* additiveExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* additiveExpression0 = k_ASTNode_new();
         pair->m_right = additiveExpression0;
         parseAdditiveExpression(parser, additiveExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2031,13 +1842,13 @@ bool isShiftOperator(k_TokenType_t type) {
  * :	multiplicativeExpression (multiplicativeOperator multiplicativeExpression)*
  * ;
  */
-void parseAdditiveExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseAdditiveExpression(k_Parser_t* parser) {
 
-    k_AdditiveExpressionContext_t* context = k_AdditiveExpressionContext_new(node);
+
+    k_AdditiveExpression_t* context = k_AdditiveExpression_new();
 
     /* Parse the operand left of the operator. */
-    k_ASTNode_t* multiplicativeExpression = k_ASTNode_new(node);
+    k_ASTNode_t* multiplicativeExpression = k_ASTNode_new();
     context->m_multiplicativeExpression = multiplicativeExpression;
     parseMultiplicativeExpression(parser, multiplicativeExpression);
 
@@ -2052,12 +1863,12 @@ void parseAdditiveExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume the additive operator token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* multiplicativeExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* multiplicativeExpression0 = k_ASTNode_new();
         pair->m_right = multiplicativeExpression0;
         parseMultiplicativeExpression(parser, multiplicativeExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2076,13 +1887,13 @@ bool isAdditiveOperator(k_TokenType_t type) {
  * :	unaryExpression (multiplicativeOperator unaryExpression)*
  * ;
  */
-void parseMultiplicativeExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseMultiplicativeExpression(k_Parser_t* parser) {
 
-    k_MultiplicativeExpressionContext_t* context = k_MultiplicativeExpressionContext_new(node);
+
+    k_MultiplicativeExpression_t* context = k_MultiplicativeExpression_new();
 
     /* Parse the operand left of the operator. */
-    k_ASTNode_t* unaryExpression = k_ASTNode_new(node);
+    k_ASTNode_t* unaryExpression = k_ASTNode_new();
     context->m_unaryExpression = unaryExpression;
     parseUnaryExpression(parser, unaryExpression);
 
@@ -2097,12 +1908,12 @@ void parseMultiplicativeExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume the multiplicative operator token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* unaryExpression0 = k_ASTNode_new(node);
+        k_ASTNode_t* unaryExpression0 = k_ASTNode_new();
         pair->m_right = unaryExpression0;
         parseUnaryExpression(parser, unaryExpression0);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2124,10 +1935,10 @@ bool isMultiplicativeOperator(k_TokenType_t type) {
  * |	postfixExpression
  * ;
  */
-void parseUnaryExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseUnaryExpression(k_Parser_t* parser) {
 
-    k_UnaryExpressionContext_t* context = k_UnaryExpressionContext_new(node);
+
+    k_UnaryExpression_t* context = k_UnaryExpression_new();
 
     k_TokenType_t la1 = la(parser, 1);
     if (isUnaryOperator(la1)) {
@@ -2136,12 +1947,12 @@ void parseUnaryExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume the unary operator token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        k_ASTNode_t* unaryExpression = k_ASTNode_new(node);
+        k_ASTNode_t* unaryExpression = k_ASTNode_new();
         context->m_unaryExpression = unaryExpression;
         parseUnaryExpression(parser, unaryExpression);
     }
     else if (isPostfixExpressionFollow(la1)) {
-        k_ASTNode_t* postfixExpression = k_ASTNode_new(node);
+        k_ASTNode_t* postfixExpression = k_ASTNode_new();
         context->m_postfixExpression = postfixExpression;
         parsePostfixExpression(parser, postfixExpression);
     }
@@ -2150,7 +1961,7 @@ void parseUnaryExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         reportAndRecover(parser, KUSH_TOKEN_INTEGER_LITERAL);
     }
 
-    k_StackTrace_exit();
+
 }
 
 bool isUnaryExpressionFollow(k_TokenType_t type) {
@@ -2194,12 +2005,12 @@ bool isUnaryOperator(k_TokenType_t type) {
  * The following function combines both the rules. This measure was
  * taken to avoid redundant nodes in the AST.
  */
-void parsePostfixExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parsePostfixExpression(k_Parser_t* parser) {
 
-    k_PostfixExpressionContext_t* context = k_PostfixExpressionContext_new(node);
 
-    k_ASTNode_t* primaryExpression = k_ASTNode_new(node);
+    k_PostfixExpression_t* context = k_PostfixExpression_new();
+
+    k_ASTNode_t* primaryExpression = k_ASTNode_new();
     context->m_primaryExpression = primaryExpression;
     parsePrimaryExpression(parser, primaryExpression);
 
@@ -2207,14 +2018,14 @@ void parsePostfixExpression(k_Parser_t* parser, k_ASTNode_t* node) {
     while (isPostfixPartFollow(la1)) {
         switch (la1) {
             case KUSH_TOKEN_LEFT_SQUARE_BRACKET: {
-                k_ASTNode_t* subscript = k_ASTNode_new(node);
+                k_ASTNode_t* subscript = k_ASTNode_new();
                 jtk_ArrayList_add(context->m_postfixParts, subscript);
                 parseSubscript(parser, subscript);
                 break;
             }
 
             case KUSH_TOKEN_LEFT_PARENTHESIS: {
-                k_ASTNode_t* functionArguments = k_ASTNode_new(node);
+                k_ASTNode_t* functionArguments = k_ASTNode_new();
                 jtk_ArrayList_add(context->m_postfixParts, functionArguments);
 
                 parseFunctionArguments(parser, functionArguments);
@@ -2223,7 +2034,7 @@ void parsePostfixExpression(k_Parser_t* parser, k_ASTNode_t* node) {
             }
 
             case KUSH_TOKEN_DOT: {
-                k_ASTNode_t* memberAccess = k_ASTNode_new(node);
+                k_ASTNode_t* memberAccess = k_ASTNode_new();
                 jtk_ArrayList_add(context->m_postfixParts, memberAccess);
                 parseMemberAccess(parser, memberAccess);
                 break;
@@ -2231,7 +2042,7 @@ void parsePostfixExpression(k_Parser_t* parser, k_ASTNode_t* node) {
 
             // case KUSH_TOKEN_PLUS_2:
             // case KUSH_TOKEN_DASH_2: {
-            //     k_ASTNode_t* parsePostfixOperator( = k_ASTNode_new(node);
+            //     k_ASTNode_t* parsePostfixOperator( = k_ASTNode_new();
             //     jtk_ArrayList_add(context->m_postfixParts, parsePostfixOperator();
             //     parsePostfixOperator((parser, parsePostfixOperator();
             //     break;
@@ -2240,7 +2051,7 @@ void parsePostfixExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         la1 = la(parser, 1);
     }
 
-    k_StackTrace_exit();
+
 }
 
 bool isPostfixExpressionFollow(k_TokenType_t type) {
@@ -2260,10 +2071,10 @@ bool isPostfixPartFollow(k_TokenType_t type) {
  * :	'[' expression ']'
  * ;
  */
-void parseSubscript(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseSubscript(k_Parser_t* parser) {
 
-    k_SubscriptContext_t* context = k_SubscriptContext_new(node);
+
+    k_Subscript_t* context = k_Subscript_new();
 
     /* Match and discard the '[' token. */
     match(parser, KUSH_TOKEN_LEFT_SQUARE_BRACKET);
@@ -2273,7 +2084,7 @@ void parseSubscript(k_Parser_t* parser, k_ASTNode_t* node) {
      */
     pushFollowToken(parser, KUSH_TOKEN_RIGHT_SQUARE_BRACKET);
 
-    k_ASTNode_t* expression = k_ASTNode_new(node);
+    k_ASTNode_t* expression = k_ASTNode_new();
     context->m_expression = expression;
     parseExpression(parser, expression);
 
@@ -2283,7 +2094,7 @@ void parseSubscript(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the ']' token. */
     match(parser, KUSH_TOKEN_RIGHT_SQUARE_BRACKET);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2291,10 +2102,10 @@ void parseSubscript(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	'(' expressions? ')'
  * ;
  */
-void parseFunctionArguments(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseFunctionArguments(k_Parser_t* parser) {
 
-    k_FunctionArgumentsContext_t* context = k_FunctionArgumentsContext_new(node);
+
+    k_FunctionArguments_t* context = k_FunctionArguments_new();
 
     /* Match and discard the '(' token. */
     match(parser, KUSH_TOKEN_LEFT_PARENTHESIS);
@@ -2305,7 +2116,7 @@ void parseFunctionArguments(k_Parser_t* parser, k_ASTNode_t* node) {
         */
         pushFollowToken(parser, KUSH_TOKEN_RIGHT_PARENTHESIS);
 
-        k_ASTNode_t* expressions = k_ASTNode_new(node);
+        k_ASTNode_t* expressions = k_ASTNode_new();
         context->m_expressions = expressions;
         parseExpressions(parser, expressions);
 
@@ -2316,7 +2127,7 @@ void parseFunctionArguments(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the ')' token. */
     match(parser, KUSH_TOKEN_RIGHT_PARENTHESIS);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2324,10 +2135,10 @@ void parseFunctionArguments(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	'.' IDENTIFIER
  * ;
  */
-void parseMemberAccess(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseMemberAccess(k_Parser_t* parser) {
 
-    k_MemberAccessContext_t* context = k_MemberAccessContext_new(node);
+
+    k_MemberAccess_t* context = k_MemberAccess_new();
 
     /* Match and discard the '.' token. */
     match(parser, KUSH_TOKEN_DOT);
@@ -2335,7 +2146,7 @@ void parseMemberAccess(k_Parser_t* parser, k_ASTNode_t* node) {
     k_Token_t* identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
     context->m_identifier = newTerminalNode(node, identifier);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2344,10 +2155,10 @@ void parseMemberAccess(k_Parser_t* parser, k_ASTNode_t* node) {
  * |	'--'
  * ;
  */
-void parsePostfixOperator(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parsePostfixOperator(k_Parser_t* parser) {
 
-    k_PostfixOperatorContext_t* context = k_PostfixOperatorContext_new(node);
+
+    k_PostfixOperator_t* context = k_PostfixOperator_new();
 
     switch (la(parser, 1)) {
         case KUSH_TOKEN_PLUS_2:
@@ -2365,7 +2176,7 @@ void parsePostfixOperator(k_Parser_t* parser, k_ASTNode_t* node) {
         }
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2391,10 +2202,10 @@ void parsePostfixOperator(k_Parser_t* parser, k_ASTNode_t* node) {
  * AST node it receives to the best matching child rule.
  *
  */
-void parsePrimaryExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parsePrimaryExpression(k_Parser_t* parser) {
 
-    k_PrimaryExpressionContext_t* context = k_PrimaryExpressionContext_new(node);
+
+    k_PrimaryExpression_t* context = k_PrimaryExpression_new();
     k_TokenType_t la1 = la(parser, 1);
     if (isLiteralFollow(la1)) {
         k_Token_t* literal = k_TokenStream_lt(parser->m_tokens, 1);
@@ -2422,7 +2233,7 @@ void parsePrimaryExpression(k_Parser_t* parser, k_ASTNode_t* node) {
                  */
                 pushFollowToken(parser, KUSH_TOKEN_RIGHT_PARENTHESIS);
 
-                k_ASTNode_t* expression = k_ASTNode_new(node);
+                k_ASTNode_t* expression = k_ASTNode_new();
                 context->m_expression = expression;
                 parseExpression(parser, expression);
 
@@ -2436,7 +2247,7 @@ void parsePrimaryExpression(k_Parser_t* parser, k_ASTNode_t* node) {
             }
 
             case KUSH_TOKEN_LEFT_BRACE: {
-                k_ASTNode_t* mapExpression = k_ASTNode_new(node);
+                k_ASTNode_t* mapExpression = k_ASTNode_new();
                 context->m_expression = mapExpression;
                 parseInitializerExpression(parser, mapExpression);
 
@@ -2444,7 +2255,7 @@ void parsePrimaryExpression(k_Parser_t* parser, k_ASTNode_t* node) {
             }
 
             case KUSH_TOKEN_LEFT_SQUARE_BRACKET: {
-                k_ASTNode_t* arrayExpression = k_ASTNode_new(node);
+                k_ASTNode_t* arrayExpression = k_ASTNode_new();
                 context->m_expression = arrayExpression;
                 parseArrayExpression(parser, arrayExpression);
 
@@ -2468,7 +2279,7 @@ void parsePrimaryExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         }
     }
 
-    k_StackTrace_exit();
+
 }
 
 bool isPrimaryExpressionFollow(k_TokenType_t type) {
@@ -2522,10 +2333,10 @@ bool isLiteralFollow(k_TokenType_t type) {
  * TODO: We can add an arbitary ',' in the end of a map, list, or an array.
  *		 Simply use the isExpressionFollow() function.
  */
-void parseInitializerExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseInitializerExpression(k_Parser_t* parser) {
 
-	k_MapExpressionContext_t* context = k_MapExpressionContext_new(node);
+
+	k_MapExpression_t* context = k_MapExpression_new();
 
     /* Match and discard the '{' token. */
     match(parser, KUSH_TOKEN_LEFT_BRACE);
@@ -2536,7 +2347,7 @@ void parseInitializerExpression(k_Parser_t* parser, k_ASTNode_t* node) {
     pushFollowToken(parser, KUSH_TOKEN_RIGHT_BRACE);
 
     if (isExpressionFollow(la(parser, 1))) {
-        k_ASTNode_t* mapEntries = k_ASTNode_new(node);
+        k_ASTNode_t* mapEntries = k_ASTNode_new();
         context->m_mapEntries = mapEntries;
         parseInitializerEntries(parser, mapEntries);
     }
@@ -2547,7 +2358,7 @@ void parseInitializerExpression(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the '}' token. */
     match(parser, KUSH_TOKEN_RIGHT_BRACE);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2555,12 +2366,12 @@ void parseInitializerExpression(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	mapEntry (',' mapEntry)*
  * ;
  */
-void parseInitializerEntries(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseInitializerEntries(k_Parser_t* parser) {
 
-    k_MapEntriesContext_t* context = k_MapEntriesContext_new(node);
 
-    k_ASTNode_t* mapEntry = k_ASTNode_new(node);
+    k_MapEntries_t* context = k_MapEntries_new();
+
+    k_ASTNode_t* mapEntry = k_ASTNode_new();
     jtk_ArrayList_add(context->m_mapEntries, mapEntry);
     parseInitializerEntry(parser, mapEntry);
 
@@ -2568,12 +2379,12 @@ void parseInitializerEntries(k_Parser_t* parser, k_ASTNode_t* node) {
         /* Consume and discard the ',' token. */
         k_TokenStream_consume(parser->m_tokens);
 
-        mapEntry = k_ASTNode_new(node);
+        mapEntry = k_ASTNode_new();
         jtk_ArrayList_add(context->m_mapEntries, mapEntry);
         parseInitializerEntry(parser, mapEntry);
     }
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2581,24 +2392,24 @@ void parseInitializerEntries(k_Parser_t* parser, k_ASTNode_t* node) {
  * :	IDENTIFIER ':' expression
  * ;
  */
-void parseInitializerEntry(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseInitializerEntry(k_Parser_t* parser) {
 
-    k_MapEntryContext_t* context = k_MapEntryContext_new(node);
+
+    k_MapEntry_t* context = k_MapEntry_new();
 
     // TODO: The key should be an identifier.
-    k_ASTNode_t* keyExpression = k_ASTNode_new(node);
+    k_ASTNode_t* keyExpression = k_ASTNode_new();
     context->m_keyExpression = keyExpression;
     parseExpression(parser, keyExpression);
 
     /* Match and discard the ':' token. */
     match(parser, KUSH_TOKEN_COLON);
 
-    k_ASTNode_t* valueExpression = k_ASTNode_new(node);
+    k_ASTNode_t* valueExpression = k_ASTNode_new();
     context->m_valueExpression = valueExpression;
     parseExpression(parser, valueExpression);
 
-    k_StackTrace_exit();
+
 }
 
 /*
@@ -2606,10 +2417,10 @@ void parseInitializerEntry(k_Parser_t* parser, k_ASTNode_t* node) {
  * :    '[' expressions ']'
  * ;
  */
-void parseArrayExpression(k_Parser_t* parser, k_ASTNode_t* node) {
-    k_StackTrace_enter();
+void parseArrayExpression(k_Parser_t* parser) {
 
-    k_ListExpressionContext_t* context = k_ListExpressionContext_new(node);
+
+    k_ListExpression_t* context = k_ListExpression_new();
 
     /* Match and discard the '[' token. */
     match(parser, KUSH_TOKEN_LEFT_SQUARE_BRACKET);
@@ -2620,7 +2431,7 @@ void parseArrayExpression(k_Parser_t* parser, k_ASTNode_t* node) {
         */
         pushFollowToken(parser, KUSH_TOKEN_RIGHT_SQUARE_BRACKET);
 
-        k_ASTNode_t* expressions = k_ASTNode_new(node);
+        k_ASTNode_t* expressions = k_ASTNode_new();
         context->m_expressions = expressions;
         parseExpressions(parser, expressions);
 
@@ -2631,5 +2442,5 @@ void parseArrayExpression(k_Parser_t* parser, k_ASTNode_t* node) {
     /* Match and discard the ']' token. */
     match(parser, KUSH_TOKEN_RIGHT_SQUARE_BRACKET);
 
-    k_StackTrace_exit();
+
 }
