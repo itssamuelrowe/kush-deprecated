@@ -1105,4 +1105,12 @@ struct k_StorageDeclarator_t {
 
 typedef struct k_StorageDeclarator_t k_StorageDeclarator_t;
 
+// This is CatchContext
+struct k_CatchFilter_t {
+    jtk_ArrayList_t* m_captures;
+    k_Token_t* m_identifier;
+};
+
+typedef struct k_CatchFilter_t k_CatchFilter_t;
+
 #endif /* KUSH_PARSER_CONTEXT_H */
