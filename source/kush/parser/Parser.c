@@ -25,8 +25,6 @@
  * Parser                                                                      *
  *******************************************************************************/
 
-#define la(parser, count) k_TokenStream_la(parser->m_tokens, count)
-
 // Match
 
 static void match(k_Parser_t* parser, k_TokenType_t type);
@@ -128,39 +126,20 @@ static const char ruleNames[][50] = {
 
     "compilationUnit",
     "importDeclaration",
-    "componentDeclaration",
     "functionDeclaration",
-    "functionParameters",
-    "functionBody",
+    "functionParameter",
     "blockStatement",
-    "simpleStatement",
-    "statement",
-    "emptyStatement",
     "variableDeclaration",
     "variableDeclarator",
     "breakStatement",
     "returnStatement",
     "throwStatement",
-    "compoundStatement",
     "ifStatement",
     "ifClause",
-    "elseIfClause",
-    "elseClause",
     "iterativeStatement",
-    "labelClause",
-    "whileStatement",
-    "forStatement",
-    "forParameters",
     "tryStatement",
-    "tryClause",
     "catchClause",
-    "catchFilter",
-    "finallyClause",
     "structureDeclaration",
-    "structureSuite",
-    "structureMember",
-    "expressions",
-    "expression",
     "assignmentExpression",
     "conditionalExpression",
     "logicalOrExpression",
@@ -175,16 +154,14 @@ static const char ruleNames[][50] = {
     "multiplicativeExpression",
     "unaryExpression",
     "postfixExpression",
-    "subscript",
-    "functionArguments",
-    "memberAccess",
-    "postfixOperator",
-    "primaryExpression",
     "initializerExpression",
-    "initializerEntries",
-    "initializerEntry",
     "arrayExpression"
 };
+
+#define la(parser, count) k_TokenStream_la((parser)->m_tokens, (count))
+#define consume(parser) k_TokenStream_consume((parser)->m_tokens)
+#define match(parser, type) matchAndYield((parser), type)
+#define lt(parser, count) k_TokenStream_lt((parser)->m_tokens, (count))
 
 /* Constructor */
 
@@ -196,7 +173,7 @@ k_Parser_t* k_Parser_new(k_Compiler_t* compiler, k_TokenStream_t* tokens) {
     parser->m_tokens = tokens;
     parser->m_followSet = jtk_Memory_allocate(k_TokenType_t, 128);
     parser->m_followSetSize = 0;
-    parser->m_followSetCapacity = 128;
+    parser->m_followSetCapacity = 16;
     parser->m_recovery = false;
 
     return parser;
@@ -227,19 +204,7 @@ void k_Parser_reset(k_Parser_t* parser, k_TokenStream_t* tokens) {
     parser->m_recovery = false;
 }
 
-/* Terminal Node */
-
-static k_ASTNode_t* newTerminalNode(k_ASTNode_t* node, k_Token_t* token) {
-    k_ASTNode_t* terminalNode = k_ASTNode_new();
-    terminalNode->m_type = KUSH_AST_NODE_TYPE_TERMINAL;
-    terminalNode->m_context = token;
-    terminalNode->m_contextDestructor = NULL;
-    terminalNode->m_enumerateContextChildren = NULL;
-
-    return terminalNode;
-}
-
-/* Recover */
+// Recover
 
 /* When the parser encounters an invalid input, the current rule cannot continue,
  * so the parser recovers by skipping tokens until it a possible resynchronized
@@ -256,7 +221,7 @@ void recover(k_Parser_t* parser) {
     parser->m_recovery = true;
 
     if (parser->m_followSetSize > 0) {
-        k_Token_t* lt1 = k_TokenStream_lt(parser->m_tokens, 1);
+        k_Token_t* lt1 = lt(parser, 1);
         /* The parser tries to recover until a token from the follow set or
          * the end-of-stream token is encountered.
          */
@@ -278,11 +243,27 @@ void recover(k_Parser_t* parser) {
             /* Consume and discard the current token. */
             consume(parser);
             /* Update the lookahead token. */
-            lt1 = k_TokenStream_lt(parser->m_tokens, 1);
+            lt1 = lt(parser, 1);
         }
         afterDiscard:
             ;
     }
+}
+
+void reportAndRecover(k_Parser_t* parser, k_TokenType_t expected) {
+    /* Do not report the error if the parser is in recovery mode. Otherwise,
+    * duplicate syntax errors will be reported to the end user.
+    */
+    if (!parser->m_recovery) {
+        k_Token_t* lt1 = lt(parser, 1);
+        k_Compiler_t* compiler = parser->m_compiler;
+        k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+        k_ErrorHandler_handleSyntacticalError(errorHandler, parser,
+            KUSH_ERROR_CODE_UNEXPECTED_TOKEN, lt1, expected);
+    }
+
+    /* Try to resychronize the parser with the input. */
+    recover(parser);
 }
 
 bool ensureFollowSetSpace(k_Parser_t* parser, int32_t capacity) {
@@ -343,44 +324,31 @@ void popFollowToken(k_Parser_t* parser) {
     parser->m_followSetSize--;
 }
 
-/* Match */
+/* Consume */
 
-void match(k_Parser_t* parser, k_TokenType_t type) {
-    jtk_Assert_assertObject(parser, "The specified parser is null.");
+k_Token_t* consumeAndYield(k_Parser_t* parser) {
+    k_Token_t* lt1 = lt(parser, 1);
+    consume(parser);
 
-    matchAndYield(parser, type);
+    return lt1;
 }
+
+/* Match */
 
 int32_t matchEx(k_Parser_t* parser, k_TokenType_t* types, int32_t count) {
     jtk_Assert_assertObject(parser, "The specified parser is null.");
 
     int32_t index;
     matchAndYieldEx(parser, types, count, &index);
+    return index;
 }
-
-void reportAndRecover(k_Parser_t* parser, k_TokenType_t expected) {
-    /* Do not report the error if the parser is in recovery mode. Otherwise,
-    * duplicate syntax errors will be reported to the end user.
-    */
-    if (!parser->m_recovery) {
-        k_Token_t* lt1 = k_TokenStream_lt(parser->m_tokens, 1);
-        k_Compiler_t* compiler = parser->m_compiler;
-        k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-        k_ErrorHandler_handleSyntacticalError(errorHandler, parser,
-            KUSH_ERROR_CODE_UNEXPECTED_TOKEN, lt1, expected);
-    }
-
-    /* Try to resychronize the parser with the input. */
-    recover(parser);
-}
-
 
 k_Token_t* matchAndYieldEx(k_Parser_t* parser, k_TokenType_t* types, int32_t count,
     int32_t* index) {
     jtk_Assert_assertObject(parser, "The specified parser is null.");
     jtk_Assert_assertTrue(count > 0, "The specified count is invalid.");
 
-    k_Token_t* lt1 = k_TokenStream_lt(parser->m_tokens, 1);
+    k_Token_t* lt1 = lt(parser, 1);
     *index = -1;
     int32_t i;
     for (i = 0; i < count; i++) {
@@ -412,8 +380,7 @@ k_Token_t* matchAndYieldEx(k_Parser_t* parser, k_TokenType_t* types, int32_t cou
 k_Token_t* matchAndYield(k_Parser_t* parser, k_TokenType_t type) {
     jtk_Assert_assertObject(parser, "The specified parser is null.");
 
-    k_Token_t* lt1 = k_TokenStream_lt(parser->m_tokens, 1);
-
+    k_Token_t* lt1 = lt(parser, 1);
     if (lt1->m_type == type) {
         /* The token expected by the parser was found. If we the parser is
          * in error recovery, turn it off.
@@ -434,8 +401,7 @@ k_Token_t* matchAndYield(k_Parser_t* parser, k_TokenType_t type) {
     return lt1;
 }
 
-
-static bool isReturnType(k_TokenType_t token) {
+bool isReturnType(k_TokenType_t token) {
     return (token == KUSH_TOKEN_KEYWORD_VOID) ||
         (token == KUSH_TOKEN_KEYWORD_I8) ||
         (token == KUSH_TOKEN_KEYWORD_I16) ||
@@ -679,29 +645,6 @@ bool isLiteralFollow(k_TokenType_t type) {
     return isLiteral(type);
 }
 
-static k_TokenType_t returnTypes[] = {
-    KUSH_TOKEN_KEYWORD_BOOLEAN,
-    KUSH_TOKEN_KEYWORD_I8,
-    KUSH_TOKEN_KEYWORD_I16,
-    KUSH_TOKEN_KEYWORD_I32,
-    KUSH_TOKEN_KEYWORD_I64,
-    KUSH_TOKEN_KEYWORD_F32,
-    KUSH_TOKEN_KEYWORD_F64,
-    KUSH_TOKEN_KEYWORD_VOID,
-    KUSH_TOKEN_IDENTIFIER
-};
-
-static k_TokenType_t types[] = {
-    KUSH_TOKEN_KEYWORD_BOOLEAN,
-    KUSH_TOKEN_KEYWORD_I8,
-    KUSH_TOKEN_KEYWORD_I16,
-    KUSH_TOKEN_KEYWORD_I32,
-    KUSH_TOKEN_KEYWORD_I64,
-    KUSH_TOKEN_KEYWORD_F32,
-    KUSH_TOKEN_KEYWORD_F64,
-    KUSH_TOKEN_IDENTIFIER
-};
-
 /*
  * -----------------------------------------------------------------------------
  * How do we construct the abstract syntax tree?
@@ -866,8 +809,29 @@ k_ImportDeclaration_t* parseImportDeclaration(k_Parser_t* parser) {
 
 k_Token_t* parseTypeEx(k_Parser_t* parser, int32_t* dimensions, bool includeVoid) {
     int32_t index;
+    static const k_TokenType_t returnTypes[] = {
+        KUSH_TOKEN_KEYWORD_BOOLEAN,
+        KUSH_TOKEN_KEYWORD_I8,
+        KUSH_TOKEN_KEYWORD_I16,
+        KUSH_TOKEN_KEYWORD_I32,
+        KUSH_TOKEN_KEYWORD_I64,
+        KUSH_TOKEN_KEYWORD_F32,
+        KUSH_TOKEN_KEYWORD_F64,
+        KUSH_TOKEN_KEYWORD_VOID,
+        KUSH_TOKEN_IDENTIFIER
+    };
+    static const k_TokenType_t types[] = {
+        KUSH_TOKEN_KEYWORD_BOOLEAN,
+        KUSH_TOKEN_KEYWORD_I8,
+        KUSH_TOKEN_KEYWORD_I16,
+        KUSH_TOKEN_KEYWORD_I32,
+        KUSH_TOKEN_KEYWORD_I64,
+        KUSH_TOKEN_KEYWORD_F32,
+        KUSH_TOKEN_KEYWORD_F64,
+        KUSH_TOKEN_IDENTIFIER
+    };
     k_Token_t* token = matchAndYieldEx(parser, includeVoid? returnTypes : types,
-        9, &index);
+        includeVoid? 9 : 8, &index);
 
     *dimensions = 0;
     while (la(parser, 1) == KUSH_TOKEN_LEFT_SQUARE_BRACKET) {
@@ -912,7 +876,7 @@ k_Token_t* parseReturnType(k_Parser_t* parser, int32_t* dimensions) {
  * :    returnType IDENTIFIER functionParameters (functionBody | SEMICOLON)
  * ;
  */
-void parseFunctionDeclaration(k_Parser_t* parser, k_ASTNode_t* node,
+k_FunctionDeclaration_t* parseFunctionDeclaration(k_Parser_t* parser, k_ASTNode_t* node,
     uint32_t modifiers) {
 	/* If function parameters fails, skip tokens until ';', '{', or '}' is found. */
     pushFollowToken(parser, KUSH_TOKEN_SEMICOLON);
@@ -922,7 +886,8 @@ void parseFunctionDeclaration(k_Parser_t* parser, k_ASTNode_t* node,
     k_FunctionDeclaration_t* context = k_FunctionDeclaration_new();
     context->m_returnType = parseReturnType(parser, &context->m_returnTypeDimensions);
     context->m_identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-    context->m_functionParameters = parseFunctionParameters(parser);
+    parseFunctionParameters(parser, context->m_fixedParameters,
+        &context->m_variableParameter);
 
     /* Pop the ';', '{', and '}' tokens from the follow set. */
     popFollowToken(parser);
@@ -958,11 +923,10 @@ void parseFunctionDeclaration(k_Parser_t* parser, k_ASTNode_t* node,
  * The following function combines the above mentioned rules. This measure was
  * taken to avoid redundant nodes in the AST.
  */
-void parseFunctionParameters(k_Parser_t* parser) {
-	k_FunctionParameters_t* context = k_FunctionParameters_new();
-
-    /* Match and discard the '(' token. */
+void parseFunctionParameters(k_Parser_t* parser,
+    jtk_ArrayList_t* fixedParameters, k_FunctionParameter_t** variableParameter) {
     match(parser, KUSH_TOKEN_LEFT_PARENTHESIS);
+    pushFollowToken(parser, KUSH_TOKEN_RIGHT_PARENTHESIS);
 
     k_TokenType_t la1 = la(parser, 1);
     if (isType(la1)) {
@@ -977,19 +941,20 @@ void parseFunctionParameters(k_Parser_t* parser) {
             if (la(parser, 1) == KUSH_TOKEN_ELLIPSIS) {
                 parameter->m_variable = true;
                 match(parser, KUSH_TOKEN_ELLIPSIS);
+                *variableParameter = parameter;
+                break;
+            }
+            else {
+                jtk_ArrayList_add(fixedParameters, parameter);
             }
             parameter->m_identifier = matchAndYield(parser, KUSH_TOKEN_IDENTIFIER);
-            jtk_ArrayList_add(context->m_fixedParameters, parameter);
-
             first = false;
         }
         while (la(parser, 1) == KUSH_TOKEN_COMMA);
     }
 
-    /* Match and discard the ')' token. */
+    popFollowToken(parser);
     match(parser, KUSH_TOKEN_RIGHT_PARENTHESIS);
-
-
 }
 
 /*
@@ -1005,8 +970,8 @@ void parseFunctionParameters(k_Parser_t* parser) {
  * The following function combines the above mentioned rules. This measure was
  * taken to avoid redundant nodes in the AST.
  */
-void parseBlockStatementk_Parser_t* parser) {
-	k_StatementSuite_t* context = k_StatementSuite_new();
+k_BlockStatement_t* parseBlockStatement(k_Parser_t* parser) {
+	k_BlockStatement_t* context = k_StatementSuite_new();
 
     /* Consume and discard the '{' token. */
     match(parser, KUSH_TOKEN_LEFT_BRACE);
@@ -1175,7 +1140,7 @@ k_BreakStatement_t* parseBreakStatement(k_Parser_t* parser) {
     match(parser, KUSH_TOKEN_KEYWORD_BREAK);
 
     if (la(parser, 1) == KUSH_TOKEN_IDENTIFIER) {
-        k_Token_t* identifier = k_TokenStream_lt(parser->m_tokens, 1);
+        k_Token_t* identifier = lt(parser, 1);
         context->m_identifier = newTerminalNode(node, identifier);
         consume(parser);
     }

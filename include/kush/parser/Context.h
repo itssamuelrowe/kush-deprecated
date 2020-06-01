@@ -20,14 +20,17 @@
 #define KUSH_PARSER_CONTEXT_H
 
 #include <jtk/collection/list/ArrayList.h>
+#include <kush/parser/ContextType.h>
 
 /*******************************************************************************
  * Context                                                                     *
  *******************************************************************************/
 
-struct k_ASTNode_t {
-    k_ASTNodeType_t m_type;
+struct k_Context_t {
+    k_ContextType_t m_type;
 };
+
+typedef struct k_Context_t k_Context_t;
 
 /*******************************************************************************
  * CompilationUnit                                                             *
