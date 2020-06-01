@@ -94,27 +94,6 @@ struct k_VariableDeclaration_t {
 typedef struct k_VariableDeclaration_t k_VariableDeclaration_t;
 
 /*******************************************************************************
- * VariableDeclarator                                                          *
- *******************************************************************************/
-
-/**
- * @class VariableDeclarator
-
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_VariableDeclarator_t {
-    k_ContextType_t m_type;
-    k_Token_t* m_identifier;
-    k_BinaryExpression_t* m_expression;
-};
-
-/**
- * @memberof VariableDeclarator
- */
-typedef struct k_VariableDeclarator_t k_VariableDeclarator_t;
-
-/*******************************************************************************
  * TryStatement                                                                *
  *******************************************************************************/
 

@@ -16,7 +16,6 @@
 
 #include <jtk/collection/Pair.h>
 
-#include <kush/ast/context/Context.h>
 #include <kush/parser/Parser.h>
 #include <kush/lexer/TokenStream.h>
 #include <kush/support/StackTrace.h>
