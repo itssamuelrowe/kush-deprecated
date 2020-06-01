@@ -226,7 +226,7 @@ k_Lexer_t* k_Lexer_new(k_Compiler_t* compiler) {
 * This function is responsible for the destruction of
 * such tokens.
 */
-void k_Lexer_destroyStaleTokens(k_Lexer_t* lexer) {
+static void destroyStaleTokens(k_Lexer_t* lexer) {
     int32_t size = jtk_ArrayList_getSize(lexer->m_tokens->m_list);
     int32_t i;
     for (i = 0; i < size; i++) {
@@ -246,7 +246,7 @@ void k_Lexer_delete(k_Lexer_t* lexer) {
 
 /* Create Token */
 
-k_Token_t* k_Lexer_createToken(k_Lexer_t* lexer) {
+static k_Token_t* createToken(k_Lexer_t* lexer) {
     uint8_t* text = jtk_CString_newEx(lexer->m_text->m_value, lexer->m_text->m_size); // jtk_StringBuilder_toCString(lexer->m_text);
     int32_t length = jtk_StringBuilder_getSize(lexer->m_text);
 
@@ -274,12 +274,12 @@ k_Token_t* k_Lexer_createToken(k_Lexer_t* lexer) {
     return token;
 }
 
-void k_Lexer_onNewline(k_Lexer_t* lexer) {
+static void onNewline(k_Lexer_t* lexer) {
     lexer->m_line++;
     lexer->m_column = 1;
 }
 
-k_LexerError_t* k_Lexer_createError(k_Lexer_t* lexer, const char* message) {
+static k_LexerError_t* createError(k_Lexer_t* lexer, const char* message) {
     k_LexerError_t* error = k_LexerError_new(message, "<unknown>" /*lexer->m_inputStream->m_path*/, lexer->m_startLine, lexer->m_startColumn);
     return error;
 }
@@ -288,7 +288,7 @@ bool k_Lexer_isInputStart(k_Lexer_t* lexer) {
     return (lexer->m_startLine == 0) && (lexer->m_startColumn == 0);
 }
 
-void k_Lexer_consume(k_Lexer_t* lexer) {
+static void consume(k_Lexer_t* lexer) {
     jtk_StringBuilder_appendCodePoint(lexer->m_text, lexer->m_la1);
 
     lexer->m_index++;
@@ -309,7 +309,7 @@ void k_Lexer_consume(k_Lexer_t* lexer) {
     }
 }
 
-void k_Lexer_emit(k_Lexer_t* lexer, k_Token_t* token) {
+static void emit(k_Lexer_t* lexer, k_Token_t* token) {
     lexer->m_token = token;
     jtk_ArrayQueue_enqueue(lexer->m_tokens, token);
 }
@@ -442,7 +442,7 @@ void k_Lexer_emit(k_Lexer_t* lexer, k_Token_t* token) {
 *
 */
 
-void k_Lexer_binaryIntegerLiteral(k_Lexer_t* lexer) {
+static void binaryIntegerLiteral(k_Lexer_t* lexer) {
     /* Consume and discard the binary prefix character. */
     k_Lexer_consume(lexer);
 
@@ -475,7 +475,7 @@ void k_Lexer_binaryIntegerLiteral(k_Lexer_t* lexer) {
     }
 }
 
-void k_Lexer_octalIntegerLiteral(k_Lexer_t* lexer) {
+static void octalIntegerLiteral(k_Lexer_t* lexer) {
     /* Consume and discard the octal prefix character. */
     k_Lexer_consume(lexer);
 
@@ -508,7 +508,7 @@ void k_Lexer_octalIntegerLiteral(k_Lexer_t* lexer) {
     }
 }
 
-void k_Lexer_hexadecimalIntegerLiteral(k_Lexer_t* lexer) {
+static void hexadecimalIntegerLiteral(k_Lexer_t* lexer) {
     /* Consume and discard the binary prefix character. */
     k_Lexer_consume(lexer);
 
@@ -541,7 +541,7 @@ void k_Lexer_hexadecimalIntegerLiteral(k_Lexer_t* lexer) {
     }
 }
 
-void k_Lexer_decimalIntegerLiteral(k_Lexer_t* lexer) {
+static void decimalIntegerLiteral(k_Lexer_t* lexer) {
     /* Consume and discard the decimal digit character. */
     k_Lexer_consume(lexer);
 
@@ -696,7 +696,7 @@ void k_Lexer_decimalIntegerLiteral(k_Lexer_t* lexer) {
  * ;
  *
  */
-void k_Lexer_integerLiteral(k_Lexer_t* lexer) {
+static void integerLiteral(k_Lexer_t* lexer) {
     /* The lexer has recognized an integer literal. */
     lexer->m_type = KUSH_TOKEN_INTEGER_LITERAL;
 
@@ -1919,12 +1919,6 @@ loopEntry : {
                      *
                      * The following algorithm tries to prevent redundant comparisons
                      * between strings (as many as possible).
-                     * Basically, the code checks if the token length is known.
-                     * If true, then the keywords with the correspoding length
-                     * are compared against the token. The keywords are always
-                     * arranged in ascending lexicographical order. Thus, we
-                     * reduce the worst case scenario for number of comparisons
-                     * from 40 to 7.
                      */
                     lexer->m_type = KUSH_TOKEN_IDENTIFIER;
                     switch (text[0]) {
@@ -2110,7 +2104,7 @@ loopEntry : {
 
 // Reset
 
-void k_Lexer_reset(k_Lexer_t* lexer, jtk_InputStream_t* inputStream) {
+static void reset(k_Lexer_t* lexer, jtk_InputStream_t* inputStream) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
     jtk_Assert_assertObject(inputStream, "The specified input stream is null.");
 
@@ -2141,21 +2135,21 @@ void k_Lexer_reset(k_Lexer_t* lexer, jtk_InputStream_t* inputStream) {
 
 // Misc.
 
-bool k_Lexer_isBinaryPrefix(int32_t codePoint) {
+static bool isBinaryPrefix(int32_t codePoint) {
     return (codePoint == 'b') || (codePoint == 'B');
 }
 
-bool k_Lexer_isBinaryDigit(int32_t codePoint) {
+static bool isBinaryDigit(int32_t codePoint) {
     return (codePoint == '0') || (codePoint == '1');
 }
 
-bool k_Lexer_isBinaryDigitOrUnderscore(int32_t codePoint) {
+static bool isBinaryDigitOrUnderscore(int32_t codePoint) {
     return (codePoint == '0') ||
            (codePoint == '1') ||
            (codePoint == '_');
 }
 
-bool k_Lexer_isBasicEscapeSequence(int32_t codePoint) {
+static bool isBasicEscapeSequence(int32_t codePoint) {
     return (codePoint == 'b') ||
            (codePoint == 'f') ||
            (codePoint == 'n') ||
@@ -2166,61 +2160,61 @@ bool k_Lexer_isBasicEscapeSequence(int32_t codePoint) {
            (codePoint == '\'');
 }
 
-bool k_Lexer_isDecimalDigit(int32_t codePoint) {
+static bool isDecimalDigit(int32_t codePoint) {
     return (codePoint >= '0') && (codePoint <= '9');
 }
 
-bool k_Lexer_isDecimalDigitOrUnderscore(int32_t codePoint) {
+static bool isDecimalDigitOrUnderscore(int32_t codePoint) {
     return k_Lexer_isDecimalDigit(codePoint) || (codePoint == '_');
 }
 
-bool k_Lexer_isIdentifierStart(int32_t codePoint) {
+static bool isIdentifierStart(int32_t codePoint) {
     return ((codePoint >= 'a') && (codePoint <= 'z')) ||
            ((codePoint >= 'A') && (codePoint <= 'Z'));
 }
 
-bool k_Lexer_isIdentifierPart(int32_t codePoint) {
+static bool isIdentifierPart(int32_t codePoint) {
     return ((codePoint >= 'a') && (codePoint <= 'z')) ||
            ((codePoint >= 'A') && (codePoint <= 'Z')) ||
            ((codePoint >= '0') && (codePoint <= '9')) ||
            (codePoint == '_');
 }
 
-bool k_Lexer_isLetter(int32_t codePoint) {
+static bool isLetter(int32_t codePoint) {
     return ((codePoint >= 'a') && (codePoint <= 'z')) ||
            ((codePoint >= 'A') && (codePoint <= 'Z'));
 }
 
-bool k_Lexer_isLetterOrDigit(int32_t codePoint) {
+static bool isLetterOrDigit(int32_t codePoint) {
     return k_Lexer_isLetter(codePoint) || k_Lexer_isDecimalDigit(codePoint);
 }
 
-bool k_Lexer_isHexadecimalPrefix(int32_t codePoint) {
+static bool isHexadecimalPrefix(int32_t codePoint) {
     return (codePoint == 'x') || (codePoint == 'X');
 }
 
-bool k_Lexer_isHexadecimalDigit(int32_t codePoint) {
+static bool isHexadecimalDigit(int32_t codePoint) {
     return k_Lexer_isDecimalDigit(codePoint) ||
            ((codePoint >= 'a') && (codePoint <= 'f')) ||
            ((codePoint >= 'A') && (codePoint <= 'F'));
 }
 
-bool k_Lexer_isHexadecimalDigitOrUnderscore(int32_t codePoint) {
+static bool isHexadecimalDigitOrUnderscore(int32_t codePoint) {
     return k_Lexer_isHexadecimalDigit(codePoint) || (codePoint == '_');
 }
 
-bool k_Lexer_isOctalDigit(int32_t codePoint) {
+static bool isOctalDigit(int32_t codePoint) {
     return (codePoint >= '0') && (codePoint <= '7');
 }
 
-bool k_Lexer_isOctalPrefix(int32_t codePoint) {
+static bool isOctalPrefix(int32_t codePoint) {
     return (codePoint == 'c') || (codePoint == 'C');
 }
 
-bool k_Lexer_isOctalDigitOrUnderscore(int32_t codePoint) {
+static bool isOctalDigitOrUnderscore(int32_t codePoint) {
     return k_Lexer_isOctalDigit(codePoint) || (codePoint == '_');
 }
 
-bool k_Lexer_isIntegerSuffix(int32_t codePoint) {
+static bool isIntegerSuffix(int32_t codePoint) {
     return (codePoint == 'l') || (codePoint == 'L');
 }
