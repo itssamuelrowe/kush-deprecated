@@ -22,7 +22,6 @@
 #include <jtk/collection/list/ArrayList.h>
 
 #include <kush/Configuration.h>
-#include <kush/ast/ASTNode.h>
 #include <kush/lexer/TokenStream.h>
 
 /*******************************************************************************
