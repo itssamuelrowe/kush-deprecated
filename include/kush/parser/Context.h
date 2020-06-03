@@ -34,15 +34,15 @@ struct k_Context_t {
 typedef struct k_Context_t k_Context_t;
 
 /*******************************************************************************
- * CompilationUnit                                                             *
+ * Module                                                                      *
  *******************************************************************************/
 
 /**
- * @class CompilationUnit
+ * @class Module
  * @author Samuel Rowe
  * @since kush 0.1
  */
-struct k_CompilationUnit_t {
+struct k_Module_t {
     k_ContextType_t m_type;
 	jtk_ArrayList_t* m_imports;
 	jtk_ArrayList_t* m_functions;
@@ -50,9 +50,9 @@ struct k_CompilationUnit_t {
 };
 
 /**
- * @memberof CompilationUnit
+ * @memberof Module
  */
-typedef struct k_CompilationUnit_t k_CompilationUnit_t;
+typedef struct k_Module_t k_Module_t;
 
 /*******************************************************************************
  * BinaryExpression                                                            *
@@ -85,7 +85,7 @@ struct k_BinaryExpression_t {
  */
 struct k_VariableDeclaration_t {
     k_ContextType_t m_type;
-    jtk_ArrayList_t* m_declarators;
+    jtk_ArrayList_t* m_variables;
 };
 
 /**
