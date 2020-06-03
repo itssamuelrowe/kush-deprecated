@@ -94,6 +94,8 @@
 k_Primitives_t primitives = {
     .i8 = {
         .tag = K_TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
         .integer = {
             .size = 1
         }
@@ -101,6 +103,8 @@ k_Primitives_t primitives = {
 
     .i16 = {
         .tag = K_TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
         .integer = {
             .size = 2
         }
@@ -108,6 +112,8 @@ k_Primitives_t primitives = {
 
     .i32 = {
         .tag = K_TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
         .integer = {
             .size = 4
         }
@@ -115,6 +121,8 @@ k_Primitives_t primitives = {
 
     .i64 = {
         .tag = K_TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
         .integer = {
             .size = 8
         }
@@ -122,6 +130,8 @@ k_Primitives_t primitives = {
 
     .f32 = {
         .tag = K_TYPE_DECIMAL,
+        .indexable = false,
+        .accessible = false,
         .decimal = {
             .size = 4
         }
@@ -129,6 +139,8 @@ k_Primitives_t primitives = {
 
     .f64 = {
         .tag = K_TYPE_DECIMAL,
+        .indexable = false,
+        .accessible = false,
         .decimal = {
             .size = 8
         }
@@ -136,6 +148,8 @@ k_Primitives_t primitives = {
 
     .void_ = {
         .tag = K_TYPE_VOID
+        .indexable = false,
+        .accessible = false
     }
 };
 
@@ -527,6 +541,11 @@ k_Type_t* resolveExpression(k_Analyzer_t* analyzer, k_Context_t* context) {
                     printf("[internal error] Control should not reach here.\n");
                 }
             }
+
+            break;
+        }
+
+        case K_CONTEXT_POSTFIX_EXPRESSION: {
 
             break;
         }

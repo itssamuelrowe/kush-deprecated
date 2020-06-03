@@ -519,6 +519,8 @@ typedef struct k_StorageDeclarator_t k_StorageDeclarator_t;
 
 struct k_Type_t {
     uint8_t tag;
+    bool indexable;
+    bool accessible;
     union {
         struct {
             k_Type_t* m_base;
