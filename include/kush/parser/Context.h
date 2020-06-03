@@ -28,7 +28,7 @@
  *******************************************************************************/
 
 struct k_Context_t {
-    k_ContextType_t m_type;
+    k_ContextType_t type;
 };
 
 typedef struct k_Context_t k_Context_t;
@@ -43,10 +43,10 @@ typedef struct k_Context_t k_Context_t;
  * @since kush 0.1
  */
 struct k_Module_t {
-    k_ContextType_t m_type;
-	jtk_ArrayList_t* m_imports;
-	jtk_ArrayList_t* m_functions;
-    jtk_ArrayList_t* m_structures;
+    k_ContextType_t type;
+	jtk_ArrayList_t* imports;
+	jtk_ArrayList_t* functions;
+    jtk_ArrayList_t* structures;
 };
 
 /**
@@ -69,9 +69,9 @@ typedef struct k_BinaryExpression_t k_BinaryExpression_t;
  * @since kush 0.1
  */
 struct k_BinaryExpression_t {
-    k_ContextType_t m_type;
-    k_BinaryExpression_t* m_left;
-    jtk_ArrayList_t* m_others;
+    k_ContextType_t type;
+    k_BinaryExpression_t* left;
+    jtk_ArrayList_t* others;
 };
 
 /*******************************************************************************
@@ -84,8 +84,8 @@ struct k_BinaryExpression_t {
  * @since kush 0.1
  */
 struct k_VariableDeclaration_t {
-    k_ContextType_t m_type;
-    jtk_ArrayList_t* m_variables;
+    k_ContextType_t type;
+    jtk_ArrayList_t* variables;
 };
 
 /**
@@ -103,10 +103,10 @@ typedef struct k_VariableDeclaration_t k_VariableDeclaration_t;
  * @since kush 0.1
  */
 struct k_TryStatement_t {
-    k_ContextType_t m_type;
-    k_BlockStatement_t* m_tryClause;
-    jtk_ArrayList_t* m_catchClauses;
-    k_BlockStatement_t* m_finallyClause;
+    k_ContextType_t type;
+    k_BlockStatement_t* tryClause;
+    jtk_ArrayList_t* catchClauses;
+    k_BlockStatement_t* finallyClause;
 };
 
 /**
@@ -124,8 +124,8 @@ typedef struct k_TryStatement_t k_TryStatement_t;
  * @since kush 0.1
  */
 struct k_ThrowStatement_t {
-    k_ContextType_t m_type;
-    k_BinaryExpression_t* m_expression;
+    k_ContextType_t type;
+    k_BinaryExpression_t* expression;
 };
 
 /**
@@ -143,8 +143,8 @@ typedef struct k_ThrowStatement_t k_ThrowStatement_t;
  * @since kush 0.1
  */
 struct k_ReturnStatement_t {
-    k_ContextType_t m_type;
-    k_BinaryExpression_t* m_expression;
+    k_ContextType_t type;
+    k_BinaryExpression_t* expression;
 };
 
 /**
@@ -162,8 +162,8 @@ typedef struct k_ReturnStatement_t k_ReturnStatement_t;
  * @since kush 0.1
  */
 struct k_BlockStatement_t {
-    k_ContextType_t m_type;
-    jtk_ArrayList_t* m_statements;
+    k_ContextType_t type;
+    jtk_ArrayList_t* statements;
 };
 
 /**
@@ -182,9 +182,9 @@ typedef struct k_BlockStatement_t k_BlockStatement_t;
  * @since kush 0.1
  */
 struct k_UnaryExpression_t {
-    k_ContextType_t m_type;
-    k_Token_t* m_operator;
-    k_Context_t* m_expression; // Unary expression or postfix expression
+    k_ContextType_t type;
+    k_Token_t* operator;
+    k_Context_t* expression; // Unary expression or postfix expression
 };
 
 /**
@@ -203,10 +203,10 @@ typedef struct k_UnaryExpression_t k_UnaryExpression_t;
  * @since kush 0.1
  */
 struct k_PostfixExpression_t {
-    k_ContextType_t m_type;
-    void* m_primaryExpression;
-    bool m_primaryToken;
-    jtk_ArrayList_t* m_postfixParts; // contexts
+    k_ContextType_t type;
+    void* primaryExpression;
+    bool primaryToken;
+    jtk_ArrayList_t* postfixParts; // contexts
 };
 
 /**
@@ -225,8 +225,8 @@ typedef struct k_PostfixExpression_t k_PostfixExpression_t;
  * @since kush 0.1
  */
 struct k_MemberAccess_t {
-    k_ContextType_t m_type;
-    k_Token_t* m_identifier;
+    k_ContextType_t type;
+    k_Token_t* identifier;
 };
 
 /**
@@ -245,8 +245,8 @@ typedef struct k_MemberAccess_t k_MemberAccess_t;
  * @since kush 0.1
  */
 struct k_InitializerExpression_t {
-    k_ContextType_t m_type;
-    jtk_ArrayList_t* m_entries; // Pair<Token, BinaryExpression>
+    k_ContextType_t type;
+    jtk_ArrayList_t* entries; // Pair<Token, BinaryExpression>
 };
 
 typedef struct k_InitializerExpression_t k_InitializerExpression_t;
@@ -261,8 +261,8 @@ typedef struct k_InitializerExpression_t k_InitializerExpression_t;
  * @since kush 0.1
  */
 struct k_ArrayExpression_t {
-    k_ContextType_t m_type;
-    jtk_ArrayList_t* m_expressions;
+    k_ContextType_t type;
+    jtk_ArrayList_t* expressions;
 };
 
 typedef struct k_ArrayExpression_t k_ArrayExpression_t;
@@ -277,12 +277,12 @@ typedef struct k_ArrayExpression_t k_ArrayExpression_t;
  * @since kush 0.1
  */
 struct k_IterativeStatement_t {
-    k_ContextType_t m_type;
-    k_Token_t* m_label;
-    bool m_while;
-    k_Token_t* m_parameter;
-    k_BinaryExpression_t* m_expression;
-    k_BlockStatement_t* m_blockStatement;
+    k_ContextType_t type;
+    k_Token_t* label;
+    bool while;
+    k_Token_t* parameter;
+    k_BinaryExpression_t* expression;
+    k_BlockStatement_t* blockStatement;
 };
 
 /**
@@ -301,9 +301,9 @@ typedef struct k_IterativeStatement_t k_IterativeStatement_t;
  * @since kush 0.1
  */
 struct k_ImportDeclaration_t {
-    k_ContextType_t m_type;
-    bool m_wildcard;
-    jtk_ArrayList_t* m_identifiers;
+    k_ContextType_t type;
+    bool wildcard;
+    jtk_ArrayList_t* identifiers;
 };
 
 /**
@@ -322,10 +322,10 @@ typedef struct k_ImportDeclaration_t k_ImportDeclaration_t;
  * @since kush 0.1
  */
 struct k_IfStatement_t {
-    k_ContextType_t m_type;
-    k_IfClause_t* m_ifClause;
-    jtk_ArrayList_t* m_elseIfClauses;
-    k_BlockStatement_t* m_elseClause;
+    k_ContextType_t type;
+    k_IfClause_t* ifClause;
+    jtk_ArrayList_t* elseIfClauses;
+    k_BlockStatement_t* elseClause;
 };
 
 /**
@@ -345,9 +345,9 @@ typedef struct k_IfStatement_t k_IfStatement_t;
  * @since kush 0.1
  */
 struct k_IfClause_t {
-    k_ContextType_t m_type;
-    k_BinaryExpression_t* m_expression;
-    k_BlockStatement_t* m_body;
+    k_ContextType_t type;
+    k_BinaryExpression_t* expression;
+    k_BlockStatement_t* body;
 };
 
 /**
@@ -365,13 +365,13 @@ typedef struct k_IfClause_t k_IfClause_t;
  * @since kush 0.1
  */
 struct k_FunctionDeclaration_t {
-    k_ContextType_t m_type;
-    k_Token_t* m_identifier;
-    jtk_ArrayList_t* m_fixedParameters;
-    k_FunctionParameter_t* m_variableParameter;
-    k_BlockStatement_t* m_body;
-    k_Token_t* m_returnType;
-    int32_t m_returnTypeDimensions;
+    k_ContextType_t type;
+    k_Token_t* identifier;
+    jtk_ArrayList_t* fixedParameters;
+    k_FunctionParameter_t* variableParameter;
+    k_BlockStatement_t* body;
+    k_Token_t* returnType;
+    int32_t returnTypeDimensions;
 };
 
 /**
@@ -389,8 +389,8 @@ typedef struct k_FunctionDeclaration_t k_FunctionDeclaration_t;
  * @since kush 0.1
  */
 struct k_FunctionArguments_t {
-    k_ContextType_t m_type;
-    jtk_ArrayList_t* m_expressions;
+    k_ContextType_t type;
+    jtk_ArrayList_t* expressions;
 };
 
 /**
@@ -413,10 +413,10 @@ typedef struct k_ConditionalExpression_t k_ConditionalExpression_t;
  * @since kush 0.1
  */
 struct k_ConditionalExpression_t {
-    k_ContextType_t m_type;
-    k_BinaryExpression_t* m_logicalOrExpression;
-    k_BinaryExpression_t* m_thenExpression;
-    k_ConditionalExpression_t* m_elseExpression;
+    k_ContextType_t type;
+    k_BinaryExpression_t* logicalOrExpression;
+    k_BinaryExpression_t* thenExpression;
+    k_ConditionalExpression_t* elseExpression;
 };
 
 /*******************************************************************************
@@ -430,9 +430,10 @@ struct k_ConditionalExpression_t {
  * @since kush 0.1
  */
 struct k_StructureDeclaration_t {
-    k_ContextType_t m_type;
-    k_Token_t* m_identifier;
-    jtk_ArrayList_t* m_variables;
+    k_ContextType_t type;
+    k_Token_t* identifier;
+    jtk_ArrayList_t* variables;
+    k_Type_t* type;
 };
 
 /**
@@ -446,9 +447,9 @@ typedef struct k_StructureDeclaration_t k_StructureDeclaration_t;
  *******************************************************************************/
 
 struct k_CatchClause_t {
-    jtk_ArrayList_t* m_captures;
-    k_Token_t* m_parameter;
-    k_BlockStatement_t* m_body;
+    jtk_ArrayList_t* captures;
+    k_Token_t* parameter;
+    k_BlockStatement_t* body;
 };
 
 typedef struct k_CatchClause_t k_CatchClause_t;
@@ -468,8 +469,8 @@ typedef struct k_CatchClause_t k_CatchClause_t;
  * @since kush 0.1
  */
 struct k_BreakStatement_t {
-    k_ContextType_t m_type;
-    k_Token_t* m_identifier;
+    k_ContextType_t type;
+    k_Token_t* identifier;
 };
 
 /**
@@ -482,10 +483,10 @@ typedef struct k_BreakStatement_t k_BreakStatement_t;
  *******************************************************************************/
 
 struct k_FunctionParameter_t {
-    k_ContextType_t m_type;
-    k_Token_t* m_baseType;
-    int32_t m_dimensions;
-    k_Token_t* m_identifier;
+    k_ContextType_t type;
+    k_Token_t* baseType;
+    int32_t dimensions;
+    k_Token_t* identifier;
 };
 
 typedef struct k_FunctionParameter_t k_FunctionParameter_t;
@@ -495,15 +496,56 @@ typedef struct k_FunctionParameter_t k_FunctionParameter_t;
  *******************************************************************************/
 
 struct k_StorageDeclarator_t {
-    k_ContextType_t m_type;
-    bool m_infer;
-    bool m_constant;
-    k_Token_t* m_baseType;
-    int32_t m_dimensions;
-    k_Token_t* m_identifier;
-    k_BinaryExpression_t* m_expression;
+    k_ContextType_t type;
+    bool infer;
+    bool constant;
+    k_Token_t* baseType;
+    int32_t dimensions;
+    k_Token_t* identifier;
+    k_BinaryExpression_t* expression;
 };
 
 typedef struct k_StorageDeclarator_t k_StorageDeclarator_t;
+
+/*******************************************************************************
+ * Type                                                                        *
+ *******************************************************************************/
+
+#define K_TYPE_STRUCTURE 0
+#define K_TYPE_INTEGER 1
+#define K_TYPE_DECIMAL 2
+#define K_TYPE_ARRAY 3
+#define K_TYPE_VOID 4
+
+struct k_Type_t {
+    uint8_t tag;
+    union {
+        struct {
+            k_Type_t* m_base;
+            uint16_t m_dimensions;
+        } array;
+        struct {
+            uint8_t size;
+        } integer;
+        struct {
+            uint8_t size;
+        } decimal;
+        k_StructureDeclaration_t* structure;
+    };
+};
+
+typedef struct k_Type_t k_Type_t;
+
+struct k_Primitives_t {
+    k_Type_t i8;
+    k_Type_t i16;
+    k_Type_t i32;
+    k_Type_t i64;
+    k_Type_t f32;
+    k_Type_t f64;
+    k_Type_t void_;
+};
+
+typedef struct k_Primitives_t k_Primitives_t;
 
 #endif /* KUSH_PARSER_CONTEXT_H */

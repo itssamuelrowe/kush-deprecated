@@ -91,12 +91,59 @@
  *   y   5
  */
 
+k_Primitives_t primitives = {
+    .i8 = {
+        .tag = K_TYPE_INTEGER,
+        .integer = {
+            .size = 1
+        }
+    },
+
+    .i16 = {
+        .tag = K_TYPE_INTEGER,
+        .integer = {
+            .size = 2
+        }
+    },
+
+    .i32 = {
+        .tag = K_TYPE_INTEGER,
+        .integer = {
+            .size = 4
+        }
+    },
+
+    .i64 = {
+        .tag = K_TYPE_INTEGER,
+        .integer = {
+            .size = 8
+        }
+    },
+
+    .f32 = {
+        .tag = K_TYPE_DECIMAL,
+        .decimal = {
+            .size = 4
+        }
+    },
+
+    .f64 = {
+        .tag = K_TYPE_DECIMAL,
+        .decimal = {
+            .size = 8
+        }
+    },
+
+    .void_ = {
+        .tag = K_TYPE_VOID
+    }
+};
+
 // Import
 
 bool import(k_Analyzer_t* analyzer, const char* name, int32_t size,
     bool wildcard) {
     k_Module_t* module = NULL; // TODO
-
 
     return true;
 }
@@ -108,113 +155,108 @@ void importDefaults(k_Analyzer_t* analyzer) {
 // Define
 
 void defineSymbols(k_Analyzer_t* analyzer, k_CompilationUnit_t* unit) {
-    unit->m_scope = k_Scope_forCompilationUnit();
-    analyzer->m_scope = unit->m_scope;
+    unit->scope = k_Scope_forCompilationUnit();
+    analyzer->scope = unit->scope;
 
-    int32_t structureCount = jtk_ArrayList_getSize(unit->m_structures);
+    int32_t structureCount = jtk_ArrayList_getSize(unit->structures);
     int32_t j;
     for (j = 0; j < structureCount; j++) {
         k_Structure_t* structure = (k_Structure_t*)jtk_ArrayList_getValue(
-            unit->m_structures, j);
+            unit->structures, j);
         defineStructure(analyzer, structure);
     }
 
-    int32_t functionCount = jtk_ArrayList_getSize(unit->m_functions);
+    int32_t functionCount = jtk_ArrayList_getSize(unit->functions);
     int32_t i;
     for (i = 0; i < functionCount; i++) {
         k_Function_t* function = (k_Function_t*)jtk_ArrayList_getValue(
-            unit->m_functions, i);
+            unit->functions, i);
         defineFunction(analyzer, function);
     }
 }
 
 void defineStructure(k_Analyzer_t* analyzer, k_Structure_t* structure) {
-    structure->m_parent = analyzer->m_scope;
-    structure->m_scope = k_Scope_forStructure(analyzer->m_scope);
-    k_Scope_addStructure(analyzer->m_scope, structure);
+    structure->parent = analyzer->scope;
+    structure->scope = k_Scope_forStructure(analyzer->scope);
+    k_Scope_addStructure(analyzer->scope, structure);
 
-    int32_t limit = jtk_ArrayList_getSize(declaration->m_variables);
+    int32_t limit = jtk_ArrayList_getSize(declaration->variables);
     int32_t i;
     for (i = 0; i < limit; i++) {
         k_Storage_t* storage =
-            (k_Storage_t*)jtk_ArrayList_getValue(declaration->m_variables, i);
-        declarator->m_parent = structure->m_scope;
-        k_Scope_addStorage(structure->m_scope, storage);
+            (k_Storage_t*)jtk_ArrayList_getValue(declaration->variables, i);
+        declarator->parent = structure->scope;
+        k_Scope_addStorage(structure->scope, storage);
     }
 }
 
 void defineFunction(k_Analyzer_t* analyzer, k_Function_t* function) {
-    function->m_parent = analyzer->m_scope;
-    function->m_scope = analyzer->m_scope =
-        k_Scope_forFunction(analyzer->m_scope);
-    k_Scope_addFunction(analyzer->m_scope, function);
+    function->parent = analyzer->scope;
+    function->scope = analyzer->scope =
+        k_Scope_forFunction(analyzer->scope);
+    k_Scope_addFunction(analyzer->scope, function);
 
-    k_Scope_t* scope = defineLocals(analyzer, function->m_body);
-    int32_t parameterCount = jtk_ArrayList_getSize(function->m_parameters);
+    k_Scope_t* scope = defineLocals(analyzer, function->body);
+    int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
     int32_t i;
     for (i = 0; i < parameterCount; i++) {
-        k_Variable_t* parameter = (k_Storage_t*)jtk_ArrayList_getValue(function->m_parameters, i);
+        k_Variable_t* parameter = (k_Storage_t*)jtk_ArrayList_getValue(function->parameters, i);
         k_Scope_addVariable(scope, parameter);
     }
 }
 
-k_Scope_t* defineLocals(k_Analyzer_t* analzyer, k_BlockStatement_t* block) {
-    block->m_scope = analyzer->m_scope = k_Scope_forLocal(analyzer->m_scope);
+k_Scope_t* defineLocals(k_Analyzer_t* analyzer, k_BlockStatement_t* block) {
+    block->scope = analyzer->scope = k_Scope_forLocal(analyzer->scope);
 
-    int32_t limit = jtk_ArrayList_getSize(block->m_statements);
+    int32_t limit = jtk_ArrayList_getSize(block->statements);
     int32_t i;
     for (i = 0; i < limit; i++) {
         k_Context_t* context = (k_Context_t*)jtk_ArrayList_getValue(
-            block->m_statements, i);
-        switch (context->m_type) {
-            case K_CONTEXT_BLOCK_STATEMENT: {
-                defineLocals(analyzer, (k_BlockStatement_t*)context);
-                break;
-            }
-
+            block->statements, i);
+        switch (context->type) {
             case K_CONTEXT_ITERATIVE_STATEMENT: {
                 k_IterativeStatement_t* statement = (k_IterativeStatement_t*)context;
-                if (statement->m_label != NULL) {
-                    jtk_Scope_addLabel(analyzer->m_scope, &statement->m_label);
+                if (statement->label != NULL) {
+                    jtk_Scope_addLabel(analyzer->scope, &statement->label);
                 }
-                if (statement->m_parameter != NULL) {
-                    jtk_Scope_addVariable(scope, statement->m_parameter);
+                if (statement->parameter != NULL) {
+                    jtk_Scope_addVariable(scope, statement->parameter);
                 }
-                defineLocals(analyzer, statement->m_body);
+                defineLocals(analyzer, statement->body);
                 break;
             }
 
             case K_CONTEXT_IF_STATEMENT: {
                 k_IfStatement_t* statement = (k_IfStatement_t*)context;
-                defineLocals(analyzer, statement->m_ifClause->m_body);
-                int32_t count = jtk_ArrayList_getSize(statement->m_elseIfClauses);
+                defineLocals(analyzer, statement->ifClause->body);
+                int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
                 int32_t j;
                 for (j = 0; j < count; j++) {
                     k_IfClause_t* clause = (k_IfClause_t*)jtk_ArrayList_getValue(
-                        statement->m_elseIfClauses, j);
-                    defineLocals(analyzer, clause->m_body);
+                        statement->elseIfClauses, j);
+                    defineLocals(analyzer, clause->body);
                 }
-                if (statement->m_elseClause != NULL) {
-                    defineLocals(analyzer, statement->m_elseClause);
+                if (statement->elseClause != NULL) {
+                    defineLocals(analyzer, statement->elseClause);
                 }
                 break;
             }
 
             case K_CONTEXT_TRY_STATEMENT: {
                 k_TryStatement_t* statement = (k_TryStatement_t*)context;
-                defineLocals(analyzer, statement->m_tryClause);
+                defineLocals(analyzer, statement->tryClause);
 
-                int32_t count = jtk_ArrayList_getSize(statement->m_catchClauses);
+                int32_t count = jtk_ArrayList_getSize(statement->catchClauses);
                 int32_t j;
                 for (j = 0; j < count; j++) {
                     k_CatchClause_t* clause = (k_CatchClause_t*)jtk_ArrayList_getValue(
-                        statement->m_catchClauses, j);
-                    k_Scope_t* scope = defineLocals(clause->m_body);
-                    defineVariable(analyzer, scope, clause->m_parameter);
+                        statement->catchClauses, j);
+                    k_Scope_t* scope = defineLocals(clause->body);
+                    defineVariable(analyzer, scope, clause->parameter);
                 }
 
-                if (statement->m_finallyClause != NULL) {
-                    defineLocals(analyzer, statement->m_finallyClause);
+                if (statement->finallyClause != NULL) {
+                    defineLocals(analyzer, statement->finallyClause);
                 }
 
                 break;
@@ -222,19 +264,19 @@ k_Scope_t* defineLocals(k_Analyzer_t* analzyer, k_BlockStatement_t* block) {
 
             case K_CONTEXT_VARIABLE_DECLARATION: {
                 k_VariableDeclaration_t* statement = (k_VariableDeclaration_t*)context;
-                int32_t count = jtk_ArrayList_getSize(statement->m_variables);
+                int32_t count = jtk_ArrayList_getSize(statement->variables);
                 int32_t j;
                 for (j = 0; j < count; j++) {
                     k_Variable_t* variable = (k_Variable_t*)jtk_ArrayList_getValue(
-                        statement->m_variables, j);
-                    defineVariable(analyzer->m_scope, variable);
+                        statement->variables, j);
+                    defineVariable(analyzer->scope, variable);
                 }
                 break;
             }
         }
     }
 
-    analyzer->m_scope = analyzer->m_scope->m_parent;
+    analyzer->scope = analyzer->scope->parent;
 }
 
 // Resovle
@@ -245,10 +287,10 @@ k_Scope_t* defineLocals(k_Analyzer_t* analzyer, k_BlockStatement_t* block) {
 
 k_Analyzer_t* k_Analyzer_new(k_Compiler_t* compiler) {
     k_Analyzer_t* analyzer = k_Memory_allocate(k_Analyzer_t, 1);
-    analyzer->m_compiler = compiler;
-    analyzer->m_symbolTable = NULL;
-    analyzer->m_package = NULL;
-    analyzer->m_packageSize = -1;
+    analyzer->compiler = compiler;
+    analyzer->symbolTable = NULL;
+    analyzer->package = NULL;
+    analyzer->packageSize = -1;
 
     return analyzer;
 }
@@ -272,9 +314,9 @@ void k_Analyzer_analyze(k_Analyzer_t* analyzer, k_Module_t* module) {
 
 void k_Analyzer_reset(k_Analyzer_t* analyzer,
     k_SymbolTable_t* symbolTable, const uint8_t* package, int32_t packageSize) {
-    analyzer->m_symbolTable = symbolTable;
-    analyzer->m_package = package;
-    analyzer->m_packageSize = packageSize;
+    analyzer->symbolTable = symbolTable;
+    analyzer->package = package;
+    analyzer->packageSize = packageSize;
 }
 
 
@@ -284,7 +326,7 @@ uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
     int32_t i;
     for (i = 0; i < identifierCount; i++) {
         k_Token_t* identifier = (k_Token_t*)jtk_ArrayList_getValue(identifiers, i);
-        jtk_StringBuilder_appendEx_z(builder, identifier->m_text, identifier->m_length);
+        jtk_StringBuilder_appendEx_z(builder, identifier->text, identifier->length);
         if (i + 1 < identifierCount) {
             jtk_StringBuilder_append_c(builder, '.');
         }
@@ -297,26 +339,26 @@ uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
 }
 
 void resolve(k_Analyzer_t* analyzer, k_Module_t* module) {
-    k_Compiler_t* compiler = analyzer->m_compiler;
-    k_ErrorHandler_t* handler = compiler->m_errorHandler;
+    k_Compiler_t* compiler = analyzer->compiler;
+    k_ErrorHandler_t* handler = compiler->errorHandler;
 
-    analyzer->m_scope = module->m_scope;
-    if (!analyzer->m_compiler->m_coreApi) {
+    analyzer->scope = module->scope;
+    if (!analyzer->compiler->coreApi) {
         importDefaults(analyzer);
     }
 
-    int32_t importCount = jtk_ArrayList_getSize(module->m_imports);
+    int32_t importCount = jtk_ArrayList_getSize(module->imports);
     int32_t i;
     for (i = 0; i < importCount; i++) {
         k_ImportDeclaration_t* declaration = (k_ImportDeclaration_t*)jtk_ArrayList_getValue(
-            module->m_imports, i);
+            module->imports, i);
         int32_t size;
-        uint8_t* name = getModuleName(declaration->m_identifiers, &size);
+        uint8_t* name = getModuleName(declaration->identifiers, &size);
 
         // If a module was previously imported, we should'nt complain.
-        k_Module_t* newModule = import(analyzer, name, size, declaration->m_wildcard);
+        k_Module_t* newModule = import(analyzer, name, size, declaration->wildcard);
         if (newModule == NULL) {
-            k_Token_t* lastToken = (k_Token_t*)jtk_ArrayList_getValue(declaration->m_identifiers, -1);
+            k_Token_t* lastToken = (k_Token_t*)jtk_ArrayList_getValue(declaration->identifiers, -1);
             reportError(analyzer, KUSH_ERROR_UNKNOWN_MODULE, lastToken);
         }
         else {
@@ -325,724 +367,184 @@ void resolve(k_Analyzer_t* analyzer, k_Module_t* module) {
 
         jtk_CString_delete(name);
     }
-}
 
-void k_Analyzer_onExitImportDeclaration(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// annotatedComponentDeclaration
-
-void k_Analyzer_onEnterAnnotatedComponentDeclaration(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitAnnotatedComponentDeclaration(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// annotations
-
-void k_Analyzer_onEnterAnnotations(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitAnnotations(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// annotation
-
-void k_Analyzer_onEnterAnnotation(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitAnnotation(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// annotationType
-
-void k_Analyzer_onEnterAnnotationType(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitAnnotationType(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// annotationAttribute
-
-void k_Analyzer_onEnterAnnotationAttribute(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitAnnotationAttribute(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// componentDeclaration
-
-void k_Analyzer_onEnterComponentDeclaration(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitComponentDeclaration(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onEnterFunctionDeclaration(
-    k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-    jtk_Assert_assertObject(astListener, "The specified AST analyzer is null.");
-    jtk_Assert_assertObject(node, "The specified AST node is null.");
-
-
-    k_FunctionDeclarationContext_t* context = (k_FunctionDeclarationContext_t*)node->m_context;
-
-    k_Scope_t* scope = k_ASTAnnotations_get(analyzer->m_scopes, node);
-    k_SymbolTable_setCurrentScope(analyzer->m_symbolTable, scope);
-    k_Scope_t* enclosingScope = k_Scope_getEnclosingScope(scope);
-
-    /* Retrieve the identifier associated with the function declaration. */
-    k_ASTNode_t* identifier = context->m_identifier;
-    k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
-    /* Retrieve the text representation of the identifier. */
-    const uint8_t* identifierText = ((k_Token_t*)identifier->m_context)->m_text;
-
-    k_FunctionParametersContext_t* functionParametersContext =
-        (k_FunctionParametersContext_t*)context->m_functionParameters->m_context;
-    /* Retrieve the fixed parameters associated with the context of the
-     * function arguments.
-     */
-    jtk_ArrayList_t* fixedParameters = functionParametersContext->m_fixedParameters;
-    int32_t fixedParameterCount = jtk_ArrayList_getSize(fixedParameters);
-
-    /* Retrieve the symbol table associated with this analyzer. */
-    k_SymbolTable_t* symbolTable = analyzer->m_symbolTable;
-    k_Symbol_t* symbol = k_SymbolTable_resolve(symbolTable, identifierText);
-    k_FunctionSignature_t* signature = k_Symbol_getFunctionSignature(symbol, fixedParameterCount);
-    signature->m_tableIndex = ++analyzer->m_functionIndex;
-
-    // TODO: In inheritance, the index should be generated after following up
-    // the hierarchy to address overriding.
-
-    /* NOTE: Previously a different approach was taken to resolve clashes in
-     *       inheritance. The original idea was to apply BFS algorithm against
-     *       the inheritance graph. The generated graph tree could be used in
-     *       a  matrix to resolve clashes by comparing each class in the
-     *       cardinal set. This algorithm is active such that the compiler
-     *       quickly detects clashes.
-     *
-     *       The design of the virtual machine allows interchangeable references
-     *       of classes and other symbols without the language barrier. Therefore,
-     *       another check should be applied during the resolution of functions
-     *       and other symbols.
-     *
-     *      This introduces two disadvantages to the original algorithm.
-     *          - The compiler checks multiple times to detect the same error.
-     *          - The complexity of the algorithm is more when compared to latter
-     *            algorithm.
-     *
-     *      Therefore, I am dropping the implementation of the previous algorithm
-     *      as it is, which is incomplete.
-     */
-    /* Resolve member functions with reference to superclasses. */
-//    if (k_Scope_isClassScope(enclosingScope)) {
-//        k_ASTNode_t* identifier = context->m_identifier;
-//        k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
-//        const uint8_t* identifierText = k_Token_getText(identifierToken);
-//
-//        k_ClassScope_t* classScope = (k_ClassSymbol_t*)k_Scope_getContext(enclosingScope);
-//        k_ClassSymbol_t* classSymbol = (k_ClassSymbol_t*)classScope->m_classSymbol->m_context;
-//
-//        k_LinkedStack_t* stack = k_LinkedStack_new();
-//
-//        jtk_ArrayList_t* superClasses = k_ClassSymbol_getSuperClasses(classSymbol);
-//        int32_t size = jtk_ArrayList_getSize(superClasses);
-//        int32_t i;
-//        for (i = 0; i < size; i++) {
-//            k_Symbol_t* superClassSymbol = (k_Symbol_t*)jtk_ArrayList_getValue(superClasses, i);
-//            k_ClassSymbol_t* superClassSymbol_ = (k_ClassSymbol_t*)superClassSymbol->m_context;
-//            k_LinkedStack_push(stack, superClassSymbol_);
-//        }
-//
-//        /* The function is not resolved against the current scope as it is redundant.
-//         * Remember, the declaration phase takes care of this.
-//         */
-//
-//        k_Symbol_t* currentScopeSymbol = (k_Symbol_t*)jtk_HashMap_getValue(classScope->m_symbols, identifierText);
-//
-//        while (!k_LinkedStack_isEmpty(stack)) {
-//            k_ClassSymbol_t* classSymbol = (k_ClassSymbol_t*)k_LinkedStack_pop(stack);
-//            k_Scope_t* ts = k_ClassSymbol_getClassScope(classSymbol);
-//            classScope = (k_ClassScope_t*)ts->m_context;
-//
-//            k_Symbol_t* superScopeSymbol = (k_Symbol_t*)jtk_HashMap_getValue(classScope->m_symbols, identifierText);
-//            if (superScopeSymbol != NULL) {
-//                if (k_Symbol_isFunction(superScopeSymbol)) {
-//                    /* Thanks to the declaration phase, we can be sure that the current scope symbol
-//                     * is a function.
-//                     */
-//                    jtk_Assert_assertTrue(k_Symbol_isFunction(currentScopeSymbol), "The declaration phase declared a different symbols with the same identifier.");
-//
-//                    k_FunctionSymbol_t* currentScopeFunctionSymbol = (k_FunctionSymbol_t*)currentScopeSymbol->m_context;
-//                    k_FunctionSymbol_t* superScopeFunctionSymbol = (k_FunctionSymbol_t*)superScopeSymbol->m_context;
-//
-//                    if ((currentScopeFunctionSymbol->m_parameterThreshold == -1) &&
-//                        (superScopeFunctionSymbol->m_parameterThreshold == -1)) {
-//                        printf("Either functions were overridden or overloaded.");
-//                    }
-//                    else if ((currentScopeFunctionSymbol->m_parameterThreshold != -1) &&
-//                        (superScopeFunctionSymbol->m_parameterThreshold != -1)) {
-//                        if (currentScopeFunctionSymbol->m_parameterThreshold != superScopeFunctionSymbol->m_parameterThreshold) {
-//                            /* k_Error_t* error = */ k_ErrorHandler_reportError(NULL, "Multiple overloads with variable parameters across superclass and subclass.", (k_Token_t*)currentScopeSymbol->m_identifier->m_context);
-//                            // k_Error_addExtra(error, "Previously valid here");
-//                       }
-//                    }
-//                    else if ((currentScopeFunctionSymbol->m_parameterThreshold != -1) &&
-//                        (superScopeFunctionSymbol->m_parameterThreshold == -1)) {
-//                        jtk_ArrayList_t* superScopeSignatures = k_FunctionSymbol_getSignatures(superScopeFunctionSymbol);
-//                        int32_t superScopeSignatureCount = jtk_ArrayList_getSize(superScopeSignatures);
-//                        int32_t j;
-//                        for (j = 0; j < superScopeSignatureCount; j++) {
-//                            k_FunctionSignature_t* superScopeSignature = (k_FunctionSignature_t*)jtk_ArrayList_getValue(superScopeSignatures, j);
-//                            int32_t fixedParameterCount = jtk_ArrayList_getSize(superScopeSignature->m_fixedParameters);
-//                            if (fixedParameterCount >= currentScopeFunctionSymbol->m_parameterThreshold) {
-//                                k_ErrorHandler_reportError(NULL, "Superclass function exceeds parameter threshold", (k_Token_t*)superScopeSymbol->m_identifier->m_context);
-//                            }
-//                        }
-//                    }
-//                    else if ((currentScopeFunctionSymbol->m_parameterThreshold == -1) &&
-//                        (superScopeFunctionSymbol->m_parameterThreshold != -1)) {
-//                        jtk_ArrayList_t* currentScopeSignatures = k_FunctionSymbol_getSignatures(currentScopeFunctionSymbol);
-//                        int32_t currentScopeSignatureCount = jtk_ArrayList_getSize(currentScopeSignatures);
-//                        int32_t j;
-//                        for (j = 0; j < currentScopeSignatureCount; j++) {
-//                            k_FunctionSignature_t* currentScopeSignature = (k_FunctionSignature_t*)jtk_ArrayList_getValue(currentScopeSignatures, j);
-//                            int32_t fixedParameterCount = jtk_ArrayList_getSize(currentScopeSignature->m_fixedParameters);
-//                            if (fixedParameterCount >= superScopeFunctionSymbol->m_parameterThreshold) {
-//                                k_ErrorHandler_reportError(NULL, "Subclass function exceeds parameter threshold", (k_Token_t*)currentScopeSymbol->m_identifier->m_context);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            else {
-//                superClasses = k_ClassSymbol_getSuperClasses(classSymbol);
-//                size = jtk_ArrayList_getSize(superClasses);
-//                for (i = 0; i < size; i++) {
-//                    k_Symbol_t* rawSuperClassSymbol = jtk_ArrayList_getValue(superClasses, i);
-//                    k_ClassSymbol_t* superClassSymbol = (k_ClassSymbol_t*)rawSuperClassSymbol->m_context;
-//                    k_LinkedStack_push(stack, superClassSymbol);
-//                }
-//            }
-//        }
-//    }
-}
-
-void k_Analyzer_onExitFunctionDeclaration(
-    k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-    jtk_Assert_assertObject(astListener, "The specified AST analyzer is null.");
-    jtk_Assert_assertObject(node, "The specified AST node is null.");
-
-
-    k_SymbolTable_invalidateCurrentScope(analyzer->m_symbolTable);
-}
-
-// functionParameters
-
-void k_Analyzer_onEnterFunctionParameters(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitFunctionParameters(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// functionBody
-
-void k_Analyzer_onEnterFunctionBody(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitFunctionBody(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onEnterStatementSuite(
-    k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-    jtk_Assert_assertObject(astListener, "The specified AST analyzer is null.");
-    jtk_Assert_assertObject(node, "The specified AST node is null.");
-
-
-
-    k_Scope_t* scope = k_ASTAnnotations_get(analyzer->m_scopes, node);
-    k_SymbolTable_setCurrentScope(analyzer->m_symbolTable, scope);
-}
-
-void k_Analyzer_onExitStatementSuite(
-    k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-    jtk_Assert_assertObject(astListener, "The specified AST analyzer is null.");
-    jtk_Assert_assertObject(node, "The specified AST node is null.");
-
-
-
-    k_SymbolTable_invalidateCurrentScope(analyzer->m_symbolTable);
-}
-
-// simpleStatement
-
-void k_Analyzer_onEnterSimpleStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitSimpleStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// statement
-
-void k_Analyzer_onEnterStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// emptyStatement
-
-void k_Analyzer_onEnterEmptyStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitEmptyStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// variableDeclaration
-
-void k_Analyzer_onEnterVariableDeclaration(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitVariableDeclaration(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// variableDeclarator
-
-void k_Analyzer_onEnterVariableDeclarator(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitVariableDeclarator(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// constantDeclaration
-
-void k_Analyzer_onEnterConstantDeclaration(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitConstantDeclaration(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// constantDeclarator
-
-void k_Analyzer_onEnterConstantDeclarator(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitConstantDeclarator(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// assertStatement
-
-void k_Analyzer_onEnterAssertStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitAssertStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onEnterBreakStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// breakStatement
-
-void k_Analyzer_onExitBreakStatement(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// continueStatement
-
-void k_Analyzer_onEnterContinueStatement(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitContinueStatement(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// returnStatement
-
-void k_Analyzer_onEnterReturnStatement(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitReturnStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// throwStatement
-
-void k_Analyzer_onEnterThrowStatement(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitThrowStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// compoundStatement
-
-void k_Analyzer_onEnterCompoundStatement(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitCompoundStatement(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// ifStatement
-
-void k_Analyzer_onEnterIfStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitIfStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// ifClause
-
-void k_Analyzer_onEnterIfClause(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitIfClause(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// elseIfClause
-
-void k_Analyzer_onEnterElseIfClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitElseIfClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// elseClause
-
-void k_Analyzer_onEnterElseClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitElseClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// iterativeStatement
-
-void k_Analyzer_onEnterIterativeStatement(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitIterativeStatement(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// label
-
-void k_Analyzer_onEnterLabel(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitLabel(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// whileStatement
-
-void k_Analyzer_onEnterWhileStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitWhileStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// forStatement
-
-void k_Analyzer_onEnterForStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitForStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// forParameters
-
-void k_Analyzer_onEnterForParameters(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitForParameters(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// tryStatement
-
-void k_Analyzer_onEnterTryStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-    jtk_Assert_assertObject(astListener, "The specified AST analyzer is null.");
-    jtk_Assert_assertObject(node, "The specified AST node is null.");
-
-
-    k_TryStatementContext_t* context = (k_TryStatementContext_t*)node->m_context;
-
-    int32_t catchClauseCount = jtk_ArrayList_getSize(context->m_catchClauses);
+    int32_t functionCount = jtk_ArrayList_getSize(unit->functions);
     int32_t i;
-    for (i = 0; i < catchClauseCount; i++) {
-        k_ASTNode_t* catchClause = (k_ASTNode_t*)jtk_ArrayList_getValue(context->m_catchClauses, i);
-        k_CatchClauseContext_t* catchClauseContext = (k_CatchClauseContext_t*)catchClause->m_context;
-
-        k_Scope_t* scope = k_ASTAnnotations_get(analyzer->m_scopes, catchClause);
-        k_SymbolTable_setCurrentScope(analyzer->m_symbolTable, scope);
-
-        /* Visit the scopes of the statement suite specified to the
-         * catch clause.
-         */
-        k_ASTWalker_walk(astListener, catchClauseContext->m_statementSuite);
-
-        k_SymbolTable_invalidateCurrentScope(analyzer->m_symbolTable);
+    for (i = 0; i < functionCount; i++) {
+        k_Function_t* function = (k_Function_t*)jtk_ArrayList_getValue(
+            unit->functions, i);
+        resolveLocals(analyzer, function->body);
     }
-
-    k_ASTListener_skipChildren(astListener);
 }
 
-void k_Analyzer_onExitTryStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
+void resolveLocals(k_Analyzer_t* analyzer, k_BlockStatement_t* block) {
+    analyzer->scope = block->scope;
 
-// tryClause
-
-void k_Analyzer_onEnterTryClause(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitTryClause(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// catchClause
-
-void k_Analyzer_onEnterCatchClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitCatchClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// catchFilter
-
-void k_Analyzer_onEnterCatchFilter(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitCatchFilter(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// finallyClause
-
-void k_Analyzer_onEnterFinallyClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitFinallyClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// synchronizeStatement
-
-void k_Analyzer_onEnterSynchronizeStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitSynchronizeStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// withStatement
-
-void k_Analyzer_onEnterWithStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-    jtk_Assert_assertObject(astListener, "The specified AST analyzer is null.");
-    jtk_Assert_assertObject(node, "The specified AST node is null.");
-}
-
-void k_Analyzer_onExitWithStatement(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-    jtk_Assert_assertObject(astListener, "The specified AST analyzer is null.");
-    jtk_Assert_assertObject(node, "The specified AST node is null.");
-}
-
-// classDeclaration
-
-void k_Analyzer_onEnterClassDeclaration(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-    jtk_Assert_assertObject(astListener, "The specified AST analyzer is null.");
-    jtk_Assert_assertObject(node, "The specified AST node is null.");
-
-    /* Retrieve the instance of the symbol resolution analyzer. */
-
-    /* Retrieve the scope associated with the class being declared. */
-    k_Scope_t* scope = k_ASTAnnotations_get(analyzer->m_scopes, node);
-    /* If the definition of the class is duplicate, a scope is not associated with
-     * it.
-     */
-    if (scope != NULL) {
-        /* Update the current scope in the symbol table. */
-        k_SymbolTable_setCurrentScope(analyzer->m_symbolTable, scope);
-
-        k_ClassDeclarationContext_t* classDeclarationContext = (k_ClassDeclarationContext_t*)node->m_context;
-        if (classDeclarationContext->m_classExtendsClause != NULL) {
-            k_ClassExtendsClauseContext_t* classExtendsClauseContext = classExtendsClauseContext = (k_ClassExtendsClauseContext_t*)classDeclarationContext->m_classExtendsClause->m_context;
-
-            // TODO: Use a node annotation
-
-            k_Symbol_t* symbol = k_SymbolTable_resolve(analyzer->m_symbolTable, k_Token_getText((k_Token_t*)classDeclarationContext->m_identifier->m_context));
-            k_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
-            jtk_ArrayList_t* superClasses = k_ClassSymbol_getSuperClasses(classSymbol);
-
-            int32_t superClassCount = jtk_ArrayList_getSize(classExtendsClauseContext->m_typeNames);
-            int32_t i;
-            for (i = 0; i < superClassCount; i++) {
-                k_ASTNode_t* typeName = (k_ASTNode_t*)jtk_ArrayList_getValue(classExtendsClauseContext->m_typeNames, i);
-                // const uint8_t* qualifiedTypeName = k_Analyzer_getQualifiedTypeName(typeName);
-                // TODO!!
-                k_TypeNameContext_t* typeNameContext = (k_TypeNameContext_t*)(typeName->m_context);
-                jtk_ArrayList_t* identifiers = typeNameContext->m_identifiers;
-                k_Token_t* first = ((k_ASTNode_t*)jtk_ArrayList_getValue(identifiers, 0))->m_context;
-                const uint8_t* firstText = k_Token_getText(first);
-                k_Symbol_t* superClassSymbol = k_SymbolTable_resolve(analyzer->m_symbolTable, firstText);
-                if (superClassSymbol == NULL) {
-                    fprintf(stderr, "[semantic error] Unknown class\n");
+    int32_t limit = jtk_ArrayList_getSize(block->statements);
+    int32_t i;
+    for (i = 0; i < limit; i++) {
+        k_Context_t* context = (k_Context_t*)jtk_ArrayList_getValue(
+            block->statements, i);
+        switch (context->type) {
+            case K_CONTEXT_ITERATIVE_STATEMENT: {
+                k_IterativeStatement_t* statement = (k_IterativeStatement_t*)context;
+                if (statement->label != NULL) {
+                    jtk_Scope_addLabel(analyzer->scope, &statement->label);
                 }
-                else {
-                    jtk_ArrayList_add(superClasses, superClassSymbol);
+                if (statement->parameter != NULL) {
+                    jtk_Scope_addVariable(scope, statement->parameter);
                 }
+                resolveLocals(analyzer, statement->body);
+                break;
+            }
+
+            case K_CONTEXT_IF_STATEMENT: {
+                k_IfStatement_t* statement = (k_IfStatement_t*)context;
+                resolveLocals(analyzer, statement->ifClause->body);
+                int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
+                int32_t j;
+                for (j = 0; j < count; j++) {
+                    k_IfClause_t* clause = (k_IfClause_t*)jtk_ArrayList_getValue(
+                        statement->elseIfClauses, j);
+                    resolveLocals(analyzer, clause->body);
+                }
+                if (statement->elseClause != NULL) {
+                    resolveLocals(analyzer, statement->elseClause);
+                }
+                break;
+            }
+
+            case K_CONTEXT_TRY_STATEMENT: {
+                k_TryStatement_t* statement = (k_TryStatement_t*)context;
+                resolveLocals(analyzer, statement->tryClause);
+
+                int32_t count = jtk_ArrayList_getSize(statement->catchClauses);
+                int32_t j;
+                for (j = 0; j < count; j++) {
+                    k_CatchClause_t* clause = (k_CatchClause_t*)jtk_ArrayList_getValue(
+                        statement->catchClauses, j);
+                    k_Scope_t* scope = resolveLocals(clause->body);
+                    defineVariable(analyzer, scope, clause->parameter);
+                }
+
+                if (statement->finallyClause != NULL) {
+                    resolveLocals(analyzer, statement->finallyClause);
+                }
+
+                break;
+            }
+
+            case K_CONTEXT_VARIABLE_DECLARATION: {
+                k_VariableDeclaration_t* statement = (k_VariableDeclaration_t*)context;
+                int32_t count = jtk_ArrayList_getSize(statement->variables);
+                int32_t j;
+                for (j = 0; j < count; j++) {
+                    k_Variable_t* variable = (k_Variable_t*)jtk_ArrayList_getValue(
+                        statement->variables, j);
+                    defineVariable(analyzer->scope, variable);
+                }
+                break;
             }
         }
-
-        k_ASTWalker_walk(astListener, classDeclarationContext->m_classSuite);
-
-        k_SymbolTable_invalidateCurrentScope(analyzer->m_symbolTable);
     }
-    k_ASTListener_skipChildren(astListener);
+
+    analyzer->scope = analyzer->scope->parent;
 }
 
-void k_Analyzer_onExitClassDeclaration(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-    jtk_Assert_assertObject(astListener, "The specified AST analyzer is null.");
-    jtk_Assert_assertObject(node, "The specified AST node is null.");
-}
+k_Type_t* resolveExpression(k_Analyzer_t* analyzer, k_Context_t* context) {
+    switch (context->type) {
+        case K_CONTEXT_RELATIONAL_EXPRESSION:
+        case K_CONTEXT_EQUALITY_EXPRESSION: {
+            k_BinaryExpression_t* expression = (k_BinaryExpression_t*)context;
+            k_Type_t* leftType = resolveExpression(analyzer, expression->left);
 
-// classExtends
+            int32_t count = jtk_ArrayList_getSize(expression->others);
+            if (count == 1) {
+                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(
+                    expression->others, 0);
+                k_Type_t* rightType = resolveExpression(analyzer, pair->right);
 
-void k_Analyzer_onEnterClassExtendsClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
+                if (leftType != rightType) {
+                    reportError(analyzer, K_ERROR_INCOMPATIBLE_TYPES, pair->left);
+                }
+            }
+            else if (count > 1) {
+                reportError(analyzer, K_ERROR_COMBINING_EQUALITY_OPERATORS);
+            }
 
-void k_Analyzer_onExitClassExtendsClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
+            break;
+        }
 
-// classSuite
+        case K_CONTEXT_ASSIGNMENT_EXPRESSION:
+        case K_CONTEXT_LOGICAL_OR_EXPRESSION:
+        case K_CONTEXT_LOGICAL_AND_EXPRESSION:
+        case K_CONTEXT_INCLUSIVE_OR_EXPRESSION:
+        case K_CONTEXT_EXCLUSIVE_OR_EXPRESSION:
+        case K_CONTEXT_AND_EXPRESSION:
+        case K_CONTEXT_SHIFT_EXPRESSION:
+        case K_CONTEXT_ADDITIVE_EXPRESSION:
+        case K_CONTEXT_MULTIPLICATIVE_EXPRESSION: {
+            k_BinaryExpression_t* expression = (k_BinaryExpression_t*)context;
+            k_Type_t* leftType = resolveExpression(analyzer, expression->left);
 
-void k_Analyzer_onEnterClassSuite(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
+            int32_t count = jtk_ArrayList_getSize(expression->others);
+            int32_t i;
+            for (i = 0; i < count; i++) {
+                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(
+                    expression->others, i);
+                k_Type_t* rightType = resolveExpression(analyzer, pair->right);
 
-void k_Analyzer_onExitClassSuite(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
+                if (leftType != rightType) {
+                    reportError(analyzer, K_ERROR_INCOMPATIBLE_TYPES, pair->left);
+                }
+            }
 
-// classMember
+            break;
+        }
 
-void k_Analyzer_onEnterClassMember(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
+        case K_CONTEXT_UNARY_EXPRESSION: {
+            k_UnaryExpression_t* expression = (k_UnaryExpression_t*)context;
+            k_Type_t* type = resolveExpression(expression->m_expression);
+            k_Token_t* operator = expression->operator;
+            if (operator != NULL) {
+                k_TokenType_t token = operator->type;
+                if ((token == K_TOKEN_PLUS) || (token == K_TOKEN_MINUS)) {
+                    if ((type.tag != K_TYPE_INTEGER) && (type.tag != K_TYPE_DECIMAL)) {
+                        reportError(analyzer, K_ERROR_INCOMPATIBLE_OPERAND, operator);
+                    }
+                }
+                else if (token == K_TOKEN_TILDE) {
+                    if (type.tag != K_TYPE_INTEGER) {
+                        reportError(analyzer, K_ERROR_INCOMPATIBLE_OPERAND, operator);
+                    }
+                }
+                else if (token == KUSH_TOKEN_EXCLAMATION_MARK) {
+                    if (type.tag != K_TYPE_BOOLEAN) {
+                        reportError(analyzer, K_ERROR_INCOMPATIBLE_OPERAND, operator);
+                    }
+                }
+                else {
+                    printf("[internal error] Control should not reach here.\n");
+                }
+            }
 
-void k_Analyzer_onExitClassMember(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// void k_Analyzer_onEnterConstructorDeclaration(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-// }
-
-// void k_Analyzer_onExitConstructorDeclaration(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-// }
-
-// enumerationDeclaration
-
-void k_Analyzer_onEnterEnumerationDeclaration(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitEnumerationDeclaration(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// enumerationBaseClass
-
-void k_Analyzer_onEnterEnumrationBaseClass(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitEnumerationBaseClause(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// enumerationSuite
-
-void k_Analyzer_onEnterEnumerationSuite(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitEnumerationSuite(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// enumerate
-
-void k_Analyzer_onEnterEnumerate(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitEnumerate(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// expressions
-
-void k_Analyzer_onEnterExpressions(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitExpressions(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// expression
-
-void k_Analyzer_onEnterExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-
-    k_ExpressionContext_t* context = (k_ExpressionContext_t*)node->m_context;
-
-    /* Use the function stack to save the previous label. This is
-     * important in the case of nested assignment expressions. Consider
-     * the expression `x = (y = z)`, if the previous label is unsaved,
-     * the nested assignment expression can alter the label of the outer
-     * assignment expression.
-     */
-    k_ExpressionAnnotation_t previous = analyzer->m_label;
-
-    k_ASTWalker_walk(astListener, context->m_assignmentExpression);
-
-    /* Restore the previous label saved on the function stack. */
-    analyzer->m_label = previous;
-
-    k_ASTListener_skipChildren(astListener);
-}
-
-void k_Analyzer_onExitExpression(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// assignmentExpression
-
-void k_Analyzer_onExitAssignmentExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
+            break;
+        }
+    }
 }
 
 void k_Analyzer_onEnterAssignmentExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_AssignmentExpressionContext_t* context = (k_AssignmentExpressionContext_t*)node->m_context;
-    k_Compiler_t* compiler = analyzer->m_compiler;
-    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_AssignmentExpressionContext_t* context = (k_AssignmentExpressionContext_t*)node->context;
+    k_Compiler_t* compiler = analyzer->compiler;
+    k_ErrorHandler_t* errorHandler = compiler->errorHandler;
 
-    k_ASTNode_t* assignmentOperator = context->m_assignmentOperator;
+    k_ASTNode_t* assignmentOperator = context->assignmentOperator;
     if (assignmentOperator != NULL) {
-        k_ASTWalker_walk(astListener, context->m_conditionalExpression);
-        if (analyzer->m_label == KUSH_EXPRESSION_ANNOTATION_VALUE) {
-            k_Token_t* assignmentOperatorToken = (k_Token_t*)assignmentOperator->m_context;
+        k_ASTWalker_walk(astListener, context->conditionalExpression);
+        if (analyzer->label == KUSH_EXPRESSION_ANNOTATION_VALUE) {
+            k_Token_t* assignmentOperatorToken = (k_Token_t*)assignmentOperator->context;
             k_ErrorHandler_handleSemanticalError(errorHandler, analyzer,
             KUSH_ERROR_CODE_INVALID_LVALUE, assignmentOperatorToken);
         }
@@ -1050,7 +552,7 @@ void k_Analyzer_onEnterAssignmentExpression(k_Analyzer_t* analyzer,
             /* Do not walk through the assignment expression when the left value
              * is invalid.
              */
-            k_ASTWalker_walk(astListener, context->m_assignmentExpression);
+            k_ASTWalker_walk(astListener, context->assignmentExpression);
         }
         k_ASTListener_skipChildren(astListener);
     }
@@ -1061,15 +563,11 @@ void k_Analyzer_onEnterAssignmentExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitConditionalExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_ConditionalExpressionContext_t* context = (k_ConditionalExpressionContext_t*)node->m_context;
+    k_ConditionalExpressionContext_t* context = (k_ConditionalExpressionContext_t*)node->context;
 
-    if (context->m_thenExpression != NULL) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (context->thenExpression != NULL) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
-}
-
-void k_Analyzer_onEnterConditionalExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
 }
 
 // logicalOrExpression
@@ -1077,15 +575,11 @@ void k_Analyzer_onEnterConditionalExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitLogicalOrExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_LogicalOrExpressionContext_t* context = (k_LogicalOrExpressionContext_t*)node->m_context;
+    k_LogicalOrExpressionContext_t* context = (k_LogicalOrExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_logicalAndExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->logicalAndExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
-}
-
-void k_Analyzer_onEnterLogicalOrExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
 }
 
 // logicalAndExpression
@@ -1093,10 +587,10 @@ void k_Analyzer_onEnterLogicalOrExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitLogicalAndExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_LogicalAndExpressionContext_t* context = (k_LogicalAndExpressionContext_t*)node->m_context;
+    k_LogicalAndExpressionContext_t* context = (k_LogicalAndExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_inclusiveOrExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->inclusiveOrExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1109,10 +603,10 @@ void k_Analyzer_onEnterLogicalAndExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitInclusiveOrExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_InclusiveOrExpressionContext_t* context = (k_InclusiveOrExpressionContext_t*)node->m_context;
+    k_InclusiveOrExpressionContext_t* context = (k_InclusiveOrExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_exclusiveOrExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->exclusiveOrExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1125,10 +619,10 @@ void k_Analyzer_onEnterInclusiveOrExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitExclusiveOrExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_ExclusiveOrExpressionContext_t* context = (k_ExclusiveOrExpressionContext_t*)node->m_context;
+    k_ExclusiveOrExpressionContext_t* context = (k_ExclusiveOrExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_andExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->andExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1141,10 +635,10 @@ void k_Analyzer_onEnterExclusiveOrExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitAndExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_AndExpressionContext_t* context = (k_AndExpressionContext_t*)node->m_context;
+    k_AndExpressionContext_t* context = (k_AndExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_equalityExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->equalityExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1157,10 +651,10 @@ void k_Analyzer_onEnterAndExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitEqualityExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_EqualityExpressionContext_t* context = (k_EqualityExpressionContext_t*)node->m_context;
+    k_EqualityExpressionContext_t* context = (k_EqualityExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_relationalExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->relationalExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1173,10 +667,10 @@ void k_Analyzer_onEnterEqualityExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitRelationalExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_RelationalExpressionContext_t* context = (k_RelationalExpressionContext_t*)node->m_context;
+    k_RelationalExpressionContext_t* context = (k_RelationalExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_shiftExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->shiftExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1189,10 +683,10 @@ void k_Analyzer_onEnterRelationalExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitShiftExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_ShiftExpressionContext_t* context = (k_ShiftExpressionContext_t*)node->m_context;
+    k_ShiftExpressionContext_t* context = (k_ShiftExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_additiveExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->additiveExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1205,10 +699,10 @@ void k_Analyzer_onEnterShiftExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitAdditiveExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_AdditiveExpressionContext_t* context = (k_AdditiveExpressionContext_t*)node->m_context;
+    k_AdditiveExpressionContext_t* context = (k_AdditiveExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_multiplicativeExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->multiplicativeExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 }
 
@@ -1221,15 +715,11 @@ void k_Analyzer_onEnterAdditiveExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitMultiplicativeExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_MultiplicativeExpressionContext_t* context = (k_MultiplicativeExpressionContext_t*)node->m_context;
+    k_MultiplicativeExpressionContext_t* context = (k_MultiplicativeExpressionContext_t*)node->context;
 
-    if (!jtk_ArrayList_isEmpty(context->m_unaryExpressions)) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (!jtk_ArrayList_isEmpty(context->unaryExpressions)) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
-}
-
-void k_Analyzer_onEnterMultiplicativeExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
 }
 
 // unaryExpression
@@ -1237,65 +727,46 @@ void k_Analyzer_onEnterMultiplicativeExpression(k_Analyzer_t* analyzer,
 void k_Analyzer_onExitUnaryExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_UnaryExpressionContext_t* context = (k_UnaryExpressionContext_t*)node->m_context;
+    k_UnaryExpressionContext_t* context = (k_UnaryExpressionContext_t*)node->context;
 
-    if (context->m_unaryOperator != NULL) {
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+    if (context->unaryOperator != NULL) {
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
-}
-
-void k_Analyzer_onEnterUnaryExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
 }
 
 // postfixExpression
 
-void k_Analyzer_onEnterPostfixExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-
-    k_PostfixExpressionContext_t* context = (k_PostfixExpressionContext_t*)node->m_context;
-
-    /* The normal behaviour of the AST walker causes the analyzer to
-     * visit the AST in an undesirable fashion. Therefore, we partially
-     * switch from the analyzer to visitor design pattern. The AST walker
-     * can be guided to switch to this mode via k_ASTListener_skipChildren()
-     * function which causes the AST walker to skip iterating over the children
-     * nodes.
-     */
-    k_ASTListener_skipChildren(astListener);
-}
-
 void k_Analyzer_onExitPostfixExpression(k_Analyzer_t* analyzer,
     k_ASTNode_t* node) {
 
-    k_PostfixExpressionContext_t* context = (k_PostfixExpressionContext_t*)node->m_context;
-    k_Compiler_t* compiler = analyzer->m_compiler;
-    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    k_ASTNode_t* primaryExpression = context->m_primaryExpression;
-    k_PrimaryExpressionContext_t* primaryExpressionContext = (k_PrimaryExpressionContext_t*)primaryExpression->m_context;
+    k_PostfixExpressionContext_t* context = (k_PostfixExpressionContext_t*)node->context;
+    k_Compiler_t* compiler = analyzer->compiler;
+    k_ErrorHandler_t* errorHandler = compiler->errorHandler;
+    k_ASTNode_t* primaryExpression = context->primaryExpression;
+    k_PrimaryExpressionContext_t* primaryExpressionContext = (k_PrimaryExpressionContext_t*)primaryExpression->context;
 
     k_Symbol_t* primarySymbol = NULL;
-    int32_t postfixPartCount = jtk_ArrayList_getSize(context->m_postfixParts);
+    int32_t postfixPartCount = jtk_ArrayList_getSize(context->postfixParts);
 
-    k_ASTNode_t* expression = primaryExpressionContext->m_expression;
+    k_ASTNode_t* expression = primaryExpressionContext->expression;
     k_Token_t* token = NULL;
     /* Check if the primary expression is a literal or an identifier. */
     if (k_ASTNode_isTerminal(expression)) {
         /* Retrieve the token that the primary expression represents. */
-        token = (k_Token_t*)expression->m_context;
+        token = (k_Token_t*)expression->context;
 
         switch (k_Token_getType(token)) {
             case KUSH_TOKEN_IDENTIFIER: {
                 /* Retrieve the string equivalent to the identifier node. */
                 const uint8_t* identifierText = k_Token_getText(token);
                 /* Resolve the symbol in the symbol table. */
-                k_Symbol_t* symbol = k_SymbolTable_resolve(analyzer->m_symbolTable, identifierText);
+                k_Symbol_t* symbol = k_SymbolTable_resolve(analyzer->symbolTable, identifierText);
 
                 if (symbol != NULL) {
                     k_Scope_t* enclosingScope = k_Symbol_getEnclosingScope(symbol);
                     if (k_Symbol_isVariable(symbol) || k_Symbol_isConstant(symbol)) {
                         /* Annotate the AST node as placeholder. */
-                        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
+                        analyzer->label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
                     }
                     else {
                         /* Pass the reference to the symbol to the next phase. */
@@ -1303,8 +774,8 @@ void k_Analyzer_onExitPostfixExpression(k_Analyzer_t* analyzer,
                     }
 
                     if ((enclosingScope != NULL) && k_Scope_isLocalScope(enclosingScope)) {
-                        k_Token_t* symbolToken = (k_Token_t*)symbol->m_identifier->m_context;
-                        if (token->m_startIndex <= symbolToken->m_startIndex) {
+                        k_Token_t* symbolToken = (k_Token_t*)symbol->identifier->context;
+                        if (token->startIndex <= symbolToken->startIndex) {
                             k_ErrorHandler_handleSemanticalError(errorHandler, analyzer,
                                     KUSH_ERROR_CODE_UNDECLARED_IDENTIFIER, token);
                         }
@@ -1325,37 +796,37 @@ void k_Analyzer_onExitPostfixExpression(k_Analyzer_t* analyzer,
             case KUSH_TOKEN_KEYWORD_THIS:
             case KUSH_TOKEN_KEYWORD_TRUE: {
                 /* Annotate the AST node as value. */
-                analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+                analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
 
                 break;
             }
         }
     }
-    else if ((expression->m_type == KUSH_AST_NODE_TYPE_MAP_EXPRESSION) ||
-        (expression->m_type == KUSH_AST_NODE_TYPE_LIST_EXPRESSION) ||
-        (expression->m_type == KUSH_AST_NODE_TYPE_EXPRESSION) ||
-        (expression->m_type == KUSH_AST_NODE_TYPE_NEW_EXPRESSION)) {
+    else if ((expression->type == KUSH_AST_NODE_TYPE_MAP_EXPRESSION) ||
+        (expression->type == KUSH_AST_NODE_TYPE_LIST_EXPRESSION) ||
+        (expression->type == KUSH_AST_NODE_TYPE_EXPRESSION) ||
+        (expression->type == KUSH_AST_NODE_TYPE_NEW_EXPRESSION)) {
         k_ASTWalker_walk(astListener, expression);
 
         /* Annotate the AST node as value. */
-        analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+        analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
     }
 
     int32_t i;
     for (i = 0; i < postfixPartCount; i++) {
         k_ASTNode_t* postfixPart = (k_ASTNode_t*)jtk_ArrayList_getValue(
-            context->m_postfixParts, i);
+            context->postfixParts, i);
         k_ASTNodeType_t type = k_ASTNode_getType(postfixPart);
 
         switch (type) {
             case KUSH_AST_NODE_TYPE_SUBSCRIPT: {
                 /* Annotate the AST node as placeholder. */
-                analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
+                analyzer->label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
 
-                k_SubscriptContext_t* subscriptContext = (k_SubscriptContext_t*)postfixPart->m_context;
+                k_SubscriptContext_t* subscriptContext = (k_SubscriptContext_t*)postfixPart->context;
 
                 /* Visit the index expression node and analyze. */
-                k_ASTWalker_walk(astListener, subscriptContext->m_expression);
+                k_ASTWalker_walk(astListener, subscriptContext->expression);
 
                 /* The normal behaviour of the AST walker causes the analyzer to
                  * visit the index in an undesirable fashion. Therefore, we partially
@@ -1371,10 +842,10 @@ void k_Analyzer_onExitPostfixExpression(k_Analyzer_t* analyzer,
 
             case KUSH_AST_NODE_TYPE_FUNCTION_ARGUMENTS: {
                 /* Annotate the AST node as value. */
-                analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+                analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
 
                 k_FunctionArgumentsContext_t* functionArgumentsContext =
-                    (k_FunctionArgumentsContext_t*)postfixPart->m_context;
+                    (k_FunctionArgumentsContext_t*)postfixPart->context;
 
                 if (i == 0) {
                     if (primarySymbol == NULL) {
@@ -1382,17 +853,17 @@ void k_Analyzer_onExitPostfixExpression(k_Analyzer_t* analyzer,
                             KUSH_ERROR_CODE_VARIABLE_TREATED_AS_FUNCTION, token);
                     }
                     else if (k_Symbol_isFunction(primarySymbol)) {
-                        k_FunctionSymbol_t* functionSymbol = &primarySymbol->m_context.m_asFunction;
-                        k_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
+                        k_FunctionSymbol_t* functionSymbol = &primarySymbol->context.asFunction;
+                        k_ASTNode_t* expressions = functionArgumentsContext->expressions;
                         if (expressions != NULL) {
-                            k_ExpressionsContext_t* expressionsContext = (k_ExpressionsContext_t*)expressions->m_context;
-                            int32_t argumentCount = jtk_ArrayList_getSize(expressionsContext->m_expressions);
+                            k_ExpressionsContext_t* expressionsContext = (k_ExpressionsContext_t*)expressions->context;
+                            int32_t argumentCount = jtk_ArrayList_getSize(expressionsContext->expressions);
                             if (argumentCount > 0) {
                                 int32_t argumentIndex;
                                 for (argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
                                     /* Retrieve the expression for the current argument. */
                                     k_ASTNode_t* argument = (k_ASTNode_t*)jtk_ArrayList_getValue(
-                                        expressionsContext->m_expressions, argumentIndex);
+                                        expressionsContext->expressions, argumentIndex);
 
                                     /* Visit the expression node and analyze. */
                                     k_ASTWalker_walk(astListener, argument);
@@ -1413,18 +884,18 @@ void k_Analyzer_onExitPostfixExpression(k_Analyzer_t* analyzer,
 
             case KUSH_AST_NODE_TYPE_MEMBER_ACCESS: {
                 k_MemberAccessContext_t* memberAccessContext =
-                    (k_MemberAccessContext_t*)postfixPart->m_context;
-                k_ASTNode_t* identifier = memberAccessContext->m_identifier;
-                k_Token_t* identifierToken = (k_Token_t*)identifier->m_context;
+                    (k_MemberAccessContext_t*)postfixPart->context;
+                k_ASTNode_t* identifier = memberAccessContext->identifier;
+                k_Token_t* identifierToken = (k_Token_t*)identifier->context;
 
                 k_ASTNode_t* functionArguments = NULL;
 
                 /* Annotate the AST node as placeholder. */
-                analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
+                analyzer->label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
 
                 if ((i + 1) < postfixPartCount) {
                     k_ASTNode_t* nextPostfixPart = (k_ASTNode_t*)jtk_ArrayList_getValue(
-                        context->m_postfixParts, i + 1);
+                        context->postfixParts, i + 1);
                     k_ASTNodeType_t nextPostfixPartType = k_ASTNode_getType(nextPostfixPart);
                     if (nextPostfixPartType == KUSH_AST_NODE_TYPE_FUNCTION_ARGUMENTS) {
                         functionArguments = nextPostfixPart;
@@ -1434,21 +905,21 @@ void k_Analyzer_onExitPostfixExpression(k_Analyzer_t* analyzer,
 
                 if (functionArguments != NULL) {
                     /* Annotate the AST node as placeholder. */
-                    analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_VALUE;
+                    analyzer->label = KUSH_EXPRESSION_ANNOTATION_VALUE;
 
                     k_FunctionArgumentsContext_t* functionArgumentsContext =
-                        (k_FunctionArgumentsContext_t*)functionArguments->m_context;
+                        (k_FunctionArgumentsContext_t*)functionArguments->context;
 
-                    k_ASTNode_t* expressions = functionArgumentsContext->m_expressions;
+                    k_ASTNode_t* expressions = functionArgumentsContext->expressions;
                     if (expressions != NULL) {
-                        k_ExpressionsContext_t* expressionsContext = (k_ExpressionsContext_t*)expressions->m_context;
-                        int32_t argumentCount = jtk_ArrayList_getSize(expressionsContext->m_expressions);
+                        k_ExpressionsContext_t* expressionsContext = (k_ExpressionsContext_t*)expressions->context;
+                        int32_t argumentCount = jtk_ArrayList_getSize(expressionsContext->expressions);
                         if (argumentCount > 0) {
                             int32_t argumentIndex;
                             for (argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
                                 /* Retrieve the expression for the current argument. */
                                 k_ASTNode_t* argument = (k_ASTNode_t*)jtk_ArrayList_getValue(
-                                    expressionsContext->m_expressions, argumentIndex);
+                                    expressionsContext->expressions, argumentIndex);
 
                                 /* Visit the expression node and generate the relevant instructions. */
                                 k_ASTWalker_walk(astListener, argument);
@@ -1473,89 +944,6 @@ void k_Analyzer_onExitPostfixExpression(k_Analyzer_t* analyzer,
     }
 }
 
-// subscript
-
-void k_Analyzer_onEnterSubscript(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-
-    k_ExpressionContext_t* context = (k_ExpressionContext_t*)node->m_context;
-
-    // analyzer->m_label = KUSH_EXPRESSION_ANNOTATION_PLACEHOLDER;
-}
-
-void k_Analyzer_onExitSubscript(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// functionArguments
-
-void k_Analyzer_onEnterFunctionArguments(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitFunctionArguments(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// memberAccess
-
-void k_Analyzer_onEnterMemberAccess(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitMemberAccess(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// postfixOperator
-
-void k_Analyzer_onEnterPostfixOperator(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitPostfixOperator(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// Primary Expression
-
-void k_Analyzer_onEnterPrimaryExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitPrimaryExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onEnterMapExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitMapExpression(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// mapEntries
-
-void k_Analyzer_onEnterMapEntries(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitMapEntries(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-// mapEntry
-
-void k_Analyzer_onEnterMapEntry(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitMapEntry(k_Analyzer_t* analyzer, k_ASTNode_t* node) {
-}
-
-// listExpression
-
-void k_Analyzer_onEnterListExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
-void k_Analyzer_onExitListExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
-}
-
 // New Expression
 
 void k_Analyzer_onEnterNewExpression(k_Analyzer_t* analyzer,
@@ -1563,26 +951,26 @@ void k_Analyzer_onEnterNewExpression(k_Analyzer_t* analyzer,
     // TODO: Debug this function when superclasses are implemented!
 
 
-    k_Compiler_t* compiler = analyzer->m_compiler;
-    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
+    k_Compiler_t* compiler = analyzer->compiler;
+    k_ErrorHandler_t* errorHandler = compiler->errorHandler;
     /* Retrieve the logger from the compiler. */
-    jtk_Logger_t* logger = compiler->m_logger;
+    jtk_Logger_t* logger = compiler->logger;
 
-    k_NewExpressionContext_t* context = (k_NewExpressionContext_t*)node->m_context;
+    k_NewExpressionContext_t* context = (k_NewExpressionContext_t*)node->context;
 
     /* Retrieve the scope within which the new expression appears. */
-    // k_Scope_t* scope = k_SymbolTable_getCurrentScope(generator->m_symbolTable);
+    // k_Scope_t* scope = k_SymbolTable_getCurrentScope(generator->symbolTable);
 
     /* Retrieve the string equivalent of the type name node. */
     int32_t typeNameSize;
-    uint8_t* typeNameText = k_ASTNode_toCString(context->m_typeName, &typeNameSize);
-    k_TypeNameContext_t* typeName = (k_TypeNameContext_t*)context->m_typeName->m_context;
-    int32_t identifierCount = jtk_ArrayList_getSize(typeName->m_identifiers);
-    k_ASTNode_t* lastIdentifier = jtk_ArrayList_getValue(typeName->m_identifiers, identifierCount - 1);
-    k_Token_t* lastIdentifierToken = (k_Token_t*)lastIdentifier->m_context;
+    uint8_t* typeNameText = k_ASTNode_toCString(context->typeName, &typeNameSize);
+    k_TypeNameContext_t* typeName = (k_TypeNameContext_t*)context->typeName->context;
+    int32_t identifierCount = jtk_ArrayList_getSize(typeName->identifiers);
+    k_ASTNode_t* lastIdentifier = jtk_ArrayList_getValue(typeName->identifiers, identifierCount - 1);
+    k_Token_t* lastIdentifierToken = (k_Token_t*)lastIdentifier->context;
 
     /* Resolve the class symbol for the type name. */
-    k_Symbol_t* symbol = k_SymbolTable_resolve(analyzer->m_symbolTable, typeNameText);
+    k_Symbol_t* symbol = k_SymbolTable_resolve(analyzer->symbolTable, typeNameText);
 
     if (symbol == NULL) {
         k_ErrorHandler_handleSemanticalError(errorHandler, analyzer,
@@ -1590,13 +978,13 @@ void k_Analyzer_onEnterNewExpression(k_Analyzer_t* analyzer,
     }
     else {
         if (k_Symbol_isExternal(symbol)) {
-            symbol = symbol->m_context.m_asExternal;
+            symbol = symbol->context.asExternal;
         }
 
         if (k_Symbol_isClass(symbol)) {
-            k_ClassSymbol_t* classSymbol = &symbol->m_context.m_asClass;
+            k_ClassSymbol_t* classSymbol = &symbol->context.asClass;
             /* Retrieve the scope corresponding to the class symbol. */
-            k_Scope_t* scope = classSymbol->m_classScope;
+            k_Scope_t* scope = classSymbol->classScope;
             if (k_Scope_isClassScope(scope)) {
                 /* Retrieve the constructor declared in this class. */
                 k_Symbol_t* constructorSymbol = k_Scope_resolve(scope, "new");
@@ -1628,8 +1016,4 @@ void k_Analyzer_onEnterNewExpression(k_Analyzer_t* analyzer,
      * entry in the constant pool. Therefore, we delay its destruction.
      */
     jtk_CString_delete(typeNameText);
-}
-
-void k_Analyzer_onExitNewExpression(k_Analyzer_t* analyzer,
-    k_ASTNode_t* node) {
 }
