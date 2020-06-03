@@ -21,12 +21,10 @@
 
 #include <kush/Configuration.h>
 #include <kush/Compiler.h>
-#include <kush/ast/ASTListener.h>
-#include <kush/ast/context/Context.h>
+#include <kush/parser/ContextType.h>
 #include <kush/symbol-table/Scope.h>
 #include <kush/symbol-table/ScopeType.h>
 #include <kush/symbol-table/SymbolTable.h>
-#include <kush/ast/ASTAnnotations.h>
 
 /*******************************************************************************
  * SymbolDefinitionListener                                                    *

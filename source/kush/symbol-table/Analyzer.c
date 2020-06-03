@@ -19,7 +19,6 @@
 
 #include <kush/ast/ASTNode.h>
 #include <kush/lexer/Token.h>
-#include <kush/symbol-table/FunctionSignature.h>
 #include <kush/symbol-table/FunctionSymbol.h>
 #include <kush/symbol-table/Analyzer.h>
 #include <kush/symbol-table/SymbolTable.h>
@@ -142,13 +141,9 @@ void k_Analyzer_reset(k_Analyzer_t* listener,
 
 // define
 
-#define enterScope(analyzer, scope) k_SymbolTable_setCurrentScope((analyzer)->m_symbolTable, (scope))
-#define exitScope(analyzer) k_SymbolTable_invalidateCurrentScope((analyzer)->m_symbolTable);
-
-
 void define(k_Analyzer_t* analyzer, k_CompilationUnit_t* unit) {
     unit->m_scope = k_Scope_forCompilationUnit();
-    analyzer->m_currentScope = unit->m_scope;
+    analyzer->m_scope = unit->m_scope;
 
     int32_t structureCount = jtk_ArrayList_getSize(unit->m_structures);
     int32_t j;
@@ -168,48 +163,113 @@ void define(k_Analyzer_t* analyzer, k_CompilationUnit_t* unit) {
 }
 
 void defineStructure(k_Analyzer_t* analyzer, k_Structure_t* structure) {
-    structure->m_parentScope = analyzer->m_currentScope;
-    structure->m_scope = k_Scope_forStructure(analyzer->m_currentScope);
-    k_Scope_addStructure(analyzer->m_currentScope, structure);
+    structure->m_parent = analyzer->m_scope;
+    structure->m_scope = k_Scope_forStructure(analyzer->m_scope);
+    k_Scope_addStructure(analyzer->m_scope, structure);
 
     int32_t limit = jtk_ArrayList_getSize(declaration->m_variables);
     int32_t i;
     for (i = 0; i < limit; i++) {
         k_Storage_t* storage =
             (k_Storage_t*)jtk_ArrayList_getValue(declaration->m_variables, i);
-        declarator->m_parentScope = structure->m_scope;
+        declarator->m_parent = structure->m_scope;
         k_Scope_addStorage(structure->m_scope, storage);
     }
 }
 
 void defineFunction(k_Analyzer_t* analyzer, k_Function_t* function) {
-    function->m_parentScope = analyzer->m_currentScope;
-    function->m_scope = analyzer->m_currentScope =
-        k_Scope_forFunction(analyzer->m_currentScope);
-    k_Scope_addFunction(analyzer->m_currentScope, function);
+    function->m_parent = analyzer->m_scope;
+    function->m_scope = analyzer->m_scope =
+        k_Scope_forFunction(analyzer->m_scope);
+    k_Scope_addFunction(analyzer->m_scope, function);
 
-    // TODO: Parameters
-
-    jtk_ArrayStack_t* stack = jtk_ArrayStack_new();
-    jtk_ArrayStack_push(function->m_body);
-    while (!jtk_ArrayStack_isEmpty(stack)) {
-        k_BlockStatement_t* block = (k_BlockStatement_t*)jtk_ArrayStack_pop(stack);
-
-        int32_t limit = jtk_ArrayList_getSize(block->m_statements);
-        int32_t i;
-        for (i = 0; i < limit; i++) {
-            k_Context_t* context = (k_Context_t*)jtk_ArrayList_getValue(
-                block->m_statements, i);
-            switch (context->m_type) {
-
-            }
-        }
+    k_Scope_t* scope = defineLocals(analyzer, function->m_body);
+    int32_t parameterCount = jtk_ArrayList_getSize(function->m_parameters);
+    int32_t i;
+    for (i = 0; i < parameterCount; i++) {
+        k_Variable_t* parameter = (k_Storage_t*)jtk_ArrayList_getValue(function->m_parameters, i);
+        k_Scope_addVariable(scope, parameter);
     }
 }
 
+k_Scope_t* defineLocals(k_Analyzer_t* analzyer, k_BlockStatement_t* block) {
+    block->m_scope = analyzer->m_scope = k_Scope_forLocal(analyzer->m_scope);
 
+    int32_t limit = jtk_ArrayList_getSize(block->m_statements);
+    int32_t i;
+    for (i = 0; i < limit; i++) {
+        k_Context_t* context = (k_Context_t*)jtk_ArrayList_getValue(
+            block->m_statements, i);
+        switch (context->m_type) {
+            case K_CONTEXT_BLOCK_STATEMENT: {
+                defineLocals(analyzer, (k_BlockStatement_t*)context);
+                break;
+            }
 
+            case K_CONTEXT_ITERATIVE_STATEMENT: {
+                k_IterativeStatement_t* statement = (k_IterativeStatement_t*)context;
+                if (statement->m_label != NULL) {
+                    jtk_Scope_addLabel(analyzer->m_scope, &statement->m_label);
+                }
+                if (statement->m_parameter != NULL) {
+                    jtk_Scope_addVariable(scope, statement->m_parameter);
+                }
+                defineLocals(analyzer, statement->m_body);
+                break;
+            }
 
+            case K_CONTEXT_IF_STATEMENT: {
+                k_IfStatement_t* statement = (k_IfStatement_t*)context;
+                defineLocals(analyzer, statement->m_ifClause->m_body);
+                int32_t count = jtk_ArrayList_getSize(statement->m_elseIfClauses);
+                int32_t j;
+                for (j = 0; j < count; j++) {
+                    k_IfClause_t* clause = (k_IfClause_t*)jtk_ArrayList_getValue(
+                        statement->m_elseIfClauses, j);
+                    defineLocals(analyzer, clause->m_body);
+                }
+                if (statement->m_elseClause != NULL) {
+                    defineLocals(analyzer, statement->m_elseClause);
+                }
+                break;
+            }
+
+            case K_CONTEXT_TRY_STATEMENT: {
+                k_TryStatement_t* statement = (k_TryStatement_t*)context;
+                defineLocals(analyzer, statement->m_tryClause);
+
+                int32_t count = jtk_ArrayList_getSize(statement->m_catchClauses);
+                int32_t j;
+                for (j = 0; j < count; j++) {
+                    k_CatchClause_t* clause = (k_CatchClause_t*)jtk_ArrayList_getValue(
+                        statement->m_catchClauses, j);
+                    k_Scope_t* scope = defineLocals(clause->m_body);
+                    defineVariable(analyzer, scope, clause->m_parameter);
+                }
+
+                if (statement->m_finallyClause != NULL) {
+                    defineLocals(analyzer, statement->m_finallyClause);
+                }
+
+                break;
+            }
+
+            case K_CONTEXT_VARIABLE_DECLARATION: {
+                k_VariableDeclaration_t* statement = (k_VariableDeclaration_t*)context;
+                int32_t count = jtk_ArrayList_getSize(statement->m_variables);
+                int32_t j;
+                for (j = 0; j < count; j++) {
+                    k_Variable_t* variable = (k_Variable_t*)jtk_ArrayList_getValue(
+                        statement->m_variables, j);
+                    defineVariable(analyzer->m_scope, variable);
+                }
+                break;
+            }
+        }
+    }
+
+    analyzer->m_scope = analyzer->m_scope->m_parent;
+}
 
 
 
