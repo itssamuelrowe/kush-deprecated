@@ -227,7 +227,7 @@ k_Scope_t* defineLocals(k_Analyzer_t* analyzer, k_BlockStatement_t* block) {
     for (i = 0; i < limit; i++) {
         k_Context_t* context = (k_Context_t*)jtk_ArrayList_getValue(
             block->statements, i);
-        switch (context->type) {
+        switch (context->tag) {
             case K_CONTEXT_ITERATIVE_STATEMENT: {
                 k_IterativeStatement_t* statement = (k_IterativeStatement_t*)context;
                 if (statement->label != NULL) {
@@ -399,7 +399,7 @@ void resolveLocals(k_Analyzer_t* analyzer, k_BlockStatement_t* block) {
     for (i = 0; i < limit; i++) {
         k_Context_t* context = (k_Context_t*)jtk_ArrayList_getValue(
             block->statements, i);
-        switch (context->type) {
+        switch (context->tag) {
             case K_CONTEXT_ITERATIVE_STATEMENT: {
                 k_IterativeStatement_t* statement = (k_IterativeStatement_t*)context;
                 if (statement->label != NULL) {
@@ -466,7 +466,7 @@ void resolveLocals(k_Analyzer_t* analyzer, k_BlockStatement_t* block) {
 }
 
 k_Type_t* resolveExpression(k_Analyzer_t* analyzer, k_Context_t* context) {
-    switch (context->type) {
+    switch (context->tag) {
         case K_CONTEXT_RELATIONAL_EXPRESSION:
         case K_CONTEXT_EQUALITY_EXPRESSION: {
             k_BinaryExpression_t* expression = (k_BinaryExpression_t*)context;
@@ -518,10 +518,10 @@ k_Type_t* resolveExpression(k_Analyzer_t* analyzer, k_Context_t* context) {
 
         case K_CONTEXT_UNARY_EXPRESSION: {
             k_UnaryExpression_t* expression = (k_UnaryExpression_t*)context;
-            k_Type_t* type = resolveExpression(expression->m_expression);
+            k_Type_t* type = resolveExpression(expression->expression);
             k_Token_t* operator = expression->operator;
             if (operator != NULL) {
-                k_TokenType_t token = operator->type;
+                k_TokenType_t token = operator->tag;
                 if ((token == K_TOKEN_PLUS) || (token == K_TOKEN_MINUS)) {
                     if ((type.tag != K_TYPE_INTEGER) && (type.tag != K_TYPE_DECIMAL)) {
                         reportError(analyzer, K_ERROR_INCOMPATIBLE_OPERAND, operator);
@@ -546,6 +546,49 @@ k_Type_t* resolveExpression(k_Analyzer_t* analyzer, k_Context_t* context) {
         }
 
         case K_CONTEXT_POSTFIX_EXPRESSION: {
+            k_PostfixExpression_t* expression = (k_PostfixExpression_t*)context;
+            k_Type_t* type = expression->primaryToken?
+                resolveTokenType((k_Token_t*)expression->primary) :
+                resolveExpression(expression->primary);
+
+            k_Type_t* previous = type;
+            int32_t count = jtk_ArrayList_getSize(expression->postfixParts);
+            int32_t i;
+            for (i = 0; i < count; i++) {
+                k_Context_t* postfix = (k_Context_t*)jtk_ArrayList_getValue(
+                    expression->postfixParts, i);
+
+                k_Type_t* postfixType = NULL;
+                if (postfix->tag == K_CONTEXT_SUBSCRIPT) {
+                    k_Subscript_t* subscript = (k_Subscript_t*)postfix;
+                    resolveExpression(subscript->expression);
+                    if (!previous->m_indexable) {
+                        reportError(analyzer, K_ERROR_INVALID_LEFT_OPERAND,
+                            subscript->bracket);
+                    }
+                }
+                else if (postfix->tag == K_CONTEXT_FUNCTION) {
+                    k_FunctionArguments_t* arguments = (k_FunctionArguments_t*)postfix;
+                    if (!previous->callable) {
+                        reportError(analyzer, K_ERROR_INVALID_FUNCTION_INVOCATION,
+                            arguments->parenthesis);
+                    }
+                    int32_t j;
+                    for (j = 0; j < arguments->expressions->size; j++) {
+                        k_BinaryExpression_t* argument = (k_BinaryExpression_t*)
+                            arguments->expressions->values[j];
+                        resolveExpression(analyzer, argument);
+                    }
+                }
+                else if (postfix->tag == K_CONTEXT_MEMBER_ACCESS) {
+                    k_MemberAccess_t* access = (k_MemberAccess_t*)postfix;
+                    if (!previous->accessible) {
+                        reportError(analyzer, K_ERROR_INVALID_MEMBER_ACCESS,
+                            arguments->identifier);
+                    }
+                    // resolve the type of the member
+                }
+            }
 
             break;
         }
@@ -821,10 +864,10 @@ void k_Analyzer_onExitPostfixExpression(k_Analyzer_t* analyzer,
             }
         }
     }
-    else if ((expression->type == KUSH_AST_NODE_TYPE_MAP_EXPRESSION) ||
-        (expression->type == KUSH_AST_NODE_TYPE_LIST_EXPRESSION) ||
-        (expression->type == KUSH_AST_NODE_TYPE_EXPRESSION) ||
-        (expression->type == KUSH_AST_NODE_TYPE_NEW_EXPRESSION)) {
+    else if ((expression->tag == KUSH_AST_NODE_TYPE_MAP_EXPRESSION) ||
+        (expression->tag == KUSH_AST_NODE_TYPE_LIST_EXPRESSION) ||
+        (expression->tag == KUSH_AST_NODE_TYPE_EXPRESSION) ||
+        (expression->tag == KUSH_AST_NODE_TYPE_NEW_EXPRESSION)) {
         k_ASTWalker_walk(astListener, expression);
 
         /* Annotate the AST node as value. */
@@ -982,8 +1025,8 @@ void k_Analyzer_onEnterNewExpression(k_Analyzer_t* analyzer,
 
     /* Retrieve the string equivalent of the type name node. */
     int32_t typeNameSize;
-    uint8_t* typeNameText = k_ASTNode_toCString(context->typeName, &typeNameSize);
-    k_TypeNameContext_t* typeName = (k_TypeNameContext_t*)context->typeName->context;
+    uint8_t* typeNameText = k_ASTNode_toCString(context->tagName, &typeNameSize);
+    k_TypeNameContext_t* typeName = (k_TypeNameContext_t*)context->tagName->context;
     int32_t identifierCount = jtk_ArrayList_getSize(typeName->identifiers);
     k_ASTNode_t* lastIdentifier = jtk_ArrayList_getValue(typeName->identifiers, identifierCount - 1);
     k_Token_t* lastIdentifierToken = (k_Token_t*)lastIdentifier->context;

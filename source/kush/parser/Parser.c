@@ -1754,7 +1754,7 @@ k_UnaryExpression_t* parseUnaryExpression(k_Parser_t* parser) {
 k_PostfixExpression_t* parsePostfixExpression(k_Parser_t* parser) {
     k_PostfixExpression_t* context = k_PostfixExpression_new();
 
-    context->m_primaryExpression = parsePrimaryExpression(parser,
+    context->m_primary = parsePrimaryExpression(parser,
         &context->m_primaryToken);
 
     k_TokenType_t la1 = la(parser, 1);
@@ -1795,7 +1795,7 @@ k_PostfixExpression_t* parsePostfixExpression(k_Parser_t* parser) {
 k_Subscript_t* parseSubscript(k_Parser_t* parser) {
     k_Subscript_t* context = k_Subscript_new();
 
-    match(parser, KUSH_TOKEN_LEFT_SQUARE_BRACKET);
+    context->bracket = matchAndYield(parser, KUSH_TOKEN_LEFT_SQUARE_BRACKET);
     pushFollowToken(parser, KUSH_TOKEN_RIGHT_SQUARE_BRACKET);
     context->m_expression = parseExpression(parser);
     popFollowToken(parser);

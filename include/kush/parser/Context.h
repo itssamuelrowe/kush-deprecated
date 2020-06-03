@@ -28,7 +28,7 @@
  *******************************************************************************/
 
 struct k_Context_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
 };
 
 typedef struct k_Context_t k_Context_t;
@@ -43,7 +43,7 @@ typedef struct k_Context_t k_Context_t;
  * @since kush 0.1
  */
 struct k_Module_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
 	jtk_ArrayList_t* imports;
 	jtk_ArrayList_t* functions;
     jtk_ArrayList_t* structures;
@@ -69,7 +69,7 @@ typedef struct k_BinaryExpression_t k_BinaryExpression_t;
  * @since kush 0.1
  */
 struct k_BinaryExpression_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_BinaryExpression_t* left;
     jtk_ArrayList_t* others;
 };
@@ -84,7 +84,7 @@ struct k_BinaryExpression_t {
  * @since kush 0.1
  */
 struct k_VariableDeclaration_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     jtk_ArrayList_t* variables;
 };
 
@@ -103,7 +103,7 @@ typedef struct k_VariableDeclaration_t k_VariableDeclaration_t;
  * @since kush 0.1
  */
 struct k_TryStatement_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_BlockStatement_t* tryClause;
     jtk_ArrayList_t* catchClauses;
     k_BlockStatement_t* finallyClause;
@@ -124,7 +124,7 @@ typedef struct k_TryStatement_t k_TryStatement_t;
  * @since kush 0.1
  */
 struct k_ThrowStatement_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_BinaryExpression_t* expression;
 };
 
@@ -143,7 +143,7 @@ typedef struct k_ThrowStatement_t k_ThrowStatement_t;
  * @since kush 0.1
  */
 struct k_ReturnStatement_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_BinaryExpression_t* expression;
 };
 
@@ -162,7 +162,7 @@ typedef struct k_ReturnStatement_t k_ReturnStatement_t;
  * @since kush 0.1
  */
 struct k_BlockStatement_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     jtk_ArrayList_t* statements;
 };
 
@@ -182,7 +182,7 @@ typedef struct k_BlockStatement_t k_BlockStatement_t;
  * @since kush 0.1
  */
 struct k_UnaryExpression_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_Token_t* operator;
     k_Context_t* expression; // Unary expression or postfix expression
 };
@@ -203,7 +203,7 @@ typedef struct k_UnaryExpression_t k_UnaryExpression_t;
  * @since kush 0.1
  */
 struct k_PostfixExpression_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     void* primaryExpression;
     bool primaryToken;
     jtk_ArrayList_t* postfixParts; // contexts
@@ -225,7 +225,7 @@ typedef struct k_PostfixExpression_t k_PostfixExpression_t;
  * @since kush 0.1
  */
 struct k_MemberAccess_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_Token_t* identifier;
 };
 
@@ -245,7 +245,7 @@ typedef struct k_MemberAccess_t k_MemberAccess_t;
  * @since kush 0.1
  */
 struct k_InitializerExpression_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     jtk_ArrayList_t* entries; // Pair<Token, BinaryExpression>
 };
 
@@ -261,7 +261,7 @@ typedef struct k_InitializerExpression_t k_InitializerExpression_t;
  * @since kush 0.1
  */
 struct k_ArrayExpression_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     jtk_ArrayList_t* expressions;
 };
 
@@ -277,7 +277,7 @@ typedef struct k_ArrayExpression_t k_ArrayExpression_t;
  * @since kush 0.1
  */
 struct k_IterativeStatement_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_Token_t* label;
     bool while;
     k_Token_t* parameter;
@@ -301,7 +301,7 @@ typedef struct k_IterativeStatement_t k_IterativeStatement_t;
  * @since kush 0.1
  */
 struct k_ImportDeclaration_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     bool wildcard;
     jtk_ArrayList_t* identifiers;
 };
@@ -322,7 +322,7 @@ typedef struct k_ImportDeclaration_t k_ImportDeclaration_t;
  * @since kush 0.1
  */
 struct k_IfStatement_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_IfClause_t* ifClause;
     jtk_ArrayList_t* elseIfClauses;
     k_BlockStatement_t* elseClause;
@@ -345,7 +345,7 @@ typedef struct k_IfStatement_t k_IfStatement_t;
  * @since kush 0.1
  */
 struct k_IfClause_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_BinaryExpression_t* expression;
     k_BlockStatement_t* body;
 };
@@ -365,7 +365,7 @@ typedef struct k_IfClause_t k_IfClause_t;
  * @since kush 0.1
  */
 struct k_FunctionDeclaration_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_Token_t* identifier;
     jtk_ArrayList_t* fixedParameters;
     k_FunctionParameter_t* variableParameter;
@@ -389,7 +389,8 @@ typedef struct k_FunctionDeclaration_t k_FunctionDeclaration_t;
  * @since kush 0.1
  */
 struct k_FunctionArguments_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
+    k_Token_t* parenthesis;
     jtk_ArrayList_t* expressions;
 };
 
@@ -413,7 +414,7 @@ typedef struct k_ConditionalExpression_t k_ConditionalExpression_t;
  * @since kush 0.1
  */
 struct k_ConditionalExpression_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_BinaryExpression_t* logicalOrExpression;
     k_BinaryExpression_t* thenExpression;
     k_ConditionalExpression_t* elseExpression;
@@ -430,7 +431,7 @@ struct k_ConditionalExpression_t {
  * @since kush 0.1
  */
 struct k_StructureDeclaration_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_Token_t* identifier;
     jtk_ArrayList_t* variables;
     k_Type_t* type;
@@ -469,7 +470,7 @@ typedef struct k_CatchClause_t k_CatchClause_t;
  * @since kush 0.1
  */
 struct k_BreakStatement_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_Token_t* identifier;
 };
 
@@ -483,7 +484,7 @@ typedef struct k_BreakStatement_t k_BreakStatement_t;
  *******************************************************************************/
 
 struct k_FunctionParameter_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     k_Token_t* baseType;
     int32_t dimensions;
     k_Token_t* identifier;
@@ -496,7 +497,7 @@ typedef struct k_FunctionParameter_t k_FunctionParameter_t;
  *******************************************************************************/
 
 struct k_StorageDeclarator_t {
-    k_ContextType_t type;
+    k_ContextType_t tag;
     bool infer;
     bool constant;
     k_Token_t* baseType;
@@ -521,6 +522,7 @@ struct k_Type_t {
     uint8_t tag;
     bool indexable;
     bool accessible;
+    bool callable;
     union {
         struct {
             k_Type_t* m_base;
