@@ -2173,6 +2173,22 @@ loopEntry : {
                         }
                         break;
                     }
+                    case 'u' : {
+												if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_UI16], 4)) {
+                            lexer->m_type = KUSH_TOKEN_KEYWORD_UI16;
+                        }
+                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_UI32], 4)) {
+                            lexer->m_type = KUSH_TOKEN_KEYWORD_UI32;
+                        }
+                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_UI64], 4)) {
+                            lexer->m_type = KUSH_TOKEN_KEYWORD_UI64;
+                        }
+                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_UI8], 3)) {
+                            lexer->m_type = KUSH_TOKEN_KEYWORD_UI8;
+                        }
+                        break;
+											
+										}
                     case 'v' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_VAR], 3)) {
                             lexer->m_type = KUSH_TOKEN_KEYWORD_VAR;
