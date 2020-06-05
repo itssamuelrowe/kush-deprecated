@@ -517,6 +517,8 @@ typedef struct k_StorageDeclarator_t k_StorageDeclarator_t;
 #define K_TYPE_DECIMAL 2
 #define K_TYPE_ARRAY 3
 #define K_TYPE_VOID 4
+#define K_TYPE_NULL 5
+#define K_TYPE_STRING 6
 
 struct k_Type_t {
     uint8_t tag;
@@ -548,6 +550,8 @@ struct k_Primitives_t {
     k_Type_t f32;
     k_Type_t f64;
     k_Type_t void_;
+    k_Type_t null;
+    k_Type_t string;
 };
 
 typedef struct k_Primitives_t k_Primitives_t;

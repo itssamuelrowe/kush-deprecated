@@ -1860,7 +1860,6 @@ k_MemberAccess_t* parseMemberAccess(k_Parser_t* parser) {
  * |	'false'
  * |	STRING_LITERAL
  * |	'null'
- * |    'this'
  * ;
  *
  * NOTE: The primaryExpression rule has no context. It simply forwards the
