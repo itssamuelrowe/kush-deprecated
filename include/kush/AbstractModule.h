@@ -3,7 +3,15 @@
 
 /* The Abstract Module binary format describes the layout in which function and structure
  * declarations are stored in ".am" files.
- */ 
+ */
+
+/*******************************************************************************
+ * Flags                                                                       *
+ *******************************************************************************/
+
+#define hasSynthetic(modifiers) (modifiers & KUSH_MODIFIER_SYNTHETIC) != 0
+#define hasNative(modifiers) (modifiers & KUSH_MODIFIER_NATIVE) != 0
+#define hasVariableParameter(modifiers) (modifiers & KUSH_MODIFIER_VARIABLE_PARAMETER)
 
 /**
  * @author Samuel Rowe
@@ -20,7 +28,7 @@ struct k_Module_t {
 	k_Structure_t** m_structures;
 	uint16_t m_functionCount;
 	k_Function_t** m_functions;
-	
+
 };
 
 typedef struct k_Module_t k_Module_t;
@@ -31,7 +39,7 @@ typedef struct k_Module_t k_Module_t;
  */
 struct k_Structure_t {
 	uint16_t m_flags;
-	
+
 	/**
 	 * The size of the structure name.
 	 */
@@ -41,7 +49,7 @@ struct k_Structure_t {
 	 * The name of the structure.
 	 */
 	uint8_t* m_name;
-	
+
 	/**
 	 * The number of attributes that are members of the structure.
 	 */

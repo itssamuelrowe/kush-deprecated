@@ -165,6 +165,22 @@ Primitives primitives = {
     }
 };
 
+
+Context* find(k_Scope_t* scope, const uint8_t* identifier, int32_t size) {
+    Context* symbol = NULL;
+    while (scope != NULL) {
+        symbol = resolve(scope, identifier);
+        if (symbol != NULL) {
+            break;
+        }
+        else {
+            scope = scope->parent;
+        }
+    }
+
+    return symbol;
+}
+
 // Import
 
 bool import(Analyzer* analyzer, const char* name, int32 size,

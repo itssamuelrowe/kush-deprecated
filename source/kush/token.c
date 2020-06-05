@@ -153,3 +153,38 @@ int32_t k_Token_getIndex(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
     return token->m_index;
 }
+
+
+/*******************************************************************************
+ * TokenType                                                                   *
+ *******************************************************************************/
+
+// Modifiers
+
+uint32_t k_TokenType_toModifiers(k_TokenType_t type) {
+    uint32_t modifiers = 0;
+    switch (type) {
+    case KUSH_TOKEN_KEYWORD_NATIVE: {
+        modifiers |= KUSH_MODIFIER_NATIVE;
+        break;
+    }
+    }
+    return modifiers;
+}
+
+// Assignment Operator
+
+bool k_TokenType_isAssignmentOperator(k_TokenType_t type) {
+    return (type == KUSH_TOKEN_EQUAL) ||
+           (type == KUSH_TOKEN_MODULUS_EQUAL) ||
+           (type == KUSH_TOKEN_AMPERSAND_EQUAL) ||
+           (type == KUSH_TOKEN_ASTERISK_2_EQUAL) ||
+           (type == KUSH_TOKEN_ASTERISK_EQUAL) ||
+           (type == KUSH_TOKEN_PLUS_EQUAL) ||
+           (type == KUSH_TOKEN_DASH_EQUAL) ||
+           (type == KUSH_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) ||
+           (type == KUSH_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) ||
+           (type == KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL) ||
+           (type == KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL) ||
+           (type == KUSH_TOKEN_VERTICAL_BAR_EQUAL);
+}
