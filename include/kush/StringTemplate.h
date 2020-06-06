@@ -6,38 +6,177 @@
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
 
-/* Optionally, a map template entry may be associated with a tag. This allows
- * a template to invoke another template.
- * [main.template]
+/**
+ * The rendering engine is logic-less, meaning there are no for loops and if statements.
+ * However, the directives are flexible enough to suffice most needs.
+ *
+ * The directives are divided into simple and compound directives. A compound
+ * directive has an opening tag and a closing tag. Whereas, a simple directive
+ * uses a standalone tag. All tags are enclosed within the angle brackets.
+ *
+ * ## Simple Directives
+ *
+ * ### Variable Directive
+ * The variale directive is the simplest directive. You can use it to access
+ * render the value stored in a variable.
+ * The general form of a variable directive is shown below:
  * ```
- * <.names>
+ * <.identifier>
+ * ```
+ * Here, the identifier indicates the variable whose value you want to render.
+ *
+ * ### Context Directive
+ * The context directive is a special directive which represents the current
+ * value within a loop directive.
+ * The general form of a context directive is shown below:
+ * ```
  * <$>
- * </>
- * ```
- * [full_name.template]
- * ```
- * <.first_name> <.last_name>
  * ```
  *
- * We feed the renderer:
+ * ## Compound Directives
+ *
+ * ### Loop Directive
+ * The loop directive allows you to iterate over a list.
+ * The general form of a loop directive is shown below:
+ * ```
+ * <@identifier>
+ * ...
+ * </>
+ * ```
+ * Here, the identifier indicates the list you want to iterative over.
+ * The `</>` construct is the closing tag and indicates the termination of
+ * the compound directive. Whatever is in between the opening and the closing
+ * tags will be rendered n times, where n is the number of entries in the list.
+ * You can embed any directive within the body of the loop directive.
+ *
+ *
+ * ## Conditional Directive
+ * The conditional directive allows you to enable or disable a section
+ * within your template.
+ * The general form of a conditional directive is shown below:
+ * ```
+ * <?identifier>
+ * ...
+ * </>
+ * If there is a variable with the specified identifier defined in the context,
+ * then the block inside the directive is executed. Otherwise, the whole
+ * directive is skipped.
+ *
+ * ## Invoking Other Templates
+ *
+ * Consider the following context:
  * ```
  * {
- *  [
- *      {
- *          "$tag": "full_name"
- *          "first_name": "Samuel"
- *          "last_name": "Rowe"
- *      },
- *      {
- *          "$tag": "full_name"
- *          "first_name": "Joel"
- *          "last_name": "Rego"
- *      }
- *  ]
+ *     "name": "Samuel"
+ * }
+ *```
+ * What happens when you feed this context to the template shown below?
+ * ```
+ * Hi, <.name>!
+ * ```
+ * The renderer would produce the string "Hi, Samuel!".
+ *
+ * What would happen if you fed the following context?
+ * ```
+ * {
+ *     "name": {
+ *         "first_name": "Samuel",
+ *         "last_name": "Rowe"
+ *     }
+ * }
+ * ```
+ * The renderer would generate an error saying "Cannot render a map. Could not
+ * find a suitable template."
+ *
+ * Before we proceed, remember that the variable directive can render only primitive
+ * values such as integers, decimals, booleans, and strings. But there are
+ * legitimate cases where maps and lists should be rendered. We will talk about
+ * rendering lists later. As for maps, this is where the ability of a template
+ * to invoke other template comes in.
+ *
+ * So the idea is, we assign each template an optional identifier. When a map
+ * is encountered in a variable directive, the renderer looks for a special key
+ * called "$tag" within the map. The value associated with "$tag" tells the
+ * renderer which template to use to render the map. The map finds a matching
+ * template and then injects the map as the context.
+ *
+ * Consider the following template whose identifier is "name".
+ * ```
+ * {.first_name} {last_name}
+ * ```
+ *
+ * Now consider another template whose identifier is "main".
+ * ```
+ * Hi, {.name}!
+ * ```
+ *
+ * When we render the main template with the context shown below:
+ * ```
+ * {
+ *     "name": {
+ *         "first_name": "Samuel",
+ *         "last_name": "Rowe"
+ *         "$tag": "name"
+ *     }
  * }
  * ```
  *
- * Without tags, the render would not know how to render an object.
+ * When the engine encounters `{.name}` and realizes that the name is a map,
+ * it looks for the `$tag` key. If it is not present, it reports an error as
+ * usual. Otherwise, it will retrieve the identifier and look for a template
+ * with the same identifier. The renderer reports an error if a suitable
+ * template was not found. Otherwise, it will invoke the second template with
+ * the context `{ "first_name": "Samuel", "last_name": "Rowe" }`. The result
+ * of rendering the second template is replaced with `<.name>`. So the renderer
+ * returns the string `"Hi, Samuel Rowe!"`
+ *
+ * The ability to invoke other templates allows you to render recursive data
+ * structures.
+ *
+ * Imagine you wanted to print a tree (each node here is simply a map). You
+ * would have to create template with the identifier "node".
+ * ``
+ * <.title>
+ * <.children>
+ *     <$>
+ * </>
+ *
+ * Now if you feed it:
+ * {
+ *     "title": "directory_a',
+ *     "$tag": "node",
+ *     children: [
+ *         {
+ *             "title": "directory_b",
+ *             "$tag": "node",
+ *             children: [
+ *                 {
+ *                     "title": "file_1",
+ *                     "$tag": "node",
+ *                     children: []
+ *                 }
+ *             ]
+ *         },
+ *         {
+ *             "title": "directory_c",
+ *             "$tag": "node",
+ *             children: []
+ *         }
+ *     ]
+ * }
+ * ```
+ * The renderer would generate the following output:
+ * ```
+ * directory_a
+ *     directory_b
+ *         file_1
+ *     directory_c
+ * ```
+ *
+ * As you can see, the best part is you do not have to do any extra work for
+ * indentation. The renderer will automatically take care of indentation.
+ * This becomes really important when you are using the renderer to generate
+ * code that needs to be well formatted.
  */
 
 #define TEMPLATE_ENTRY_STRING 0
