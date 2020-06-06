@@ -53,7 +53,7 @@ StringTemplate* stringTemplateNew();
 void stringTemplateDelete(StringTemplate* self);
 void stringTemplateAdd_i(StringTemplate* self, const uint8_t* name, int32_t value);
 void stringTemplateAdd_d(StringTemplate* self, const uint8_t* name, double value);
-void stringTemplateAdd_s(StringTemplate* self, const uint8_t* name, const uint8_t* bytes, int32_t bytesSize);
+void stringTemplateAdd_s(StringTemplate* self, const uint8_t* name, const uint8_t* bytes);
 void stringTemplateAdd_v(StringTemplate* self, const uint8_t* name, void* custom);
 void stringTemplateAddEx_i(StringTemplate* self, const uint8_t* name, int32_t length, int32_t value);
 void stringTemplateAddEx_d(StringTemplate* self, const uint8_t* name, int32_t length, double value);
