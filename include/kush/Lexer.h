@@ -146,21 +146,6 @@ struct k_Lexer_t {
      */
     jtk_ArrayStack_t* m_indentations;
 
-    /**
-     * The number of opening square brackets, angle brackets,
-     * braces, or parenthesis the lexer has encountered without
-     * corresponding closing square brackets, angle brackets,
-     * braces, or parenthesis, irrespectively.
-     *
-     * NOTE: The lexer disables emission of indentation,
-     *       dedentation, and newline tokens when the
-     *       enclosure counter is greater than one. Which
-     *       means presence of unmatched square brackets,
-     *       angle brackets, braces, or parenthesis results
-     *       in undefined lexical behaviour.
-     */
-    int32_t m_enclosures;
-
     k_ErrorCode_t m_errorCode;
 };
 

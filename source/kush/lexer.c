@@ -17,8 +17,6 @@
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/queue/ArrayQueue.h>
 #include <jtk/collection/stack/ArrayStack.h>
-// #include <jtk/log/Logger.h>
-// #include <jtk/log/LogPriority.h>
 #include <jtk/io/InputStream.h>
 #include <jtk/core/StringBuilder.h>
 #include <jtk/core/CString.h>
@@ -37,134 +35,29 @@
 // Consume
 
 static void consume(k_Lexer_t* lexer);
-
-// Destroy stale token
-
 static void destroyStaleTokens(k_Lexer_t* lexer);
-
-// Emit
-
 static void emit(k_Lexer_t* lexer, k_Token_t* token);
-
-// Error
-
 static k_LexerError_t* createError(k_Lexer_t* lexer, const char* message);
-
-// Token
-
-/**
- * Creates a token.
- *
- * @param  lexer
- *         The lexer that is creating the token.
- * @return A token.
- */
 static k_Token_t* createToken(k_Lexer_t* lexer);
-
-// Newline
-
-/**
- * @memberof Lexer
- */
 static void onNewline(k_Lexer_t* lexer);
-
-// Reset
-
-/**
- * @memberof Lexer
- */
 static void reset(k_Lexer_t* lexer, jtk_InputStream_t* inputStream);
-
-// Misc.
-
-/**
- * @memberof Lexer
- */
 static bool isInputStart(k_Lexer_t* lexer);
-
-/**
- * @memberof Lexer
- */
 static bool isBinaryPrefix(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isBinaryDigit(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isBinaryDigitOrUnderscore(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isBasicEscapeSequence(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isDecimalDigit(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isDecimalDigitOrUnderscore(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isIdentifierStart(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isIdentifierPart(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isLetter(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isLetterOrDigit(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isHexadecimalPrefix(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isHexadecimalDigit(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isHexadecimalDigitOrUnderscore(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isOctalDigit(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isOctalPrefix(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isOctalDigitOrUnderscore(int32_t codePoint);
-
-/**
- * @memberof Lexer
- */
 static bool isIntegerSuffix(int32_t codePoint);
 
 
@@ -929,7 +822,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
          *    is not explicitly checked because errorneous token recognition
          *    too generate tokens!)
          */
-loopEntry : {
+        loopEntry: {
             lexer->m_token = NULL;
             lexer->m_type = KUSH_TOKEN_UNKNOWN;
             jtk_StringBuilder_clear(lexer->m_text);
@@ -997,160 +890,68 @@ loopEntry : {
                 break;
             }
 
-            case ' '  :
-            case '\r' :
-            case '\n' : {
-                int32_t indentation = 0;
+            case ' '  : {
                 if (lexer->m_la1 == ' ') {
                     do {
-                        indentation++;
                         consume(lexer);
                     }
                     while (lexer->m_la1 == ' ');
 
-                    if (!isInputStart(lexer)) {
-                        /* This token belongs to the WHITESPACE rule. */
-                        lexer->m_type = KUSH_TOKEN_WHITESPACE;
-                        lexer->m_channel = KUSH_TOKEN_CHANNEL_HIDDEN;
-                    }
+                    /* This token belongs to the WHITESPACE rule. */
+                    lexer->m_type = KUSH_TOKEN_WHITESPACE;
+                    lexer->m_channel = KUSH_TOKEN_CHANNEL_HIDDEN;
                 }
-                else {
-                    if (lexer->m_la1 == '\r') {
-                        consume(lexer);
-                        /* Optionally, the carriage return character may be
-                         * followed by a newline character.
-                         */
-                        if (lexer->m_la1 == '\n') {
-                            consume(lexer);
+                break;
+            }
 
-                            /* Update information such as the current line,
-                             * current column, etc.
-                             */
-                            onNewLine(lexer);
-                        }
-                    }
-                    else {
+            case '\r' :
+            case '\n' : {
+                if (lexer->m_la1 == '\r') {
+                    consume(lexer);
+                    /* Optionally, the carriage return character may be
+                        * followed by a newline character.
+                        */
+                    if (lexer->m_la1 == '\n') {
                         consume(lexer);
 
                         /* Update information such as the current line,
-                         * current column, etc.
-                         */
+                            * current column, etc.
+                            */
                         onNewLine(lexer);
                     }
+                }
+                else {
+                    consume(lexer);
 
-                    while (lexer->m_la1 == ' ') {
-                        indentation++;
-                        consume(lexer);
-                    }
+                    /* Update information such as the current line,
+                        * current column, etc.
+                        */
+                    onNewLine(lexer);
                 }
 
-                if (lexer->m_type != KUSH_TOKEN_WHITESPACE) {
-                    int32_t la1 = lexer->m_la1;
-                    if ((lexer->m_enclosures > 0) || (la1 == '\r') || (la1 == '\n')) {
-                        /* If the lexer is within the context of a collection
-                         * or a blank line it ignores all the indentations,
-                         * dedentations, and newlines.
-                         */
-                        // k_Logger_log(KUSH_LOG_PRIORITY_INFO, "Skipping a character (line=%d, column=%d)", lexer->m_startIndex + 1, lexer->m_startColumn + 1);
-                        goto loopEntry;
-                    }
-                    else {
-                        /*
-                         * NOTE: The lexer is creating a custom token here.
-                         *       Therefore, we directly invoke k_Token_new().
-                         */
-                        k_Token_t* newlineToken = k_Token_new(
-                                                      KUSH_TOKEN_CHANNEL_DEFAULT,
-                                                      KUSH_TOKEN_NEWLINE,
-                                                      "\n",
-                                                      1,
-                                                      lexer->m_startIndex,    /* inclusive */
-                                                      lexer->m_index,         /* exclusive */
-                                                      lexer->m_startLine,     /* inclusive */
-                                                      lexer->m_line,          /* inclusive */
-                                                      lexer->m_startColumn,   /* inclusive */
-                                                      lexer->m_column,        /* inclusive */
-                                                      file
-                                                  );
-                        emit(lexer, newlineToken);
-
-                        int32_t previous = jtk_ArrayStack_isEmpty(lexer->m_indentations)?
-                                           0 : (int32_t)jtk_ArrayStack_peek(lexer->m_indentations);
-
-                        if (indentation == previous) {
-                            /* The lexer does not generate an INDENTETATION
-                             * token if the current indentation is the same
-                             * as the previous indentation.
-                             */
-                            goto loopEntry;
-                        }
-                        else if (indentation > previous) {
-                            /* The lexer generates a new INDENTETATION token
-                             * if the current indentation is greater than the
-                             * previous indentation, indicating a deeper block
-                             * nest.
-                             */
-                            jtk_ArrayStack_push(lexer->m_indentations, (void*)indentation);
-                            /*
-                             * NOTE: The lexer is creating a custom token here.
-                             *       Therefore, we directly invoke k_Token_new().
-                             */
-                            k_Token_t* indentationToken = k_Token_new(
-                                                              KUSH_TOKEN_CHANNEL_DEFAULT,
-                                                              KUSH_TOKEN_INDENTATION,
-                                                              "",
-                                                              0,
-                                                              lexer->m_startIndex,    /* inclusive */
-                                                              lexer->m_index,         /* exclusive */
-                                                              lexer->m_startLine,     /* inclusive */
-                                                              lexer->m_line,          /* inclusive */
-                                                              lexer->m_startColumn,   /* inclusive */
-                                                              lexer->m_column,        /* inclusive */
-                                                              file
-                                                          );
-                            emit(lexer, indentationToken);
-                        }
-                        else {
-                            /* The lexer generates one or more DEDENTATION tokens
-                             * if the current indentation is lesser than the
-                             * previous indentation, indicating a shallower
-                             * block.
-                             *
-                             * Interestingly, the dedentation does not require
-                             * the exact number of whitespaces as seen in the
-                             * indentation.
-                             */
-                            while (!jtk_ArrayStack_isEmpty(lexer->m_indentations) &&
-                                    ((int32_t)jtk_ArrayStack_peek(lexer->m_indentations) > indentation)) {
-                                /*
-                                 * NOTE: The lexer is creating a custom token here.
-                                 *       Therefore, we directly invoke k_Token_new().
-                                 */
-                                k_Token_t* dedentationToken = k_Token_new(
-                                                                  KUSH_TOKEN_CHANNEL_DEFAULT,
-                                                                  KUSH_TOKEN_DEDENTATION,
-                                                                  "",
-                                                                  0,
-                                                                  lexer->m_startIndex,    /* inclusive */
-                                                                  lexer->m_index,         /* exclusive */
-                                                                  lexer->m_startLine,     /* inclusive */
-                                                                  lexer->m_line,          /* inclusive */
-                                                                  lexer->m_startColumn,   /* inclusive */
-                                                                  lexer->m_column,        /* inclusive */
-                                                                  file
-                                                              );
-                                emit(lexer, dedentationToken);
-                                jtk_ArrayStack_pop(lexer->m_indentations);
-                            }
-                        }
-                    }
-                    /* The rule action has taken care of generating
-                     * tokens. The lexer can confidently skip any other
-                     * token producing operations.
-                     */
-                    goto loopEntry;
-                }
-                break;
+                /*
+                 * NOTE: The lexer is creating a custom token here.
+                 *       Therefore, we directly invoke k_Token_new().
+                 */
+                k_Token_t* newlineToken = k_Token_new(
+                    KUSH_TOKEN_CHANNEL_DEFAULT,
+                    KUSH_TOKEN_NEWLINE,
+                    "\n",
+                    1,
+                    lexer->m_startIndex,    /* inclusive */
+                    lexer->m_index,         /* exclusive */
+                    lexer->m_startLine,     /* inclusive */
+                    lexer->m_line,          /* inclusive */
+                    lexer->m_startColumn,   /* inclusive */
+                    lexer->m_column,        /* inclusive */
+                    file
+                );
+                emit(lexer, newlineToken);
+                /* The rule action has taken care of generating
+                 * tokens. The lexer can confidently skip any other
+                 * token producing operations.
+                 */
+                goto loopEntry;
             }
 
             /* EXCLAMATION_MARK_EQUAL
@@ -1261,11 +1062,6 @@ loopEntry : {
                 consume(lexer);
                 /* The lexer has recognized the '(' token. */
                 lexer->m_type = KUSH_TOKEN_LEFT_PARENTHESIS;
-                /* The lexer is inside an enclosure. The parser will fail
-                 * if newline or indentation tokens are generated. Therefore,
-                 * mark this enclosure.
-                 */
-                lexer->m_enclosures++;
                 break;
             }
 
@@ -1278,11 +1074,6 @@ loopEntry : {
                 consume(lexer);
                 /* The lexer has recognized the '(' token. */
                 lexer->m_type = KUSH_TOKEN_RIGHT_PARENTHESIS;
-                /* The lexer is outside an enclosure. The parser will fail
-                 * if newline or indentation tokens are not generated
-                 * appropriately. Therefore, unmark this enclosure.
-                 */
-                lexer->m_enclosures--;
                 break;
             }
 
@@ -1793,11 +1584,6 @@ loopEntry : {
                 consume(lexer);
                 /* The lexer has recognized the '{' token. */
                 lexer->m_type = KUSH_TOKEN_LEFT_BRACE;
-                /* The lexer is inside an enclosure. The parser will fail
-                 * if newline or indentation tokens are generated. Therefore,
-                 * mark this enclosure.
-                 */
-                lexer->m_enclosures++;
                 break;
             }
 
@@ -1810,11 +1596,6 @@ loopEntry : {
                 consume(lexer);
                 /* The lexer has recognized the '}' token. */
                 lexer->m_type = KUSH_TOKEN_RIGHT_BRACE;
-                /* The lexer is outside an enclosure. The parser will fail
-                 * if newline or indentation tokens are not generated
-                 * appropriately. Therefore, unmark this enclosure.
-                 */
-                lexer->m_enclosures--;
                 break;
             }
 
@@ -1827,11 +1608,6 @@ loopEntry : {
                 consume(lexer);
                 /* The lexer has recognized the '[' token. */
                 lexer->m_type = KUSH_TOKEN_LEFT_SQUARE_BRACKET;
-                /* The lexer is inside an enclosure. The parser will fail
-                 * if newline or indentation tokens are generated. Therefore,
-                 * mark this enclosure.
-                 */
-                lexer->m_enclosures++;
                 break;
             }
 
@@ -1844,11 +1620,6 @@ loopEntry : {
                 consume(lexer);
                 /* The lexer has recognized the ']' token. */
                 lexer->m_type = KUSH_TOKEN_RIGHT_SQUARE_BRACKET;
-                /* The lexer is outside an enclosure. The parser will fail
-                 * if newline or indentation tokens are not generated
-                 * appropriately. Therefore, unmark this enclosure.
-                 */
-                lexer->m_enclosures--;
                 break;
             }
 
@@ -2187,7 +1958,7 @@ loopEntry : {
                             lexer->m_type = KUSH_TOKEN_KEYWORD_UI8;
                         }
                         break;
-											
+
 										}
                     case 'v' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_VAR], 3)) {
@@ -2279,7 +2050,6 @@ void reset(k_Lexer_t* lexer, jtk_InputStream_t* inputStream) {
     lexer->m_token = NULL;
     lexer->m_channel = KUSH_TOKEN_CHANNEL_DEFAULT;
     lexer->m_type = KUSH_TOKEN_UNKNOWN;
-    lexer->m_enclosures = 0;
     lexer->m_errorCode = KUSH_ERROR_CODE_NONE;
 
     jtk_StringBuilder_clear(lexer->m_text);

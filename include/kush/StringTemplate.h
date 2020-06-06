@@ -185,6 +185,7 @@
 #define TEMPLATE_ENTRY_LIST 3
 #define TEMPLATE_ENTRY_MAP 4
 #define TEMPLATE_ENTRY_CUSTOM 5
+#define TEMPLATE_ENTRY_BOOLEAN 6
 
 typedef struct TemplateEntry TemplateEntry;
 
@@ -201,6 +202,7 @@ struct TemplateEntry {
         jtk_ArrayList_t* list;
         jtk_HashMap_t* map;
         void* custom;
+        bool boolean;
     };
 };
 
@@ -214,50 +216,32 @@ TemplateEntry* makeCustomEntry(TemplateEntry* parent, void* custom);
 typedef uint8_t* (*RenderCustom)(void* custom, int32_t* length);
 typedef void (*DestroyCustom)(void* custom, int32_t* length);
 
-struct StringTemplate {
+struct StringRenderer {
     TemplateEntry* root;
     RenderCustom renderCustom;
     DestroyCustom destroyCustom;
 };
 
-typedef struct StringTemplate StringTemplate;
+typedef struct StringRenderer StringRenderer;
 
-StringTemplate* stringTemplateNew();
-void stringTemplateDelete(StringTemplate* self);
-void stringTemplateAdd_i(StringTemplate* self, const uint8_t* name, int32_t value);
-void stringTemplateAdd_d(StringTemplate* self, const uint8_t* name, double value);
-void stringTemplateAdd_s(StringTemplate* self, const uint8_t* name, const uint8_t* bytes);
-void stringTemplateAdd_v(StringTemplate* self, const uint8_t* name, void* custom);
-void stringTemplateAddEx_i(StringTemplate* self, const uint8_t* name, int32_t length, int32_t value);
-void stringTemplateAddEx_d(StringTemplate* self, const uint8_t* name, int32_t length, double value);
-void stringTemplateAddEx_s(StringTemplate* self, const uint8_t* name, int32_t length, const uint8_t* bytes, int32_t bytesSize);
-void stringTemplateAddEx_v(StringTemplate* self, const uint8_t* name, int32_t length, void* custom);
+StringRenderer* stringRendererNew();
+void stringRendererDelete(StringRenderer* self);
+void stringRendererAdd_i(StringRenderer* self, const uint8_t* name, int32_t value);
+void stringRendererAdd_d(StringRenderer* self, const uint8_t* name, double value);
+void stringRendererAdd_s(StringRenderer* self, const uint8_t* name, const uint8_t* bytes);
+void stringRendererAdd_v(StringRenderer* self, const uint8_t* name, void* custom);
+void stringRendererAddEx_i(StringRenderer* self, const uint8_t* name, int32_t length, int32_t value);
+void stringRendererAddEx_d(StringRenderer* self, const uint8_t* name, int32_t length, double value);
+void stringRendererAddEx_s(StringRenderer* self, const uint8_t* name, int32_t length, const uint8_t* bytes, int32_t bytesSize);
+void stringRendererAddEx_v(StringRenderer* self, const uint8_t* name, int32_t length, void* custom);
 
-void stringTemplateSet_i(StringTemplate* self, const uint8_t* name, int32_t value);
-void stringTemplateSet_d(StringTemplate* self, const uint8_t* name, double value);
-void stringTemplateSet_s(StringTemplate* self, const uint8_t* name, const uint8_t* bytes);
-void stringTemplateSet_v(StringTemplate* self, const uint8_t* name, void* custom);
-void stringTemplateSetEx_i(StringTemplate* self, const uint8_t* name, int32_t length, int32_t value);
-void stringTemplateSetEx_d(StringTemplate* self, const uint8_t* name, int32_t length, double value);
-void stringTemplateSetEx_s(StringTemplate* self, const uint8_t* name, int32_t length, const uint8_t* bytes, int32_t bytesSize);
-void stringTemplateSetEx_v(StringTemplate* self, const uint8_t* name, int32_t length, void* custom);
+void stringRendererSet_i(StringRenderer* self, const uint8_t* name, int32_t value);
+void stringRendererSet_d(StringRenderer* self, const uint8_t* name, double value);
+void stringRendererSet_s(StringRenderer* self, const uint8_t* name, const uint8_t* bytes);
+void stringRendererSet_v(StringRenderer* self, const uint8_t* name, void* custom);
+void stringRendererSetEx_i(StringRenderer* self, const uint8_t* name, int32_t length, int32_t value);
+void stringRendererSetEx_d(StringRenderer* self, const uint8_t* name, int32_t length, double value);
+void stringRendererSetEx_s(StringRenderer* self, const uint8_t* name, int32_t length, const uint8_t* bytes, int32_t bytesSize);
+void stringRendererSetEx_v(StringRenderer* self, const uint8_t* name, int32_t length, void* custom);
 
 #endif /* STRING_TEMPLATE_H */
-
-/* [test.template]
- * {{ title }}
- * {{ @names }}
- * Hi, {{ $ }}!
- * {{ ... }}
- *
- * [main.c]
- * int main() {
- *     StringTemplate* self = stringTemplateNew();
- *     stringTemplateSet_s(self, "title", "Hello, world!");
- *     stringTemplateAdd_s(self, "names", "Samuel");
- *     stringTemplateAdd_s(self, "names", "Joel");
- *     uint8_t* result = stringTemplateRenderFile(self, "test.template");
- *     printf("%s\n", result);
- *     return 0;
- * }
- */
