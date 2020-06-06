@@ -22,7 +22,7 @@
 #include <jtk/collection/list/ArrayList.h>
 
 #include <kush/Configuration.h>
-#include <kush/lexer/TokenStream.h>
+#include <kush/TokenStream.h>
 
 /*******************************************************************************
  * Parser                                                                      *

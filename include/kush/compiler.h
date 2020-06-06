@@ -24,7 +24,7 @@
 #include <kush/ast/ASTAnnotations.h>
 #include <kush/symbol-table/SymbolTable.h>
 #include <kush/symbol-table/SymbolLoader.h>
-#include <kush/support/ErrorHandler.h>
+#include <kush/error-handler.h>
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>

@@ -43,7 +43,7 @@
 #include <kush/virtual-machine/feb/constant-pool/ConstantPoolUtf8.h>
 
 #include <kush/symbol-table/SymbolLoader.h>
-#include <kush/Compiler.h>
+#include <kush/compiler.h>
 
 /*******************************************************************************
  * SymbolLoader                                                                *

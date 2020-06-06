@@ -16,9 +16,9 @@
 
 #include <jtk/collection/Pair.h>
 
-#include <kush/parser/Parser.h>
-#include <kush/lexer/TokenStream.h>
-#include <kush/support/StackTrace.h>
+#include <kush/parser.h>
+#include <kush/TokenStream.h>
+#include <kush/StackTrace.h>
 
 /*******************************************************************************
  * Parser                                                                      *

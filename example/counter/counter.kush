@@ -1,0 +1,12 @@
+i32 Counter();
+
+Counter makeCounter(i32 i) {
+	 return @ -> i += 1;
+}
+
+void main() {
+    var next = makeCounter(-1);
+    while next() < 10 {
+        print('Hello, world!');
+    }
+}

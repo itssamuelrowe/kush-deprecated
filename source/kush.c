@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <kush/Compiler.h>
+#include <kush/compiler.h>
 
 int32_t main(int32_t length, char** arguments) {
     // jtk_Assert_assertTrue(k_Instruction_verify(), "The instruction set is invalid.");

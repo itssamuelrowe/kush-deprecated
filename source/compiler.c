@@ -35,23 +35,10 @@
 #include <jtk/core/CStringObjectAdapter.h>
 #include <jtk/core/CString.h>
 
-#include <kush/Compiler.h>
-#include <kush/lexer/Lexer.h>
-#include <kush/lexer/LexerError.h>
-#include <kush/lexer/TokenStream.h>
-#include <kush/parser/Parser.h>
-#include <kush/ast/ASTNode.h>
-#include <kush/ast/ASTListener.h>
-#include <kush/ast/ASTWalker.h>
-#include <kush/ast/ASTAnnotations.h>
-#include <kush/ast/ASTPrinter.h>
-
-#include <kush/symbol-table/SymbolResolutionListener.h>
-#include <kush/symbol-table/FunctionSymbol.h>
-#include <kush/symbol-table/SymbolDefinitionListener.h>
-#include <kush/symbol-table/SymbolTable.h>
-
-#include <kush/support/ErrorHandler.h>
+#include <kush/compiler.h>
+#include <kush/lexer.h>
+#include <kush/parser.h>
+#include <kush/error-handler.h>
 
 // Register
 

@@ -37,16 +37,16 @@ set (
     ${PROJECT_SOURCE_DIR}/source/kush/ast/AstWalker.c
 
     # Lexer
-    ${PROJECT_SOURCE_DIR}/source/kush/lexer/Lexer.c
-    ${PROJECT_SOURCE_DIR}/source/kush/lexer/LexerError.c
-    ${PROJECT_SOURCE_DIR}/source/kush/lexer/Token.c
-    ${PROJECT_SOURCE_DIR}/source/kush/lexer/TokenStream.c
-    ${PROJECT_SOURCE_DIR}/source/kush/lexer/TokenType.c
+    ${PROJECT_SOURCE_DIR}/source/kush/Lexer.c
+    ${PROJECT_SOURCE_DIR}/source/kush/LexerError.c
+    ${PROJECT_SOURCE_DIR}/source/kush/Token.c
+    ${PROJECT_SOURCE_DIR}/source/kush/TokenStream.c
+    ${PROJECT_SOURCE_DIR}/source/kush/TokenType.c
 
     # Parser
-    ${PROJECT_SOURCE_DIR}/source/kush/parser/Context.c
-    ${PROJECT_SOURCE_DIR}/source/kush/parser/Parser.c
-    ${PROJECT_SOURCE_DIR}/source/kush/parser/ParserError.c
+    ${PROJECT_SOURCE_DIR}/source/kush/Context.c
+    ${PROJECT_SOURCE_DIR}/source/kush/Parser.c
+    ${PROJECT_SOURCE_DIR}/source/kush/ParserError.c
 
     # Symbol Table
     ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/SymbolDefinitionListener.c
@@ -60,8 +60,8 @@ set (
     ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/FunctionSymbol.c
     ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/Symbol.c
 
-    ${PROJECT_SOURCE_DIR}/source/kush/support/Error.c
-    ${PROJECT_SOURCE_DIR}/source/kush/support/ErrorHandler.c
+    ${PROJECT_SOURCE_DIR}/source/kush/Error.c
+    ${PROJECT_SOURCE_DIR}/source/kush/ErrorHandler.c
 )
 
 # Compile

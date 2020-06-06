@@ -22,8 +22,8 @@
 #include <jtk/collection/list/ArrayList.h>
 
 #include <kush/Configuration.h>
-#include <kush/support/Error.h>
-#include <kush/support/ErrorCode.h>
+#include <kush/Error.h>
+#include <kush/ErrorCode.h>
 
 /*******************************************************************************
  * ErrorCode                                                                   *

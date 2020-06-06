@@ -20,8 +20,8 @@
 #define KUSH_PARSER_CONTEXT_H
 
 #include <jtk/collection/list/ArrayList.h>
-#include <kush/parser/ContextType.h>
-#include <kush/lexer/Token.h>
+#include <kush/ContextType.h>
+#include <kush/Token.h>
 
 /*******************************************************************************
  * ContextType                                                                 *

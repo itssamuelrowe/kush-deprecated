@@ -16,7 +16,7 @@
 
 // Monday, March 11, 2018
 
-#include <kush/support/ErrorHandler.h>
+#include <kush/error-handler.h>
 
 /*******************************************************************************
  * ErrorHandler                                                                *

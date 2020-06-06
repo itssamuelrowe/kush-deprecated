@@ -3,6 +3,82 @@
 Kush is a general purpose programming language designed to build simple, safe
 and efficient programs. It is heavily inspired by C.
 
+### Example 1: Linear Search
+
+The following example demonstrates the linear search algorithm in Kush.
+
+```
+void main() {
+    var names = [
+        'Samuel Rowe',
+        'Joel E. Rego',
+        'Bill Gates',
+        'Linus Trovalds',
+        'Abraham Lincoln',
+        'Isaac Newton',
+        'Albert Einstein',
+        'Richard Feynman',
+        'Christopher Nolan',
+        'Benedict Cumberbatch'
+    ];
+    var key = 'Marshall Mathers';
+    var result = -1;
+    var i = 0;
+    while i < names.size {
+        if String:equals(key, names[i]) {
+            result = i;
+            break;
+        }
+        i += 1;
+    }
+
+    if result != -1 {
+        print('Found the key at index ' + result + '.');
+    }
+    else {
+        print('Could not find the key.');
+    }
+}
+```
+
+### Example 2: Factorial
+
+The following example demonstrates calculation of factorial in Kush.
+```
+void main() {
+    print('Enter an integer: ');
+    var n = parseInteger(scan());
+
+    var result = 1;
+    var i = 1;
+    while i <= n {
+        result *= i;
+        i += 1;
+    }
+
+    print_i(result);
+}
+```
+
+### Example 3: Counter
+
+The following example demonstrates closures in Kush.
+
+```
+i32 Counter();
+
+Counter makeCounter(i32 i) {
+	 return @ -> i += 1;
+}
+
+void main() {
+    var next = makeCounter(-1);
+    while next() < 10 {
+        print('Hello, world!');
+    }
+}
+```
+
 ## Installation
 
 Before you install Kush, you need to install JTK and pkg-config on your system.

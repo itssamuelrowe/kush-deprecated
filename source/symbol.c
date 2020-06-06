@@ -17,7 +17,7 @@
 // Monday, January 08, 2018
 
 #include <kush/symbol-table/Symbol.h>
-#include <kush/lexer/Token.h>
+#include <kush/Token.h>
 #include <jtk/core/CString.h>
 
 /*******************************************************************************

@@ -21,10 +21,10 @@
 #include <jtk/core/StringBuilder.h>
 #include <jtk/core/CString.h>
 
-#include <kush/lexer/Lexer.h>
-#include <kush/lexer/Token.h>
-#include <kush/lexer/TokenType.h>
-#include <kush/support/ErrorHandler.h>
+#include <kush/lexer.h>
+#include <kush/Token.h>
+#include <kush/TokenType.h>
+#include <kush/error-handler.h>
 
 /*******************************************************************************
  * Lexer                                                                       *
@@ -37,25 +37,6 @@ static k_LexerError_t* createError(k_Lexer_t* lexer, const char* message);
 static k_Token_t* createToken(k_Lexer_t* lexer);
 static void onNewline(k_Lexer_t* lexer);
 static void reset(k_Lexer_t* lexer, jtk_InputStreat* inputStream);
-static bool isInputStart(k_Lexer_t* lexer);
-static bool isBinaryPrefix(int32_t codePoint);
-static bool isBinaryDigit(int32_t codePoint);
-static bool isBinaryDigitOrUnderscore(int32_t codePoint);
-static bool isBasicEscapeSequence(int32_t codePoint);
-static bool isDecimalDigit(int32_t codePoint);
-static bool isDecimalDigitOrUnderscore(int32_t codePoint);
-static bool isIdentifierStart(int32_t codePoint);
-static bool isIdentifierPart(int32_t codePoint);
-static bool isLetter(int32_t codePoint);
-static bool isLetterOrDigit(int32_t codePoint);
-static bool isHexadecimalPrefix(int32_t codePoint);
-static bool isHexadecimalDigit(int32_t codePoint);
-static bool isHexadecimalDigitOrUnderscore(int32_t codePoint);
-static bool isOctalDigit(int32_t codePoint);
-static bool isOctalPrefix(int32_t codePoint);
-static bool isOctalDigitOrUnderscore(int32_t codePoint);
-static bool isIntegerSuffix(int32_t codePoint);
-
 static void binaryIntegerLiteral(k_Lexer_t* lexer);
 static void octalIntegerLiteral(k_Lexer_t* lexer);
 static void hexadecimalIntegerLiteral(k_Lexer_t* lexer);
@@ -2097,8 +2078,6 @@ void reset(k_Lexer_t* lexer, jtk_InputStreat* inputStream) {
 
     jtk_StringBuilder_clear(lexer->text);
     jtk_ArrayQueue_clear(lexer->tokens);
-    // jtk_ArrayStack_clear(lexer->indentations);
-    jtk_ArrayList_clear(lexer->indentations->list);
 
     consume(lexer);
 }

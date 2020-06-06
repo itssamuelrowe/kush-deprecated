@@ -21,7 +21,7 @@
 #include <kush/symbol-table/Scope.h>
 #include <kush/symbol-table/Symbol.h>
 #include <kush/ast/ASTNode.h>
-#include <kush/lexer/Token.h>
+#include <kush/Token.h>
 
 k_Scope_t* k_Scope_new(const uint8_t* name, int32_t nameSize,
     k_ScopeType_t type, k_Scope_t* enclosingScope, k_Symbol_t* symbol) {

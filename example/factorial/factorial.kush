@@ -1,0 +1,13 @@
+void main() {
+    print('Enter an integer: ');
+    var n = parseInteger(scan());
+
+    var result = 1;
+    var i = 1;
+    while i <= n {
+        result *= i;
+        i += 1;
+    }
+
+    print_i(result)
+}

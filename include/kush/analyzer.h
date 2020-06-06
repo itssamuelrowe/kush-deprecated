@@ -20,8 +20,8 @@
 #define KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H
 
 #include <kush/Configuration.h>
-#include <kush/Compiler.h>
-#include <kush/parser/ContextType.h>
+#include <kush/compiler.h>
+#include <kush/ContextType.h>
 #include <kush/symbol-table/Scope.h>
 #include <kush/symbol-table/ScopeType.h>
 #include <kush/symbol-table/SymbolTable.h>

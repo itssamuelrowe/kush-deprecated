@@ -22,10 +22,10 @@
 #include <jtk/collection/list/ArrayList.h>
 
 #include <kush/Configuration.h>
-#include <kush/Compiler.h>
-#include <kush/lexer/Lexer.h>
-#include <kush/lexer/Token.h>
-#include <kush/lexer/TokenType.h>
+#include <kush/compiler.h>
+#include <kush/lexer.h>
+#include <kush/Token.h>
+#include <kush/TokenType.h>
 
 /*******************************************************************************
  * TokenStream                                                           *

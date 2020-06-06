@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <kush/support/Error.h>
+#include <kush/Error.h>
 
 /*******************************************************************************
  * Error                                                                       *

@@ -15,7 +15,7 @@
  */
 
 #include <jtk/collection/array/Arrays.h>
-#include <kush/lexer/TokenStream.h>
+#include <kush/TokenStream.h>
 
 k_TokenStreat* k_TokenStreanew(k_Compiler_t* compiler,
                                    k_Lexer_t* lexer, k_TokenChannel_t channel) {

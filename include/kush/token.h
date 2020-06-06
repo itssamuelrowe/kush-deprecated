@@ -19,9 +19,7 @@
 #ifndef KUSH_COMPILER_LEXER_TOKEN_H
 #define KUSH_COMPILER_LEXER_TOKEN_H
 
-#include <kush/Configuration.h>
-#include <kush/lexer/TokenType.h>
-#include <kush/lexer/TokenChannel.h>
+#include <kush/configuration.h>
 
 /*******************************************************************************
  * TokenType                                                                   *

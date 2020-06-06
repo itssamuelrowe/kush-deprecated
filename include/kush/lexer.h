@@ -26,11 +26,11 @@
 #include <jtk/io/InputStream.h>
 
 #include <kush/Configuration.h>
-#include <kush/Compiler.h>
-#include <kush/lexer/LexerError.h>
-#include <kush/lexer/Token.h>
-#include <kush/lexer/TokenType.h>
-#include <kush/lexer/TokenChannel.h>
+#include <kush/compiler.h>
+#include <kush/LexerError.h>
+#include <kush/Token.h>
+#include <kush/TokenType.h>
+#include <kush/TokenChannel.h>
 
 #define KUSH_LEXER_DEFAULT_CHANNEL 0
 #define KUSH_LEXER_HIDDEN_CHANNEL 1

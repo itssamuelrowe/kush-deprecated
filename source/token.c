@@ -15,7 +15,7 @@
  */
 
 #include <jtk/core/CString.h>
-#include <kush/lexer/Token.h>
+#include <kush/Token.h>
 
 k_Token_t* k_Token_new(
     k_TokenChannel_t channel,
