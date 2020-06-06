@@ -26,13 +26,9 @@
 #include <kush/lexer/TokenType.h>
 #include <kush/support/ErrorHandler.h>
 
-#warning "Lexer does not recognize decimal values!"
-
 /*******************************************************************************
  * Lexer                                                                       *
  *******************************************************************************/
-
-// Consume
 
 static void consume(k_Lexer_t* lexer);
 static void destroyStaleTokens(k_Lexer_t* lexer);
@@ -60,13 +56,62 @@ static bool isOctalPrefix(int32_t codePoint);
 static bool isOctalDigitOrUnderscore(int32_t codePoint);
 static bool isIntegerSuffix(int32_t codePoint);
 
-
 static void binaryIntegerLiteral(k_Lexer_t* lexer);
 static void octalIntegerLiteral(k_Lexer_t* lexer);
 static void hexadecimalIntegerLiteral(k_Lexer_t* lexer);
 static void decimalIntegerLiteral(k_Lexer_t* lexer);
 static void integerLiteral(k_Lexer_t* lexer);
 
+
+#define isBinaryPrefix(c) (c == 'b') || (c == 'B')
+
+#define isBinaryDigit(c) (c == '0') || (c == '1')
+
+#define isBinaryDigitOrUnderscore(c) \
+    (c == '0') || (c == '1') || (c == '_')
+
+#define isBasicEscapeSequence(c) \
+    (c == 'b') || \
+    (c == 'f') || \
+    (c == 'n') || \
+    (c == 'r') || \
+    (c == 't') || \
+    (c == '\\') || \
+    (c == '\"') || \
+    (c == '\'')
+
+#define isDecimalDigit(c) (c >= '0') && (c <= '9')
+
+#define isDecimalDigitOrUnderscore(c) isDecimalDigit(c) || (c == '_')
+
+#define isIdentifierStart(c) \
+    ((c >= 'a') && (c <= 'z')) || \
+    ((c >= 'A') && (c <= 'Z'))
+
+#define isIdentifierPart(c) \
+    ((c >= 'a') && (c <= 'z')) || \
+    ((c >= 'A') && (c <= 'Z')) || \
+    ((c >= '0') && (c <= '9')) || \
+    (c == '_')
+
+#define isLetter(c) ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'))
+
+#define isLetterOrDigit(c) isLetter(c) || isDecimalDigit(c)
+
+#define isHexadecimalPrefix(c) (c == 'x') || (c == 'X')
+
+#define isHexadecimalDigit(c) \
+    isDecimalDigit(c) || ((c >= 'a') && (c <= 'f')) || ((c >= 'A') && (c <= 'F'))
+
+#define isHexadecimalDigitOrUnderscore(c) isHexadecimalDigit(c) || (c == '_')
+
+#define isOctalDigit(c) (c >= '0') && (c <= '7')
+
+#define isOctalPrefix(c) (c == 'c') || (c == 'C')
+
+#define isOctalDigitOrUnderscore(c) isOctalDigit(c) || (c == '_')
+
+#define isIntegerSuffix(c) (c == 'l') || (c == 'L')
 
 uint8_t k_Lexer_literalNames[][25] = {
     { '<', 'u', 'n', 'k', 'n', 'o', 'w', 'n', '>', '\0' },
@@ -247,8 +292,6 @@ k_Lexer_t* k_Lexer_new(k_Compiler_t* compiler) {
     lexer->text = jtk_StringBuilder_new();
     lexer->type = KUSH_TOKEN_UNKNOWN;
     lexer->tokens = jtk_ArrayQueue_new();
-    lexer->indentations = jtk_ArrayStack_new();
-    lexer->enclosures = 0;
     lexer->errorCode = KUSH_ERROR_CODE_NONE;
 
     return lexer;
@@ -2058,90 +2101,4 @@ void reset(k_Lexer_t* lexer, jtk_InputStreat* inputStream) {
     jtk_ArrayList_clear(lexer->indentations->list);
 
     consume(lexer);
-}
-
-// Misc.
-
-bool isBinaryPrefix(int32_t codePoint) {
-    return (codePoint == 'b') || (codePoint == 'B');
-}
-
-bool isBinaryDigit(int32_t codePoint) {
-    return (codePoint == '0') || (codePoint == '1');
-}
-
-bool isBinaryDigitOrUnderscore(int32_t codePoint) {
-    return (codePoint == '0') ||
-           (codePoint == '1') ||
-           (codePoint == '_');
-}
-
-bool isBasicEscapeSequence(int32_t codePoint) {
-    return (codePoint == 'b') ||
-           (codePoint == 'f') ||
-           (codePoint == 'n') ||
-           (codePoint == 'r') ||
-           (codePoint == 't') ||
-           (codePoint == '\\') ||
-           (codePoint == '\"') ||
-           (codePoint == '\'');
-}
-
-bool isDecimalDigit(int32_t codePoint) {
-    return (codePoint >= '0') && (codePoint <= '9');
-}
-
-bool isDecimalDigitOrUnderscore(int32_t codePoint) {
-    return isDecimalDigit(codePoint) || (codePoint == '_');
-}
-
-bool isIdentifierStart(int32_t codePoint) {
-    return ((codePoint >= 'a') && (codePoint <= 'z')) ||
-           ((codePoint >= 'A') && (codePoint <= 'Z'));
-}
-
-bool isIdentifierPart(int32_t codePoint) {
-    return ((codePoint >= 'a') && (codePoint <= 'z')) ||
-           ((codePoint >= 'A') && (codePoint <= 'Z')) ||
-           ((codePoint >= '0') && (codePoint <= '9')) ||
-           (codePoint == '_');
-}
-
-bool isLetter(int32_t codePoint) {
-    return ((codePoint >= 'a') && (codePoint <= 'z')) ||
-           ((codePoint >= 'A') && (codePoint <= 'Z'));
-}
-
-bool isLetterOrDigit(int32_t codePoint) {
-    return isLetter(codePoint) || isDecimalDigit(codePoint);
-}
-
-bool isHexadecimalPrefix(int32_t codePoint) {
-    return (codePoint == 'x') || (codePoint == 'X');
-}
-
-bool isHexadecimalDigit(int32_t codePoint) {
-    return isDecimalDigit(codePoint) ||
-           ((codePoint >= 'a') && (codePoint <= 'f')) ||
-           ((codePoint >= 'A') && (codePoint <= 'F'));
-}
-
-bool isHexadecimalDigitOrUnderscore(int32_t codePoint) {
-    return isHexadecimalDigit(codePoint) || (codePoint == '_');
-}
-
-bool isOctalDigit(int32_t codePoint) {
-    return (codePoint >= '0') && (codePoint <= '7');
-}
-
-bool isOctalPrefix(int32_t codePoint) {
-    return (codePoint == 'c') || (codePoint == 'C');
-}
-
-bool isOctalDigitOrUnderscore(int32_t codePoint) {
-    return isOctalDigit(codePoint) || (codePoint == '_');
-}
-
-bool isIntegerSuffix(int32_t codePoint) {
-    return (codePoint == 'l') || (codePoint == 'L');
 }

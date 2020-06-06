@@ -60,7 +60,7 @@ struct k_Lexer_t {
     /**
      * The input stream of characters.
      */
-    jtk_InputStreat* inputStream;
+    jtk_InputStream_t* inputStream;
 
     /**
      * The character at LA(1), this field is always updated
@@ -140,11 +140,6 @@ struct k_Lexer_t {
      * buffers up tokens.
      */
     jtk_ArrayQueue_t* tokens;
-
-    /**
-     * A stack that stores indentation depths.
-     */
-    jtk_ArrayStack_t* indentations;
 
     k_ErrorCode_t errorCode;
 };
