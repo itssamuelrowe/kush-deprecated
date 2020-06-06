@@ -29,46 +29,46 @@ k_Token_t* k_Token_new(
     int32_t startColumn,
     int32_t stopColumn,
     const char* file) {
-    k_Token_t* token = k_Memory_allocate(k_Token_t, 1);
-    token->m_channel = channel;
-    token->m_type = type;
-    token->m_text = jtk_CString_newEx(text, length);
-    token->m_length = length; // This is the length of the text representation!
-    token->m_startIndex = startIndex;
-    token->m_stopIndex = stopIndex;
-    token->m_startLine = startLine;
-    token->m_stopLine = stopLine;
-    token->m_startColumn = startColumn;
-    token->m_stopColumn = stopColumn;
-    token->m_file = file;
+    k_Token_t* token = allocate(k_Token_t, 1);
+    token->channel = channel;
+    token->type = type;
+    token->text = jtk_CString_newEx(text, length);
+    token->length = length; // This is the length of the text representation!
+    token->startIndex = startIndex;
+    token->stopIndex = stopIndex;
+    token->startLine = startLine;
+    token->stopLine = stopLine;
+    token->startColumn = startColumn;
+    token->stopColumn = stopColumn;
+    token->file = file;
 
     return token;
 }
 
 void k_Token_delete(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    jtk_CString_delete(token->m_text);
-    jtk_Memory_deallocate(token);
+    jtk_CString_delete(token->text);
+    jtdeallocate(token);
 }
 
 k_TokenChannel_t k_Token_getChannel(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    return token->m_channel;
+    return token->channel;
 }
 
 void k_Token_setChannel(k_Token_t* token, k_TokenChannel_t channel) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    token->m_channel = channel;
+    token->channel = channel;
 }
 
 k_TokenType_t k_Token_getType(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    return token->m_type;
+    return token->type;
 }
 
 void k_Token_setType(k_Token_t* token, k_TokenType_t type) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    token->m_type = type;
+    token->type = type;
 }
 
 
@@ -76,82 +76,82 @@ void k_Token_setText(k_Token_t* token, const uint8_t* text, int32_t length) {
     jtk_Assert_assertObject(token, "The specified token is null.");
 
     /* The text should not be null. */
-    jtk_CString_delete(token->m_text);
-    token->m_text = jtk_CString_newEx(text, length);
-    token->m_length = length;
+    jtk_CString_delete(token->text);
+    token->text = jtk_CString_newEx(text, length);
+    token->length = length;
 }
 
 const uint8_t* k_Token_getText(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    return token->m_text;
+    return token->text;
 }
 
 
 int32_t k_Token_getLength(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    return token->m_length;
+    return token->length;
 }
 
 
 void k_Token_setStartIndex(k_Token_t* token, int32_t startIndex) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    token->m_startIndex = startIndex;
+    token->startIndex = startIndex;
 }
 
 void k_Token_setStopIndex(k_Token_t* token, int32_t stopIndex) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    token->m_stopIndex = stopIndex;
+    token->stopIndex = stopIndex;
 }
 
 
 void k_Token_setStartLine(k_Token_t* token, int32_t startLine) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    token->m_startLine = startLine;
+    token->startLine = startLine;
 }
 
 int32_t k_Token_getStartLine(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    return token->m_startLine;
+    return token->startLine;
 }
 
 void k_Token_setStopLine(k_Token_t* token, int32_t stopLine) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    token->m_startLine = stopLine;
+    token->startLine = stopLine;
 }
 
 int32_t k_Token_getStopLine(k_Token_t* token) {
-    return token->m_stopLine;
+    return token->stopLine;
 }
 
 void k_Token_setStartColumn(k_Token_t* token, int32_t startColumn) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    token->m_startColumn = startColumn;
+    token->startColumn = startColumn;
 }
 
 int32_t k_Token_getStartColumn(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    return token->m_startColumn;
+    return token->startColumn;
 }
 
 
 void k_Token_setStopColumn(k_Token_t* token, int32_t stopColumn) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    token->m_stopColumn = stopColumn;
+    token->stopColumn = stopColumn;
 }
 
 int32_t k_Token_getStopColumn(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    return token->m_stopColumn;
+    return token->stopColumn;
 }
 
 void k_Token_setIndex(k_Token_t* token, int32_t index) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    token->m_index = index;
+    token->index = index;
 }
 
 int32_t k_Token_getIndex(k_Token_t* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
-    return token->m_index;
+    return token->index;
 }
 
 

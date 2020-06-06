@@ -39,8 +39,8 @@
     #define NULL 0
 #endif
 
-#define k_Memory_allocate(type, units) (type*)k_Memory_allocate0(sizeof (type) * (units))
-#define k_Memory_deallocate(object) free(object)
+#define allocate(type, units) (type*)allocate0(sizeof (type) * (units))
+#define deallocate(object) free(object)
 #define k_Assert_assertObject(object, message) assert((object) != NULL)
 #define k_Assert_assertTrue(expression, message) assert(expression)
 #define k_Assert_assertFalse(expression, message) assert(!(expression))
@@ -48,6 +48,6 @@
 #define k_Assert_assertRange(startIndex, stopIndex, size, message) puts("TODO: k_Assert_assertRange");
 #define k_Assert_assertAddIndex(index, size, message) assert(((index) <= (size)) && ((index) >= 0))
 
-void* k_Memory_allocate0(int32_t size);
+void* allocate0(int32_t size);
 
 #endif /* KUSH_CONFIGURATION_H */

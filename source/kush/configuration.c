@@ -18,7 +18,7 @@
 
 static int32_t s_footprint = 0;
 
-void* k_Memory_allocate0(int32_t size) {
+void* allocate0(int32_t size) {
     s_footprint += size;
 
     void* object = malloc(size);

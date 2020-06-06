@@ -55,82 +55,82 @@ typedef struct k_ErrorHandler_t k_ErrorHandler_t;
  */
 struct k_Lexer_t {
 
-    k_Compiler_t* m_compiler;
+    k_Compiler_t* compiler;
 
     /**
      * The input stream of characters.
      */
-    jtk_InputStream_t* m_inputStream;
+    jtk_InputStreat* inputStream;
 
     /**
      * The character at LA(1), this field is always updated
      * by k_Lexer_consume(...).
      */
-    int32_t m_la1;
+    int32_t la1;
 
     /**
      * The input cursor under which the current look ahead
      * character is located.
      */
-    int32_t m_index;
+    int32_t index;
 
     /**
      * The zero based line number at which the lexer is currently
      * reading.
      */
-    int32_t m_line;
+    int32_t line;
 
     /**
      * The zero based column index within the line, where the
      * lexer is currently reading.
      */
-    int32_t m_column;
+    int32_t column;
 
     /**
      * The starting index of the current token in the input
      * stream, inclusive.
      */
-    int32_t m_startIndex;
+    int32_t startIndex;
 
     /**
      * The zero based line number at which the current
      * token begins, inclusive.
      */
-    int32_t m_startLine;
+    int32_t startLine;
 
     /**
      * The zero based column at which the current token
      * begins. It is always relative to the starting line.
      */
-    int32_t m_startColumn;
+    int32_t startColumn;
 
     /**
      * Determines whether the lexer has reached the end of
      * the input stream.
      */
-    int32_t m_hitEndOfStream:1;
+    int32_t hitEndOfStream:1;
 
     /**
      * The token that was most recently emitted.
      */
-    k_Token_t* m_token;
+    k_Token_t* token;
 
     /**
      * The channel on which the next recognized
      * token will be created on.
      */
-    k_TokenChannel_t  m_channel;
+    k_TokenChannel_t  channel;
 
     /**
      * The text consumed so far to recognize the next
      * token.
      */
-    jtk_StringBuilder_t* m_text;
+    jtk_StringBuilder_t* text;
 
     /**
      * The token type of the next recognized token.
      */
-    k_TokenType_t m_type;
+    k_TokenType_t type;
 
     /**
      * A buffer to store emitted tokens.
@@ -139,14 +139,14 @@ struct k_Lexer_t {
      * emission of multiple tokens. Therefore, the lexer
      * buffers up tokens.
      */
-    jtk_ArrayQueue_t* m_tokens;
+    jtk_ArrayQueue_t* tokens;
 
     /**
      * A stack that stores indentation depths.
      */
-    jtk_ArrayStack_t* m_indentations;
+    jtk_ArrayStack_t* indentations;
 
-    k_ErrorCode_t m_errorCode;
+    k_ErrorCode_t errorCode;
 };
 
 /**

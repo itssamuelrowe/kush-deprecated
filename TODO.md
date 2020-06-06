@@ -20,7 +20,7 @@ April 24
 * Implement decimal values!
 
 April 25
- * Use symbol->m_name instead of symbol->m_context.as_Class.qualifiedName
+ * Use symbol->name instead of symbol->context.as_Class.qualifiedName
  * Implement the logical operators
  * Implement the array function.
 

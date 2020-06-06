@@ -36,13 +36,13 @@
  * @since Kush 0.1
  */
 struct k_SymbolResolutionListener_t {
-    k_Compiler_t* m_compiler;
-    k_ASTListener_t* m_astListener;
-    k_SymbolTable_t* m_symbolTable;
-    k_ASTAnnotations_t* m_scopes;
-    k_ExpressionAnnotation_t m_label;
-    int32_t m_functionIndex;
-    int32_t m_fieldIndex;
+    k_Compiler_t* compiler;
+    k_ASTListener_t* astListener;
+    k_SymbolTable_t* symbolTable;
+    k_ASTAnnotations_t* scopes;
+    k_ExpressionAnnotation_t label;
+    int32_t functionIndex;
+    int32_t fieldIndex;
 };
 
 /**

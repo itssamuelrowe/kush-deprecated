@@ -28,10 +28,10 @@ k_Error_t* k_Error_new(k_ErrorCode_t code, k_Token_t* token) {
 
 k_Error_t* k_Error_newEx(k_ErrorCode_t code, k_Token_t* token,
     k_TokenType_t expected) {
-    k_Error_t* error = jtk_Memory_allocate(k_Error_t, 1);
-    error->m_code = code;
-    error->m_token = token;
-    error->m_expected = expected;
+    k_Error_t* error = jtallocate(k_Error_t, 1);
+    error->code = code;
+    error->token = token;
+    error->expected = expected;
 
     return error;
 }
@@ -41,5 +41,5 @@ k_Error_t* k_Error_newEx(k_ErrorCode_t code, k_Token_t* token,
 void k_Error_delete(k_Error_t* error) {
     jtk_Assert_assertObject(error, "The specified error is null.");
 
-    jtk_Memory_deallocate(error);
+    jtdeallocate(error);
 }

@@ -62,15 +62,15 @@ void k_Compiler_registerSymbol(k_Compiler_t* compiler, const uint8_t* identifier
      * to the symbol we are mapping. Therefore, the lifetime of both the qualified
      * name and the symbol are equivalent.
      */
-    jtk_HashMap_put(compiler->m_repository, identifier, symbol);
+    jtk_HashMap_put(compiler->repository, identifier, symbol);
 }
 
 k_Symbol_t* k_Compiler_resolveSymbol(k_Compiler_t* compiler,
     const uint8_t* name, int32_t nameSize) {
-    k_Symbol_t* result = jtk_HashMap_getValue(compiler->m_repository,
+    k_Symbol_t* result = jtk_HashMap_getValue(compiler->repository,
         name);
     if (result == NULL) {
-        result = k_SymbolLoader_findSymbol(compiler->m_symbolLoader,
+        result = k_SymbolLoader_findSymbol(compiler->symbolLoader,
             name, nameSize);
     }
     return result;
@@ -79,11 +79,11 @@ k_Symbol_t* k_Compiler_resolveSymbol(k_Compiler_t* compiler,
 // Token
 
 void k_Compiler_printToken(k_Token_t* token) {
-    printf("[%d-%d:%d-%d:%s:%s]", token->m_startLine, token->m_stopLine, token->m_startColumn + 1, token->m_stopColumn + 1, token->m_channel == KUSH_TOKEN_CHANNEL_DEFAULT? "default" : "hidden", k_Lexer_getLiteralName(token->m_type));
+    printf("[%d-%d:%d-%d:%s:%s]", token->startLine, token->stopLine, token->startColumn + 1, token->stopColumn + 1, token->channel == KUSH_TOKEN_CHANNEL_DEFAULT? "default" : "hidden", k_Lexer_getLiteralName(token->type));
     k_TokenType_t type = k_Token_getType(token);
     if ((type == KUSH_TOKEN_IDENTIFIER) || (type == KUSH_TOKEN_INTEGER_LITERAL) ||
         (type == KUSH_TOKEN_STRING_LITERAL)) {
-        printf(" %.*s", token->m_length, token->m_text);
+        printf(" %.*s", token->length, token->text);
     }
     puts("");
 }
@@ -137,22 +137,22 @@ bool jtk_PathHelper_exists(const uint8_t* path) {
 
 #define JTK_FILE_OPEN_MODE_BUFFERED (1 << 0)
 
-jtk_InputStream_t* jtk_PathHelper_read(const uint8_t* path);
-jtk_InputStream_t* jtk_PathHelper_readEx(const uint8_t* path, uint32_t flags);
+jtk_InputStreat* jtk_PathHelper_read(const uint8_t* path);
+jtk_InputStreat* jtk_PathHelper_readEx(const uint8_t* path, uint32_t flags);
 
-jtk_InputStream_t* jtk_PathHelper_read(const uint8_t* path) {
+jtk_InputStreat* jtk_PathHelper_read(const uint8_t* path) {
     return jtk_PathHelper_readEx(path, JTK_FILE_OPEN_MODE_BUFFERED);
 }
 
-jtk_InputStream_t* jtk_PathHelper_readEx(const uint8_t* path, uint32_t flags) {
-    jtk_InputStream_t* result = NULL;
+jtk_InputStreat* jtk_PathHelper_readEx(const uint8_t* path, uint32_t flags) {
+    jtk_InputStreat* result = NULL;
 
-    jtk_FileInputStream_t* fileStream = jtk_FileInputStream_newFromString(path);
-    result = fileStream->m_inputStream;
+    jtk_FileInputStreat* fileStream = jtk_FileInputStreanewFromString(path);
+    result = fileStream->inputStream;
 
     if ((flags & JTK_FILE_OPEN_MODE_BUFFERED) != 0) {
-        jtk_BufferedInputStream_t* bufferedStream = jtk_BufferedInputStream_new(fileStream->m_inputStream);
-        result = bufferedStream->m_inputStream;
+        jtk_BufferedInputStreat* bufferedStream = jtk_BufferedInputStreanew(fileStream->inputStream);
+        result = bufferedStream->inputStream;
     }
 
     return result;
@@ -178,28 +178,28 @@ uint8_t* jtk_PathHelper_getParent(const uint8_t* path, int32_t size,
 k_Compiler_t* k_Compiler_new() {
     jtk_ObjectAdapter_t* stringObjectAdapter = jtk_CStringObjectAdapter_getInstance();
 
-    k_Compiler_t* compiler = jtk_Memory_allocate(k_Compiler_t, 1);
-    compiler->m_dumpTokens = false;
-    compiler->m_dumpNodes = false;
-    compiler->m_footprint = false;
-    compiler->m_dumpInstructions = false;
-    compiler->m_inputFiles = jtk_ArrayList_new();
-    compiler->m_currentFileIndex = -1;
-    compiler->m_errorHandler = k_ErrorHandler_new();
-    compiler->m_compilationUnits = NULL;
-    compiler->m_symbolTables = NULL;
-    compiler->m_scopes = NULL;
-    compiler->m_packages = NULL;
-    compiler->m_packageSizes = NULL;
-    compiler->m_symbolLoader = k_SymbolLoader_new(compiler);
-    compiler->m_repository = jtk_HashMap_new(stringObjectAdapter, NULL);
-    compiler->m_trash = NULL;
-    compiler->m_coreApi = false;
+    k_Compiler_t* compiler = jtallocate(k_Compiler_t, 1);
+    compiler->dumpTokens = false;
+    compiler->dumpNodes = false;
+    compiler->footprint = false;
+    compiler->dumpInstructions = false;
+    compiler->inputFiles = jtk_ArrayList_new();
+    compiler->currentFileIndex = -1;
+    compiler->errorHandler = k_ErrorHandler_new();
+    compiler->compilationUnits = NULL;
+    compiler->symbolTables = NULL;
+    compiler->scopes = NULL;
+    compiler->packages = NULL;
+    compiler->packageSizes = NULL;
+    compiler->symbolLoader = k_SymbolLoader_new(compiler);
+    compiler->repository = jtk_HashMap_new(stringObjectAdapter, NULL);
+    compiler->trash = NULL;
+    compiler->coreApi = false;
 #ifdef JTK_LOGGER_DISABLE
-    compiler->m_logger = NULL;
+    compiler->logger = NULL;
 #else
-    compiler->m_logger = jtk_Logger_new(jtk_ConsoleLogger_log);
-    jtk_Logger_setLevel(compiler->m_logger, JTK_LOG_LEVEL_NONE);
+    compiler->logger = jtk_Logger_new(jtk_ConsoleLogger_log);
+    jtk_Logger_setLevel(compiler->logger, JTK_LOG_LEVEL_NONE);
 #endif
 
     return compiler;
@@ -210,20 +210,20 @@ k_Compiler_t* k_Compiler_new() {
 void k_Compiler_delete(k_Compiler_t* compiler) {
     jtk_Assert_assertObject(compiler, "The specified compiler is null.");
 
-    if (compiler->m_compilationUnits != NULL) {
-        jtk_Memory_deallocate(compiler->m_compilationUnits);
+    if (compiler->compilationUnits != NULL) {
+        jtdeallocate(compiler->compilationUnits);
     }
 
-    if (compiler->m_symbolTables != NULL) {
-        jtk_Memory_deallocate(compiler->m_symbolTables);
+    if (compiler->symbolTables != NULL) {
+        jtdeallocate(compiler->symbolTables);
     }
 
-    if (compiler->m_scopes != NULL) {
-        jtk_Memory_deallocate(compiler->m_scopes);
+    if (compiler->scopes != NULL) {
+        jtdeallocate(compiler->scopes);
     }
 
-    if (compiler->m_trash != NULL) {
-        int32_t size = jtk_ArrayList_getSize(compiler->m_trash);
+    if (compiler->trash != NULL) {
+        int32_t size = jtk_ArrayList_getSize(compiler->trash);
         int32_t i;
         for (i = 0; i < size; i++) {
             /* The ownership of the tokens produced by the lexer
@@ -231,41 +231,41 @@ void k_Compiler_delete(k_Compiler_t* compiler) {
             * their creation. Therefore, the token stream
             * has to destroy the buffered tokens.
             */
-            k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(compiler->m_trash, i);
+            k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(compiler->trash, i);
             k_Token_delete(token);
         }
-        jtk_ArrayList_delete(compiler->m_trash);
+        jtk_ArrayList_delete(compiler->trash);
     }
 
-    if (compiler->m_packages != NULL) {
+    if (compiler->packages != NULL) {
         int32_t i;
-        int32_t inputCount = jtk_ArrayList_getSize(compiler->m_inputFiles);
+        int32_t inputCount = jtk_ArrayList_getSize(compiler->inputFiles);
         for (i = 0; i < inputCount; i++) {
-            jtk_CString_delete(compiler->m_packages[i]);
+            jtk_CString_delete(compiler->packages[i]);
         }
-        jtk_Memory_deallocate(compiler->m_packages);
-        jtk_Memory_deallocate(compiler->m_packageSizes);
+        jtdeallocate(compiler->packages);
+        jtdeallocate(compiler->packageSizes);
     }
 
-    jtk_Iterator_t* iterator = jtk_HashMap_getKeyIterator(compiler->m_repository);
+    jtk_Iterator_t* iterator = jtk_HashMap_getKeyIterator(compiler->repository);
     while (jtk_Iterator_hasNext(iterator)) {
         uint8_t* key = (uint8_t*)jtk_Iterator_getNext(iterator);
         jtk_CString_delete(key);
     }
     jtk_Iterator_delete(iterator);
-    jtk_HashMap_delete(compiler->m_repository);
+    jtk_HashMap_delete(compiler->repository);
 
-    k_ErrorHandler_delete(compiler->m_errorHandler);
+    k_ErrorHandler_delete(compiler->errorHandler);
 
 #ifndef JTK_LOGGER_DISABLE
-    jtk_Logger_delete(compiler->m_logger);
+    jtk_Logger_delete(compiler->logger);
 #endif
-    jtk_ArrayList_delete(compiler->m_inputFiles);
-    jtk_Memory_deallocate(compiler);
+    jtk_ArrayList_delete(compiler->inputFiles);
+    jtdeallocate(compiler);
 }
 
 void k_Compiler_onLexerError(k_LexerError_t* error) {
-    fprintf(stderr, "[error] %s:%d:%d -- %s\n", error->m_path, error->m_line, error->m_column, error->m_message);
+    fprintf(stderr, "[error] %s:%d:%d -- %s\n", error->path, error->line, error->column, error->message);
     fflush(stderr);
 }
 
@@ -320,88 +320,88 @@ const uint8_t* k_ErrorCode_messages[] = {
 };
 
 void k_Compiler_printErrors(k_Compiler_t* compiler) {
-    jtk_ArrayList_t* errors = k_ErrorHandler_getErrors(compiler->m_errorHandler);
+    jtk_ArrayList_t* errors = k_ErrorHandler_getErrors(compiler->errorHandler);
     int32_t errorCount = jtk_ArrayList_getSize(errors);
     int32_t i;
     for (i = 0; i < errorCount; i++) {
         k_Error_t* error = (k_Error_t*)jtk_ArrayList_getValue(errors, i);
-        k_Token_t* token = error->m_token;
-        const char* message = k_ErrorCode_messages[(int32_t)error->m_code];
+        k_Token_t* token = error->token;
+        const char* message = k_ErrorCode_messages[(int32_t)error->code];
         char message0[128];
 
         char lineNumbers[100];
-        if (token->m_startLine != token->m_stopLine) {
-            sprintf(lineNumbers, "%d-%d", token->m_startLine, token->m_stopLine);
+        if (token->startLine != token->stopLine) {
+            sprintf(lineNumbers, "%d-%d", token->startLine, token->stopLine);
         }
         else {
-            sprintf(lineNumbers, "%d", token->m_startLine);
+            sprintf(lineNumbers, "%d", token->startLine);
         }
 
-        if (error->m_expected != KUSH_TOKEN_UNKNOWN) {
-            const uint8_t* expectedName = k_Lexer_getLiteralName(error->m_expected);
-            const uint8_t* actualName = k_Lexer_getLiteralName(token->m_type);
+        if (error->expected != KUSH_TOKEN_UNKNOWN) {
+            const uint8_t* expectedName = k_Lexer_getLiteralName(error->expected);
+            const uint8_t* actualName = k_Lexer_getLiteralName(token->type);
             sprintf(message0, "Expected token '%s', encountered token '%s'",
                 expectedName, actualName);
             message = message0;
         }
         fprintf(stderr, "\033[1;31m[error]\033[0m %s:%s:%d-%d: %s\n",
-            token->m_file, lineNumbers, token->m_startColumn,
-            token->m_stopColumn, message);
+            token->file, lineNumbers, token->startColumn,
+            token->stopColumn, message);
     }
 }
 
 void k_Compiler_initialize(k_Compiler_t* compiler) {
-    int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
-    compiler->m_compilationUnits = jtk_Memory_allocate(k_ASTNode_t*, size);
-    compiler->m_symbolTables = jtk_Memory_allocate(k_SymbolTable_t*, size);
-    compiler->m_scopes = jtk_Memory_allocate(k_ASTAnnotations_t*, size);
-    compiler->m_packages = jtk_Memory_allocate(uint8_t*, size);
-    compiler->m_packageSizes = jtk_Memory_allocate(int32_t, size);
+    int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
+    compiler->compilationUnits = jtallocate(k_ASTNode_t*, size);
+    compiler->symbolTables = jtallocate(k_SymbolTable_t*, size);
+    compiler->scopes = jtallocate(k_ASTAnnotations_t*, size);
+    compiler->packages = jtallocate(uint8_t*, size);
+    compiler->packageSizes = jtallocate(int32_t, size);
 }
 
 void k_Compiler_buildAST(k_Compiler_t* compiler) {
     k_Lexer_t* lexer = k_Lexer_new(compiler);
-    k_TokenStream_t* tokens = k_TokenStream_new(compiler, lexer, KUSH_TOKEN_CHANNEL_DEFAULT);
+    k_TokenStreat* tokens = k_TokenStreanew(compiler, lexer, KUSH_TOKEN_CHANNEL_DEFAULT);
     k_Parser_t* parser = k_Parser_new(compiler, tokens);
     k_ASTPrinter_t* astPrinter = k_ASTPrinter_new();
     k_ASTListener_t* astPrinterASTListener = k_ASTPrinter_getASTListener(astPrinter);
 
-    int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
+    int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
-        compiler->m_currentFileIndex = i;
+        compiler->currentFileIndex = i;
 
-        const uint8_t* path = (const uint8_t*)jtk_ArrayList_getValue(compiler->m_inputFiles, i);
+        const uint8_t* path = (const uint8_t*)jtk_ArrayList_getValue(compiler->inputFiles, i);
         if (!jtk_PathHelper_exists(path)) {
             fprintf(stderr, "[error] Path '%s' does not exist.\n", path);
         }
         else {
             int32_t packageSize;
             uint8_t* package = jtk_PathHelper_getParent(path, -1, &packageSize);
-            compiler->m_packages[i] = package;
-            compiler->m_packageSizes[i] = packageSize;
+            compiler->packages[i] = package;
+            compiler->packageSizes[i] = packageSize;
             jtk_Arrays_replace_b(package, packageSize, '/', '.');
 
-            jtk_InputStream_t* stream = jtk_PathHelper_read(path);
+            jtk_InputStreat* stream = jtk_PathHelper_read(path);
             k_Lexer_reset(lexer, stream);
 
-            jtk_Logger_info(compiler->m_logger, "The lexical analysis phase has started.");
+            jtk_Logger_info(compiler->logger, "The lexical analysis phase has started.");
 
-            int32_t previousLexicalErrors = k_ErrorHandler_getErrorCount(compiler->m_errorHandler);
-            k_TokenStream_reset(tokens);
-            k_TokenStream_fill(tokens);
-            if (compiler->m_dumpTokens) {
-                k_Compiler_k_Compiler_printTokens(compiler, tokens->m_tokens);
+            int32_t previousLexicalErrors = k_ErrorHandler_getErrorCount(compiler->errorHandler);
+            k_TokenStreareset(tokens);
+            k_TokenStreafill(tokens);
+            if (compiler->dumpTokens) {
+                k_Compiler_k_Compiler_printTokens(compiler, tokens->tokens);
             }
-            int32_t currentLexicalErrors = k_ErrorHandler_getErrorCount(compiler->m_errorHandler);
+            int32_t currentLexicalErrors = k_ErrorHandler_getErrorCount(compiler->errorHandler);
 
-            jtk_Logger_info(compiler->m_logger, "The lexical analysis phase is complete.");
+            jtk_Logger_info(compiler->logger, "The lexical analysis phase is complete.");
 
             /* Perform syntax analysis for the current input source file only if
              * there are no lexical errors.
              */
             if (previousLexicalErrors == currentLexicalErrors) {
-                jtk_Logger_info(compiler->m_logger, "The syntactical analysis phase has started.");
+                jtk_Logger_info(compiler->logger, "The syntactical analysis phase has started.");
 
                 k_ASTNode_t* compilationUnit = k_ASTNode_new(NULL);
                 /* We do not have to reset the parser because the same token stream
@@ -413,24 +413,24 @@ void k_Compiler_buildAST(k_Compiler_t* compiler) {
                  */
                 k_Parser_reset(parser, tokens);
                 k_Parser_compilationUnit(parser, compilationUnit);
-                compiler->m_compilationUnits[i] = compilationUnit;
+                compiler->compilationUnits[i] = compilationUnit;
 
-                jtk_Logger_info(compiler->m_logger, "The syntactical analysis phase is complete.");
+                jtk_Logger_info(compiler->logger, "The syntactical analysis phase is complete.");
 
-                if (compiler->m_dumpNodes) {
+                if (compiler->dumpNodes) {
                     k_ASTWalker_walk(astPrinterASTListener, compilationUnit);
                 }
             }
 
-            jtk_InputStream_destroy(stream);
+            jtk_InputStreadestroy(stream);
         }
     }
 
-    compiler->m_trash = tokens->m_trash;
+    compiler->trash = tokens->trash;
 
     k_ASTPrinter_delete(astPrinter);
     k_Parser_delete(parser);
-    k_TokenStream_delete(tokens);
+    k_TokenStreadelete(tokens);
     k_Lexer_delete(lexer);
 
     k_Compiler_printErrors(compiler);
@@ -443,36 +443,36 @@ void k_Compiler_analyze(k_Compiler_t* compiler) {
     k_SymbolResolutionListener_t* symbolResolutionListener = k_SymbolResolutionListener_new(compiler);
     k_ASTListener_t* symbolResolutionASTListener = k_SymbolResolutionListener_getASTListener(symbolResolutionListener);
 
-    int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
+    int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
-        compiler->m_currentFileIndex = i;
-        k_ASTNode_t* compilationUnit = compiler->m_compilationUnits[i];
+        compiler->currentFileIndex = i;
+        k_ASTNode_t* compilationUnit = compiler->compilationUnits[i];
 
         k_SymbolTable_t* symbolTable = k_SymbolTable_new(compiler);
         k_ASTAnnotations_t* scopes = k_ASTAnnotations_new();
 
-        jtk_Logger_info(compiler->m_logger, "Starting definition phase...");
+        jtk_Logger_info(compiler->logger, "Starting definition phase...");
         k_SymbolDefinitionListener_reset(symbolDefinitionListener, symbolTable,
-            scopes, compiler->m_packages[i], compiler->m_packageSizes[i]);
+            scopes, compiler->packages[i], compiler->packageSizes[i]);
         k_ASTWalker_walk(symbolDefinitionASTListener, compilationUnit);
-        jtk_Logger_info(compiler->m_logger, "The symbol definition phase is complete.");
+        jtk_Logger_info(compiler->logger, "The symbol definition phase is complete.");
 
-        compiler->m_symbolTables[i] = symbolTable;
-        compiler->m_scopes[i] = scopes;
+        compiler->symbolTables[i] = symbolTable;
+        compiler->scopes[i] = scopes;
     }
 
     for (i = 0; i < size; i++) {
-        compiler->m_currentFileIndex = i;
-        k_ASTNode_t* compilationUnit = compiler->m_compilationUnits[i];
+        compiler->currentFileIndex = i;
+        k_ASTNode_t* compilationUnit = compiler->compilationUnits[i];
 
-        k_SymbolTable_t* symbolTable = compiler->m_symbolTables[i];
-        k_ASTAnnotations_t* scopes = compiler->m_scopes[i];
+        k_SymbolTable_t* symbolTable = compiler->symbolTables[i];
+        k_ASTAnnotations_t* scopes = compiler->scopes[i];
 
-        jtk_Logger_info(compiler->m_logger, "Starting symbol resolution phase...");
+        jtk_Logger_info(compiler->logger, "Starting symbol resolution phase...");
         k_SymbolResolutionListener_reset(symbolResolutionListener, symbolTable, scopes);
         k_ASTWalker_walk(symbolResolutionASTListener, compilationUnit);
-        jtk_Logger_info(compiler->m_logger, "The symbol resolution phase is complete.");
+        jtk_Logger_info(compiler->logger, "The symbol resolution phase is complete.");
     }
 
     k_SymbolResolutionListener_delete(symbolResolutionListener);
@@ -483,23 +483,23 @@ void k_Compiler_analyze(k_Compiler_t* compiler) {
 
 void k_Compiler_generate(k_Compiler_t* compiler) {
     /*
-    int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
+    int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
-        compiler->m_currentFileIndex = i;
+        compiler->currentFileIndex = i;
 
-        jtk_Logger_info(compiler->m_logger, "Starting code generation phase...");
+        jtk_Logger_info(compiler->logger, "Starting code generation phase...");
 
-        k_SymbolTable_t* symbolTable = compiler->m_symbolTables[i];
-        k_ASTAnnotations_t* scopes = compiler->m_scopes[i];
-        k_ASTNode_t* compilationUnit = compiler->m_compilationUnits[i];
+        k_SymbolTable_t* symbolTable = compiler->symbolTables[i];
+        k_ASTAnnotations_t* scopes = compiler->scopes[i];
+        k_ASTNode_t* compilationUnit = compiler->compilationUnits[i];
         k_BinaryEntityGenerator_reset(generator, symbolTable, scopes,
-            compilationUnit, compiler->m_packages[i], compiler->m_packageSizes[i],
+            compilationUnit, compiler->packages[i], compiler->packageSizes[i],
             NULL);
 
         k_BinaryEntityGenerator_generate(generator);
 
-        jtk_Logger_info(compiler->m_logger, "The code generation phase is complete.");
+        jtk_Logger_info(compiler->logger, "The code generation phase is complete.");
     }
     */
 }
@@ -526,7 +526,7 @@ void k_Compiler_destroyNestedScopes(k_ASTAnnotations_t* scopes) {
      */
 
     jtk_ArrayList_t* temporary = jtk_ArrayList_new();
-    jtk_Iterator_t* iterator = jtk_HashMap_getValueIterator(scopes->m_map);
+    jtk_Iterator_t* iterator = jtk_HashMap_getValueIterator(scopes->map);
     while (jtk_Iterator_hasNext(iterator)) {
         /* The scopes are created during the definition phase of the symbol table.
          * Therefore, we destroy them here.
@@ -596,7 +596,7 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
     jtk_Assert_assertObject(compiler, "The specified compiler is null.");
 
     // TODO: Add the --path flag
-    k_SymbolLoader_addDirectory(compiler->m_symbolLoader, ".");
+    k_SymbolLoader_addDirectory(compiler->symbolLoader, ".");
 
     char** vmArguments = NULL;
     int32_t vmArgumentsSize = 0;
@@ -606,19 +606,19 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
     for (i = 1; i < length; i++) {
         if (arguments[i][0] == '-') {
             if (strcmp(arguments[i], "--tokens") == 0) {
-                compiler->m_dumpTokens = true;
+                compiler->dumpTokens = true;
             }
             else if (strcmp(arguments[i], "--nodes") == 0) {
-                compiler->m_dumpNodes = true;
+                compiler->dumpNodes = true;
             }
             else if (strcmp(arguments[i], "--footprint") == 0) {
-                compiler->m_footprint = true;
+                compiler->footprint = true;
             }
             else if (strcmp(arguments[i], "--instructions") == 0) {
-                compiler->m_dumpInstructions = true;
+                compiler->dumpInstructions = true;
             }
             else if (strcmp(arguments[i], "--core-api") == 0) {
-                compiler->m_coreApi = true;
+                compiler->coreApi = true;
             }
             else if (strcmp(arguments[i], "--run") == 0) {
                 vmArgumentsSize = length - i + 1;
@@ -680,7 +680,7 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
                     #ifdef JTK_LOGGER_DISABLE
                         printf("[warning] The logger was disabled at compile time. Please consider building k without the `JTK_LOGGER_DISABLE` constant in 'Configuration.h'.\n");
                     #else
-                        jtk_Logger_setLevel(compiler->m_logger, level);
+                        jtk_Logger_setLevel(compiler->logger, level);
                     #endif
                 }
                 else {
@@ -694,12 +694,12 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
         }
         else {
             // jtk_String_t* path = jtk_String_new(arguments[i]);
-            // jtk_ArrayList_add(compiler->m_inputFiles, path);
-            jtk_ArrayList_add(compiler->m_inputFiles, arguments[i]);
+            // jtk_ArrayList_add(compiler->inputFiles, path);
+            jtk_ArrayList_add(compiler->inputFiles, arguments[i]);
         }
     }
 
-    int32_t size = jtk_ArrayList_getSize(compiler->m_inputFiles);
+    int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     bool noErrors = false;
     if (size == 0) {
         fprintf(stderr, "[error] Please specify input files.\n");
@@ -707,10 +707,10 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
     else {
         k_Compiler_initialize(compiler);
         k_Compiler_buildAST(compiler);
-        if ((noErrors = !k_ErrorHandler_hasErrors(compiler->m_errorHandler))) {
+        if ((noErrors = !k_ErrorHandler_hasErrors(compiler->errorHandler))) {
             k_Compiler_analyze(compiler);
 
-            if ((noErrors = !k_ErrorHandler_hasErrors(compiler->m_errorHandler))) {
+            if ((noErrors = !k_ErrorHandler_hasErrors(compiler->errorHandler))) {
                 k_Compiler_generate(compiler);
             }
         }
@@ -720,8 +720,8 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
         /* The ASTAnnotations that stores the scopes is not required anymore.
         * Therefore, destroy it and release the resources it holds.
         */
-        if (compiler->m_scopes[i] != NULL) {
-            k_Compiler_destroyNestedScopes(compiler->m_scopes[i]);
+        if (compiler->scopes[i] != NULL) {
+            k_Compiler_destroyNestedScopes(compiler->scopes[i]);
         }
     }
 
@@ -729,16 +729,16 @@ bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t leng
         /* The symbol table is not required anymore. Therefore, destroy it
          * and release the resources it holds.
          */
-        if (compiler->m_symbolTables[i] != NULL) {
-            k_SymbolTable_delete(compiler->m_symbolTables[i]);
+        if (compiler->symbolTables[i] != NULL) {
+            k_SymbolTable_delete(compiler->symbolTables[i]);
         }
 
-        if (compiler->m_compilationUnits[i] != NULL) {
-            k_ASTNode_delete(compiler->m_compilationUnits[i]);
+        if (compiler->compilationUnits[i] != NULL) {
+            k_ASTNode_delete(compiler->compilationUnits[i]);
         }
     }
 
-    if (compiler->m_footprint) {
+    if (compiler->footprint) {
         int32_t footprint = k_Memory_getFootprint();
         printf("Memory Footprint = %.2f KB\n", footprint / 1024.0f);
     }

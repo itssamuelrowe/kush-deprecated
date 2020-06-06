@@ -19,7 +19,7 @@
 int32_t main(int32_t length, char** arguments) {
     // jtk_Assert_assertTrue(k_Instruction_verify(), "The instruction set is invalid.");
 
-    jtk_System_initialize();
+    jtk_Systeinitialize();
 
     k_Compiler_t* compiler = k_Compiler_new();
     bool result = k_Compiler_compileEx(compiler, arguments, length);

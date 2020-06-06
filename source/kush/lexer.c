@@ -40,7 +40,7 @@ static void emit(k_Lexer_t* lexer, k_Token_t* token);
 static k_LexerError_t* createError(k_Lexer_t* lexer, const char* message);
 static k_Token_t* createToken(k_Lexer_t* lexer);
 static void onNewline(k_Lexer_t* lexer);
-static void reset(k_Lexer_t* lexer, jtk_InputStream_t* inputStream);
+static void reset(k_Lexer_t* lexer, jtk_InputStreat* inputStream);
 static bool isInputStart(k_Lexer_t* lexer);
 static bool isBinaryPrefix(int32_t codePoint);
 static bool isBinaryDigit(int32_t codePoint);
@@ -231,25 +231,25 @@ k_Lexer_t* k_Lexer_new(k_Compiler_t* compiler) {
      * to certain attributes.
      */
 
-    k_Lexer_t* lexer = k_Memory_allocate(k_Lexer_t, 1);
-    lexer->m_compiler = compiler;
-    lexer->m_inputStream = NULL;
-    lexer->m_la1 = 0;
-    lexer->m_index = -1;
-    lexer->m_line = 1;
-    lexer->m_column = -1;
-    lexer->m_startIndex = 0;
-    lexer->m_startLine = 0;
-    lexer->m_startColumn = 0;
-    lexer->m_hitEndOfStream = false;
-    lexer->m_token = NULL;
-    lexer->m_channel = KUSH_TOKEN_CHANNEL_DEFAULT;
-    lexer->m_text = jtk_StringBuilder_new();
-    lexer->m_type = KUSH_TOKEN_UNKNOWN;
-    lexer->m_tokens = jtk_ArrayQueue_new();
-    lexer->m_indentations = jtk_ArrayStack_new();
-    lexer->m_enclosures = 0;
-    lexer->m_errorCode = KUSH_ERROR_CODE_NONE;
+    k_Lexer_t* lexer = allocate(k_Lexer_t, 1);
+    lexer->compiler = compiler;
+    lexer->inputStream = NULL;
+    lexer->la1 = 0;
+    lexer->index = -1;
+    lexer->line = 1;
+    lexer->column = -1;
+    lexer->startIndex = 0;
+    lexer->startLine = 0;
+    lexer->startColumn = 0;
+    lexer->hitEndOfStream = false;
+    lexer->token = NULL;
+    lexer->channel = KUSH_TOKEN_CHANNEL_DEFAULT;
+    lexer->text = jtk_StringBuilder_new();
+    lexer->type = KUSH_TOKEN_UNKNOWN;
+    lexer->tokens = jtk_ArrayQueue_new();
+    lexer->indentations = jtk_ArrayStack_new();
+    lexer->enclosures = 0;
+    lexer->errorCode = KUSH_ERROR_CODE_NONE;
 
     return lexer;
 }
@@ -261,10 +261,10 @@ k_Lexer_t* k_Lexer_new(k_Compiler_t* compiler) {
 * such tokens.
 */
 void destroyStaleTokens(k_Lexer_t* lexer) {
-    int32_t size = jtk_ArrayList_getSize(lexer->m_tokens->m_list);
+    int32_t size = jtk_ArrayList_getSize(lexer->tokens->list);
     int32_t i;
     for (i = 0; i < size; i++) {
-        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(lexer->m_tokens->m_list, i);
+        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(lexer->tokens->list, i);
         k_Token_delete(token);
     }
 }
@@ -272,33 +272,33 @@ void destroyStaleTokens(k_Lexer_t* lexer) {
 void k_Lexer_delete(k_Lexer_t* lexer) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
 
-    jtk_StringBuilder_delete(lexer->m_text);
-    jtk_ArrayQueue_delete(lexer->m_tokens);
-    jtk_ArrayStack_delete(lexer->m_indentations);
-    jtk_Memory_deallocate(lexer);
+    jtk_StringBuilder_delete(lexer->text);
+    jtk_ArrayQueue_delete(lexer->tokens);
+    jtk_ArrayStack_delete(lexer->indentations);
+    jtdeallocate(lexer);
 }
 
 /* Create Token */
 
 k_Token_t* createToken(k_Lexer_t* lexer) {
-    uint8_t* text = jtk_CString_newEx(lexer->m_text->m_value, lexer->m_text->m_size); // jtk_StringBuilder_toCString(lexer->m_text);
-    int32_t length = jtk_StringBuilder_getSize(lexer->m_text);
+    uint8_t* text = jtk_CString_newEx(lexer->text->value, lexer->text->size); // jtk_StringBuilder_toCString(lexer->text);
+    int32_t length = jtk_StringBuilder_getSize(lexer->text);
 
-    k_Compiler_t* compiler = lexer->m_compiler;
-    const char* file = jtk_ArrayList_getValue(compiler->m_inputFiles,
-                       compiler->m_currentFileIndex);
+    k_Compiler_t* compiler = lexer->compiler;
+    const char* file = jtk_ArrayList_getValue(compiler->inputFiles,
+                       compiler->currentFileIndex);
     k_Token_t* token =
         k_Token_new(
-            lexer->m_channel,
-            lexer->m_type,
+            lexer->channel,
+            lexer->type,
             text,
             length,
-            lexer->m_startIndex,    /* inclusive */
-            lexer->m_index,         /* exclusive */
-            lexer->m_startLine,     /* inclusive */
-            lexer->m_line,          /* inclusive */
-            lexer->m_startColumn,   /* inclusive */
-            lexer->m_column,        /* inclusive */
+            lexer->startIndex,    /* inclusive */
+            lexer->index,         /* exclusive */
+            lexer->startLine,     /* inclusive */
+            lexer->line,          /* inclusive */
+            lexer->startColumn,   /* inclusive */
+            lexer->column,        /* inclusive */
             file
         );
 
@@ -309,24 +309,24 @@ k_Token_t* createToken(k_Lexer_t* lexer) {
 }
 
 void onNewline(k_Lexer_t* lexer) {
-    lexer->m_line++;
-    lexer->m_column = 1;
+    lexer->line++;
+    lexer->column = 1;
 }
 
 k_LexerError_t* createError(k_Lexer_t* lexer, const char* message) {
-    k_LexerError_t* error = k_LexerError_new(message, "<unknown>" /*lexer->m_inputStream->m_path*/, lexer->m_startLine, lexer->m_startColumn);
+    k_LexerError_t* error = k_LexerError_new(message, "<unknown>" /*lexer->inputStream->path*/, lexer->startLine, lexer->startColumn);
     return error;
 }
 
 bool isInputStart(k_Lexer_t* lexer) {
-    return (lexer->m_startLine == 0) && (lexer->m_startColumn == 0);
+    return (lexer->startLine == 0) && (lexer->startColumn == 0);
 }
 
 void consume(k_Lexer_t* lexer) {
-    jtk_StringBuilder_appendCodePoint(lexer->m_text, lexer->m_la1);
+    jtk_StringBuilder_appendCodePoint(lexer->text, lexer->la1);
 
-    lexer->m_index++;
-    lexer->m_column++;
+    lexer->index++;
+    lexer->column++;
     /* NOTE: We could have used lexer->index >= "length of input stream"
      * Unfortunately, the flexible design of both the lexer and input stream fails
      * to provide a method to determine the stream length in advance.
@@ -335,17 +335,17 @@ void consume(k_Lexer_t* lexer) {
      * working of this function is not finalized. Therefore, the following expression
      * may be subjected to changes.
      */
-    if (!jtk_InputStream_isAvailable(lexer->m_inputStream)) {
-        lexer->m_la1 = KUSH_END_OF_STREAM;
+    if (!jtk_InputStreaisAvailable(lexer->inputStream)) {
+        lexer->la1 = KUSH_END_OF_STREAM;
     }
     else {
-        lexer->m_la1 = jtk_InputStream_read(lexer->m_inputStream);
+        lexer->la1 = jtk_InputStrearead(lexer->inputStream);
     }
 }
 
 void emit(k_Lexer_t* lexer, k_Token_t* token) {
-    lexer->m_token = token;
-    jtk_ArrayQueue_enqueue(lexer->m_tokens, token);
+    lexer->token = token;
+    jtk_ArrayQueue_enqueue(lexer->tokens, token);
 }
 
 /* NOTE: The design for the integer literal was adopted from Java 8's lexer. The actual rules
@@ -480,14 +480,14 @@ void binaryIntegerLiteral(k_Lexer_t* lexer) {
     /* Consume and discard the binary prefix character. */
     consume(lexer);
 
-    if (isBinaryDigit(lexer->m_la1)) {
+    if (isBinaryDigit(lexer->la1)) {
         /* Consume and discard the binary digit character. */
         consume(lexer);
 
-        if (isBinaryDigitOrUnderscore(lexer->m_la1)) {
+        if (isBinaryDigitOrUnderscore(lexer->la1)) {
             uint8_t previous = '\0';
-            while (isBinaryDigitOrUnderscore(lexer->m_la1)) {
-                previous = lexer->m_la1;
+            while (isBinaryDigitOrUnderscore(lexer->la1)) {
+                previous = lexer->la1;
 
                 /* Consume and discard a binary digit or an underscore
                     * character.
@@ -496,14 +496,14 @@ void binaryIntegerLiteral(k_Lexer_t* lexer) {
             }
 
             if (previous == '_') {
-                lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
         }
     }
     else {
-        lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+        lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
         /* Consume and discard the invalid character. */
         consume(lexer);
     }
@@ -513,14 +513,14 @@ void octalIntegerLiteral(k_Lexer_t* lexer) {
     /* Consume and discard the octal prefix character. */
     consume(lexer);
 
-    if (isOctalDigit(lexer->m_la1)) {
+    if (isOctalDigit(lexer->la1)) {
         /* Consume and discard the octal digit character. */
         consume(lexer);
 
-        if (isOctalDigitOrUnderscore(lexer->m_la1)) {
+        if (isOctalDigitOrUnderscore(lexer->la1)) {
             uint8_t previous = '\0';
-            while (isOctalDigitOrUnderscore(lexer->m_la1)) {
-                previous = lexer->m_la1;
+            while (isOctalDigitOrUnderscore(lexer->la1)) {
+                previous = lexer->la1;
 
                 /* Consume and discard a octal digit or an underscore
                     * character.
@@ -529,14 +529,14 @@ void octalIntegerLiteral(k_Lexer_t* lexer) {
             }
 
             if (previous == '_') {
-                lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
         }
     }
     else {
-        lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+        lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
         /* Consume and discard the invalid character. */
         consume(lexer);
     }
@@ -546,14 +546,14 @@ void hexadecimalIntegerLiteral(k_Lexer_t* lexer) {
     /* Consume and discard the binary prefix character. */
     consume(lexer);
 
-    if (isHexadecimalDigit(lexer->m_la1)) {
+    if (isHexadecimalDigit(lexer->la1)) {
         /* Consume and discard the hexadecimal digit character. */
         consume(lexer);
 
-        if (isHexadecimalDigitOrUnderscore(lexer->m_la1)) {
+        if (isHexadecimalDigitOrUnderscore(lexer->la1)) {
             uint8_t previous = '\0';
-            while (isHexadecimalDigitOrUnderscore(lexer->m_la1)) {
-                previous = lexer->m_la1;
+            while (isHexadecimalDigitOrUnderscore(lexer->la1)) {
+                previous = lexer->la1;
 
                 /* Consume and discard a binary digit or an underscore
                     * character.
@@ -562,14 +562,14 @@ void hexadecimalIntegerLiteral(k_Lexer_t* lexer) {
             }
 
             if (previous == '_') {
-                lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
         }
     }
     else {
-        lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+        lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
         /* Consume and discard the invalid character. */
         consume(lexer);
     }
@@ -579,14 +579,14 @@ void decimalIntegerLiteral(k_Lexer_t* lexer) {
     /* Consume and discard the decimal digit character. */
     consume(lexer);
 
-    if (isDecimalDigit(lexer->m_la1)) {
+    if (isDecimalDigit(lexer->la1)) {
         /* Consume and discard the decimal digit character. */
         consume(lexer);
 
-        if (isDecimalDigitOrUnderscore(lexer->m_la1)) {
+        if (isDecimalDigitOrUnderscore(lexer->la1)) {
             uint8_t previous = '\0';
-            while (isDecimalDigitOrUnderscore(lexer->m_la1)) {
-                previous = lexer->m_la1;
+            while (isDecimalDigitOrUnderscore(lexer->la1)) {
+                previous = lexer->la1;
 
                 /* Consume and discard the decimal digit or underscore
                     * character.
@@ -595,23 +595,23 @@ void decimalIntegerLiteral(k_Lexer_t* lexer) {
             }
 
             if (previous == '_') {
-                lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
         }
     }
-    else if (lexer->m_la1 == '_') {
+    else if (lexer->la1 == '_') {
         do {
             /* Consume and discard the '_' character. */
             consume(lexer);
         }
-        while (lexer->m_la1 == '_');
+        while (lexer->la1 == '_');
 
-        if (isDecimalDigitOrUnderscore(lexer->m_la1)) {
+        if (isDecimalDigitOrUnderscore(lexer->la1)) {
             uint8_t previous = '\0';
-            while (isDecimalDigitOrUnderscore(lexer->m_la1)) {
-                previous = lexer->m_la1;
+            while (isDecimalDigitOrUnderscore(lexer->la1)) {
+                previous = lexer->la1;
 
                 /* Consume and discard the decimal digit or underscore
                     * character.
@@ -620,13 +620,13 @@ void decimalIntegerLiteral(k_Lexer_t* lexer) {
             }
 
             if (previous == '_') {
-                lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
         }
         else {
-            lexer->m_errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+            lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
             /* Consume and discard the invalid character. */
             consume(lexer);
         }
@@ -732,26 +732,26 @@ void decimalIntegerLiteral(k_Lexer_t* lexer) {
  */
 void integerLiteral(k_Lexer_t* lexer) {
     /* The lexer has recognized an integer literal. */
-    lexer->m_type = KUSH_TOKEN_INTEGER_LITERAL;
+    lexer->type = KUSH_TOKEN_INTEGER_LITERAL;
 
-    if (lexer->m_la1 == '0') {
+    if (lexer->la1 == '0') {
         /* Consume and discard the '0' character. */
         consume(lexer);
 
-        if (isBinaryPrefix(lexer->m_la1)) {
+        if (isBinaryPrefix(lexer->la1)) {
             binaryIntegerLiteral(lexer);
         }
-        else if (isOctalPrefix(lexer->m_la1)) {
+        else if (isOctalPrefix(lexer->la1)) {
             octalIntegerLiteral(lexer);
         }
-        else if (isHexadecimalPrefix(lexer->m_la1)) {
+        else if (isHexadecimalPrefix(lexer->la1)) {
             hexadecimalIntegerLiteral(lexer);
         }
-        else if (isDecimalDigit(lexer->m_la1) || lexer->m_la1 == '_') {
+        else if (isDecimalDigit(lexer->la1) || lexer->la1 == '_') {
             decimalIntegerLiteral(lexer);
         }
-        else if (isLetter(lexer->m_la1)) {
-            lexer->m_errorCode = KUSH_ERROR_CODE_INVALID_INTEGER_LITERAL_PREFIX;
+        else if (isLetter(lexer->la1)) {
+            lexer->errorCode = KUSH_ERROR_CODE_INVALID_INTEGER_LITERAL_PREFIX;
         }
     }
     else {
@@ -807,14 +807,14 @@ void integerLiteral(k_Lexer_t* lexer) {
 k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
 
-    k_Compiler_t* compiler = lexer->m_compiler;
-    const char* file = jtk_ArrayList_getValue(compiler->m_inputFiles,
-                       compiler->m_currentFileIndex);
+    k_Compiler_t* compiler = lexer->compiler;
+    const char* file = jtk_ArrayList_getValue(compiler->inputFiles,
+                       compiler->currentFileIndex);
 
     /* The lexer does not bother to recognize a token
      * from the input stream unless necessary.
      */
-    if (jtk_ArrayQueue_isEmpty(lexer->m_tokens)) {
+    if (jtk_ArrayQueue_isEmpty(lexer->tokens)) {
         /* We don't exit the loop until
          * -- We have a token.
          * -- We have reached the end of the stream.
@@ -823,19 +823,19 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
          *    too generate tokens!)
          */
         loopEntry: {
-            lexer->m_token = NULL;
-            lexer->m_type = KUSH_TOKEN_UNKNOWN;
-            jtk_StringBuilder_clear(lexer->m_text);
-            lexer->m_channel = KUSH_TOKEN_CHANNEL_DEFAULT;
-            lexer->m_startIndex = lexer->m_index;
-            lexer->m_startLine = lexer->m_line;
-            lexer->m_startColumn = lexer->m_column;
-            lexer->m_errorCode = KUSH_ERROR_CODE_NONE;
+            lexer->token = NULL;
+            lexer->type = KUSH_TOKEN_UNKNOWN;
+            jtk_StringBuilder_clear(lexer->text);
+            lexer->channel = KUSH_TOKEN_CHANNEL_DEFAULT;
+            lexer->startIndex = lexer->index;
+            lexer->startLine = lexer->line;
+            lexer->startColumn = lexer->column;
+            lexer->errorCode = KUSH_ERROR_CODE_NONE;
 
 
-            switch (lexer->m_la1) {
+            switch (lexer->la1) {
             case KUSH_END_OF_STREAM : {
-                if (!jtk_ArrayStack_isEmpty(lexer->m_indentations)) {
+                if (!jtk_ArrayStack_isEmpty(lexer->indentations)) {
                     /* It appears that the lexer has reached the end of
                      * the stream inside a block. In order to prevent sytax
                      * errors occuring because of a "missing newline" we emit
@@ -851,17 +851,17 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                                                   KUSH_TOKEN_NEWLINE,
                                                   "\n",
                                                   1,
-                                                  lexer->m_startIndex,    /* inclusive */
-                                                  lexer->m_index,         /* exclusive */
-                                                  lexer->m_startLine,     /* inclusive */
-                                                  lexer->m_line,          /* inclusive */
-                                                  lexer->m_startColumn,   /* inclusive */
-                                                  lexer->m_column,         /* inclusive */
+                                                  lexer->startIndex,    /* inclusive */
+                                                  lexer->index,         /* exclusive */
+                                                  lexer->startLine,     /* inclusive */
+                                                  lexer->line,          /* inclusive */
+                                                  lexer->startColumn,   /* inclusive */
+                                                  lexer->column,         /* inclusive */
                                                   file
                                               );
                     emit(lexer, newlineToken);
 
-                    while (!jtk_ArrayStack_isEmpty(lexer->m_indentations)) {
+                    while (!jtk_ArrayStack_isEmpty(lexer->indentations)) {
                         /*
                          * NOTE: The lexer is creating an imaginary token here.
                          *       Therefore, we directly invoke k_Token_new().
@@ -871,47 +871,47 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                                                           KUSH_TOKEN_DEDENTATION,
                                                           "",
                                                           0,
-                                                          lexer->m_startIndex,    /* inclusive */
-                                                          lexer->m_index,         /* exclusive */
-                                                          lexer->m_startLine,     /* inclusive */
-                                                          lexer->m_line,          /* inclusive */
-                                                          lexer->m_startColumn,   /* inclusive */
-                                                          lexer->m_column,        /* inclusive */
+                                                          lexer->startIndex,    /* inclusive */
+                                                          lexer->index,         /* exclusive */
+                                                          lexer->startLine,     /* inclusive */
+                                                          lexer->line,          /* inclusive */
+                                                          lexer->startColumn,   /* inclusive */
+                                                          lexer->column,        /* inclusive */
                                                           file
                                                       );
                         emit(lexer, dedentationToken);
-                        jtk_ArrayStack_pop(lexer->m_indentations);
+                        jtk_ArrayStack_pop(lexer->indentations);
                     }
                 }
                 /* The data required for the creating the end-of-stream token.
                  */
-                lexer->m_type = KUSH_TOKEN_END_OF_STREAM;
-                lexer->m_hitEndOfStream = true;
+                lexer->type = KUSH_TOKEN_END_OF_STREAM;
+                lexer->hitEndOfStream = true;
                 break;
             }
 
             case ' '  : {
-                if (lexer->m_la1 == ' ') {
+                if (lexer->la1 == ' ') {
                     do {
                         consume(lexer);
                     }
-                    while (lexer->m_la1 == ' ');
+                    while (lexer->la1 == ' ');
 
                     /* This token belongs to the WHITESPACE rule. */
-                    lexer->m_type = KUSH_TOKEN_WHITESPACE;
-                    lexer->m_channel = KUSH_TOKEN_CHANNEL_HIDDEN;
+                    lexer->type = KUSH_TOKEN_WHITESPACE;
+                    lexer->channel = KUSH_TOKEN_CHANNEL_HIDDEN;
                 }
                 break;
             }
 
             case '\r' :
             case '\n' : {
-                if (lexer->m_la1 == '\r') {
+                if (lexer->la1 == '\r') {
                     consume(lexer);
                     /* Optionally, the carriage return character may be
                         * followed by a newline character.
                         */
-                    if (lexer->m_la1 == '\n') {
+                    if (lexer->la1 == '\n') {
                         consume(lexer);
 
                         /* Update information such as the current line,
@@ -938,12 +938,12 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     KUSH_TOKEN_NEWLINE,
                     "\n",
                     1,
-                    lexer->m_startIndex,    /* inclusive */
-                    lexer->m_index,         /* exclusive */
-                    lexer->m_startLine,     /* inclusive */
-                    lexer->m_line,          /* inclusive */
-                    lexer->m_startColumn,   /* inclusive */
-                    lexer->m_column,        /* inclusive */
+                    lexer->startIndex,    /* inclusive */
+                    lexer->index,         /* exclusive */
+                    lexer->startLine,     /* inclusive */
+                    lexer->line,          /* inclusive */
+                    lexer->startColumn,   /* inclusive */
+                    lexer->column,        /* inclusive */
                     file
                 );
                 emit(lexer, newlineToken);
@@ -965,12 +965,12 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
             case '!' : {
                 consume(lexer);
 
-                if (lexer->m_la1 == '=') {
+                if (lexer->la1 == '=') {
                     consume(lexer);
-                    lexer->m_type = KUSH_TOKEN_EXCLAMATION_MARK_EQUAL;
+                    lexer->type = KUSH_TOKEN_EXCLAMATION_MARK_EQUAL;
                 }
                 else {
-                    lexer->m_type = KUSH_TOKEN_EXCLAMATION_MARK;
+                    lexer->type = KUSH_TOKEN_EXCLAMATION_MARK;
                 }
 
                 break;
@@ -984,7 +984,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '@' character. */
                 consume(lexer);
                 /* The lexer has recognized the '@' token. */
-                lexer->m_type = KUSH_TOKEN_AT;
+                lexer->type = KUSH_TOKEN_AT;
                 break;
             }
 
@@ -996,7 +996,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '#' character. */
                 consume(lexer);
                 /* The lexer has recognized the '#' token. */
-                lexer->m_type = KUSH_TOKEN_HASH;
+                lexer->type = KUSH_TOKEN_HASH;
 
                 break;
             }
@@ -1012,12 +1012,12 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
             case '%' : {
                 consume(lexer);
 
-                if (lexer->m_la1 == '=') {
+                if (lexer->la1 == '=') {
                     consume(lexer);
-                    lexer->m_type = KUSH_TOKEN_MODULUS_EQUAL;
+                    lexer->type = KUSH_TOKEN_MODULUS_EQUAL;
                 }
                 else {
-                    lexer->m_type = KUSH_TOKEN_MODULUS;
+                    lexer->type = KUSH_TOKEN_MODULUS;
                 }
 
                 break;
@@ -1038,16 +1038,16 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
             case '&' : {
                 consume(lexer);
 
-                if (lexer->m_la1 == '&') {
+                if (lexer->la1 == '&') {
                     consume(lexer);
-                    lexer->m_type = KUSH_TOKEN_AMPERSAND_2;
+                    lexer->type = KUSH_TOKEN_AMPERSAND_2;
                 }
-                else if (lexer->m_la1 == '=') {
+                else if (lexer->la1 == '=') {
                     consume(lexer);
-                    lexer->m_type = KUSH_TOKEN_AMPERSAND_EQUAL;
+                    lexer->type = KUSH_TOKEN_AMPERSAND_EQUAL;
                 }
                 else {
-                    lexer->m_type = KUSH_TOKEN_AMPERSAND;
+                    lexer->type = KUSH_TOKEN_AMPERSAND;
                 }
 
                 break;
@@ -1061,7 +1061,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '(' character. */
                 consume(lexer);
                 /* The lexer has recognized the '(' token. */
-                lexer->m_type = KUSH_TOKEN_LEFT_PARENTHESIS;
+                lexer->type = KUSH_TOKEN_LEFT_PARENTHESIS;
                 break;
             }
 
@@ -1073,7 +1073,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '(' character. */
                 consume(lexer);
                 /* The lexer has recognized the '(' token. */
-                lexer->m_type = KUSH_TOKEN_RIGHT_PARENTHESIS;
+                lexer->type = KUSH_TOKEN_RIGHT_PARENTHESIS;
                 break;
             }
 
@@ -1097,29 +1097,29 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '*' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '*') {
+                if (lexer->la1 == '*') {
                     /* Consume and discard the '*' character. */
                     consume(lexer);
 
-                    if (lexer->m_la1 == '=') {
+                    if (lexer->la1 == '=') {
                         /* Consume and discard the '=' character. */
                         consume(lexer);
                         /* The lexer has recognized the '**=' token. */
-                        lexer->m_type = KUSH_TOKEN_ASTERISK_2_EQUAL;
+                        lexer->type = KUSH_TOKEN_ASTERISK_2_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '**' token. */
-                        lexer->m_type = KUSH_TOKEN_ASTERISK_2;
+                        lexer->type = KUSH_TOKEN_ASTERISK_2;
                     }
                 }
-                else if (lexer->m_la1 == '=') {
+                else if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '*=' token. */
-                    lexer->m_type = KUSH_TOKEN_ASTERISK_EQUAL;
+                    lexer->type = KUSH_TOKEN_ASTERISK_EQUAL;
                 }
                 else {
-                    lexer->m_type = KUSH_TOKEN_ASTERISK;
+                    lexer->type = KUSH_TOKEN_ASTERISK;
                 }
 
                 break;
@@ -1141,20 +1141,20 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '+' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '+') {
+                if (lexer->la1 == '+') {
                     /* Consume and discard the '+' character. */
                     consume(lexer);
                     /* The lexer has recognized the '++' token. */
-                    lexer->m_type = KUSH_TOKEN_PLUS_2;
+                    lexer->type = KUSH_TOKEN_PLUS_2;
                 }
-                else if (lexer->m_la1 == '=') {
+                else if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '+=' token. */
-                    lexer->m_type = KUSH_TOKEN_PLUS_EQUAL;
+                    lexer->type = KUSH_TOKEN_PLUS_EQUAL;
                 }
                 else {
-                    lexer->m_type = KUSH_TOKEN_PLUS;
+                    lexer->type = KUSH_TOKEN_PLUS;
                 }
 
                 break;
@@ -1168,7 +1168,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the ',' character. */
                 consume(lexer);
                 /* The lexer has recognized the ',' token. */
-                lexer->m_type = KUSH_TOKEN_COMMA;
+                lexer->type = KUSH_TOKEN_COMMA;
                 break;
             }
 
@@ -1192,27 +1192,27 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '-' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '-') {
+                if (lexer->la1 == '-') {
                     /* Consume and discard the '-' character. */
                     consume(lexer);
                     /* The lexer has recognized the '--' token. */
-                    lexer->m_type = KUSH_TOKEN_DASH_2;
+                    lexer->type = KUSH_TOKEN_DASH_2;
                 }
-                else if (lexer->m_la1 == '>') {
+                else if (lexer->la1 == '>') {
                     /* Consume and discard the '>' character. */
                     consume(lexer);
                     /* The lexer has recognized the '->' token. */
-                    lexer->m_type = KUSH_TOKEN_ARROW;
+                    lexer->type = KUSH_TOKEN_ARROW;
                 }
-                else if (lexer->m_la1 == '=') {
+                else if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '-=' token. */
-                    lexer->m_type = KUSH_TOKEN_DASH_EQUAL;
+                    lexer->type = KUSH_TOKEN_DASH_EQUAL;
                 }
                 else {
                     /* The lexer has recognized the '-' token. */
-                    lexer->m_type = KUSH_TOKEN_DASH;
+                    lexer->type = KUSH_TOKEN_DASH;
                 }
 
                 break;
@@ -1234,24 +1234,24 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '.' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '.') {
+                if (lexer->la1 == '.') {
                     /* Consume and discard the '.' character. */
                     consume(lexer);
 
-                    if (lexer->m_la1 == '.') {
+                    if (lexer->la1 == '.') {
                         /* Consume and discard the '.' character. */
                         consume(lexer);
                         /* The lexer has recognized the '...' token. */
-                        lexer->m_type = KUSH_TOKEN_ELLIPSIS;
+                        lexer->type = KUSH_TOKEN_ELLIPSIS;
                     }
                     else {
                         /* The lexer has recognized the '..' token. */
-                        lexer->m_type = KUSH_TOKEN_DOT_2;
+                        lexer->type = KUSH_TOKEN_DOT_2;
                     }
                 }
                 else {
                     /* The lexer has recognized the '.' token. */
-                    lexer->m_type = KUSH_TOKEN_DOT;
+                    lexer->type = KUSH_TOKEN_DOT;
                 }
 
                 break;
@@ -1277,11 +1277,11 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '/' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '/') {
+                if (lexer->la1 == '/') {
                     /* Consume and discard the '/' character. */
                     consume(lexer);
 
-                    while ((lexer->m_la1 != '\n') && (lexer->m_la1 != KUSH_END_OF_STREAM)) {
+                    while ((lexer->la1 != '\n') && (lexer->la1 != KUSH_END_OF_STREAM)) {
                         /* Consume and discard the unknown character. */
                         consume(lexer);
                     }
@@ -1294,33 +1294,33 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Update information such as the current line,
                      * current column, etc.
                      */
-                    if (lexer->m_la1 == '\n') {
+                    if (lexer->la1 == '\n') {
                         onNewLine(lexer);
                     }
 
                     /* The lexer has recognized a single line comment. */
-                    lexer->m_type = KUSH_TOKEN_SINGLE_LINE_COMMENT;
+                    lexer->type = KUSH_TOKEN_SINGLE_LINE_COMMENT;
                     /* The single-line comment token should be produced on the
                      * hidden channel. Otherwise, the parser will have a hard
                      * time ignoring redundant single-line comment tokens.
                      */
-                    lexer->m_channel = KUSH_TOKEN_CHANNEL_HIDDEN;
+                    lexer->channel = KUSH_TOKEN_CHANNEL_HIDDEN;
                 }
-                else if (lexer->m_la1 == '*') {
+                else if (lexer->la1 == '*') {
                     /* Consume and discard the '*' token. */
                     consume(lexer);
 
                     do {
-                        while (lexer->m_la1 != '*') {
-                            if (lexer->m_la1 == KUSH_END_OF_STREAM) {
-                                lexer->m_errorCode = KUSH_ERROR_CODE_UNTERMINATED_MULTI_LINE_COMMENT;
+                        while (lexer->la1 != '*') {
+                            if (lexer->la1 == KUSH_END_OF_STREAM) {
+                                lexer->errorCode = KUSH_ERROR_CODE_UNTERMINATED_MULTI_LINE_COMMENT;
                                 break;
                             }
 
                             /* Update information such as the current line,
                              * current column, etc.
                              */
-                            if (lexer->m_la1 == '\n') {
+                            if (lexer->la1 == '\n') {
                                 onNewLine(lexer);
                             }
 
@@ -1332,7 +1332,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                          * outer loop. We do not have to report the error.
                          * Because the error was reported in the inner loop.
                          */
-                        if (lexer->m_la1 == KUSH_END_OF_STREAM) {
+                        if (lexer->la1 == KUSH_END_OF_STREAM) {
                             break;
                         }
 
@@ -1341,9 +1341,9 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                          */
                         consume(lexer);
                     }
-                    while (lexer->m_la1 != '/');
+                    while (lexer->la1 != '/');
 
-                    if (lexer->m_la1 == '/') {
+                    if (lexer->la1 == '/') {
                         /* At this point, we are indeed processing the '/'
                          * character. Therefore, we consume it.
                          */
@@ -1356,22 +1356,22 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     */
 
                     /* The lexer has recognized the multi-line comment. */
-                    lexer->m_type = KUSH_TOKEN_MULTI_LINE_COMMENT;
+                    lexer->type = KUSH_TOKEN_MULTI_LINE_COMMENT;
                     /* The multi-line comment token should be produced on the
                      * hidden channel. Otherwise, the parser will have a hard
                      * time ignoring redundant multi-line comment tokens.
                      */
-                    lexer->m_channel = KUSH_TOKEN_CHANNEL_HIDDEN;
+                    lexer->channel = KUSH_TOKEN_CHANNEL_HIDDEN;
                 }
-                else if (lexer->m_la1 == '=') {
+                else if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '/=' token. */
-                    lexer->m_type = KUSH_TOKEN_FORWARD_SLASH_EQUAL;
+                    lexer->type = KUSH_TOKEN_FORWARD_SLASH_EQUAL;
                 }
                 else {
                     /* The lexer has recognized the '/' token. */
-                    lexer->m_type = KUSH_TOKEN_FORWARD_SLASH;
+                    lexer->type = KUSH_TOKEN_FORWARD_SLASH;
                 }
 
                 break;
@@ -1389,16 +1389,16 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the ':' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == ':') {
+                if (lexer->la1 == ':') {
                     /* Consume and discard the ':' character. */
                     consume(lexer);
 
                     /* The lexer has recognized the '::' token. */
-                    lexer->m_type = KUSH_TOKEN_COLON_2;
+                    lexer->type = KUSH_TOKEN_COLON_2;
                 }
                 else {
                     /* The lexer has recognized the ':' token. */
-                    lexer->m_type = KUSH_TOKEN_COLON;
+                    lexer->type = KUSH_TOKEN_COLON;
                 }
 
                 break;
@@ -1412,7 +1412,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the ';' character. */
                 consume(lexer);
                 /* The lexer has recognized the ';' token. */
-                lexer->m_type = KUSH_TOKEN_SEMICOLON;
+                lexer->type = KUSH_TOKEN_SEMICOLON;
                 break;
             }
 
@@ -1436,30 +1436,30 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '<' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '<') {
+                if (lexer->la1 == '<') {
                     /* Consume and discard the '<' character. */
                     consume(lexer);
 
-                    if (lexer->m_la1 == '=') {
+                    if (lexer->la1 == '=') {
                         /* Consume and discard the '=' character. */
                         consume(lexer);
                         /* The lexer has recognized the '<<=' token. */
-                        lexer->m_type = KUSH_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL;
+                        lexer->type = KUSH_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '<<' token. */
-                        lexer->m_type = KUSH_TOKEN_LEFT_ANGLE_BRACKET_2;
+                        lexer->type = KUSH_TOKEN_LEFT_ANGLE_BRACKET_2;
                     }
                 }
-                else if (lexer->m_la1 == '=') {
+                else if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '<=' token. */
-                    lexer->m_type = KUSH_TOKEN_LEFT_ANGLE_BRACKET_EQUAL;
+                    lexer->type = KUSH_TOKEN_LEFT_ANGLE_BRACKET_EQUAL;
                 }
                 else {
                     /* The lexer has recognized the '<' token. */
-                    lexer->m_type = KUSH_TOKEN_LEFT_ANGLE_BRACKET;
+                    lexer->type = KUSH_TOKEN_LEFT_ANGLE_BRACKET;
                 }
 
                 break;
@@ -1493,45 +1493,45 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '>' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '>') {
+                if (lexer->la1 == '>') {
                     /* Consume and discard the '>' character. */
                     consume(lexer);
 
-                    if (lexer->m_la1 == '>') {
+                    if (lexer->la1 == '>') {
                         /* Consume and discard the '>' character. */
                         consume(lexer);
 
-                        if (lexer->m_la1 == '=') {
+                        if (lexer->la1 == '=') {
                             /* Consume and discard the '=' character. */
                             consume(lexer);
                             /* The lexer has recognized the '>>>=' token. */
-                            lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL;
+                            lexer->type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL;
                         }
                         else {
                             /* The lexer has recognized the '>>>' token. */
-                            lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3;
+                            lexer->type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3;
                         }
                     }
-                    else if (lexer->m_la1 == '=') {
+                    else if (lexer->la1 == '=') {
                         /* Consume and discard the '=' character. */
                         consume(lexer);
                         /* The lexer has recognized the '>>=' token. */
-                        lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL;
+                        lexer->type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL;
                     }
                     else {
                         /* The lexer has recognized the '>>' token. */
-                        lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2;
+                        lexer->type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2;
                     }
                 }
-                else if (lexer->m_la1 == '=') {
+                else if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '>=' token. */
-                    lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_EQUAL;
+                    lexer->type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET_EQUAL;
                 }
                 else {
                     /* The lexer has recognized the '>' token. */
-                    lexer->m_type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET;
+                    lexer->type = KUSH_TOKEN_RIGHT_ANGLE_BRACKET;
                 }
 
                 break;
@@ -1549,15 +1549,15 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '=' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '=') {
+                if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '==' token. */
-                    lexer->m_type = KUSH_TOKEN_EQUAL_2;
+                    lexer->type = KUSH_TOKEN_EQUAL_2;
                 }
                 else {
                     /* The lexer has recognized the '=' token. */
-                    lexer->m_type = KUSH_TOKEN_EQUAL;
+                    lexer->type = KUSH_TOKEN_EQUAL;
                 }
 
                 break;
@@ -1571,7 +1571,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '?' character. */
                 consume(lexer);
                 /* The lexer has recognized the '?' token. */
-                lexer->m_type = KUSH_TOKEN_HOOK;
+                lexer->type = KUSH_TOKEN_HOOK;
                 break;
             }
 
@@ -1583,7 +1583,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '{' character. */
                 consume(lexer);
                 /* The lexer has recognized the '{' token. */
-                lexer->m_type = KUSH_TOKEN_LEFT_BRACE;
+                lexer->type = KUSH_TOKEN_LEFT_BRACE;
                 break;
             }
 
@@ -1595,7 +1595,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '}' character. */
                 consume(lexer);
                 /* The lexer has recognized the '}' token. */
-                lexer->m_type = KUSH_TOKEN_RIGHT_BRACE;
+                lexer->type = KUSH_TOKEN_RIGHT_BRACE;
                 break;
             }
 
@@ -1607,7 +1607,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '[' character. */
                 consume(lexer);
                 /* The lexer has recognized the '[' token. */
-                lexer->m_type = KUSH_TOKEN_LEFT_SQUARE_BRACKET;
+                lexer->type = KUSH_TOKEN_LEFT_SQUARE_BRACKET;
                 break;
             }
 
@@ -1619,7 +1619,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the ']' character. */
                 consume(lexer);
                 /* The lexer has recognized the ']' token. */
-                lexer->m_type = KUSH_TOKEN_RIGHT_SQUARE_BRACKET;
+                lexer->type = KUSH_TOKEN_RIGHT_SQUARE_BRACKET;
                 break;
             }
 
@@ -1635,15 +1635,15 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '^' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '=') {
+                if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '^=' token. */
-                    lexer->m_type = KUSH_TOKEN_CARET_EQUAL;
+                    lexer->type = KUSH_TOKEN_CARET_EQUAL;
                 }
                 else {
                     /* The lexer has recognized the '^' token. */
-                    lexer->m_type = KUSH_TOKEN_CARET;
+                    lexer->type = KUSH_TOKEN_CARET;
                 }
 
                 break;
@@ -1665,21 +1665,21 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '|' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '|') {
+                if (lexer->la1 == '|') {
                     /* Consume and discard the '|' character. */
                     consume(lexer);
                     /* The lexer has recognized the '||' token. */
-                    lexer->m_type = KUSH_TOKEN_VERTICAL_BAR_2;
+                    lexer->type = KUSH_TOKEN_VERTICAL_BAR_2;
                 }
-                else if (lexer->m_la1 == '=') {
+                else if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '|=' token. */
-                    lexer->m_type = KUSH_TOKEN_VERTICAL_BAR_EQUAL;
+                    lexer->type = KUSH_TOKEN_VERTICAL_BAR_EQUAL;
                 }
                 else {
                     /* The lexer has recognized the '|' token. */
-                    lexer->m_type = KUSH_TOKEN_VERTICAL_BAR;
+                    lexer->type = KUSH_TOKEN_VERTICAL_BAR;
                 }
 
                 break;
@@ -1697,15 +1697,15 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 /* Consume and discard the '~' character. */
                 consume(lexer);
 
-                if (lexer->m_la1 == '=') {
+                if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '~=' token. */
-                    lexer->m_type = KUSH_TOKEN_TILDE_EQUAL;
+                    lexer->type = KUSH_TOKEN_TILDE_EQUAL;
                 }
                 else {
                     /* The lexer has recognized the '~' token. */
-                    lexer->m_type = KUSH_TOKEN_TILDE;
+                    lexer->type = KUSH_TOKEN_TILDE;
                 }
 
                 break;
@@ -1732,46 +1732,46 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
              */
             case '"':
             case '\'' : {
-                uint8_t terminator = lexer->m_la1;
+                uint8_t terminator = lexer->la1;
 
                 /* Consume and discard the character which marks the
                  * beginning of this string.
                  */
                 consume(lexer);
 
-                while (lexer->m_la1 != terminator) {
-                    if ((lexer->m_la1 == KUSH_END_OF_STREAM) || (lexer->m_la1 == '\n')) {
-                        lexer->m_errorCode = KUSH_ERROR_CODE_UNTERMINATED_STRING_LITERAL;
+                while (lexer->la1 != terminator) {
+                    if ((lexer->la1 == KUSH_END_OF_STREAM) || (lexer->la1 == '\n')) {
+                        lexer->errorCode = KUSH_ERROR_CODE_UNTERMINATED_STRING_LITERAL;
                         break;
                     }
-                    else if (lexer->m_la1 == '\\') {
+                    else if (lexer->la1 == '\\') {
                         /* Consume and discard the '\' character. */
                         consume(lexer);
 
-                        if (isBasicEscapeSequence(lexer->m_la1)) {
+                        if (isBasicEscapeSequence(lexer->la1)) {
                             /* Consume and discard the character which represents
                              * a basic escape sequence.
                              */
                             consume(lexer);
                         }
-                        else if (lexer->m_la1 == 'u') {
+                        else if (lexer->la1 == 'u') {
                             /* Consume and discard the 'u' character. */
                             consume(lexer);
 
                             int32_t i;
                             for (i = 0; i < 4; i++) {
-                                if (isHexadecimalDigit(lexer->m_la1)) {
+                                if (isHexadecimalDigit(lexer->la1)) {
                                     /* Consume and discard the hexadecimal digit character. */
                                     consume(lexer);
                                 }
                                 else {
-                                    lexer->m_errorCode = KUSH_ERROR_CODE_MALFORMED_UNICODE_CHARACTER_SEQUENCE;
+                                    lexer->errorCode = KUSH_ERROR_CODE_MALFORMED_UNICODE_CHARACTER_SEQUENCE;
                                     break;
                                 }
                             }
                         }
                         else {
-                            lexer->m_errorCode = KUSH_ERROR_CODE_INVALID_ESCAPE_SEQUENCE;
+                            lexer->errorCode = KUSH_ERROR_CODE_INVALID_ESCAPE_SEQUENCE;
 
                             /* Consume and discard the unknown escape sequence. */
                             consume(lexer);
@@ -1783,7 +1783,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     }
                 }
 
-                if (lexer->m_la1 == terminator) {
+                if (lexer->la1 == terminator) {
                     /* At this point, we are processing the terminating
                      * double or single quote character. Therefore,
                      * consume and discard it.
@@ -1795,7 +1795,7 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                 }
 
                 /* The lexer has recognized a string literal. */
-                lexer->m_type = KUSH_TOKEN_STRING_LITERAL;
+                lexer->type = KUSH_TOKEN_STRING_LITERAL;
 
                 break;
             }
@@ -1806,19 +1806,19 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                  * :    LETTER LETTER_OR_DIGIT*
                  * ;
                  */
-                if (isIdentifierStart(lexer->m_la1)) {
+                if (isIdentifierStart(lexer->la1)) {
                     /* Consume and discard the first letter. */
                     consume(lexer);
 
-                    while (isIdentifierPart(lexer->m_la1)) {
+                    while (isIdentifierPart(lexer->la1)) {
                         /* Consume and discard the consecutive letter
                          * or digit character.
                          */
                         consume(lexer);
                     }
 
-                    uint8_t* text = lexer->m_text->m_value; // jtk_StringBuilder_toCString(lexer->m_text);
-                    int32_t length = lexer->m_text->m_size; // lexer->m_index - lexer->m_startIndex;
+                    uint8_t* text = lexer->text->value; // jtk_StringBuilder_toCString(lexer->text);
+                    int32_t length = lexer->text->size; // lexer->index - lexer->startIndex;
 
                     /* TODO: Find a better solution. Given we have access to a sorted
                      * list of keywords, a good idea would be to implement a binary
@@ -1832,149 +1832,149 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                      * The following algorithm tries to prevent redundant comparisons
                      * between strings (as many as possible).
                      */
-                    lexer->m_type = KUSH_TOKEN_IDENTIFIER;
+                    lexer->type = KUSH_TOKEN_IDENTIFIER;
                     switch (text[0]) {
                     case 'b' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_BOOLEAN], 7)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_BOOLEAN;
+                            lexer->type = KUSH_TOKEN_KEYWORD_BOOLEAN;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_BREAK], 5)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_BREAK;
+                            lexer->type = KUSH_TOKEN_KEYWORD_BREAK;
                         }
                         break;
                     }
 
                     case 'c': {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_CATCH], 5)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_CATCH;
+                            lexer->type = KUSH_TOKEN_KEYWORD_CATCH;
                         }
                         break;
                     }
 
                     case 'd' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_ELSE], 4)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_ELSE;
+                            lexer->type = KUSH_TOKEN_KEYWORD_ELSE;
                         }
                         break;
                     }
 
                     case 'f' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_F32], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_F32;
+                            lexer->type = KUSH_TOKEN_KEYWORD_F32;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_F64], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_F64;
+                            lexer->type = KUSH_TOKEN_KEYWORD_F64;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FALSE], 5)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_FALSE;
+                            lexer->type = KUSH_TOKEN_KEYWORD_FALSE;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FINALLY], 7)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_FINALLY;
+                            lexer->type = KUSH_TOKEN_KEYWORD_FINALLY;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_FOR], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_FOR;
+                            lexer->type = KUSH_TOKEN_KEYWORD_FOR;
                         }
                         break;
                     }
 
                     case 'i' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_I16], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_I16;
+                            lexer->type = KUSH_TOKEN_KEYWORD_I16;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_I32], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_I32;
+                            lexer->type = KUSH_TOKEN_KEYWORD_I32;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_I64], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_I64;
+                            lexer->type = KUSH_TOKEN_KEYWORD_I64;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_I8], 2)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_I8;
+                            lexer->type = KUSH_TOKEN_KEYWORD_I8;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IF], 2)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_IF;
+                            lexer->type = KUSH_TOKEN_KEYWORD_IF;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_IMPORT], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_IMPORT;
+                            lexer->type = KUSH_TOKEN_KEYWORD_IMPORT;
                         }
                         break;
                     }
 
                     case 'l' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_LET], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_LET;
+                            lexer->type = KUSH_TOKEN_KEYWORD_LET;
                         }
                         break;
                     }
                     case 'n' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NATIVE], 6)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_NATIVE;
+                            lexer->type = KUSH_TOKEN_KEYWORD_NATIVE;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NEW], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_NEW;
+                            lexer->type = KUSH_TOKEN_KEYWORD_NEW;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_NULL], 4)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_NULL;
+                            lexer->type = KUSH_TOKEN_KEYWORD_NULL;
                         }
                         break;
                     }
                     case 'r' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_RETURN], 6)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_RETURN;
+                            lexer->type = KUSH_TOKEN_KEYWORD_RETURN;
                         }
                         break;
                     }
                     case 's' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_STRUCT], 5)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_STRUCT;
+                            lexer->type = KUSH_TOKEN_KEYWORD_STRUCT;
                         }
                         break;
                     }
                     case 't' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_THIS], 4)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_THIS;
+                            lexer->type = KUSH_TOKEN_KEYWORD_THIS;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_THROW], 5)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_THROW;
+                            lexer->type = KUSH_TOKEN_KEYWORD_THROW;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_TRUE], 4)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_TRUE;
+                            lexer->type = KUSH_TOKEN_KEYWORD_TRUE;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_TRY], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_TRY;
+                            lexer->type = KUSH_TOKEN_KEYWORD_TRY;
                         }
                         break;
                     }
                     case 'u' : {
 												if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_UI16], 4)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_UI16;
+                            lexer->type = KUSH_TOKEN_KEYWORD_UI16;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_UI32], 4)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_UI32;
+                            lexer->type = KUSH_TOKEN_KEYWORD_UI32;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_UI64], 4)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_UI64;
+                            lexer->type = KUSH_TOKEN_KEYWORD_UI64;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_UI8], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_UI8;
+                            lexer->type = KUSH_TOKEN_KEYWORD_UI8;
                         }
                         break;
 
 										}
                     case 'v' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_VAR], 3)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_VAR;
+                            lexer->type = KUSH_TOKEN_KEYWORD_VAR;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_VOID], 4)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_VOID;
+                            lexer->type = KUSH_TOKEN_KEYWORD_VOID;
                         }
                         break;
                     }
                     case 'w' : {
                         if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_WITH], 4)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_WITH;
+                            lexer->type = KUSH_TOKEN_KEYWORD_WITH;
                         }
                         else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)KUSH_TOKEN_KEYWORD_WHILE], 5)) {
-                            lexer->m_type = KUSH_TOKEN_KEYWORD_WHILE;
+                            lexer->type = KUSH_TOKEN_KEYWORD_WHILE;
                         }
                         break;
                     }
@@ -1983,17 +1983,17 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     /* Destroy the text; not required anymore. */
                     // jtk_CString_delete(text);
                 }
-                else if (isDecimalDigit(lexer->m_la1)) {
+                else if (isDecimalDigit(lexer->la1)) {
                     integerLiteral(lexer);
 
                     /* Check for integer type suffix. */
 
                     /* All integers in KUSH occupy 64-bits. */
-                    // if (isIntegerSuffix(lexer->m_la1)) {
+                    // if (isIntegerSuffix(lexer->la1)) {
                     /* Consume and discard the integer suffix character. */
                     // consume(lexer);
                     // }
-                    // else if (isLetter(lexer->m_la1)) {
+                    // else if (isLetter(lexer->la1)) {
                     /* Consume and discard the invalid suffix. */
                     // consume(lexer);
 
@@ -2001,12 +2001,12 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
                     // }
                 }
                 else {
-                    lexer->m_errorCode = KUSH_ERROR_CODE_UNKNOWN_CHARACTER;
+                    lexer->errorCode = KUSH_ERROR_CODE_UNKNOWN_CHARACTER;
 
                     /* Consume and discard the unknown character. */
                     consume(lexer);
                     /* The lexer has encountered an unrecognized character. */
-                    lexer->m_type = KUSH_TOKEN_UNKNOWN;
+                    lexer->type = KUSH_TOKEN_UNKNOWN;
                 }
                 break;
             }
@@ -2019,43 +2019,43 @@ k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer) {
         /* Unlike the parser, the lexer does not support error recovery strategies.
          * Therefore, all types of errors are collectively recorded at this point.
          */
-        if (lexer->m_errorCode != KUSH_ERROR_CODE_NONE) {
-            k_ErrorHandler_handleLexicalError(lexer->m_compiler->m_errorHandler,
-                                              lexer, lexer->m_errorCode, newToken);
+        if (lexer->errorCode != KUSH_ERROR_CODE_NONE) {
+            k_ErrorHandler_handleLexicalError(lexer->compiler->errorHandler,
+                                              lexer, lexer->errorCode, newToken);
         }
     }
 
-    k_Token_t* next = (k_Token_t*)jtk_ArrayQueue_peek(lexer->m_tokens);
-    jtk_ArrayQueue_dequeue(lexer->m_tokens);
+    k_Token_t* next = (k_Token_t*)jtk_ArrayQueue_peek(lexer->tokens);
+    jtk_ArrayQueue_dequeue(lexer->tokens);
     return next;
 }
 
 // Reset
 
-void reset(k_Lexer_t* lexer, jtk_InputStream_t* inputStream) {
+void reset(k_Lexer_t* lexer, jtk_InputStreat* inputStream) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
     jtk_Assert_assertObject(inputStream, "The specified input stream is null.");
 
     destroyStaleTokens(lexer);
 
-    lexer->m_inputStream = inputStream;
-    lexer->m_la1 = 0;
-    lexer->m_index = -1;
-    lexer->m_line = 1;
-    lexer->m_column = -1;
-    lexer->m_startIndex = 0;
-    lexer->m_startLine = 0;
-    lexer->m_startColumn = 0;
-    lexer->m_hitEndOfStream = false;
-    lexer->m_token = NULL;
-    lexer->m_channel = KUSH_TOKEN_CHANNEL_DEFAULT;
-    lexer->m_type = KUSH_TOKEN_UNKNOWN;
-    lexer->m_errorCode = KUSH_ERROR_CODE_NONE;
+    lexer->inputStream = inputStream;
+    lexer->la1 = 0;
+    lexer->index = -1;
+    lexer->line = 1;
+    lexer->column = -1;
+    lexer->startIndex = 0;
+    lexer->startLine = 0;
+    lexer->startColumn = 0;
+    lexer->hitEndOfStream = false;
+    lexer->token = NULL;
+    lexer->channel = KUSH_TOKEN_CHANNEL_DEFAULT;
+    lexer->type = KUSH_TOKEN_UNKNOWN;
+    lexer->errorCode = KUSH_ERROR_CODE_NONE;
 
-    jtk_StringBuilder_clear(lexer->m_text);
-    jtk_ArrayQueue_clear(lexer->m_tokens);
-    // jtk_ArrayStack_clear(lexer->m_indentations);
-    jtk_ArrayList_clear(lexer->m_indentations->m_list);
+    jtk_StringBuilder_clear(lexer->text);
+    jtk_ArrayQueue_clear(lexer->tokens);
+    // jtk_ArrayStack_clear(lexer->indentations);
+    jtk_ArrayList_clear(lexer->indentations->list);
 
     consume(lexer);
 }

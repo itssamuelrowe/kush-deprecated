@@ -61,21 +61,21 @@ struct k_SymbolLoader_t {
      * The list of directories where the loader looks for the definitions
      * of entities.
      */
-    jtk_DoublyLinkedList_t* m_directories;
+    jtk_DoublyLinkedList_t* directories;
 
-    uint32_t m_flags;
+    uint32_t flags;
 
     /**
      * Cache to store entities loaded previously.
      */
-    jtk_HashMap_t* m_symbols;
+    jtk_HashMap_t* symbols;
 
-    k_Compiler_t* m_compiler;
+    k_Compiler_t* compiler;
 
-    int32_t m_index;
-    uint8_t* m_bytes;
-    int32_t m_size;
-    k_Symbol_t* m_symbol;
+    int32_t index;
+    uint8_t* bytes;
+    int32_t size;
+    k_Symbol_t* symbol;
 };
 
 /**

@@ -42,13 +42,13 @@ typedef struct k_Scope_t k_Scope_t;
  * @since Kush 0.1
  */
 struct k_Scope_t {
-    uint8_t* m_name;
-    int32_t m_nameSize;
-    k_ScopeType_t m_type;
-    k_Scope_t* m_enclosingScope;
-    jtk_HashMap_t* m_symbols;
-    int32_t m_nextTicket;
-    k_Symbol_t* m_symbol;
+    uint8_t* name;
+    int32_t nameSize;
+    k_ScopeType_t type;
+    k_Scope_t* enclosingScope;
+    jtk_HashMap_t* symbols;
+    int32_t nextTicket;
+    k_Symbol_t* symbol;
 };
 
 // Constructor

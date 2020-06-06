@@ -39,23 +39,23 @@
  * @since Kush 0.1
  */
 struct k_Compiler_t {
-    bool m_dumpTokens;
-    bool m_dumpNodes;
-    bool m_footprint;
-    bool m_dumpInstructions;
-    jtk_Logger_t* m_logger;
-    jtk_ArrayList_t* m_inputFiles;
-    int32_t m_currentFileIndex;
-    k_ErrorHandler_t* m_errorHandler;
-    k_ASTNode_t** m_compilationUnits;
-    k_SymbolTable_t** m_symbolTables;
-    k_ASTAnnotations_t** m_scopes;
-    uint8_t** m_packages;
-    int32_t* m_packageSizes;
-    k_SymbolLoader_t* m_symbolLoader;
-    jtk_HashMap_t* m_repository;
-    jtk_ArrayList_t* m_trash;
-    bool m_coreApi;
+    bool dumpTokens;
+    bool dumpNodes;
+    bool footprint;
+    bool dumpInstructions;
+    jtk_Logger_t* logger;
+    jtk_ArrayList_t* inputFiles;
+    int32_t currentFileIndex;
+    k_ErrorHandler_t* errorHandler;
+    k_ASTNode_t** compilationUnits;
+    k_SymbolTable_t** symbolTables;
+    k_ASTAnnotations_t** scopes;
+    uint8_t** packages;
+    int32_t* packageSizes;
+    k_SymbolLoader_t* symbolLoader;
+    jtk_HashMap_t* repository;
+    jtk_ArrayList_t* trash;
+    bool coreApi;
 };
 
 /**

@@ -31,9 +31,9 @@
  * @since Kush 0.1
  */
 struct k_Error_t {
-    k_ErrorCode_t m_code;
-    k_Token_t* m_token;
-    k_TokenType_t m_expected;
+    k_ErrorCode_t code;
+    k_Token_t* token;
+    k_TokenType_t expected;
 };
 
 /**

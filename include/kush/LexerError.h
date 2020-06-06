@@ -32,10 +32,10 @@
  * @since Kush 0.1
  */
 struct k_LexerError_t {
-    char* m_message;
-    char* m_path;
-    int32_t m_line;
-    int32_t m_column;
+    char* message;
+    char* path;
+    int32_t line;
+    int32_t column;
 };
 
 /**

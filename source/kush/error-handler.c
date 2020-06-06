@@ -25,16 +25,16 @@
 // Constructor
 
 k_ErrorHandler_t* k_ErrorHandler_new() {
-    k_ErrorHandler_t* handler = jtk_Memory_allocate(k_ErrorHandler_t, 1);
-    handler->m_handleLexicalError = NULL;
-    handler->m_handleSyntacticalError = NULL;
-    handler->m_handleSemanticalError = NULL;
-    handler->m_onLexicalError = NULL;
-    handler->m_onSyntacticalError = NULL;
-    handler->m_onSemanticalError = NULL;
-    handler->m_errors = jtk_ArrayList_new();
-    handler->m_active = true;
-    handler->m_context = NULL;
+    k_ErrorHandler_t* handler = jtallocate(k_ErrorHandler_t, 1);
+    handler->handleLexicalError = NULL;
+    handler->handleSyntacticalError = NULL;
+    handler->handleSemanticalError = NULL;
+    handler->onLexicalError = NULL;
+    handler->onSyntacticalError = NULL;
+    handler->onSemanticalError = NULL;
+    handler->errors = jtk_ArrayList_new();
+    handler->active = true;
+    handler->context = NULL;
 
     return handler;
 }
@@ -44,14 +44,14 @@ k_ErrorHandler_t* k_ErrorHandler_new() {
 void k_ErrorHandler_delete(k_ErrorHandler_t* handler) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    int32_t errorCount = jtk_ArrayList_getSize(handler->m_errors);
+    int32_t errorCount = jtk_ArrayList_getSize(handler->errors);
     int32_t i;
     for (i = 0; i < errorCount; i++) {
-        k_Error_t* error = (k_Error_t*)jtk_ArrayList_getValue(handler->m_errors, i);
+        k_Error_t* error = (k_Error_t*)jtk_ArrayList_getValue(handler->errors, i);
         k_Error_delete(error);
     }
-    jtk_ArrayList_delete(handler->m_errors);
-    jtk_Memory_deallocate(handler);
+    jtk_ArrayList_delete(handler->errors);
+    jtdeallocate(handler);
 }
 
 // Active
@@ -59,13 +59,13 @@ void k_ErrorHandler_delete(k_ErrorHandler_t* handler) {
 void k_ErrorHandler_setActive(k_ErrorHandler_t* handler, bool active) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    handler->m_active = active;
+    handler->active = active;
 }
 
 bool k_ErrorHandler_isActive(k_ErrorHandler_t* handler) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    return handler->m_active;
+    return handler->active;
 }
 
 // Syntactical Error
@@ -74,14 +74,14 @@ void k_ErrorHandler_setOnSyntacticalError(k_ErrorHandler_t* handler,
     k_ErrorHandler_OnSyntacticalErrorFunction_t onSyntacticalError) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    handler->m_onSyntacticalError = onSyntacticalError;
+    handler->onSyntacticalError = onSyntacticalError;
 }
 
 k_ErrorHandler_OnSyntacticalErrorFunction_t k_ErrorHandler_getOnSyntacticalError(
     k_ErrorHandler_t* handler) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    return handler->m_onSemanticalError;
+    return handler->onSemanticalError;
 }
 
 void k_ErrorHandler_handleSyntacticalError(k_ErrorHandler_t* handler,
@@ -90,14 +90,14 @@ void k_ErrorHandler_handleSyntacticalError(k_ErrorHandler_t* handler,
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
     k_Error_t* error = k_Error_newEx(errorCode, token, expected);
-    jtk_ArrayList_add(handler->m_errors, error);
+    jtk_ArrayList_add(handler->errors, error);
 
-    if (handler->m_handleSyntacticalError != NULL) {
-        handler->m_handleSyntacticalError(handler->m_context, parser, error);
+    if (handler->handleSyntacticalError != NULL) {
+        handler->handleSyntacticalError(handler->context, parser, error);
     }
 
-    if (handler->m_active && (handler->m_onSyntacticalError != NULL)) {
-        handler->m_onSyntacticalError(handler->m_context, parser, error, expected);
+    if (handler->active && (handler->onSyntacticalError != NULL)) {
+        handler->onSyntacticalError(handler->context, parser, error, expected);
     }
 }
 
@@ -107,14 +107,14 @@ void k_ErrorHandler_setOnLexicalError(k_ErrorHandler_t* handler,
     k_ErrorHandler_OnLexicalErrorFunction_t onLexicalError) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    handler->m_onLexicalError = onLexicalError;
+    handler->onLexicalError = onLexicalError;
 }
 
 k_ErrorHandler_OnLexicalErrorFunction_t k_ErrorHandler_getOnLexicalError(
     k_ErrorHandler_t* handler) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    return handler->m_onLexicalError;
+    return handler->onLexicalError;
 }
 
 void k_ErrorHandler_handleLexicalError(k_ErrorHandler_t* handler,
@@ -122,14 +122,14 @@ void k_ErrorHandler_handleLexicalError(k_ErrorHandler_t* handler,
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
     k_Error_t* error = k_Error_new(errorCode, token);
-    jtk_ArrayList_add(handler->m_errors, error);
+    jtk_ArrayList_add(handler->errors, error);
 
-    if (handler->m_handleLexicalError != NULL) {
-        handler->m_handleLexicalError(handler->m_context, lexer, error);
+    if (handler->handleLexicalError != NULL) {
+        handler->handleLexicalError(handler->context, lexer, error);
     }
 
-    if (handler->m_active && (handler->m_onLexicalError != NULL)) {
-        handler->m_onLexicalError(handler->m_context, lexer, error);
+    if (handler->active && (handler->onLexicalError != NULL)) {
+        handler->onLexicalError(handler->context, lexer, error);
     }
 }
 
@@ -139,14 +139,14 @@ void k_ErrorHandler_setOnSemanticalError(k_ErrorHandler_t* handler,
     k_ErrorHandler_OnSemanticalErrorFunction_t onSemanticalError) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    handler->m_onSemanticalError = onSemanticalError;
+    handler->onSemanticalError = onSemanticalError;
 }
 
 k_ErrorHandler_OnSemanticalErrorFunction_t k_ErrorHandler_getOnSemanticalError(
     k_ErrorHandler_t* handler){
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    return handler->m_onSemanticalError;
+    return handler->onSemanticalError;
 }
 
 void k_ErrorHandler_handleSemanticalError(k_ErrorHandler_t* handler,
@@ -154,14 +154,14 @@ void k_ErrorHandler_handleSemanticalError(k_ErrorHandler_t* handler,
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
     k_Error_t* error = k_Error_new(errorCode, token);
-    jtk_ArrayList_add(handler->m_errors, error);
+    jtk_ArrayList_add(handler->errors, error);
 
-    if (handler->m_handleSemanticalError != NULL) {
-        handler->m_handleSemanticalError(handler->m_context, origin, error);
+    if (handler->handleSemanticalError != NULL) {
+        handler->handleSemanticalError(handler->context, origin, error);
     }
 
-    if (handler->m_active && (handler->m_onSemanticalError != NULL)) {
-        handler->m_onSemanticalError(handler->m_context, origin, error);
+    if (handler->active && (handler->onSemanticalError != NULL)) {
+        handler->onSemanticalError(handler->context, origin, error);
     }
 }
 
@@ -170,14 +170,14 @@ void k_ErrorHandler_handleGeneralError(k_ErrorHandler_t* handler,
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
     k_Error_t* error = k_Error_new(errorCode, NULL);
-    jtk_ArrayList_add(handler->m_errors, error);
+    jtk_ArrayList_add(handler->errors, error);
 
-    // if (handler->m_handleGeneralError != NULL) {
-    //     handler->m_handleGeneralError(handler->m_context, origin, error);
+    // if (handler->handleGeneralError != NULL) {
+    //     handler->handleGeneralError(handler->context, origin, error);
     // }
 
-    if (handler->m_active && (handler->m_onGeneralError != NULL)) {
-        handler->m_onGeneralError(handler->m_context, origin, error);
+    if (handler->active && (handler->onGeneralError != NULL)) {
+        handler->onGeneralError(handler->context, origin, error);
     }
 }
 
@@ -186,17 +186,17 @@ void k_ErrorHandler_handleGeneralError(k_ErrorHandler_t* handler,
 jtk_ArrayList_t* k_ErrorHandler_getErrors(k_ErrorHandler_t* handler) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    return handler->m_errors;
+    return handler->errors;
 }
 
 int32_t k_ErrorHandler_getErrorCount(k_ErrorHandler_t* handler) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    return jtk_ArrayList_getSize(handler->m_errors);
+    return jtk_ArrayList_getSize(handler->errors);
 }
 
 bool k_ErrorHandler_hasErrors(k_ErrorHandler_t* handler) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
-    return !jtk_ArrayList_isEmpty(handler->m_errors);
+    return !jtk_ArrayList_isEmpty(handler->errors);
 }

@@ -35,13 +35,13 @@ typedef struct k_Scope_t k_Scope_t;
  */
 struct k_ClassSymbol_t {
     /* The superclasses are added in the resolution phase. */
-    jtk_ArrayList_t* m_superClasses; /* <k_Symbol_t*> */
-    uint8_t* m_qualifiedName;
-    int32_t m_qualifiedNameSize;
-    k_Scope_t* m_classScope;
+    jtk_ArrayList_t* superClasses; /* <k_Symbol_t*> */
+    uint8_t* qualifiedName;
+    int32_t qualifiedNameSize;
+    k_Scope_t* classScope;
 
-    uint8_t* m_descriptor;
-    int32_t m_descriptorSize;
+    uint8_t* descriptor;
+    int32_t descriptorSize;
 };
 
 /**

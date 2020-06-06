@@ -29,14 +29,14 @@ k_Scope_t* k_Scope_new(const uint8_t* name, int32_t nameSize,
 
     jtk_ObjectAdapter_t* stringObjectAdapter = jtk_CStringObjectAdapter_getInstance();
 
-    k_Scope_t* scope = jtk_Memory_allocate(k_Scope_t, 1);
-    scope->m_name = NULL; // jtk_CString_make(name, &nameSize);
-    scope->m_nameSize = nameSize;
-    scope->m_type = type;
-    scope->m_enclosingScope = enclosingScope;
-    scope->m_symbols = jtk_HashMap_new(stringObjectAdapter, NULL);
-    scope->m_nextTicket = 0;
-    scope->m_symbol = symbol;
+    k_Scope_t* scope = jtallocate(k_Scope_t, 1);
+    scope->name = NULL; // jtk_CString_make(name, &nameSize);
+    scope->nameSize = nameSize;
+    scope->type = type;
+    scope->enclosingScope = enclosingScope;
+    scope->symbols = jtk_HashMap_new(stringObjectAdapter, NULL);
+    scope->nextTicket = 0;
+    scope->symbol = symbol;
 
     return scope;
 }
@@ -60,9 +60,9 @@ k_Scope_t* k_Scope_forClass(k_Scope_t* enclosingScope) {
 void k_Scope_delete(k_Scope_t* scope) {
     jtk_Assert_assertObject(scope, "The specified scope is null.");
 
-    jtk_HashMap_delete(scope->m_symbols);
-    jtk_CString_delete(scope->m_name);
-    jtk_Memory_deallocate(scope);
+    jtk_HashMap_delete(scope->symbols);
+    jtk_CString_delete(scope->name);
+    jtdeallocate(scope);
 }
 
 // Children Symbols
@@ -71,44 +71,44 @@ void k_Scope_getChildrenSymbols(k_Scope_t* scope, jtk_ArrayList_t* childrenSymbo
     jtk_Assert_assertObject(scope, "The specified scope is null.");
     jtk_Assert_assertObject(childrenSymbols, "The specified list is null.");
 
-    jtk_Iterator_t* iterator = jtk_HashMap_getValueIterator(scope->m_symbols);
+    jtk_Iterator_t* iterator = jtk_HashMap_getValueIterator(scope->symbols);
     jtk_ArrayList_addAllFromIterator(childrenSymbols, iterator);
     jtk_Iterator_delete(iterator);
 }
 
 bool k_Scope_isEnumerationScope(k_Scope_t* scope) {
-    return scope->m_type == KUSH_SCOPE_ENUMERATION;
+    return scope->type == KUSH_SCOPE_ENUMERATION;
 }
 
 bool k_Scope_isClassScope(k_Scope_t* scope) {
-    return scope->m_type == KUSH_SCOPE_CLASS;
+    return scope->type == KUSH_SCOPE_CLASS;
 }
 
 bool k_Scope_isFunctionScope(k_Scope_t* scope) {
-    return scope->m_type == KUSH_SCOPE_FUNCTION;
+    return scope->type == KUSH_SCOPE_FUNCTION;
 }
 
 bool k_Scope_isCompilationUnitScope(k_Scope_t* scope) {
-    return scope->m_type == KUSH_SCOPE_COMPILATION_UNIT;
+    return scope->type == KUSH_SCOPE_COMPILATION_UNIT;
 }
 
 bool k_Scope_isLocalScope(k_Scope_t* scope) {
-    return scope->m_type == KUSH_SCOPE_LOCAL;
+    return scope->type == KUSH_SCOPE_LOCAL;
 }
 
 k_Scope_t* k_Scope_getEnclosingScope(k_Scope_t* scope) {
     jtk_Assert_assertObject(scope, "The specified scope is null.");
-    return scope->m_enclosingScope;
+    return scope->enclosingScope;
 }
 
 void k_Scope_define(k_Scope_t* scope, k_Symbol_t* symbol) {
-    const uint8_t* text = ((k_Token_t*)symbol->m_identifier->m_context)->m_text;
+    const uint8_t* text = ((k_Token_t*)symbol->identifier->context)->text;
     k_Scope_defineEx(scope, text, -1, symbol);
 }
 
 void k_Scope_defineEx(k_Scope_t* scope, const uint8_t* descriptor,
     int32_t descriptorSize, k_Symbol_t* symbol) {
-    if (!jtk_HashMap_putStrictly(scope->m_symbols, (void*)descriptor, symbol)) {
+    if (!jtk_HashMap_putStrictly(scope->symbols, (void*)descriptor, symbol)) {
         fprintf(stderr, "[internal error] k_Scope_define() invoked to redefine a symbol.\n");
     }
 }
@@ -139,7 +139,7 @@ k_Symbol_t* k_Scope_resolveClassMember(k_Scope_t* scope,
     jtk_Assert_assertObject(identifier, "The specified identifier is null.");
 
     k_Symbol_t* result = NULL;
-    k_Symbol_t* symbol = scope->m_symbol;
+    k_Symbol_t* symbol = scope->symbol;
 
     jtk_LinkedStack_t* stack = jtk_LinkedStack_new();
     /* The things you have to do when you have no inheritance. (-__-) */
@@ -148,12 +148,12 @@ k_Symbol_t* k_Scope_resolveClassMember(k_Scope_t* scope,
     while (!jtk_LinkedStack_isEmpty(stack)) {
         symbol = (k_Symbol_t*)jtk_LinkedStack_pop(stack);
 
-        result = (k_Symbol_t*)jtk_HashMap_getValue(scope->m_symbols, identifier);
+        result = (k_Symbol_t*)jtk_HashMap_getValue(scope->symbols, identifier);
         if (result != NULL) {
             break;
         }
         else {
-            jtk_ArrayList_t* superClasses = symbol->m_context.m_asClass.m_superClasses;
+            jtk_ArrayList_t* superClasses = symbol->context.asClass.superClasses;
             int32_t size = jtk_ArrayList_getSize(superClasses);
             int32_t i;
             for (i = 0; i < size; i++) {
@@ -171,11 +171,11 @@ k_Symbol_t* k_Scope_resolveClassMember(k_Scope_t* scope,
 
 k_Symbol_t* k_Scope_resolve(k_Scope_t* scope, uint8_t* identifier) {
     k_Symbol_t* result = NULL;
-    switch (scope->m_type) {
+    switch (scope->type) {
         case KUSH_SCOPE_COMPILATION_UNIT:
         case KUSH_SCOPE_FUNCTION:
         case KUSH_SCOPE_LOCAL: {
-            result = jtk_HashMap_getValue(scope->m_symbols, (void*)identifier);
+            result = jtk_HashMap_getValue(scope->symbols, (void*)identifier);
             break;
         }
 
@@ -188,11 +188,11 @@ k_Symbol_t* k_Scope_resolve(k_Scope_t* scope, uint8_t* identifier) {
 }
 
 const uint8_t* k_Scope_getName(k_Scope_t* scope) {
-    return scope->m_name;
+    return scope->name;
 }
 
 k_ScopeType_t k_Scope_getType(k_Scope_t* scope) {
-    return scope->m_type;
+    return scope->type;
 }
 
 k_Scope_t* k_Scope_resolveQualifiedSymbol(k_Scope_t* scope, const uint8_t* name,

@@ -32,7 +32,7 @@
  * @since Kush 0.1
  */
 struct k_ParserError_t {
-    char* m_message;
+    char* message;
 };
 
 /**

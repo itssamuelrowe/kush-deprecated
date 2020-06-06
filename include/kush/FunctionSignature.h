@@ -35,14 +35,14 @@
  * @since Kush 0.1
  */
 struct k_FunctionSignature_t {
-    jtk_ArrayList_t* m_fixedParameters;
-    k_ASTNode_t* m_variableParameter;
-    uint8_t* m_descriptor;
-    int32_t m_descriptorSize;
-    uint16_t m_modifiers;
-    uint16_t m_tableIndex;
-    int32_t m_fixedParameterCount;
-    bool m_hasVariableParameter;
+    jtk_ArrayList_t* fixedParameters;
+    k_ASTNode_t* variableParameter;
+    uint8_t* descriptor;
+    int32_t descriptorSize;
+    uint16_t modifiers;
+    uint16_t tableIndex;
+    int32_t fixedParameterCount;
+    bool hasVariableParameter;
 };
 
 /**

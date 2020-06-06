@@ -36,8 +36,8 @@ typedef struct k_Compiler_t k_Compiler_t;
  * @since Kush 0.1
  */
 struct k_SymbolTable_t {
-    k_Scope_t* m_currentScope;
-    k_Compiler_t* m_compiler;
+    k_Scope_t* currentScope;
+    k_Compiler_t* compiler;
 };
 
 /**

@@ -590,7 +590,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 if (postfix->tag == CONTEXT_SUBSCRIPT) {
                     Subscript* subscript = (Subscript*)postfix;
                     resolveExpression(subscript->expression);
-                    if (!previous->m_indexable) {
+                    if (!previous->indexable) {
                         reportError(analyzer, ERROR_INVALID_LEFT_OPERAND,
                             subscript->bracket);
                     }

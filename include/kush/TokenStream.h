@@ -37,65 +37,65 @@
  */
 // typedef void (*k_OnLexicalError_t)(k_LexicalError_t* error);
 
-struct k_TokenStream_t {
+struct k_TokenStreat {
 
-    k_Compiler_t* m_compiler;
+    k_Compiler_t* compiler;
 
     /**
      * The lexer which recognizes and produces tokens on this
      * stream.
      */
-    k_Lexer_t* m_lexer;
+    k_Lexer_t* lexer;
 
     /**
      * The list of all the tokens recognized by the lexer so
      * far. It is considered a complete view of the input source
      * once the lexer recognizes the end-of-stream token.
      */
-    jtk_ArrayList_t* m_tokens;
+    jtk_ArrayList_t* tokens;
 
     /**
      * The index of the current token.
      */
-    int32_t m_p;
+    int32_t p;
 
     /**
      * Determines whether the end-of-stream token has been
      * produced by the lexer.
      */
-    bool m_hitEndOfStream;
+    bool hitEndOfStream;
 
     /**
      * The channel on which the token stream filters tokens
      * from.
      */
-    k_TokenChannel_t m_channel;
+    k_TokenChannel_t channel;
 
-    jtk_ArrayList_t* m_trash;
+    jtk_ArrayList_t* trash;
 };
 
-typedef struct k_TokenStream_t k_TokenStream_t;
+typedef struct k_TokenStreat k_TokenStreat;
 
-k_TokenStream_t* k_TokenStream_new(k_Compiler_t* compiler, k_Lexer_t* lexer,
+k_TokenStreat* k_TokenStreanew(k_Compiler_t* compiler, k_Lexer_t* lexer,
     k_TokenChannel_t channel);
-void k_TokenStream_delete(k_TokenStream_t* stream);
-void k_TokenStream_reset(k_TokenStream_t* stream);
-int32_t k_TokenStream_getIndex(k_TokenStream_t* stream);
-int32_t k_TokenStream_getSize(k_TokenStream_t* stream);
-void k_TokenStream_consume(k_TokenStream_t* stream);
-bool k_TokenStream_synchronize(k_TokenStream_t* stream, int32_t i);
-int32_t k_TokenStream_fetch(k_TokenStream_t* stream, int32_t n);
-k_Token_t* k_TokenStream_getToken(k_TokenStream_t* stream, int32_t index);
-jtk_ArrayList_t* k_TokenStream_getTokens(k_TokenStream_t* stream, int32_t startIndex, int32_t stopIndex);
-k_TokenType_t k_TokenStream_la(k_TokenStream_t* stream, int32_t i);
-k_Token_t* k_TokenStream_lt(k_TokenStream_t* stream, int32_t k);
-void k_TokenStream_initialize(k_TokenStream_t* stream);
-int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream, int32_t i, k_TokenChannel_t channel);
-int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream, int32_t i, k_TokenChannel_t channel);
-void k_TokenStream_fill(k_TokenStream_t* stream);
-uint8_t* k_TokenStream_getSourceName(k_TokenStream_t* stream, int32_t* size);
-k_Lexer_t* k_TokenStream_getLexer(k_TokenStream_t* stream);
-uint8_t* k_TokenStream_getText(k_TokenStream_t* stream, int32_t startIndex, int32_t stopIndex, int32_t* size);
-int32_t k_TokenStream_getNumberOfTokens(k_TokenStream_t* stream, k_TokenChannel_t channel);
+void k_TokenStreadelete(k_TokenStreat* stream);
+void k_TokenStreareset(k_TokenStreat* stream);
+int32_t k_TokenStreagetIndex(k_TokenStreat* stream);
+int32_t k_TokenStreagetSize(k_TokenStreat* stream);
+void k_TokenStreaconsume(k_TokenStreat* stream);
+bool k_TokenStreasynchronize(k_TokenStreat* stream, int32_t i);
+int32_t k_TokenStreafetch(k_TokenStreat* stream, int32_t n);
+k_Token_t* k_TokenStreagetToken(k_TokenStreat* stream, int32_t index);
+jtk_ArrayList_t* k_TokenStreagetTokens(k_TokenStreat* stream, int32_t startIndex, int32_t stopIndex);
+k_TokenType_t k_TokenStreala(k_TokenStreat* stream, int32_t i);
+k_Token_t* k_TokenStrealt(k_TokenStreat* stream, int32_t k);
+void k_TokenStreainitialize(k_TokenStreat* stream);
+int32_t k_TokenStreagetNextTokenOnChannel(k_TokenStreat* stream, int32_t i, k_TokenChannel_t channel);
+int32_t k_TokenStreagetPreviousTokenOnChannel(k_TokenStreat* stream, int32_t i, k_TokenChannel_t channel);
+void k_TokenStreafill(k_TokenStreat* stream);
+uint8_t* k_TokenStreagetSourceName(k_TokenStreat* stream, int32_t* size);
+k_Lexer_t* k_TokenStreagetLexer(k_TokenStreat* stream);
+uint8_t* k_TokenStreagetText(k_TokenStreat* stream, int32_t startIndex, int32_t stopIndex, int32_t* size);
+int32_t k_TokenStreagetNumberOfTokens(k_TokenStreat* stream, k_TokenChannel_t channel);
 
 #endif /* KUSH_TOKEN_STREAM_H */

@@ -81,18 +81,18 @@ typedef void (*k_ErrorHandler_OnGeneralErrorFunction_t)(void* context, void* ori
  * @since Kush 0.1
  */
 struct k_ErrorHandler_t {
-    k_ErrorHandler_HandleLexicalErrorFunction_t m_handleLexicalError;
-    k_ErrorHandler_HandleSyntacticalErrorFunction_t m_handleSyntacticalError;
-    k_ErrorHandler_HandleSemanticalErrorFunction_t m_handleSemanticalError;
+    k_ErrorHandler_HandleLexicalErrorFunction_t handleLexicalError;
+    k_ErrorHandler_HandleSyntacticalErrorFunction_t handleSyntacticalError;
+    k_ErrorHandler_HandleSemanticalErrorFunction_t handleSemanticalError;
 
-    k_ErrorHandler_OnLexicalErrorFunction_t m_onLexicalError;
-    k_ErrorHandler_OnSyntacticalErrorFunction_t m_onSyntacticalError;
-    k_ErrorHandler_OnSemanticalErrorFunction_t m_onSemanticalError;
-    k_ErrorHandler_OnGeneralErrorFunction_t m_onGeneralError;
+    k_ErrorHandler_OnLexicalErrorFunction_t onLexicalError;
+    k_ErrorHandler_OnSyntacticalErrorFunction_t onSyntacticalError;
+    k_ErrorHandler_OnSemanticalErrorFunction_t onSemanticalError;
+    k_ErrorHandler_OnGeneralErrorFunction_t onGeneralError;
 
-    jtk_ArrayList_t* m_errors;
-    bool m_active;
-    void* m_context;
+    jtk_ArrayList_t* errors;
+    bool active;
+    void* context;
 };
 
 /**

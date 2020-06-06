@@ -15,8 +15,8 @@
  * @since 0.1
  */
 struct k_String_t {
-	uint8_t* m_value;
-	int32_t m_length;
+	uint8_t* value;
+	int32_t length;
 	uint32_t hashCode;
 };
 

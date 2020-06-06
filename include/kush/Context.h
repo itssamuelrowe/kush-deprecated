@@ -527,8 +527,8 @@ struct k_Type_t {
     bool callable;
     union {
         struct {
-            k_Type_t* m_base;
-            uint16_t m_dimensions;
+            k_Type_t* base;
+            uint16_t dimensions;
         } array;
         struct {
             uint8_t size;

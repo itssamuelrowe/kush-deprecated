@@ -17,63 +17,63 @@
 #include <jtk/collection/array/Arrays.h>
 #include <kush/lexer/TokenStream.h>
 
-k_TokenStream_t* k_TokenStream_new(k_Compiler_t* compiler,
+k_TokenStreat* k_TokenStreanew(k_Compiler_t* compiler,
                                    k_Lexer_t* lexer, k_TokenChannel_t channel) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
 
-    k_TokenStream_t* stream = k_Memory_allocate(k_TokenStream_t, 1);
-    stream->m_compiler = compiler;
-    stream->m_lexer = lexer;
-    stream->m_tokens = jtk_ArrayList_newWithCapacity(128);
-    stream->m_p = -1;
-    stream->m_hitEndOfStream = false;
-    stream->m_channel = channel;
-    stream->m_trash = jtk_ArrayList_new();
+    k_TokenStreat* stream = allocate(k_TokenStreat, 1);
+    stream->compiler = compiler;
+    stream->lexer = lexer;
+    stream->tokens = jtk_ArrayList_newWithCapacity(128);
+    stream->p = -1;
+    stream->hitEndOfStream = false;
+    stream->channel = channel;
+    stream->trash = jtk_ArrayList_new();
 
     return stream;
 }
 
-void k_TokenStream_destroyStaleTokens(k_TokenStream_t* stream) {
+void k_TokenStreadestroyStaleTokens(k_TokenStreat* stream) {
 }
 
 // TODO: The tokens must be destroyed!
-void k_TokenStream_delete(k_TokenStream_t* stream) {
+void k_TokenStreadelete(k_TokenStreat* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
 
-    jtk_ArrayList_delete(stream->m_tokens);
-    jtk_Memory_deallocate(stream);
+    jtk_ArrayList_delete(stream->tokens);
+    jtdeallocate(stream);
 }
 
-void k_TokenStream_reset(k_TokenStream_t* stream) {
+void k_TokenStreareset(k_TokenStreat* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
 
-    jtk_ArrayList_clear(stream->m_tokens);
-    stream->m_p = -1;
-    stream->m_hitEndOfStream = false;
+    jtk_ArrayList_clear(stream->tokens);
+    stream->p = -1;
+    stream->hitEndOfStream = false;
 }
 
-int32_t k_TokenStream_getIndex(k_TokenStream_t* stream) {
+int32_t k_TokenStreagetIndex(k_TokenStreat* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
-    return stream->m_p;
+    return stream->p;
 }
 
-int32_t k_TokenStream_getSize(k_TokenStream_t* stream) {
+int32_t k_TokenStreagetSize(k_TokenStreat* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
-    return jtk_ArrayList_getSize(stream->m_tokens);
+    return jtk_ArrayList_getSize(stream->tokens);
 }
 
-void k_TokenStream_consume(k_TokenStream_t* stream) {
+void k_TokenStreaconsume(k_TokenStreat* stream) {
     bool skip;
-    if (stream->m_p >= 0) {
-        if (stream->m_hitEndOfStream) {
+    if (stream->p >= 0) {
+        if (stream->hitEndOfStream) {
             /* The end-of-stream token can be consumed only once.
              * Should we check this condition?
              */
-            skip = stream->m_p < (jtk_ArrayList_getSize(stream->m_tokens) - 1);
+            skip = stream->p < (jtk_ArrayList_getSize(stream->tokens) - 1);
         }
         else {
             /* Have we consumed all the buffered tokens? */
-            skip = stream->m_p < jtk_ArrayList_getSize(stream->m_tokens);
+            skip = stream->p < jtk_ArrayList_getSize(stream->tokens);
         }
     }
     else {
@@ -81,71 +81,71 @@ void k_TokenStream_consume(k_TokenStream_t* stream) {
         skip = false;
     }
 
-    jtk_Assert_assertFalse((!skip && (k_TokenStream_la(stream, 1) == KUSH_TOKEN_END_OF_STREAM)), "...");
+    jtk_Assert_assertFalse((!skip && (k_TokenStreala(stream, 1) == KUSH_TOKEN_END_OF_STREAM)), "...");
 
-    bool hasToken = k_TokenStream_synchronize(stream, stream->m_p + 1);
+    bool hasToken = k_TokenStreasynchronize(stream, stream->p + 1);
     if (hasToken) {
-        stream->m_p = k_TokenStream_getNextTokenOnChannel(stream, stream->m_p + 1, stream->m_channel);
+        stream->p = k_TokenStreagetNextTokenOnChannel(stream, stream->p + 1, stream->channel);
     }
 }
 
-bool k_TokenStream_synchronize(k_TokenStream_t* stream, int32_t i) {
+bool k_TokenStreasynchronize(k_TokenStreat* stream, int32_t i) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
     jtk_Assert_assertTrue(i >= 0, "The specified index is invalid.");
 
-    int32_t n = i - jtk_ArrayList_getSize(stream->m_tokens) + 1;
+    int32_t n = i - jtk_ArrayList_getSize(stream->tokens) + 1;
     bool result = true;
     if (n > 0) {
-        int32_t fetched = k_TokenStream_fetch(stream, n);
+        int32_t fetched = k_TokenStreafetch(stream, n);
         result = fetched >= n;
     }
     return result;
 }
 
-int32_t k_TokenStream_fetch(k_TokenStream_t* stream, int32_t n) {
+int32_t k_TokenStreafetch(k_TokenStreat* stream, int32_t n) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
-    if (stream->m_hitEndOfStream) {
+    if (stream->hitEndOfStream) {
         return 0;
     }
 
-    int32_t oldSize = jtk_ArrayList_getSize(stream->m_tokens);
+    int32_t oldSize = jtk_ArrayList_getSize(stream->tokens);
     int32_t i;
     for (i = 0; i < n; i++) {
-        k_Token_t* token = k_Lexer_nextToken(stream->m_lexer);
+        k_Token_t* token = k_Lexer_nextToken(stream->lexer);
         k_Token_setIndex(token, oldSize + i);
-        jtk_ArrayList_add(stream->m_tokens, token);
-        jtk_ArrayList_add(stream->m_trash, token);
+        jtk_ArrayList_add(stream->tokens, token);
+        jtk_ArrayList_add(stream->trash, token);
 
         if (k_Token_getType(token) == KUSH_TOKEN_END_OF_STREAM) {
-            stream->m_hitEndOfStream = true;
+            stream->hitEndOfStream = true;
             return i + 1;
         }
     }
     return n;
 }
 
-k_Token_t* k_TokenStream_getToken(k_TokenStream_t* stream, int32_t index) {
+k_Token_t* k_TokenStreagetToken(k_TokenStreat* stream, int32_t index) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Index-out-of-range errors are checked by the
      * jtk_ArrayList_t class.
      */
-    return jtk_ArrayList_getValue(stream->m_tokens, index);
+    return jtk_ArrayList_getValue(stream->tokens, index);
 }
 
-jtk_ArrayList_t* k_TokenStream_getTokens(k_TokenStream_t* stream,
+jtk_ArrayList_t* k_TokenStreagetTokens(k_TokenStreat* stream,
         int32_t startIndex, int32_t stopIndex) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
-    int32_t size = jtk_ArrayList_getSize(stream->m_tokens);
+    int32_t size = jtk_ArrayList_getSize(stream->tokens);
     jtk_Arrays_checkRange(size, startIndex, stopIndex);
 
-    k_TokenStream_initialize(stream);
+    k_TokenStreainitialize(stream);
     jtk_ArrayList_t* result = jtk_ArrayList_new();
     int32_t i;
     for (i = startIndex; i < stopIndex; i++) {
-        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->tokens, i);
         jtk_ArrayList_add(result, token);
     }
     /* The user is responsible for the destruction of
@@ -154,63 +154,63 @@ jtk_ArrayList_t* k_TokenStream_getTokens(k_TokenStream_t* stream,
     return result;
 }
 
-k_TokenType_t k_TokenStream_la(k_TokenStream_t* stream, int32_t i) {
-    return k_TokenStream_lt(stream, i)->m_type;
+k_TokenType_t k_TokenStreala(k_TokenStreat* stream, int32_t i) {
+    return k_TokenStrealt(stream, i)->type;
 }
 
-k_Token_t* k_TokenStream_lt(k_TokenStream_t* stream, int32_t k) {
+k_Token_t* k_TokenStrealt(k_TokenStreat* stream, int32_t k) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
-    k_TokenStream_initialize(stream);
+    k_TokenStreainitialize(stream);
     k_Token_t* token = NULL;
     if (k != 0) {
         if (k < 0) {
-            if ((stream->m_p - k) >= 0) {
-                int32_t i = stream->m_p;
+            if ((stream->p - k) >= 0) {
+                int32_t i = stream->p;
                 int32_t n = 1;
                 while ((n <= k) && (i > 0)) {
-                    i = k_TokenStream_getPreviousTokenOnChannel(stream, i - 1, stream->m_channel);
+                    i = k_TokenStreagetPreviousTokenOnChannel(stream, i - 1, stream->channel);
                     n++;
                 }
                 if (i >= 0) {
-                    token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+                    token = (k_Token_t*)jtk_ArrayList_getValue(stream->tokens, i);
                 }
             }
         }
         else {
-            int32_t i = stream->m_p;
+            int32_t i = stream->p;
             int32_t n = 1;
             while (n < k) {
-                bool hasToken = k_TokenStream_synchronize(stream, i + 1);
+                bool hasToken = k_TokenStreasynchronize(stream, i + 1);
                 if (hasToken) {
-                    i = k_TokenStream_getNextTokenOnChannel(stream, i + 1, stream->m_channel);
+                    i = k_TokenStreagetNextTokenOnChannel(stream, i + 1, stream->channel);
                 }
                 n++;
             }
-            token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+            token = (k_Token_t*)jtk_ArrayList_getValue(stream->tokens, i);
         }
     }
     return token;
 }
 
-void k_TokenStream_initialize(k_TokenStream_t* stream) {
+void k_TokenStreainitialize(k_TokenStreat* stream) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
-    if (stream->m_p == -1) {
-        k_TokenStream_synchronize(stream, 0);
-        stream->m_p = k_TokenStream_getNextTokenOnChannel(stream, 0, stream->m_channel);
+    if (stream->p == -1) {
+        k_TokenStreasynchronize(stream, 0);
+        stream->p = k_TokenStreagetNextTokenOnChannel(stream, 0, stream->channel);
     }
 }
 
-int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream,
+int32_t k_TokenStreagetPreviousTokenOnChannel(k_TokenStreat* stream,
         int32_t i, k_TokenChannel_t channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Ensure that the token stream has buffered, at least,
      * tokens till the requested index.
      */
-    k_TokenStream_synchronize(stream, i);
-    int32_t size = jtk_ArrayList_getSize(stream->m_tokens);
+    k_TokenStreasynchronize(stream, i);
+    int32_t size = jtk_ArrayList_getSize(stream->tokens);
     if (i >= size) {
         /* In case the synchronization failed to retrieve the
          * requested number of tokens, return the index of the
@@ -220,7 +220,7 @@ int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream,
     }
 
     while (i >= 0) {
-        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->tokens, i);
         if ((k_Token_getType(token) == KUSH_TOKEN_END_OF_STREAM) ||
                 (k_Token_getChannel(token) == channel)) {
             return i;
@@ -231,15 +231,15 @@ int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream,
     return -1;
 }
 
-int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream,
+int32_t k_TokenStreagetNextTokenOnChannel(k_TokenStreat* stream,
         int32_t i, k_TokenChannel_t channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Ensure that the token stream has buffered, at least,
      * tokens till the requested index.
      */
-    k_TokenStream_synchronize(stream, i);
-    int32_t size = jtk_ArrayList_getSize(stream->m_tokens);
+    k_TokenStreasynchronize(stream, i);
+    int32_t size = jtk_ArrayList_getSize(stream->tokens);
     if (i >= size) {
         /* In case the synchronization failed to retrieve the
          * requested number of tokens, return the index of the
@@ -248,7 +248,7 @@ int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream,
         return size - 1;
     }
 
-    k_Token_t* token = jtk_ArrayList_getValue(stream->m_tokens, i);
+    k_Token_t* token = jtk_ArrayList_getValue(stream->tokens, i);
     while (k_Token_getChannel(token) != channel) {
         /* In case the token stream has reached the end-of-stream,
          * return the index of the end-of-stream token.
@@ -265,15 +265,15 @@ int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream,
         /* Ensure that the token stream has buffered, at least,
          * tokens till the new index.
          */
-        k_TokenStream_synchronize(stream, i);
+        k_TokenStreasynchronize(stream, i);
         /* Update the token variable for next iteration. */
-        token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+        token = (k_Token_t*)jtk_ArrayList_getValue(stream->tokens, i);
     }
     return i;
 }
 
-void k_TokenStream_fill(k_TokenStream_t* stream) {
-    k_TokenStream_initialize(stream);
+void k_TokenStreafill(k_TokenStreat* stream) {
+    k_TokenStreainitialize(stream);
     /* The token stream tries to buffer a 1000 tokens
      * at each iteration. This is repeated until the token
      * stream fails to fetch the quota, which indicates
@@ -282,24 +282,24 @@ void k_TokenStream_fill(k_TokenStream_t* stream) {
     int32_t blockSize = 1000;
     int32_t fetched;
     do {
-        fetched = k_TokenStream_fetch(stream, blockSize);
+        fetched = k_TokenStreafetch(stream, blockSize);
     } while (fetched == blockSize);
 }
 
-int32_t k_TokenStream_getNumberOfTokens(k_TokenStream_t* stream,
+int32_t k_TokenStreagetNumberOfTokens(k_TokenStreat* stream,
                                         k_TokenChannel_t channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Fetch all the tokens from the input stream before computing
      * the number of tokens on the specified channel.
      */
-    k_TokenStream_fill(stream);
+    k_TokenStreafill(stream);
 
     int32_t n = 0;
-    int32_t size = jtk_ArrayList_getSize(stream->m_tokens);
+    int32_t size = jtk_ArrayList_getSize(stream->tokens);
     int32_t i;
     for (i = 0; i < size; i++) {
-        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->m_tokens, i);
+        k_Token_t* token = (k_Token_t*)jtk_ArrayList_getValue(stream->tokens, i);
         if (k_Token_getChannel(token) == channel) {
             n++;
         }

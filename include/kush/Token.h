@@ -37,18 +37,18 @@
  * @since  KUSH 1.0
  */
 struct k_Token_t {
-    k_TokenChannel_t m_channel;
-    k_TokenType_t m_type;
-    uint8_t* m_text;
-    int32_t m_length;
-    int32_t m_startIndex;
-    int32_t m_stopIndex;
-    int32_t m_startLine;
-    int32_t m_stopLine;
-    int32_t m_startColumn;
-    int32_t m_stopColumn;
-    int32_t m_index;
-    const char* m_file;
+    k_TokenChannel_t channel;
+    k_TokenType_t type;
+    uint8_t* text;
+    int32_t length;
+    int32_t startIndex;
+    int32_t stopIndex;
+    int32_t startLine;
+    int32_t stopLine;
+    int32_t startColumn;
+    int32_t stopColumn;
+    int32_t index;
+    const char* file;
 };
 
 /**

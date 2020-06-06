@@ -41,21 +41,21 @@ enum k_SymbolFlag_t {
  * @since Kush 0.1
  */
 struct k_Symbol_t {
-    k_SymbolCategory_t m_category;
-    k_ASTNode_t* m_identifier;
-    k_Scope_t* m_enclosingScope;
+    k_SymbolCategory_t category;
+    k_ASTNode_t* identifier;
+    k_Scope_t* enclosingScope;
     union {
-        k_ClassSymbol_t m_asClass;
-        k_FunctionSymbol_t m_asFunction;
-        k_Symbol_t* m_asExternal;
-    } m_context;
-    uint32_t m_modifiers;
-    int32_t m_ticket;
-    int32_t m_index;
-    uint32_t m_flags;
+        k_ClassSymbol_t asClass;
+        k_FunctionSymbol_t asFunction;
+        k_Symbol_t* asExternal;
+    } context;
+    uint32_t modifiers;
+    int32_t ticket;
+    int32_t index;
+    uint32_t flags;
 
-    uint8_t* m_name;
-    int32_t m_nameSize;
+    uint8_t* name;
+    int32_t nameSize;
 };
 
 /**

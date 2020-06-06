@@ -35,8 +35,8 @@
  */
 struct k_FunctionSymbol_t {
     /* Signatures are destroyed by the destructor. */
-    jtk_ArrayList_t* m_signatures; /* <k_FunctionSignature_t*> */
-    int32_t m_parameterThreshold;
+    jtk_ArrayList_t* signatures; /* <k_FunctionSignature_t*> */
+    int32_t parameterThreshold;
 };
 
 /**

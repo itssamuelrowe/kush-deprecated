@@ -35,13 +35,13 @@
  * @since Kush 0.1
  */
 struct k_Parser_t {
-    k_Compiler_t* m_compiler;
-    k_TokenStream_t* m_tokens;
-    k_TokenType_t* m_followSet;
-    int32_t m_followSetSize;
-    int32_t m_followSetCapacity;
-    bool m_recovery;
-    k_ASTNodeType_t m_mainComponent;
+    k_Compiler_t* compiler;
+    k_TokenStreat* tokens;
+    k_TokenType_t* followSet;
+    int32_t followSetSize;
+    int32_t followSetCapacity;
+    bool recovery;
+    k_ASTNodeType_t mainComponent;
 };
 
 /**
@@ -54,7 +54,7 @@ typedef struct k_Parser_t k_Parser_t;
 /**
  * @memberof Parser
  */
-k_Parser_t* k_Parser_new(k_Compiler_t* compiler, k_TokenStream_t* tokens);
+k_Parser_t* k_Parser_new(k_Compiler_t* compiler, k_TokenStreat* tokens);
 
 // Destructor
 
@@ -82,6 +82,6 @@ void k_Parser_parse(k_Parser_t* parser);
 /**
  * @memberof Parser
  */
-void k_Parser_reset(k_Parser_t* parser, k_TokenStream_t* tokens);
+void k_Parser_reset(k_Parser_t* parser, k_TokenStreat* tokens);
 
 #endif /* KUSH_COMPILER_PARSER_PARSER_H */

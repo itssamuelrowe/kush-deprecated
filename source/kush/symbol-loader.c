@@ -52,18 +52,18 @@
 k_SymbolLoader_t* k_SymbolLoader_new(k_Compiler_t* compiler) {
     jtk_ObjectAdapter_t* stringObjectAdapter = jtk_CStringObjectAdapter_getInstance();
 
-    k_SymbolLoader_t* loader = jtk_Memory_allocate(k_SymbolLoader_t, 1);
-    loader->m_directories = jtk_DoublyLinkedList_new();
-    loader->m_flags = KUSH_ENTITY_LOADER_FLAG_PRIORITIZE_DIRECTORIES;
-    loader->m_symbols = jtk_HashMap_newEx(stringObjectAdapter, NULL,
+    k_SymbolLoader_t* loader = jtallocate(k_SymbolLoader_t, 1);
+    loader->directories = jtk_DoublyLinkedList_new();
+    loader->flags = KUSH_ENTITY_LOADER_FLAG_PRIORITIZE_DIRECTORIES;
+    loader->symbols = jtk_HashMap_newEx(stringObjectAdapter, NULL,
         KUSH_ENTITY_LOADER_DEFAULT_ENTITIES_MAP_CAPCITY, JTK_HASH_MAP_DEFAULT_LOAD_FACTOR);
-    loader->m_compiler = compiler;
-    loader->m_index = 0;
-    loader->m_bytes = NULL;
-    loader->m_size = -1;
-    loader->m_constantPool.m_size = 0;
-    loader->m_constantPool.m_entries = NULL;
-    loader->m_symbol = NULL;
+    loader->compiler = compiler;
+    loader->index = 0;
+    loader->bytes = NULL;
+    loader->size = -1;
+    loader->constantPool.size = 0;
+    loader->constantPool.entries = NULL;
+    loader->symbol = NULL;
 
     return loader;
 }
@@ -84,33 +84,33 @@ k_SymbolLoader_t* k_SymbolLoader_newWithEntityDirectories(k_Compiler_t* compiler
 void k_SymbolLoader_delete(k_SymbolLoader_t* loader) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
 
-    int32_t size = jtk_DoublyLinkedList_getSize(loader->m_directories);
-    jtk_Iterator_t* iterator = jtk_DoublyLinkedList_getIterator(loader->m_directories);
+    int32_t size = jtk_DoublyLinkedList_getSize(loader->directories);
+    jtk_Iterator_t* iterator = jtk_DoublyLinkedList_getIterator(loader->directories);
     while (jtk_Iterator_hasNext(iterator)) {
         jtk_Path_t* path = (jtk_Path_t*)jtk_Iterator_getNext(iterator);
         jtk_Path_delete(path);
     }
     jtk_Iterator_delete(iterator);
-    jtk_DoublyLinkedList_delete(loader->m_directories);
+    jtk_DoublyLinkedList_delete(loader->directories);
 
-    jtk_Iterator_t* entryIterator = jtk_HashMap_getEntryIterator(loader->m_symbols);
+    jtk_Iterator_t* entryIterator = jtk_HashMap_getEntryIterator(loader->symbols);
     while (jtk_Iterator_hasNext(entryIterator)) {
         jtk_HashMapEntry_t* entry = (jtk_HashMapEntry_t*)jtk_Iterator_getNext(entryIterator);
 
         uint8_t* descriptor = (uint8_t*)jtk_HashMapEntry_getKey(entry);
         jtk_CString_delete(descriptor);
 
-        k_Symbol_t* symbol = (k_Symbol_t*)jtk_HashMapEntry_getValue(entry->m_value);
+        k_Symbol_t* symbol = (k_Symbol_t*)jtk_HashMapEntry_getValue(entry->value);
         k_Symbol_delete(symbol);
     }
     jtk_Iterator_delete(entryIterator);
-    jtk_HashMap_delete(loader->m_symbols);
+    jtk_HashMap_delete(loader->symbols);
 
-    if (loader->m_constantPool.m_entries != NULL) {
-        jtk_Memory_deallocate(loader->m_constantPool.m_entries);
+    if (loader->constantPool.entries != NULL) {
+        jtdeallocate(loader->constantPool.entries);
     }
 
-    jtk_Memory_deallocate(loader);
+    jtdeallocate(loader);
 }
 
 /* The original algorithm ensured that a valid directory was added to the entity
@@ -122,11 +122,11 @@ bool k_SymbolLoader_addDirectory(k_SymbolLoader_t* loader, const uint8_t* direct
     jtk_Assert_assertObject(directory, "The specified directory is null.");
 
     jtk_Path_t* path = jtk_Path_newFromString(directory);
-    jtk_DoublyLinkedList_add(loader->m_directories, path);
+    jtk_DoublyLinkedList_add(loader->directories, path);
 
     // bool result = jtk_Path_isDirectory(path);
     // if (result) {
-    //    jtk_DoublyLinkedList_add(loader->m_directories, path);
+    //    jtk_DoublyLinkedList_add(loader->directories, path);
     // }
     // else {
     //    jtk_Path_delete(path);
@@ -142,7 +142,7 @@ k_Symbol_t* k_SymbolLoader_findSymbol(k_SymbolLoader_t* loader,
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
     jtk_Assert_assertObject(descriptor, "The specified descriptor is null.");
 
-    k_Symbol_t* result = (k_Symbol_t*)jtk_HashMap_getValue(loader->m_symbols, descriptor);
+    k_Symbol_t* result = (k_Symbol_t*)jtk_HashMap_getValue(loader->symbols, descriptor);
     if (result == NULL) {
         result = k_SymbolLoader_loadSymbol(loader, descriptor,
             descriptorSize);
@@ -167,7 +167,7 @@ k_Symbol_t* k_SymbolLoader_loadSymbol(k_SymbolLoader_t* loader,
     jtk_CString_delete(fileName);
 
     /* Retrieve an iterator over the list of registered entity directories. */
-    jtk_Iterator_t* iterator = jtk_DoublyLinkedList_getIterator(loader->m_directories);
+    jtk_Iterator_t* iterator = jtk_DoublyLinkedList_getIterator(loader->directories);
     while (jtk_Iterator_hasNext(iterator)) {
         /* Retrieve the next directory for searching the entity file. */
         jtk_Path_t* directoryPath = (jtk_Path_t*)jtk_Iterator_getNext(iterator);
@@ -191,7 +191,7 @@ k_Symbol_t* k_SymbolLoader_loadSymbol(k_SymbolLoader_t* loader,
                     result = k_SymbolLoader_loadSymbolFromHandle(loader, entityPathHandle);
                     if (result != NULL) {
                         uint8_t* identifier = jtk_CString_newEx(descriptor, descriptorSize);
-                        jtk_HashMap_put(loader->m_symbols, identifier, result);
+                        jtk_HashMap_put(loader->symbols, identifier, result);
                     }
                     else {
                         /* At this point, the entity loader found an entity file. Unfortunately, the
@@ -214,7 +214,7 @@ k_Symbol_t* k_SymbolLoader_loadSymbol(k_SymbolLoader_t* loader,
         }
         else {
             fprintf(stderr, "[warning] Cannot find lookup directory '%s'\n",
-                directoryPath->m_value);
+                directoryPath->value);
         }
     }
     jtk_Path_delete(entityFile);
@@ -230,18 +230,18 @@ k_Symbol_t* k_SymbolLoader_loadSymbolFromHandle(k_SymbolLoader_t* loader,
     jtk_Assert_assertObject(handle, "The specified entity path handle is null.");
 
     k_Symbol_t* result = NULL;
-    jtk_FileInputStream_t* fileInputStream = jtk_FileInputStream_newFromHandle(handle);
+    jtk_FileInputStreat* fileInputStream = jtk_FileInputStreanewFromHandle(handle);
     if (fileInputStream != NULL) {
-        jtk_BufferedInputStream_t* bufferedInputStream = jtk_BufferedInputStream_newEx(
-            fileInputStream->m_inputStream, KUSH_ENTITY_LOADER_BUFFER_SIZE);
-        jtk_InputStream_t* inputStream = bufferedInputStream->m_inputStream;
+        jtk_BufferedInputStreat* bufferedInputStream = jtk_BufferedInputStreanewEx(
+            fileInputStream->inputStream, KUSH_ENTITY_LOADER_BUFFER_SIZE);
+        jtk_InputStreat* inputStream = bufferedInputStream->inputStream;
 
         jtk_ByteArray_t* input = jtk_InputStreamHelper_toByteArray(inputStream);
 
-        result = k_SymbolLoader_parse(loader, input->m_values, input->m_size);
+        result = k_SymbolLoader_parse(loader, input->values, input->size);
 
         jtk_ByteArray_delete(input);
-        jtk_InputStream_destroy(inputStream);
+        jtk_InputStreadestroy(inputStream);
     }
     else {
         // Warning: Failed to load entity from handle.
@@ -255,16 +255,16 @@ k_Symbol_t* k_SymbolLoader_loadSymbolFromHandle(k_SymbolLoader_t* loader,
 bool k_SymbolLoader_shouldIgnoreCorruptEntity(k_SymbolLoader_t* loader) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
 
-    return (loader->m_flags & KUSH_ENTITY_LOADER_FLAG_IGNORE_CORRUPT_ENTITY) != 0;
+    return (loader->flags & KUSH_ENTITY_LOADER_FLAG_IGNORE_CORRUPT_ENTITY) != 0;
 }
 
 void k_SymbolLoader_setIgnoreCorruptEntity(k_SymbolLoader_t* loader,
     bool ignoreCorruptEntity) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
 
-    loader->m_flags = ignoreCorruptEntity?
-        (loader->m_flags | KUSH_ENTITY_LOADER_FLAG_IGNORE_CORRUPT_ENTITY) :
-        (loader->m_flags & ~KUSH_ENTITY_LOADER_FLAG_IGNORE_CORRUPT_ENTITY);
+    loader->flags = ignoreCorruptEntity?
+        (loader->flags | KUSH_ENTITY_LOADER_FLAG_IGNORE_CORRUPT_ENTITY) :
+        (loader->flags & ~KUSH_ENTITY_LOADER_FLAG_IGNORE_CORRUPT_ENTITY);
 }
 
 // Parse
@@ -272,30 +272,30 @@ void k_SymbolLoader_setIgnoreCorruptEntity(k_SymbolLoader_t* loader,
 #define KUSH_FEB_HEADER_SIZE 12
 
 void k_SymbolLoader_parseConstantPool(k_SymbolLoader_t* loader) {
-    jtk_Logger_t* logger = loader->m_compiler->m_logger;
-    k_ConstantPool_t* constantPool = &loader->m_constantPool;
-    constantPool->m_size = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
-    constantPool->m_entries = jtk_Memory_allocate(k_ConstantPoolEntry_t*, loader->m_size + 1);
-    constantPool->m_entries[0] = NULL;
+    jtk_Logger_t* logger = loader->compiler->logger;
+    k_ConstantPool_t* constantPool = &loader->constantPool;
+    constantPool->size = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
+    constantPool->entries = jtallocate(k_ConstantPoolEntry_t*, loader->size + 1);
+    constantPool->entries[0] = NULL;
 
     int32_t i;
-    for (i = 1; i <= constantPool->m_size; i++) {
-        uint8_t tag = loader->m_bytes[loader->m_index++];
+    for (i = 1; i <= constantPool->size; i++) {
+        uint8_t tag = loader->bytes[loader->index++];
 
         switch (tag) {
             case KUSH_CONSTANT_POOL_TAG_INTEGER: {
-                uint32_t value = ((loader->m_bytes[loader->m_index++] & 0xFF) << 24) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 16) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint32_t value = ((loader->bytes[loader->index++] & 0xFF) << 24) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 16) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
 
                 k_ConstantPoolInteger_t* constantPoolInteger =
-                    jtk_Memory_allocate(k_ConstantPoolInteger_t, 1);
-                constantPoolInteger->m_tag = KUSH_CONSTANT_POOL_TAG_INTEGER;
-                constantPoolInteger->m_bytes = value;
+                    jtallocate(k_ConstantPoolInteger_t, 1);
+                constantPoolInteger->tag = KUSH_CONSTANT_POOL_TAG_INTEGER;
+                constantPoolInteger->bytes = value;
 
-                constantPool->m_entries[i] = constantPoolInteger;
+                constantPool->entries[i] = constantPoolInteger;
 
                 jtk_Logger_debug(logger, "Parsed constant pool entry `k_ConstantPoolInteger_t`, stored at index %d.", i);
 
@@ -303,69 +303,69 @@ void k_SymbolLoader_parseConstantPool(k_SymbolLoader_t* loader) {
             }
 
             case KUSH_CONSTANT_POOL_TAG_LONG: {
-                uint32_t highBytes = ((loader->m_bytes[loader->m_index++] & 0xFF) << 24) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 16) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint32_t lowBytes = ((loader->m_bytes[loader->m_index++] & 0xFF) << 24) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 16) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint32_t highBytes = ((loader->bytes[loader->index++] & 0xFF) << 24) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 16) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint32_t lowBytes = ((loader->bytes[loader->index++] & 0xFF) << 24) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 16) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
 
-                k_ConstantPoolLong_t* constantPoolLong = jtk_Memory_allocate(k_ConstantPoolLong_t, 1);
-                constantPoolLong->m_tag = KUSH_CONSTANT_POOL_TAG_LONG;
-                constantPoolLong->m_highBytes = highBytes;
-                constantPoolLong->m_lowBytes = lowBytes;
+                k_ConstantPoolLong_t* constantPoolLong = jtallocate(k_ConstantPoolLong_t, 1);
+                constantPoolLong->tag = KUSH_CONSTANT_POOL_TAG_LONG;
+                constantPoolLong->highBytes = highBytes;
+                constantPoolLong->lowBytes = lowBytes;
 
-                constantPool->m_entries[i] = constantPoolLong;
+                constantPool->entries[i] = constantPoolLong;
 
-                // jtk_Logger_info(parser->m_logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolLong_t`, stored at index %d.", index);
+                // jtk_Logger_info(parser->logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolLong_t`, stored at index %d.", index);
 
                 break;
             }
 
             case KUSH_CONSTANT_POOL_TAG_FLOAT: {
-                uint32_t value = ((loader->m_bytes[loader->m_index++] & 0xFF) << 24) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 16) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint32_t value = ((loader->bytes[loader->index++] & 0xFF) << 24) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 16) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
 
-                k_ConstantPoolFloat_t* constantPoolFloat = jtk_Memory_allocate(k_ConstantPoolFloat_t, 1);
-                constantPoolFloat->m_tag = KUSH_CONSTANT_POOL_TAG_FLOAT;
-                constantPoolFloat->m_bytes = value;
+                k_ConstantPoolFloat_t* constantPoolFloat = jtallocate(k_ConstantPoolFloat_t, 1);
+                constantPoolFloat->tag = KUSH_CONSTANT_POOL_TAG_FLOAT;
+                constantPoolFloat->bytes = value;
 
-                constantPool->m_entries[i] = constantPoolFloat;
+                constantPool->entries[i] = constantPoolFloat;
 
-                // jtk_Logger_info(parser->m_logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolFloat_t`, stored at index %d.", index);
+                // jtk_Logger_info(parser->logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolFloat_t`, stored at index %d.", index);
 
                 break;
             }
 
             case KUSH_CONSTANT_POOL_TAG_DOUBLE: {
-                uint32_t highBytes = ((loader->m_bytes[loader->m_index++] & 0xFF) << 24) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 16) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint32_t lowBytes = ((loader->m_bytes[loader->m_index++] & 0xFF) << 24) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 16) |
-                    ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint32_t highBytes = ((loader->bytes[loader->index++] & 0xFF) << 24) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 16) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint32_t lowBytes = ((loader->bytes[loader->index++] & 0xFF) << 24) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 16) |
+                    ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
 
-                k_ConstantPoolDouble_t* constantPoolDouble = jtk_Memory_allocate(k_ConstantPoolDouble_t, 1);
-                constantPoolDouble->m_tag = KUSH_CONSTANT_POOL_TAG_DOUBLE;
-                constantPoolDouble->m_highBytes = highBytes;
-                constantPoolDouble->m_lowBytes = lowBytes;
+                k_ConstantPoolDouble_t* constantPoolDouble = jtallocate(k_ConstantPoolDouble_t, 1);
+                constantPoolDouble->tag = KUSH_CONSTANT_POOL_TAG_DOUBLE;
+                constantPoolDouble->highBytes = highBytes;
+                constantPoolDouble->lowBytes = lowBytes;
 
-                constantPool->m_entries[i] = constantPoolDouble;
+                constantPool->entries[i] = constantPoolDouble;
 
-                // jtk_Logger_info(parser->m_logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolDouble_t`, stored at index %d.", index);
+                // jtk_Logger_info(parser->logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolDouble_t`, stored at index %d.", index);
 
                 break;
             }
 
             case KUSH_CONSTANT_POOL_TAG_UTF8: {
-                uint16_t length = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint16_t length = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
                 /* The specification guarantees that an empty string is never stored in a constant pool.
                  *
                  * Although the speciication does not specify the bytes to be null-terminated,
@@ -373,18 +373,18 @@ void k_SymbolLoader_parseConstantPool(k_SymbolLoader_t* loader) {
                  * entries for performance.
                  */
 
-                uint8_t* value = jtk_Memory_allocate(uint8_t, length + 1);
+                uint8_t* value = jtallocate(uint8_t, length + 1);
                 value[length] = '\0';
-                jtk_Arrays_copyEx_b(loader->m_bytes, loader->m_size, loader->m_index,
+                jtk_Arrays_copyEx_b(loader->bytes, loader->size, loader->index,
                     value, length, 0, length);
-                loader->m_index += length;
+                loader->index += length;
 
-                k_ConstantPoolUtf8_t* constantPoolUtf8 = jtk_Memory_allocate(k_ConstantPoolUtf8_t, 1);
-                constantPoolUtf8->m_tag = KUSH_CONSTANT_POOL_TAG_UTF8;
-                constantPoolUtf8->m_length = length;
-                constantPoolUtf8->m_bytes = value;
+                k_ConstantPoolUtf8_t* constantPoolUtf8 = jtallocate(k_ConstantPoolUtf8_t, 1);
+                constantPoolUtf8->tag = KUSH_CONSTANT_POOL_TAG_UTF8;
+                constantPoolUtf8->length = length;
+                constantPoolUtf8->bytes = value;
 
-                constantPool->m_entries[i] = constantPoolUtf8;
+                constantPool->entries[i] = constantPoolUtf8;
 
                 // jtk_Logger_debug(logger, "Parsed constant pool entry `k_ConstantPoolUtf8_t`, stored at index %d.", index);
 
@@ -392,76 +392,76 @@ void k_SymbolLoader_parseConstantPool(k_SymbolLoader_t* loader) {
             }
 
             case KUSH_CONSTANT_POOL_TAG_STRING: {
-                uint16_t stringIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint16_t stringIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
 
-                k_ConstantPoolString_t* constantPoolString = jtk_Memory_allocate(k_ConstantPoolString_t, 1);
-                constantPoolString->m_tag = KUSH_CONSTANT_POOL_TAG_STRING;
-                constantPoolString->m_stringIndex = stringIndex;
+                k_ConstantPoolString_t* constantPoolString = jtallocate(k_ConstantPoolString_t, 1);
+                constantPoolString->tag = KUSH_CONSTANT_POOL_TAG_STRING;
+                constantPoolString->stringIndex = stringIndex;
 
-                constantPool->m_entries[i] = constantPoolString;
+                constantPool->entries[i] = constantPoolString;
 
-                // jtk_Logger_info(parser->m_logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolString_t`, stored at index %d.", index);
+                // jtk_Logger_info(parser->logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolString_t`, stored at index %d.", index);
 
                 break;
             }
 
             case KUSH_CONSTANT_POOL_TAG_FUNCTION: {
-                uint16_t classIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t descriptorIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t nameIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t tableIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint16_t classIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint16_t descriptorIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint16_t nameIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint16_t tableIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
 
-                k_ConstantPoolFunction_t* constantPoolFunction = jtk_Memory_allocate(k_ConstantPoolFunction_t, 1);
-                constantPoolFunction->m_tag = KUSH_CONSTANT_POOL_TAG_FUNCTION;
-                constantPoolFunction->m_classIndex = classIndex;
-                constantPoolFunction->m_descriptorIndex = descriptorIndex;
-                constantPoolFunction->m_nameIndex = nameIndex;
-                constantPoolFunction->m_tableIndex = tableIndex;
+                k_ConstantPoolFunction_t* constantPoolFunction = jtallocate(k_ConstantPoolFunction_t, 1);
+                constantPoolFunction->tag = KUSH_CONSTANT_POOL_TAG_FUNCTION;
+                constantPoolFunction->classIndex = classIndex;
+                constantPoolFunction->descriptorIndex = descriptorIndex;
+                constantPoolFunction->nameIndex = nameIndex;
+                constantPoolFunction->tableIndex = tableIndex;
 
-                constantPool->m_entries[i] = constantPoolFunction;
+                constantPool->entries[i] = constantPoolFunction;
 
-                // jtk_Logger_info(parser->m_logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolFunction_t`, stored at index %d.", index);
+                // jtk_Logger_info(parser->logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolFunction_t`, stored at index %d.", index);
 
                 break;
             }
 
             case KUSH_CONSTANT_POOL_TAG_FIELD: {
-                uint16_t classIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t descriptorIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t nameIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint16_t classIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint16_t descriptorIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint16_t nameIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
 
-                k_ConstantPoolField_t* constantPoolField = jtk_Memory_allocate(k_ConstantPoolField_t, 1);
-                constantPoolField->m_tag = KUSH_CONSTANT_POOL_TAG_FIELD;
-                constantPoolField->m_classIndex = classIndex;
-                constantPoolField->m_descriptorIndex = descriptorIndex;
-                constantPoolField->m_nameIndex = nameIndex;
+                k_ConstantPoolField_t* constantPoolField = jtallocate(k_ConstantPoolField_t, 1);
+                constantPoolField->tag = KUSH_CONSTANT_POOL_TAG_FIELD;
+                constantPoolField->classIndex = classIndex;
+                constantPoolField->descriptorIndex = descriptorIndex;
+                constantPoolField->nameIndex = nameIndex;
 
-                constantPool->m_entries[i] = constantPoolField;
+                constantPool->entries[i] = constantPoolField;
 
-                // jtk_Logger_info(parser->m_logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolField_t`, stored at index %d.", index);
+                // jtk_Logger_info(parser->logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolField_t`, stored at index %d.", index);
 
                 break;
             }
 
             case KUSH_CONSTANT_POOL_TAG_CLASS: {
-                uint16_t nameIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint16_t nameIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
 
-                k_ConstantPoolClass_t* constantPoolClass = jtk_Memory_allocate(k_ConstantPoolClass_t, 1);
-                constantPoolClass->m_tag = KUSH_CONSTANT_POOL_TAG_CLASS;
-                constantPoolClass->m_nameIndex = nameIndex;
+                k_ConstantPoolClass_t* constantPoolClass = jtallocate(k_ConstantPoolClass_t, 1);
+                constantPoolClass->tag = KUSH_CONSTANT_POOL_TAG_CLASS;
+                constantPoolClass->nameIndex = nameIndex;
 
-                constantPool->m_entries[i] = constantPoolClass;
+                constantPool->entries[i] = constantPoolClass;
 
-                // jtk_Logger_info(parser->m_logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolClass_t`, stored at index %d.", index);
+                // jtk_Logger_info(parser->logger, KUSH_BINARY_ENTITY_PARSER_TAG, "Parsed constant pool entry `k_ConstantPoolClass_t`, stored at index %d.", index);
 
                 break;
             }
@@ -470,38 +470,38 @@ void k_SymbolLoader_parseConstantPool(k_SymbolLoader_t* loader) {
 }
 
 void k_SymbolLoader_skipAttributeTable(k_SymbolLoader_t* loader) {
-    uint16_t size = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
+    uint16_t size = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
     int32_t i;
     for (i = 0; i < size; i++) {
-        uint16_t nameIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
-        uint32_t length = ((loader->m_bytes[loader->m_index++] & 0xFF) << 24) |
-            ((loader->m_bytes[loader->m_index++] & 0xFF) << 16) |
-            ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-            (loader->m_bytes[loader->m_index++] & 0xFF);
+        uint16_t nameIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
+        uint32_t length = ((loader->bytes[loader->index++] & 0xFF) << 24) |
+            ((loader->bytes[loader->index++] & 0xFF) << 16) |
+            ((loader->bytes[loader->index++] & 0xFF) << 8) |
+            (loader->bytes[loader->index++] & 0xFF);
 
         /* Skip the bytes occupied by the unrecognized attribute. */
-        loader->m_index += length;
+        loader->index += length;
     }
 }
 
 void k_SymbolLoader_parseField(k_SymbolLoader_t* loader) {
     // Flags
-    uint16_t flags = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
+    uint16_t flags = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
 
     // Name Index
-    uint16_t nameIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
+    uint16_t nameIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
 
     // Descriptor Index
-    uint16_t descriptorIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
+    uint16_t descriptorIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
 
     // Table Index
-    uint16_t tableIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
+    uint16_t tableIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
 
     // Define field
 
@@ -512,7 +512,7 @@ void k_SymbolLoader_parseField(k_SymbolLoader_t* loader) {
 void k_SymbolLoader_declareFunction(k_SymbolLoader_t* loader,
     k_Symbol_t* symbol, const uint8_t* descriptor, int32_t descriptorSize,
     uint16_t modifiers, uint16_t tableIndex) {
-    k_FunctionSymbol_t* functionSymbol = &symbol->m_context.m_asFunction;
+    k_FunctionSymbol_t* functionSymbol = &symbol->context.asFunction;
     k_FunctionSignature_t* signature = k_FunctionSignature_newEx(descriptor, descriptorSize,
         modifiers, tableIndex);
     k_FunctionSymbol_addSignature(functionSymbol, signature);
@@ -522,117 +522,117 @@ static const uint8_t* newName = "new";
 
 void k_SymbolLoader_parseFunction(k_SymbolLoader_t* loader) {
     // Flags
-    uint16_t flags = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
+    uint16_t flags = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
 
     // Name Index
-    uint16_t nameIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
-    k_ConstantPoolUtf8_t* name = loader->m_constantPool.m_entries[nameIndex];
+    uint16_t nameIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
+    k_ConstantPoolUtf8_t* name = loader->constantPool.entries[nameIndex];
 
     // Descriptor Index
-    uint16_t descriptorIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
-    k_ConstantPoolUtf8_t* descriptor = loader->m_constantPool.m_entries[descriptorIndex];
+    uint16_t descriptorIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
+    k_ConstantPoolUtf8_t* descriptor = loader->constantPool.entries[descriptorIndex];
 
     /* NOTE: Parameter threshold set by a statically typed language prevents
      * a dynamically typed language such as KUSH from declaring functions with
      * variable parameters.
      */
-    // uint16_t parameterThreshold = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-    //     (loader->m_bytes[loader->m_index++] & 0xFF);
+    // uint16_t parameterThreshold = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+    //     (loader->bytes[loader->index++] & 0xFF);
 
-    uint16_t tableIndex = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-        (loader->m_bytes[loader->m_index++] & 0xFF);
+    uint16_t tableIndex = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+        (loader->bytes[loader->index++] & 0xFF);
 
     // Define function
-    k_Symbol_t* classSymbol = loader->m_symbol;
-    k_Scope_t* classScope = classSymbol->m_context.m_asClass.m_classScope;
-    k_Symbol_t* functionSymbol = k_Scope_resolve(classScope, descriptor->m_bytes);
+    k_Symbol_t* classSymbol = loader->symbol;
+    k_Scope_t* classScope = classSymbol->context.asClass.classScope;
+    k_Symbol_t* functionSymbol = k_Scope_resolve(classScope, descriptor->bytes);
     if (functionSymbol == NULL) {
         functionSymbol = k_Symbol_forFunction(NULL, classScope);
-        const uint8_t* name0 = name->m_bytes;
-        int32_t nameSize0 = name->m_length;
-        if (jtk_CString_equals(name->m_bytes, name->m_length, "<initialize>", 12)) {
+        const uint8_t* name0 = name->bytes;
+        int32_t nameSize0 = name->length;
+        if (jtk_CString_equals(name->bytes, name->length, "<initialize>", 12)) {
             name0 = newName;
             nameSize0 = 3;
         }
-        functionSymbol->m_name = name0;
-        functionSymbol->m_nameSize = nameSize0;
-        functionSymbol->m_modifiers = flags;
+        functionSymbol->name = name0;
+        functionSymbol->nameSize = nameSize0;
+        functionSymbol->modifiers = flags;
         k_Scope_defineEx(classScope, name0, nameSize0, functionSymbol);
     }
-    k_SymbolLoader_declareFunction(loader, functionSymbol, descriptor->m_bytes,
-        descriptor->m_length, flags, tableIndex);
+    k_SymbolLoader_declareFunction(loader, functionSymbol, descriptor->bytes,
+        descriptor->length, flags, tableIndex);
 
     // Skip attribute table
     k_SymbolLoader_skipAttributeTable(loader);
 }
 
 void k_SymbolLoader_destroyConstantPool(k_SymbolLoader_t* loader) {
-    k_ConstantPool_t* constantPool = &loader->m_constantPool;
+    k_ConstantPool_t* constantPool = &loader->constantPool;
     int32_t i;
-    for (i = 1; i <= constantPool->m_size; i++) {
-        k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)constantPool->m_entries[i];
-        if (entry->m_tag == KUSH_CONSTANT_POOL_TAG_UTF8) {
+    for (i = 1; i <= constantPool->size; i++) {
+        k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)constantPool->entries[i];
+        if (entry->tag == KUSH_CONSTANT_POOL_TAG_UTF8) {
             k_ConstantPoolUtf8_t* utf8Entry = (k_ConstantPoolUtf8_t*)entry;
-            jtk_Memory_deallocate(utf8Entry->m_bytes);
+            jtdeallocate(utf8Entry->bytes);
         }
-        jtk_Memory_deallocate(entry);
+        jtdeallocate(entry);
     }
-    jtk_Memory_deallocate(loader->m_constantPool.m_entries);
+    jtdeallocate(loader->constantPool.entries);
 }
 
 k_Symbol_t* k_SymbolLoader_parse(k_SymbolLoader_t* loader, uint8_t* bytes,
     int32_t size) {
-    k_Compiler_t* compiler = loader->m_compiler;
-    k_ErrorHandler_t* errorHandler = compiler->m_errorHandler;
-    jtk_Logger_t* logger = compiler->m_logger;
+    k_Compiler_t* compiler = loader->compiler;
+    k_ErrorHandler_t* errorHandler = compiler->errorHandler;
+    jtk_Logger_t* logger = compiler->logger;
 
-    loader->m_bytes = bytes;
-    loader->m_size = size;
+    loader->bytes = bytes;
+    loader->size = size;
 
-    if (loader->m_index + KUSH_FEB_HEADER_SIZE < size) {
-        uint32_t magicNumber = ((loader->m_bytes[loader->m_index++] & 0xFF) << 24) |
-                               ((loader->m_bytes[loader->m_index++] & 0xFF) << 16) |
-                               ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                               (loader->m_bytes[loader->m_index++] & 0xFF);
+    if (loader->index + KUSH_FEB_HEADER_SIZE < size) {
+        uint32_t magicNumber = ((loader->bytes[loader->index++] & 0xFF) << 24) |
+                               ((loader->bytes[loader->index++] & 0xFF) << 16) |
+                               ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                               (loader->bytes[loader->index++] & 0xFF);
         if (magicNumber == KUSH_BINARY_ENTITY_FORMAT_MAGIC_NUMBER) {
-            uint16_t majorVersion = (uint16_t)(((uint32_t)(loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                (loader->m_bytes[loader->m_index++] & 0xFF));
-            uint16_t minorVersion = (uint16_t)(((uint32_t)(loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                (loader->m_bytes[loader->m_index++] & 0xFF));
+            uint16_t majorVersion = (uint16_t)(((uint32_t)(loader->bytes[loader->index++] & 0xFF) << 8) |
+                (loader->bytes[loader->index++] & 0xFF));
+            uint16_t minorVersion = (uint16_t)(((uint32_t)(loader->bytes[loader->index++] & 0xFF) << 8) |
+                (loader->bytes[loader->index++] & 0xFF));
 
             if ((majorVersion < KUSH_BINARY_ENTITY_FORMAT_MAJOR_VERSION) ||
                 ((majorVersion == KUSH_BINARY_ENTITY_FORMAT_MAJOR_VERSION) &&
                 (minorVersion <= KUSH_BINARY_ENTITY_FORMAT_MINOR_VERSION))) {
-                uint16_t entityFlags = (uint16_t)(((uint32_t)(loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF));
+                uint16_t entityFlags = (uint16_t)(((uint32_t)(loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF));
 
                 // Constant Pool
                 k_SymbolLoader_parseConstantPool(loader);
 
                 /* Parse the entity */
-                uint8_t type = (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t flags = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                                (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t reference = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                                (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t superclassCount = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t* superclasses = k_Memory_allocate(uint16_t, superclassCount);
+                uint8_t type = (loader->bytes[loader->index++] & 0xFF);
+                uint16_t flags = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                                (loader->bytes[loader->index++] & 0xFF);
+                uint16_t reference = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                                (loader->bytes[loader->index++] & 0xFF);
+                uint16_t superclassCount = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint16_t* superclasses = allocate(uint16_t, superclassCount);
                 int32_t i;
                 for (i = 0; i < superclassCount; i++) {
-                    superclasses[i] = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                        (loader->m_bytes[loader->m_index++] & 0xFF);
+                    superclasses[i] = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                        (loader->bytes[loader->index++] & 0xFF);
                 }
 
-                k_ConstantPoolUtf8_t* descriptor = loader->m_constantPool.m_entries[reference];
+                k_ConstantPoolUtf8_t* descriptor = loader->constantPool.entries[reference];
 
                 k_Scope_t* classScope = k_Scope_forClass(NULL);
-                loader->m_symbol = k_Symbol_forClassAlt( classScope, descriptor->m_bytes,
-                    descriptor->m_length);
-                classScope->m_symbol = loader->m_symbol;
+                loader->symbol = k_Symbol_forClassAlt( classScope, descriptor->bytes,
+                    descriptor->length);
+                classScope->symbol = loader->symbol;
 
                 /* Skip attribute table */
                 k_SymbolLoader_skipAttributeTable(loader);
@@ -640,10 +640,10 @@ k_Symbol_t* k_SymbolLoader_parse(k_SymbolLoader_t* loader, uint8_t* bytes,
                 /* Parse fields
                  * fieldCount fieldEntity*
                  */
-                uint16_t fieldCount = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t fieldTableSize = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint16_t fieldCount = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint16_t fieldTableSize = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
                 int32_t j;
                 for (j = 0; j < fieldCount; j++) {
                     k_SymbolLoader_parseField(loader);
@@ -653,10 +653,10 @@ k_Symbol_t* k_SymbolLoader_parse(k_SymbolLoader_t* loader, uint8_t* bytes,
                  * functionCount functionEntity*
                  */
 
-                uint16_t functionCount = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
-                uint16_t functionTableSize = ((loader->m_bytes[loader->m_index++] & 0xFF) << 8) |
-                    (loader->m_bytes[loader->m_index++] & 0xFF);
+                uint16_t functionCount = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
+                uint16_t functionTableSize = ((loader->bytes[loader->index++] & 0xFF) << 8) |
+                    (loader->bytes[loader->index++] & 0xFF);
                 int32_t k;
                 for (k = 0; k < functionCount; k++) {
                     k_SymbolLoader_parseFunction(loader);
@@ -671,20 +671,20 @@ k_Symbol_t* k_SymbolLoader_parse(k_SymbolLoader_t* loader, uint8_t* bytes,
         }
     }
 
-    k_Symbol_t* result = loader->m_symbol;
+    k_Symbol_t* result = loader->symbol;
 
 
     /* Reset the symbol loader. */
-    loader->m_index = 0;
-    loader->m_bytes = NULL;
-    loader->m_size = 0;
+    loader->index = 0;
+    loader->bytes = NULL;
+    loader->size = 0;
     // TODO: The constant pool needs to be freed.
-    /*if (loader->m_constantPool.m_entries != NULL) {
+    /*if (loader->constantPool.entries != NULL) {
         k_SymbolLoader_destroyConstantPool(loader);
     }*/
-    loader->m_constantPool.m_size = 0;
-    loader->m_constantPool.m_entries = NULL;
-    loader->m_symbol = NULL;
+    loader->constantPool.size = 0;
+    loader->constantPool.entries = NULL;
+    loader->symbol = NULL;
 
     return result;
 }
@@ -725,20 +725,20 @@ int SymbolLoader()
 	}
 
 	k_Module_t* k = malloc(sizeof(k_Module_t));
-	k->m_magicNumber = magicNumber;
-	k->m_majorVersion = majorVersion;
-	k->m_minorVersion = minorVersion;
-	k->m_structureCount = structureCount;
-	k->m_functionCount = functionCount;
+	k->magicNumber = magicNumber;
+	k->majorVersion = majorVersion;
+	k->minorVersion = minorVersion;
+	k->structureCount = structureCount;
+	k->functionCount = functionCount;
 
 	// Serializing Structures
-	for(int i = 0; i < k->m_structureCount; ++i) {
-		k->m_structures = structures[i];
+	for(int i = 0; i < k->structureCount; ++i) {
+		k->structures = structures[i];
 	}
 
 	// Serializing Functions
-	for(int i = 0; i < k->m_functionCount; ++i) {
-		k->m_functions = functions[i];
+	for(int i = 0; i < k->functionCount; ++i) {
+		k->functions = functions[i];
 	}
 
 	k_Structure_t* parseStructure() {
@@ -766,12 +766,12 @@ int SymbolLoader()
 		}
 
 		k_Structure_t* k = malloc(sizeof(k_Structure_t));
-		k->m_flags = flags;
-		k->m_nameSize = nameSize;
-		k->m_name = name;
-		k->m_attributeCount = attributeCount;
-		k->m_attributeNameSizes = attributeNameSizes;
-		k->m_attributeNames = attributeNames;
+		k->flags = flags;
+		k->nameSize = nameSize;
+		k->name = name;
+		k->attributeCount = attributeCount;
+		k->attributeNameSizes = attributeNameSizes;
+		k->attributeNames = attributeNames;
 		return k;
 	}
 
@@ -797,13 +797,13 @@ int SymbolLoader()
 		}
 
 		k_Function_t* k = malloc(sizeof(k_Function_t));
-		k->m_flags = flags;
-		k->m_nameSize = nameSize;
-		k->m_name = name;
-		k->m_signatureSize = signatureSize;
-		k->m_signature = signature;
-		k->m_captureCount = captureCount;
-		k->m_captures = captures;
+		k->flags = flags;
+		k->nameSize = nameSize;
+		k->name = name;
+		k->signatureSize = signatureSize;
+		k->signature = signature;
+		k->captureCount = captureCount;
+		k->captures = captures;
 		return k;
 	}
 	return k;
