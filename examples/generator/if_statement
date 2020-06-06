@@ -1,0 +1,13 @@
+if (<.if_clause_condition>) {
+    <.if_clause_statements>
+}
+<@else_if_clauses>
+else if (<.condition>) {
+    <.statements>
+}
+</>
+<?else_clause_statements>
+else {
+    <.else_clause_statements>
+}
+</>

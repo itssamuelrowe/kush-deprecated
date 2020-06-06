@@ -1,0 +1,15 @@
+<@headers>
+#include <<$>>
+</>
+
+<@prototypes>
+<$>
+</>
+
+<@functions>
+<.returnType> <.name>(<@parameters><.type> <.name></>) {
+    <@statements>
+    <$>
+    </>
+}
+</>

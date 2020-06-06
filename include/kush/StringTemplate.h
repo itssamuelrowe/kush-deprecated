@@ -6,6 +6,40 @@
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
 
+/* Optionally, a map template entry may be associated with a tag. This allows
+ * a template to invoke another template.
+ * [main.template]
+ * ```
+ * <.names>
+ * <$>
+ * </>
+ * ```
+ * [full_name.template]
+ * ```
+ * <.first_name> <.last_name>
+ * ```
+ *
+ * We feed the renderer:
+ * ```
+ * {
+ *  [
+ *      {
+ *          "$tag": "full_name"
+ *          "first_name": "Samuel"
+ *          "last_name": "Rowe"
+ *      },
+ *      {
+ *          "$tag": "full_name"
+ *          "first_name": "Joel"
+ *          "last_name": "Rego"
+ *      }
+ *  ]
+ * }
+ * ```
+ *
+ * Without tags, the render would not know how to render an object.
+ */
+
 #define TEMPLATE_ENTRY_STRING 0
 #define TEMPLATE_ENTRY_INTEGER 1
 #define TEMPLATE_ENTRY_DECIMAL 2

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <kush/StringTemplate.h>
 
 int main() {
