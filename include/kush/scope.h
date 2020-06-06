@@ -22,9 +22,27 @@
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
 
-#include <kush/symbol-table/ScopeType.h>
+/*******************************************************************************
+ * ScopeType                                                                   *
+ *******************************************************************************/
 
-typedef struct k_Symbol_t k_Symbol_t;
+/**
+ * @class ScopeType
+ * @ingroup k_compiler_symbolTable
+ * @author Samuel Rowe
+ * @since Kush 0.1
+ */
+enum k_ScopeType_t {
+    KUSH_SCOPE_COMPILATION_UNIT,
+    KUSH_SCOPE_STRUCTURE,
+    KUSH_SCOPE_FUNCTION,
+    KUSH_SCOPE_LOCAL
+};
+
+/**
+ * @memberof ScopeType
+ */
+typedef enum k_ScopeType_t k_ScopeType_t;
 
 /*******************************************************************************
  * Scope                                                                       *

@@ -26,6 +26,100 @@
 #include <kush/support/ErrorCode.h>
 
 /*******************************************************************************
+ * ErrorCode                                                                   *
+ *******************************************************************************/
+
+/**
+ * @class ErrorCode
+ * @ingroup k_compiler_support
+ * @author Samuel Rowe
+ * @since Kush 0.1
+ */
+enum k_ErrorCode_t {
+    KUSH_ERROR_CODE_NONE = 0,
+
+    // Lexcial Errors
+
+    KUSH_ERROR_CODE_UNTERMINATED_STRING_LITERAL,
+    KUSH_ERROR_CODE_UNTERMINATED_MULTI_LINE_COMMENT,
+    KUSH_ERROR_CODE_MALFORMED_UNICODE_CHARACTER_SEQUENCE,
+    KUSH_ERROR_CODE_INVALID_ESCAPE_SEQUENCE,
+    KUSH_ERROR_CODE_UNKNOWN_CHARACTER,
+    KUSH_ERROR_CODE_INVALID_INTEGER_LITERAL_PREFIX,
+    KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE,
+
+    // Syntactical Errors
+
+    KUSH_ERROR_CODE_UNEXPECTED_TOKEN,
+    KUSH_ERROR_CODE_TRY_STATEMENT_EXPECTS_CATCH_OR_FINALLY,
+
+    // Semantical Errors
+
+    KUSH_ERROR_CODE_UNDECLARED_CLASS,
+    KUSH_ERROR_CODE_INVALID_LVALUE,
+    KUSH_ERROR_CODE_INSTANTIATION_OF_NON_CLASS_SYMBOL,
+    KUSH_ERROR_CODE_NO_SUITABLE_CONSTRUCTOR,
+    KUSH_ERROR_CODE_UNDECLARED_IDENTIFIER,
+    KUSH_ERROR_CODE_VARIABLE_TREATED_AS_FUNCTION,
+    KUSH_ERROR_CODE_STATIC_INITIALIZER_WITH_PARAMETERS,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_FUNCTION,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_PARAMETER,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_VARIABLE_PARAMETER,
+    KUSH_ERROR_CODE_MULTIPLE_FUNCTION_OVERLOADS_WITH_VARIABLE_PARAMETER,
+    KUSH_ERROR_CODE_DUPLICATE_FUNCTION_OVERLOAD,
+    KUSH_ERROR_CODE_FUNCTION_DECLARATION_EXCEEDS_PARAMETER_THRESHOLD,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_VARIABLE,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CONSTANT,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_LABEL,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_LOOP_PARAMETER,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CATCH_PARAMETER,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_AS_CLASS,
+    KUSH_ERROR_CODE_UNKNOWN_CLASS,
+    KUSH_ERROR_CODE_REDECLARATION_OF_SYMBOL_PREVIOUSLY_IMPORTED,
+    KUSH_ERROR_CODE_CANNOT_DECLARE_MULTIPLE_TYPES_OF_COMPONENT,
+    KUSH_ERROR_CODE_FUNCTION_DECLARATION_CAUSES_ANOTHER_FUNCTION_TO_EXCEED_PARAMETER_THRESHOLD,
+
+    // General Errors
+
+    KUSH_ERROR_CODE_CORRUPTED_BINARY_ENTITY,
+    KUSH_ERROR_CODE_INVALID_FEB_VERSION,
+
+    KUSH_ERROR_CODE_COUNT
+};
+
+typedef enum k_ErrorCode_t k_ErrorCode_t;
+
+/*******************************************************************************
+ * Error                                                                       *
+ *******************************************************************************/
+
+/**
+ * @class Error
+ * @ingroup k_compiler_support
+ * @author Samuel Rowe
+ * @since Kush 0.1
+ */
+struct k_Error_t {
+    k_ErrorCode_t code;
+    k_Token_t* token;
+    k_TokenType_t expected;
+};
+
+/**
+ * @memberof Error
+ */
+typedef struct k_Error_t k_Error_t;
+
+// Constructor
+
+k_Error_t* k_Error_new(k_ErrorCode_t errorCode, k_Token_t* token);
+k_Error_t* k_Error_newEx(k_ErrorCode_t errorCode, k_Token_t* token, k_TokenType_t expected);
+
+// Destructor
+
+void k_Error_delete(k_Error_t* error);
+
+/*******************************************************************************
  * ErrorHandler                                                                *
  *******************************************************************************/
 
