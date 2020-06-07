@@ -90,17 +90,17 @@ enum ContextType {
 
     CONTEXT_IMPORT_DECLARATION,
 
-    CONTEXT_FUNCTION_DECLARATION,
+    CONTEXT_FUNCTION,
 
     CONTEXT_FUNCTION_PARAMETER,
 
-    CONTEXT_BLOCSTATEMENT,
+    CONTEXT_BLOCK,
 
     CONTEXT_VARIABLE_DECLARATION,
 
     CONTEXT_VARIABLE_DECLARATOR,
 
-    CONTEXT_BREASTATEMENT,
+    CONTEXT_BREAK_STATEMENT,
 
     CONTEXT_RETURN_STATEMENT,
 
@@ -116,7 +116,7 @@ enum ContextType {
 
     CONTEXT_CATCH_CLAUSE,
 
-    CONTEXT_STRUCTURE_DECLARATION,
+    CONTEXT_STRUCTURE,
 
     CONTEXT_ASSIGNMENT_EXPRESSION,
 
@@ -215,9 +215,9 @@ typedef struct ConditionalExpression ConditionalExpression;
 
 struct ConditionalExpression {
     ContextType tag;
-    BinaryExpression* logicalOrExpression;
-    BinaryExpression* thenExpression;
-    ConditionalExpression* elseExpression;
+    BinaryExpression* condition;
+    BinaryExpression* then;
+    ConditionalExpression* otherwise;
 };
 
 /*******************************************************************************
@@ -415,6 +415,9 @@ typedef struct TryStatement TryStatement;
  * CatchClause                                                                 *
  *******************************************************************************/
 
+/**
+ * Not part of the AST.
+ */
 struct CatchClause {
     jtk_ArrayList_t* captures;
     Token* parameter;
@@ -427,8 +430,10 @@ typedef struct CatchClause CatchClause;
  * Variable                                                                    *
  *******************************************************************************/
 
+/**
+ * Not part of the AST.
+ */
 struct Variable {
-    ContextType tag;
     bool infer;
     bool constant;
     Token* baseType;
@@ -466,22 +471,22 @@ typedef struct ThrowStatement ThrowStatement;
  * ReturnStatement                                                             *
  *******************************************************************************/
 
-struct ReturnStatement_t {
+struct ReturnStatement {
     ContextType tag;
     BinaryExpression* expression;
 };
 
-typedef struct ReturnStatement_t ReturnStatement_t;
+typedef struct ReturnStatement ReturnStatement;
 
 /*******************************************************************************
  * BreakStatement                                                              *
  *******************************************************************************/
 
-struct BreakStatement_t {
+struct BreakStatement {
     ContextType tag;
     Token* identifier;
 };
 
-typedef struct BreakStatement_t BreakStatement_t;
+typedef struct BreakStatement BreakStatement;
 
 #endif /* KUSH_PARSER_CONTEXT_H */

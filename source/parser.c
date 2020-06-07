@@ -138,7 +138,7 @@ static const char ruleNames[][50] = {
     "structureDeclaration",
     "assignmentExpression",
     "conditionalExpression",
-    "logicalOrExpression",
+    "condition",
     "logicalAndExpression",
     "inclusiveOrExpression",
     "exclusiveOrExpression",
@@ -1118,8 +1118,8 @@ void parseStorageDeclarator(Parser* parser, Variable* declarator) {
  * :    'break' IDENTIFIER?
  * ;
  */
-k_BreakStatement_t* parseBreakStatement(Parser* parser) {
-    k_BreakStatement_t* context = k_BreakStatement_new();
+k_BreakStatement* parseBreakStatement(Parser* parser) {
+    k_BreakStatement* context = k_BreakStatement_new();
 
     /* Match and discard the 'break' token. */
     match(parser, TOKEN_KEYWORD_BREAK);
@@ -1138,8 +1138,8 @@ k_BreakStatement_t* parseBreakStatement(Parser* parser) {
  * :    'return' expression
  * ;
  */
-k_ReturnStatement_t* parseReturnStatement(Parser* parser) {
-    k_ReturnStatement_t* context = k_ReturnStatement_new();
+k_ReturnStatement* parseReturnStatement(Parser* parser) {
+    k_ReturnStatement* context = k_ReturnStatement_new();
 
     /* Match and discard the 'return' token. */
     match(parser, TOKEN_KEYWORD_RETURN);
@@ -1500,25 +1500,25 @@ BinaryExpression* parseAssignmentExpression(Parser* parser) {
 
 /*
  * conditionalExpression
- * :	logicalOrExpression ('then' expression 'else' conditionalExpression)?
+ * :	condition ('then' expression 'else' conditionalExpression)?
  * ;
  */
 ConditionalExpression* parseConditionalExpression(Parser* parser) {
     ConditionalExpression* context = k_ConditionalExpression_new();
-    context->logicalOrExpression = parseLogicalOrExpression(parser);
+    context->condition = parseLogicalOrExpression(parser);
 
     if (la(parser, 1) == TOKEN_HOOK) {
         consume(parser);
-        context->thenExpression = parseExpression(parser, expression);
+        context->then = parseExpression(parser, expression);
         match(parser, TOKEN_COLON);
-        context->elseExpression = parseConditionalExpression(parser);
+        context->otherwise = parseConditionalExpression(parser);
     }
 
     return context;
 }
 
 /*
- * logicalOrExpression
+ * condition
  * :	logicalAndExpression ('||' logicalAndExpression)*
  * ;
  */

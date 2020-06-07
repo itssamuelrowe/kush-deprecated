@@ -210,10 +210,10 @@ assignmentOperator
 ;
 
 conditionalExpression
-:	logicalOrExpression ('?' expression ':' conditionalExpression)?
+:	condition ('?' expression ':' conditionalExpression)?
 ;
 
-logicalOrExpression
+condition
 :	logicalAndExpression ('||' logicalAndExpression)*
 ;
 

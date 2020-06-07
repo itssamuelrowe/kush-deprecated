@@ -40,7 +40,6 @@
 #include <kush/parser.h>
 #include <kush/error-handler.h>
 
-
 // Error
 
 void printErrors(Compiler* compiler);

@@ -25,7 +25,7 @@
 // Constructor
 
 Error* errorNew(ErrorCode code, Token* token) {
-    return errorNewEx(code, token, k_TOKEN_UNKNOWN);
+    return errorNewEx(code, token, TOKEN_UNKNOWN);
 }
 
 Error* errorNewEx(ErrorCode code, Token* token,
@@ -54,14 +54,10 @@ void errorDelete(Error* error) {
 
 ErrorHandler* new() {
     ErrorHandler* handler = allocate(ErrorHandler, 1);
-    handler->handleLexicalError = NULL;
-    handler->handleSyntacticalError = NULL;
-    handler->handleSemanticalError = NULL;
     handler->onLexicalError = NULL;
-    handler->onSyntacticalError = NULL;
-    handler->onSemanticalError = NULL;
+    handler->onSyntaxError = NULL;
+    handler->onSemanticError = NULL;
     handler->errors = jtk_ArrayList_new();
-    handler->active = true;
     handler->context = NULL;
 
     return handler;
