@@ -71,7 +71,7 @@ BinaryExpression* newBinaryExpression(ContextType tag) {
     return result;
 }
 
-void delete(BinaryExpression* self) {
+void deleteBinaryExpression(BinaryExpression* self) {
     jtk_ArrayList_delete(self->others);
     deallocate(self);
 }
@@ -90,7 +90,7 @@ ConditionalExpression* newConditionalExpression() {
     return result;
 }
 
-void delete(ConditionalExpression* self) {
+void deleteConditionalExpression(ConditionalExpression* self) {
     deallocate(self);
 }
 
@@ -305,13 +305,6 @@ void deleteIfClause(IfClause* self) {
 /*******************************************************************************
  * IfStatement                                                                 *
  *******************************************************************************/
-
-struct IfStatement {
-    ContextType tag;
-    IfClause* ifClause;
-    jtk_ArrayList_t* elseIfClauses;
-    Block* elseClause;
-};
 
 IfStatement* newIfStatement() {
     IfStatement* result = allocate(IfStatement, 1);
