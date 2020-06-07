@@ -22,6 +22,8 @@
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
 
+typedef struct Context Context;
+
 /*******************************************************************************
  * ScopeType                                                                   *
  *******************************************************************************/
@@ -51,7 +53,7 @@ typedef enum k_ScopeType_t k_ScopeType_t;
 /**
  * @memberof Scope
  */
-typedef struct k_Scope_t k_Scope_t;
+typedef struct Scope Scope;
 
 /**
  * @class Scope
@@ -59,14 +61,14 @@ typedef struct k_Scope_t k_Scope_t;
  * @author Samuel Rowe
  * @since Kush 0.1
  */
-struct k_Scope_t {
+struct Scope {
     uint8_t* name;
     int32_t nameSize;
     k_ScopeType_t type;
-    k_Scope_t* enclosingScope;
+    Scope* parent;
     jtk_HashMap_t* symbols;
     int32_t nextTicket;
-    k_Symbol_t* symbol;
+    Context* symbol;
 };
 
 // Constructor
@@ -74,109 +76,109 @@ struct k_Scope_t {
 /**
  * @memberof Scope
  */
-k_Scope_t* k_Scope_new(const uint8_t* name, int32_t nameSize,
-    k_ScopeType_t type, k_Scope_t* enclosingScope, k_Symbol_t* symbol);
+Scope* k_Scope_new(const uint8_t* name, int32_t nameSize,
+    k_ScopeType_t type, Scope* parent, Context* symbol);
 
 /**
  * @memberof Scope
  */
-k_Scope_t* k_Scope_forCompilationUnit();
+Scope* k_Scope_forCompilationUnit();
 
 /**
  * @memberof Scope
  */
-k_Scope_t* k_Scope_forFunction(k_Scope_t* enclosingScope);
+Scope* k_Scope_forFunction(Scope* parent);
 
 /**
  * @memberof Scope
  */
-k_Scope_t* k_Scope_forLocal(k_Scope_t* enclosingScope);
+Scope* k_Scope_forLocal(Scope* parent);
 
 /**
  * @memberof Scope
  */
-k_Scope_t* k_Scope_forClass(k_Scope_t* enclosingScope);
+Scope* k_Scope_forClass(Scope* parent);
 
 // Destructor
 
 /**
  * @memberof Scope
  */
-void k_Scope_delete(k_Scope_t* scope);
+void k_Scope_delete(Scope* scope);
 
 // Children Symbols
 
-void k_Scope_getChildrenSymbols(k_Scope_t* scope, jtk_ArrayList_t* childrenSymbols);
+void k_Scope_getChildrenSymbols(Scope* scope, jtk_ArrayList_t* childrenSymbols);
 
 // Context
 
-void* k_Scope_getContext(k_Scope_t* scope);
+void* k_Scope_getContext(Scope* scope);
 
 // Scope Type
 
 /**
  * @memberof Scope
  */
-bool k_Scope_isEnumerationScope(k_Scope_t* scope);
+bool k_Scope_isEnumerationScope(Scope* scope);
 
 /**
  * @memberof Scope
  */
-bool k_Scope_isClassScope(k_Scope_t* scope);
+bool k_Scope_isClassScope(Scope* scope);
 
 /**
  * @memberof Scope
  */
-bool k_Scope_isFunctionScope(k_Scope_t* scope);
+bool k_Scope_isFunctionScope(Scope* scope);
 
 /**
  * @memberof Scope
  */
-bool k_Scope_isCompilationUnitScope(k_Scope_t* scope);
+bool k_Scope_isCompilationUnitScope(Scope* scope);
 
 /**
  * @memberof Scope
  */
-bool k_Scope_isLocalScope(k_Scope_t* scope);
+bool k_Scope_isLocalScope(Scope* scope);
 
 // Define
 
 /**
  * @memberof Scope
  */
-void k_Scope_define(k_Scope_t* scope, k_Symbol_t* symbol);
+void k_Scope_define(Scope* scope, Context* symbol);
 
 /**
  * @memberof Scope
  */
-void k_Scope_defineEx(k_Scope_t* scope, const uint8_t* descriptor,
-    int32_t descriptorSize, k_Symbol_t* symbol);
+void k_Scope_defineEx(Scope* scope, const uint8_t* descriptor,
+    int32_t descriptorSize, Context* symbol);
 
 // Enclosing Scope
 
 /**
  * @memberof Scope
  */
-k_Scope_t* k_Scope_getEnclosingScope(k_Scope_t* scope);
+Scope* k_Scope_getEnclosingScope(Scope* scope);
 
 // Name
 
 /**
  * @memberof Scope
  */
-const uint8_t* k_Scope_getName(k_Scope_t* scope);
+const uint8_t* k_Scope_getName(Scope* scope);
 
 // Resolve
 
 /**
  * @memberof Scope
  */
-k_Symbol_t* k_Scope_resolve(k_Scope_t* scope, uint8_t* identifier);
+Context* k_Scope_resolve(Scope* scope, uint8_t* identifier);
 
 /**
  * @memberof Scope
  */
-k_Scope_t* k_Scope_resolveQualifiedSymbol(k_Scope_t* scope,
+Scope* k_Scope_resolveQualifiedSymbol(Scope* scope,
     const uint8_t* name, int32_t nameSize);
 
 // Type
@@ -184,6 +186,6 @@ k_Scope_t* k_Scope_resolveQualifiedSymbol(k_Scope_t* scope,
 /**
  * @memberof Scope
  */
-k_ScopeType_t k_Scope_getType(k_Scope_t* scope);
+k_ScopeType_t k_Scope_getType(Scope* scope);
 
 #endif /* KUSH_SCOPE_H */

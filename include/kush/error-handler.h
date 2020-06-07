@@ -21,9 +21,8 @@
 
 #include <jtk/collection/list/ArrayList.h>
 
-#include <kush/Configuration.h>
-#include <kush/Error.h>
-#include <kush/ErrorCode.h>
+#include <kush/configuration.h>
+#include <kush/token.h>
 
 /*******************************************************************************
  * ErrorCode                                                                   *
@@ -101,8 +100,8 @@ typedef enum k_ErrorCode_t k_ErrorCode_t;
  */
 struct k_Error_t {
     k_ErrorCode_t code;
-    k_Token_t* token;
-    k_TokenType_t expected;
+    Token* token;
+    TokenType expected;
 };
 
 /**
@@ -112,8 +111,8 @@ typedef struct k_Error_t k_Error_t;
 
 // Constructor
 
-k_Error_t* k_Error_new(k_ErrorCode_t errorCode, k_Token_t* token);
-k_Error_t* k_Error_newEx(k_ErrorCode_t errorCode, k_Token_t* token, k_TokenType_t expected);
+k_Error_t* k_Error_new(k_ErrorCode_t errorCode, Token* token);
+k_Error_t* k_Error_newEx(k_ErrorCode_t errorCode, Token* token, TokenType expected);
 
 // Destructor
 
@@ -156,7 +155,7 @@ typedef void (*k_ErrorHandler_OnLexicalErrorFunction_t)(void* context, k_Lexer_t
 /**
  * @memberof ErrorHandler
  */
-typedef void (*k_ErrorHandler_OnSyntacticalErrorFunction_t)(void* context, k_Parser_t* parser, k_Error_t* error, k_TokenType_t expected);
+typedef void (*k_ErrorHandler_OnSyntacticalErrorFunction_t)(void* context, k_Parser_t* parser, k_Error_t* error, TokenType expected);
 
 /**
  * @memberof ErrorHandler
@@ -238,8 +237,8 @@ k_ErrorHandler_OnSyntacticalErrorFunction_t k_ErrorHandler_getOnSyntacticalError
  * @memberof ErrorHandler
  */
 void k_ErrorHandler_handleSyntacticalError(k_ErrorHandler_t* handler,
-    k_Parser_t* parser, k_ErrorCode_t errorCode, k_Token_t* token,
-    k_TokenType_t expected);
+    k_Parser_t* parser, k_ErrorCode_t errorCode, Token* token,
+    TokenType expected);
 
 // Lexical Error
 
@@ -259,7 +258,7 @@ k_ErrorHandler_OnLexicalErrorFunction_t k_ErrorHandler_getOnLexicalError(
  * @memberof ErrorHandler
  */
 void k_ErrorHandler_handleLexicalError(k_ErrorHandler_t* handler,
-    k_Lexer_t* lexer, k_ErrorCode_t errorCode, k_Token_t* token);
+    k_Lexer_t* lexer, k_ErrorCode_t errorCode, Token* token);
 
 // Semantic Error
 
@@ -279,7 +278,7 @@ k_ErrorHandler_OnSemanticalErrorFunction_t k_ErrorHandler_getOnSemanticalError(
  * @memberof ErrorHandler
  */
 void k_ErrorHandler_handleSemanticalError(k_ErrorHandler_t* handler,
-    void* origin, k_ErrorCode_t errorCode, k_Token_t* token);
+    void* origin, k_ErrorCode_t errorCode, Token* token);
 
 /**
  * @memberof ErrorHandler

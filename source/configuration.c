@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <kush/Configuration.h>
+#include <kush/configuration.h>
 
 static int32_t s_footprint = 0;
 
@@ -27,12 +27,4 @@ void* allocate0(int32_t size) {
 
 int32_t k_Memory_getFootprint() {
     return s_footprint;
-}
-
-void k_StackTrace_enter0(const char* file, const char* function) {
-    fprintf(stdout, "[enter] %s(%s)\n", function, file);
-}
-
-void k_StackTrace_exit0(const char* file, const char* function) {
-    fprintf(stdout, "[exit] %s(%s)\n", function, file);
 }

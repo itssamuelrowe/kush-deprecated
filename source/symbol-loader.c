@@ -42,17 +42,17 @@
 #include <kush/virtual-machine/feb/constant-pool/ConstantPoolTag.h>
 #include <kush/virtual-machine/feb/constant-pool/ConstantPoolUtf8.h>
 
-#include <kush/symbol-table/SymbolLoader.h>
+#include <kush/SymbolLoader.h>
 #include <kush/compiler.h>
 
 /*******************************************************************************
  * SymbolLoader                                                                *
  *******************************************************************************/
 
-k_SymbolLoader_t* k_SymbolLoader_new(k_Compiler_t* compiler) {
+SymbolLoader* k_SymbolLoader_new(Compiler* compiler) {
     jtk_ObjectAdapter_t* stringObjectAdapter = jtk_CStringObjectAdapter_getInstance();
 
-    k_SymbolLoader_t* loader = jtallocate(k_SymbolLoader_t, 1);
+    SymbolLoader* loader = jtallocate(SymbolLoader, 1);
     loader->directories = jtk_DoublyLinkedList_new();
     loader->flags = KUSH_ENTITY_LOADER_FLAG_PRIORITIZE_DIRECTORIES;
     loader->symbols = jtk_HashMap_newEx(stringObjectAdapter, NULL,
@@ -68,11 +68,11 @@ k_SymbolLoader_t* k_SymbolLoader_new(k_Compiler_t* compiler) {
     return loader;
 }
 
-k_SymbolLoader_t* k_SymbolLoader_newWithEntityDirectories(k_Compiler_t* compiler,
+SymbolLoader* k_SymbolLoader_newWithEntityDirectories(Compiler* compiler,
     jtk_Iterator_t* entityDirectoryIterator) {
     jtk_ObjectAdapter_t* stringObjectAdapter = jtk_CStringObjectAdapter_getInstance();
 
-    k_SymbolLoader_t* loader = k_SymbolLoader_new(compiler);
+    SymbolLoader* loader = k_SymbolLoader_new(compiler);
     while (jtk_Iterator_hasNext(entityDirectoryIterator)) {
         uint8_t* directory = (uint8_t*)jtk_Iterator_getNext(entityDirectoryIterator);
         k_SymbolLoader_addDirectory(loader, directory);
@@ -81,7 +81,7 @@ k_SymbolLoader_t* k_SymbolLoader_newWithEntityDirectories(k_Compiler_t* compiler
     return loader;
 }
 
-void k_SymbolLoader_delete(k_SymbolLoader_t* loader) {
+void k_SymbolLoader_delete(SymbolLoader* loader) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
 
     int32_t size = jtk_DoublyLinkedList_getSize(loader->directories);
@@ -107,17 +107,17 @@ void k_SymbolLoader_delete(k_SymbolLoader_t* loader) {
     jtk_HashMap_delete(loader->symbols);
 
     if (loader->constantPool.entries != NULL) {
-        jtdeallocate(loader->constantPool.entries);
+        deallocate(loader->constantPool.entries);
     }
 
-    jtdeallocate(loader);
+    deallocate(loader);
 }
 
 /* The original algorithm ensured that a valid directory was added to the entity
  * directries. Since the directories are validated when loading entities the
  * algorithm was modified to include all the directories without checking.
  */
-bool k_SymbolLoader_addDirectory(k_SymbolLoader_t* loader, const uint8_t* directory) {
+bool k_SymbolLoader_addDirectory(SymbolLoader* loader, const uint8_t* directory) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
     jtk_Assert_assertObject(directory, "The specified directory is null.");
 
@@ -137,7 +137,7 @@ bool k_SymbolLoader_addDirectory(k_SymbolLoader_t* loader, const uint8_t* direct
 
 // Find Symbol
 
-k_Symbol_t* k_SymbolLoader_findSymbol(k_SymbolLoader_t* loader,
+k_Symbol_t* k_SymbolLoader_findSymbol(SymbolLoader* loader,
     const uint8_t* descriptor, int32_t descriptorSize) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
     jtk_Assert_assertObject(descriptor, "The specified descriptor is null.");
@@ -153,7 +153,7 @@ k_Symbol_t* k_SymbolLoader_findSymbol(k_SymbolLoader_t* loader,
 
 // Load Symbol
 
-k_Symbol_t* k_SymbolLoader_loadSymbol(k_SymbolLoader_t* loader,
+k_Symbol_t* k_SymbolLoader_loadSymbol(SymbolLoader* loader,
     const uint8_t* descriptor, int32_t descriptorSize) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
     jtk_Assert_assertObject(descriptor, "The specified descriptor is null.");
@@ -224,7 +224,7 @@ k_Symbol_t* k_SymbolLoader_loadSymbol(k_SymbolLoader_t* loader,
 
 // Load Entity From File
 
-k_Symbol_t* k_SymbolLoader_loadSymbolFromHandle(k_SymbolLoader_t* loader,
+k_Symbol_t* k_SymbolLoader_loadSymbolFromHandle(SymbolLoader* loader,
     jtk_PathHandle_t* handle) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
     jtk_Assert_assertObject(handle, "The specified entity path handle is null.");
@@ -252,13 +252,13 @@ k_Symbol_t* k_SymbolLoader_loadSymbolFromHandle(k_SymbolLoader_t* loader,
 
 // Ignore Corrupt Entity
 
-bool k_SymbolLoader_shouldIgnoreCorruptEntity(k_SymbolLoader_t* loader) {
+bool k_SymbolLoader_shouldIgnoreCorruptEntity(SymbolLoader* loader) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
 
     return (loader->flags & KUSH_ENTITY_LOADER_FLAG_IGNORE_CORRUPT_ENTITY) != 0;
 }
 
-void k_SymbolLoader_setIgnoreCorruptEntity(k_SymbolLoader_t* loader,
+void k_SymbolLoader_setIgnoreCorruptEntity(SymbolLoader* loader,
     bool ignoreCorruptEntity) {
     jtk_Assert_assertObject(loader, "The specified entity loader is null.");
 
@@ -271,7 +271,7 @@ void k_SymbolLoader_setIgnoreCorruptEntity(k_SymbolLoader_t* loader,
 
 #define KUSH_FEB_HEADER_SIZE 12
 
-void k_SymbolLoader_parseConstantPool(k_SymbolLoader_t* loader) {
+void k_SymbolLoader_parseConstantPool(SymbolLoader* loader) {
     jtk_Logger_t* logger = loader->compiler->logger;
     k_ConstantPool_t* constantPool = &loader->constantPool;
     constantPool->size = ((loader->bytes[loader->index++] & 0xFF) << 8) |
@@ -469,7 +469,7 @@ void k_SymbolLoader_parseConstantPool(k_SymbolLoader_t* loader) {
     }
 }
 
-void k_SymbolLoader_skipAttributeTable(k_SymbolLoader_t* loader) {
+void k_SymbolLoader_skipAttributeTable(SymbolLoader* loader) {
     uint16_t size = ((loader->bytes[loader->index++] & 0xFF) << 8) |
         (loader->bytes[loader->index++] & 0xFF);
     int32_t i;
@@ -486,7 +486,7 @@ void k_SymbolLoader_skipAttributeTable(k_SymbolLoader_t* loader) {
     }
 }
 
-void k_SymbolLoader_parseField(k_SymbolLoader_t* loader) {
+void k_SymbolLoader_parseField(SymbolLoader* loader) {
     // Flags
     uint16_t flags = ((loader->bytes[loader->index++] & 0xFF) << 8) |
         (loader->bytes[loader->index++] & 0xFF);
@@ -509,7 +509,7 @@ void k_SymbolLoader_parseField(k_SymbolLoader_t* loader) {
     k_SymbolLoader_skipAttributeTable(loader);
 }
 
-void k_SymbolLoader_declareFunction(k_SymbolLoader_t* loader,
+void k_SymbolLoader_declareFunction(SymbolLoader* loader,
     k_Symbol_t* symbol, const uint8_t* descriptor, int32_t descriptorSize,
     uint16_t modifiers, uint16_t tableIndex) {
     k_FunctionSymbol_t* functionSymbol = &symbol->context.asFunction;
@@ -520,7 +520,7 @@ void k_SymbolLoader_declareFunction(k_SymbolLoader_t* loader,
 
 static const uint8_t* newName = "new";
 
-void k_SymbolLoader_parseFunction(k_SymbolLoader_t* loader) {
+void k_SymbolLoader_parseFunction(SymbolLoader* loader) {
     // Flags
     uint16_t flags = ((loader->bytes[loader->index++] & 0xFF) << 8) |
         (loader->bytes[loader->index++] & 0xFF);
@@ -547,7 +547,7 @@ void k_SymbolLoader_parseFunction(k_SymbolLoader_t* loader) {
 
     // Define function
     k_Symbol_t* classSymbol = loader->symbol;
-    k_Scope_t* classScope = classSymbol->context.asClass.classScope;
+    Scope* classScope = classSymbol->context.asClass.classScope;
     k_Symbol_t* functionSymbol = k_Scope_resolve(classScope, descriptor->bytes);
     if (functionSymbol == NULL) {
         functionSymbol = k_Symbol_forFunction(NULL, classScope);
@@ -569,23 +569,23 @@ void k_SymbolLoader_parseFunction(k_SymbolLoader_t* loader) {
     k_SymbolLoader_skipAttributeTable(loader);
 }
 
-void k_SymbolLoader_destroyConstantPool(k_SymbolLoader_t* loader) {
+void k_SymbolLoader_destroyConstantPool(SymbolLoader* loader) {
     k_ConstantPool_t* constantPool = &loader->constantPool;
     int32_t i;
     for (i = 1; i <= constantPool->size; i++) {
         k_ConstantPoolEntry_t* entry = (k_ConstantPoolEntry_t*)constantPool->entries[i];
         if (entry->tag == KUSH_CONSTANT_POOL_TAG_UTF8) {
             k_ConstantPoolUtf8_t* utf8Entry = (k_ConstantPoolUtf8_t*)entry;
-            jtdeallocate(utf8Entry->bytes);
+            deallocate(utf8Entry->bytes);
         }
-        jtdeallocate(entry);
+        deallocate(entry);
     }
-    jtdeallocate(loader->constantPool.entries);
+    deallocate(loader->constantPool.entries);
 }
 
-k_Symbol_t* k_SymbolLoader_parse(k_SymbolLoader_t* loader, uint8_t* bytes,
+k_Symbol_t* k_SymbolLoader_parse(SymbolLoader* loader, uint8_t* bytes,
     int32_t size) {
-    k_Compiler_t* compiler = loader->compiler;
+    Compiler* compiler = loader->compiler;
     k_ErrorHandler_t* errorHandler = compiler->errorHandler;
     jtk_Logger_t* logger = compiler->logger;
 
@@ -629,7 +629,7 @@ k_Symbol_t* k_SymbolLoader_parse(k_SymbolLoader_t* loader, uint8_t* bytes,
 
                 k_ConstantPoolUtf8_t* descriptor = loader->constantPool.entries[reference];
 
-                k_Scope_t* classScope = k_Scope_forClass(NULL);
+                Scope* classScope = k_Scope_forClass(NULL);
                 loader->symbol = k_Symbol_forClassAlt( classScope, descriptor->bytes,
                     descriptor->length);
                 classScope->symbol = loader->symbol;
@@ -724,7 +724,7 @@ int SymbolLoader()
 		functions[i] = parseFunction();
 	}
 
-	k_Module_t* k = malloc(sizeof(k_Module_t));
+	Module* k = malloc(sizeof(Module));
 	k->magicNumber = magicNumber;
 	k->majorVersion = majorVersion;
 	k->minorVersion = minorVersion;

@@ -16,8 +16,8 @@
 
 // Wedensday, October 18, 2017
 
-#ifndef KUSH_COMPILER_LEXER_TOKEN_H
-#define KUSH_COMPILER_LEXER_TOKEN_H
+#ifndef KUSH_TOKEN_H
+#define KUSH_TOKEN_H
 
 #include <kush/configuration.h>
 
@@ -25,169 +25,151 @@
  * TokenType                                                                   *
  *******************************************************************************/
 
-/**
- * @class TokenType
- * @ingroup k_compiler_lexer
- * @author Samuel Rowe
- * @since Kush 0.1
- */
-enum k_TokenType_t {
-    KUSH_TOKEN_UNKNOWN,
+enum TokenType {
+    TOKEN_UNKNOWN,
 
-    KUSH_TOKEN_INDENTATION,
-    KUSH_TOKEN_DEDENTATION,
+    TOKEN_INDENTATION,
+    TOKEN_DEDENTATION,
 
-    KUSH_TOKEN_WHITESPACE,
-    KUSH_TOKEN_NEWLINE,
-    KUSH_TOKEN_END_OF_STREAM,
+    TOKEN_WHITESPACE,
+    TOKEN_NEWLINE,
+    TOKEN_END_OF_STREAM,
 
-    KUSH_TOKEN_EXCLAMATION_MARK_EQUAL,
-    KUSH_TOKEN_EXCLAMATION_MARK,
+    TOKEN_EXCLAMATION_MARK_EQUAL,
+    TOKEN_EXCLAMATION_MARK,
 
-    KUSH_TOKEN_AT,
+    TOKEN_AT,
 
-    KUSH_TOKEN_HASH,
+    TOKEN_HASH,
 
-    KUSH_TOKEN_MODULUS_EQUAL,
-    KUSH_TOKEN_MODULUS,
+    TOKEN_MODULUS_EQUAL,
+    TOKEN_MODULUS,
 
-    KUSH_TOKEN_AMPERSAND_2,
-    KUSH_TOKEN_AMPERSAND_EQUAL,
-    KUSH_TOKEN_AMPERSAND,
+    TOKEN_AMPERSAND_2,
+    TOKEN_AMPERSAND_EQUAL,
+    TOKEN_AMPERSAND,
 
-    KUSH_TOKEN_LEFT_PARENTHESIS,
-    KUSH_TOKEN_RIGHT_PARENTHESIS,
+    TOKEN_LEFT_PARENTHESIS,
+    TOKEN_RIGHT_PARENTHESIS,
 
-    KUSH_TOKEN_ASTERISK_2_EQUAL,
-    KUSH_TOKEN_ASTERISK_2,
-    KUSH_TOKEN_ASTERISK_EQUAL,
-    KUSH_TOKEN_ASTERISK,
+    TOKEN_ASTERISK_2_EQUAL,
+    TOKEN_ASTERISK_2,
+    TOKEN_ASTERISK_EQUAL,
+    TOKEN_ASTERISK,
 
-    KUSH_TOKEN_PLUS_2,
-    KUSH_TOKEN_PLUS_EQUAL,
-    KUSH_TOKEN_PLUS,
+    TOKEN_PLUS_2,
+    TOKEN_PLUS_EQUAL,
+    TOKEN_PLUS,
 
-    KUSH_TOKEN_COMMA,
+    TOKEN_COMMA,
 
-    KUSH_TOKEN_DASH_2,
-    KUSH_TOKEN_ARROW,
-    KUSH_TOKEN_DASH_EQUAL,
-    KUSH_TOKEN_DASH,
+    TOKEN_DASH_2,
+    TOKEN_ARROW,
+    TOKEN_DASH_EQUAL,
+    TOKEN_DASH,
 
-    KUSH_TOKEN_ELLIPSIS,
-    KUSH_TOKEN_DOT_2,
-    KUSH_TOKEN_DOT,
+    TOKEN_ELLIPSIS,
+    TOKEN_DOT_2,
+    TOKEN_DOT,
 
-    KUSH_TOKEN_SINGLE_LINE_COMMENT,
-    KUSH_TOKEN_MULTI_LINE_COMMENT,
-    KUSH_TOKEN_FORWARD_SLASH_EQUAL,
-    KUSH_TOKEN_FORWARD_SLASH,
+    TOKEN_SINGLE_LINE_COMMENT,
+    TOKEN_MULTI_LINE_COMMENT,
+    TOKEN_FORWARD_SLASH_EQUAL,
+    TOKEN_FORWARD_SLASH,
 
-    KUSH_TOKEN_COLON_2,
-    KUSH_TOKEN_COLON,
+    TOKEN_COLON_2,
+    TOKEN_COLON,
 
-    KUSH_TOKEN_SEMICOLON,
+    TOKEN_SEMICOLON,
 
-    KUSH_TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL,
-    KUSH_TOKEN_LEFT_ANGLE_BRACKET_2,
-    KUSH_TOKEN_LEFT_ANGLE_BRACKET_EQUAL,
-    KUSH_TOKEN_LEFT_ANGLE_BRACKET,
+    TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL,
+    TOKEN_LEFT_ANGLE_BRACKET_2,
+    TOKEN_LEFT_ANGLE_BRACKET_EQUAL,
+    TOKEN_LEFT_ANGLE_BRACKET,
 
-    KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL,
-    KUSH_TOKEN_RIGHT_ANGLE_BRACKET_3,
-    KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL,
-    KUSH_TOKEN_RIGHT_ANGLE_BRACKET_2,
-    KUSH_TOKEN_RIGHT_ANGLE_BRACKET_EQUAL,
-    KUSH_TOKEN_RIGHT_ANGLE_BRACKET,
+    TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL,
+    TOKEN_RIGHT_ANGLE_BRACKET_3,
+    TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL,
+    TOKEN_RIGHT_ANGLE_BRACKET_2,
+    TOKEN_RIGHT_ANGLE_BRACKET_EQUAL,
+    TOKEN_RIGHT_ANGLE_BRACKET,
 
-    KUSH_TOKEN_EQUAL_2,
-    KUSH_TOKEN_EQUAL,
+    TOKEN_EQUAL_2,
+    TOKEN_EQUAL,
 
-    KUSH_TOKEN_HOOK,
+    TOKEN_HOOK,
 
-    KUSH_TOKEN_LEFT_BRACE,
-    KUSH_TOKEN_RIGHT_BRACE,
+    TOKEN_LEFT_BRACE,
+    TOKEN_RIGHT_BRACE,
 
-    KUSH_TOKEN_LEFT_SQUARE_BRACKET,
-    KUSH_TOKEN_RIGHT_SQUARE_BRACKET,
+    TOKEN_LEFT_SQUARE_BRACKET,
+    TOKEN_RIGHT_SQUARE_BRACKET,
 
-    KUSH_TOKEN_CARET_EQUAL,
-    KUSH_TOKEN_CARET,
+    TOKEN_CARET_EQUAL,
+    TOKEN_CARET,
 
-    KUSH_TOKEN_VERTICAL_BAR_2,
-    KUSH_TOKEN_VERTICAL_BAR_EQUAL,
-    KUSH_TOKEN_VERTICAL_BAR,
+    TOKEN_VERTICAL_BAR_2,
+    TOKEN_VERTICAL_BAR_EQUAL,
+    TOKEN_VERTICAL_BAR,
 
-    KUSH_TOKEN_TILDE_EQUAL,
-    KUSH_TOKEN_TILDE,
+    TOKEN_TILDE_EQUAL,
+    TOKEN_TILDE,
 
-    KUSH_TOKEN_IDENTIFIER,
+    TOKEN_IDENTIFIER,
 
     /* Keywords */
 
-    KUSH_TOKEN_KEYWORD_BOOLEAN,
-    KUSH_TOKEN_KEYWORD_BREAK,
-    KUSH_TOKEN_KEYWORD_CATCH,
-    KUSH_TOKEN_KEYWORD_ELSE,
-    KUSH_TOKEN_KEYWORD_F32,
-    KUSH_TOKEN_KEYWORD_F64,
-    KUSH_TOKEN_KEYWORD_FALSE,
-    KUSH_TOKEN_KEYWORD_FINALLY,
-    KUSH_TOKEN_KEYWORD_FOR,
-    KUSH_TOKEN_KEYWORD_I16,
-    KUSH_TOKEN_KEYWORD_I32,
-    KUSH_TOKEN_KEYWORD_I64,
-    KUSH_TOKEN_KEYWORD_I8,
-    KUSH_TOKEN_KEYWORD_IF,
-    KUSH_TOKEN_KEYWORD_IMPORT,
-    KUSH_TOKEN_KEYWORD_LET,
-    KUSH_TOKEN_KEYWORD_NATIVE,
-    KUSH_TOKEN_KEYWORD_NEW,
-    KUSH_TOKEN_KEYWORD_NULL,
-    KUSH_TOKEN_KEYWORD_RETURN,
-    KUSH_TOKEN_KEYWORD_STRUCT,
-    KUSH_TOKEN_KEYWORD_THIS,
-    KUSH_TOKEN_KEYWORD_THROW,
-    KUSH_TOKEN_KEYWORD_TRUE,
-    KUSH_TOKEN_KEYWORD_TRY,
-    KUSH_TOKEN_KEYWORD_UI16,
-    KUSH_TOKEN_KEYWORD_UI32,
-    KUSH_TOKEN_KEYWORD_UI64,
-    KUSH_TOKEN_KEYWORD_UI8,
-    KUSH_TOKEN_KEYWORD_VAR,
-    KUSH_TOKEN_KEYWORD_VOID,
-    KUSH_TOKEN_KEYWORD_WITH,
-    KUSH_TOKEN_KEYWORD_WHILE,
+    TOKEN_KEYWORD_BOOLEAN,
+    TOKEN_KEYWORD_BREAK,
+    TOKEN_KEYWORD_CATCH,
+    TOKEN_KEYWORD_ELSE,
+    TOKEN_KEYWORD_F32,
+    TOKEN_KEYWORD_F64,
+    TOKEN_KEYWORD_FALSE,
+    TOKEN_KEYWORD_FINALLY,
+    TOKEN_KEYWORD_FOR,
+    TOKEN_KEYWORD_I16,
+    TOKEN_KEYWORD_I32,
+    TOKEN_KEYWORD_I64,
+    TOKEN_KEYWORD_I8,
+    TOKEN_KEYWORD_IF,
+    TOKEN_KEYWORD_IMPORT,
+    TOKEN_KEYWORD_LET,
+    TOKEN_KEYWORD_NATIVE,
+    TOKEN_KEYWORD_NEW,
+    TOKEN_KEYWORD_NULL,
+    TOKEN_KEYWORD_RETURN,
+    TOKEN_KEYWORD_STRUCT,
+    TOKEN_KEYWORD_THIS,
+    TOKEN_KEYWORD_THROW,
+    TOKEN_KEYWORD_TRUE,
+    TOKEN_KEYWORD_TRY,
+    TOKEN_KEYWORD_UI16,
+    TOKEN_KEYWORD_UI32,
+    TOKEN_KEYWORD_UI64,
+    TOKEN_KEYWORD_UI8,
+    TOKEN_KEYWORD_VAR,
+    TOKEN_KEYWORD_VOID,
+    TOKEN_KEYWORD_WITH,
+    TOKEN_KEYWORD_WHILE,
 
-    KUSH_TOKEN_INTEGER_LITERAL,
-    KUSH_TOKEN_STRING_LITERAL,
-    KUSH_TOKEN_FLOATING_POINT_LITERAL
+    TOKEN_INTEGER_LITERAL,
+    TOKEN_STRING_LITERAL,
+    TOKEN_FLOATING_POINT_LITERAL
 };
 
-/**
- * @memberof TokenType
- */
-typedef enum k_TokenType_t k_TokenType_t;
+typedef enum TokenType TokenType;
 
 /*******************************************************************************
  * TokenChannel                                                                *
  *******************************************************************************/
 
-/**
- * @class TokenChannel
- * @ingroup k_compiler_lexer
- * @author Samuel Rowe
- * @since Kush 0.1
- */
-enum k_TokenChannel_t {
-    KUSH_TOKEN_CHANNEL_DEFAULT,
-    KUSH_TOKEN_CHANNEL_HIDDEN,
+enum TokenChannel {
+    TOKEN_CHANNEL_DEFAULT,
+    TOKEN_CHANNEL_HIDDEN,
 };
 
-/**
- * @memberof TokenChannel
- */
-typedef enum k_TokenChannel_t k_TokenChannel_t;
+typedef enum TokenChannel TokenChannel;
 
 /*******************************************************************************
  * Token                                                                       *
@@ -198,13 +180,10 @@ typedef enum k_TokenChannel_t k_TokenChannel_t;
  * in a source code. Each token has two primary attributes:
  * a token type (symbol category) and the text associated
  * with it.
- *
- * @author Samuel Rowe
- * @since  KUSH 1.0
  */
-struct k_Token_t {
-    k_TokenChannel_t channel;
-    k_TokenType_t type;
+struct Token {
+    TokenChannel channel;
+    TokenType type;
     uint8_t* text;
     int32_t length;
     int32_t startIndex;
@@ -217,141 +196,13 @@ struct k_Token_t {
     const char* file;
 };
 
-/**
- * @memberof Token
- */
-typedef struct k_Token_t k_Token_t;
+typedef struct Token Token;
 
-// Constructor
-
-/**
- * @memberof Token
- */
-k_Token_t* k_Token_new(k_TokenChannel_t channel, k_TokenType_t type,
+Token* k_Token_new(TokenChannel channel, TokenType type,
     const uint8_t* text, int32_t length, int32_t startIndex, int32_t stopIndex,
     int32_t startLine, int32_t stopLine, int32_t startColumn, int32_t stopColumn,
     const char* file);
 
-// Destructor
+void k_Token_delete(Token* token);
 
-/**
- * @memberof Token
- */
-void k_Token_delete(k_Token_t* token);
-
-// Channel
-
-/**
- * @memberof Token
- */
-k_TokenChannel_t k_Token_getChannel(k_Token_t* token);
-
-/**
- * @memberof Token
- */
-void k_Token_setChannel(k_Token_t* token, k_TokenChannel_t channel);
-
-// Type
-
-/**
- * @memberof Token
- */
-k_TokenType_t k_Token_getType(k_Token_t* token);
-
-/**
- * @memberof Token
- */
-void k_Token_setType(k_Token_t* token, k_TokenType_t type);
-
-// Text
-
-/**
- * @memberof Token
- */
-void k_Token_setText(k_Token_t* token, const uint8_t* text, int32_t length);
-
-/**
- * @memberof Token
- */
-const uint8_t* k_Token_getText(k_Token_t* token);
-
-// Length
-
-/**
- * @memberof Token
- */
-int32_t k_Token_getLength(k_Token_t* token);
-
-// Start Index
-
-/**
- * @memberof Token
- */
-void k_Token_setStartIndex(k_Token_t* token, int32_t startIndex);
-
-/**
- * @memberof Token
- */
-void k_Token_setStopIndex(k_Token_t* token, int32_t stopIndex);
-
-// Start Line
-
-/**
- * @memberof Token
- */
-void k_Token_setStartLine(k_Token_t* token, int32_t startLine);
-
-/**
- * @memberof Token
- */
-int32_t k_Token_getStartLine(k_Token_t* token);
-
-// Stop Line
-
-/**
- * @memberof Token
- */
-void k_Token_setStopLine(k_Token_t* token, int32_t stopLine);
-
-/**
- * @memberof Token
- */
-int32_t k_Token_getStopLine(k_Token_t* token);
-
-// Start Column
-
-/**
- * @memberof Token
- */
-void k_Token_setStartColumn(k_Token_t* token, int32_t startColumn);
-
-/**
- * @memberof Token
- */
-int32_t k_Token_getStartColumn(k_Token_t* token);
-
-// Stop Column
-
-/**
- * @memberof Token
- */
-void k_Token_setStopColumn(k_Token_t* token, int32_t stopColumn);
-
-/**
- * @memberof Token
- */
-int32_t k_Token_getStopColumn(k_Token_t* token);
-
-// Index
-
-/**
- * @memberof Token
- */
-int32_t k_Token_getIndex(k_Token_t* token);
-
-/**
- * @memberof Token
- */
-void k_Token_setIndex(k_Token_t* token, int32_t index);
-
-#endif /* KUSH_COMPILER_LEXER_TOKEN_H */
+#endif /* KUSH_TOKEN_H */

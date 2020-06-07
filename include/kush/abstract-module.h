@@ -17,7 +17,7 @@
  * @author Samuel Rowe
  * @since Kush 0.1
  */
-struct k_Module_t {
+struct Module {
 	/**
 	 * This attribute should always be equal to 0x3AE031999.
 	 */
@@ -31,7 +31,7 @@ struct k_Module_t {
 
 };
 
-typedef struct k_Module_t k_Module_t;
+typedef struct Module Module;
 
 /**
  * @author Samuel Rowe

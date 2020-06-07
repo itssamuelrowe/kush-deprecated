@@ -1,6 +1,6 @@
 # Friday, November 03, 2017
 
-cmake_minimurequired (VERSION 3.4.1)
+cmake_minimum_required (VERSION 3.4.1)
 
 # Project Name
 project (Kush)
@@ -22,54 +22,27 @@ include_directories ("${PROJECT_SOURCE_DIR}/include")
 set (
     KUSH_COMPILER_SOURCE
 
-    # General
-    ${PROJECT_SOURCE_DIR}/source/kush/Configuration.c
-    ${PROJECT_SOURCE_DIR}/source/kush/Compiler.c
-    ${PROJECT_SOURCE_DIR}/source/kush/Kush.c
-
-    # Abstract Syntax Tree
-    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstAnnotation.c
-    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstAnnotations.c
-    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstHelper.c
-    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstListener.c
-    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstNode.c
-    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstPrinter.c
-    ${PROJECT_SOURCE_DIR}/source/kush/ast/AstWalker.c
-
-    # Lexer
-    ${PROJECT_SOURCE_DIR}/source/kush/Lexer.c
-    ${PROJECT_SOURCE_DIR}/source/kush/LexerError.c
-    ${PROJECT_SOURCE_DIR}/source/kush/Token.c
-    ${PROJECT_SOURCE_DIR}/source/kush/TokenStream.c
-    ${PROJECT_SOURCE_DIR}/source/kush/TokenType.c
-
-    # Parser
-    ${PROJECT_SOURCE_DIR}/source/kush/Context.c
-    ${PROJECT_SOURCE_DIR}/source/kush/Parser.c
-    ${PROJECT_SOURCE_DIR}/source/kush/ParserError.c
-
-    # Symbol Table
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/SymbolDefinitionListener.c
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/SymbolResolutionListener.c
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/SymbolTable.c
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/SymbolLoader.c
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/Modifier.c
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/scope/Scope.c
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/ClassSymbol.c
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/FunctionSignature.c
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/FunctionSymbol.c
-    ${PROJECT_SOURCE_DIR}/source/kush/symbol-table/symbol/Symbol.c
-
-    ${PROJECT_SOURCE_DIR}/source/kush/Error.c
-    ${PROJECT_SOURCE_DIR}/source/kush/ErrorHandler.c
+    ${PROJECT_SOURCE_DIR}/source/analyzer.c
+    ${PROJECT_SOURCE_DIR}/source/compiler.c
+    ${PROJECT_SOURCE_DIR}/source/configuration.c
+    ${PROJECT_SOURCE_DIR}/source/context.c
+    ${PROJECT_SOURCE_DIR}/source/error-handler.c
+    ${PROJECT_SOURCE_DIR}/source/kush.c
+    ${PROJECT_SOURCE_DIR}/source/lexer.c
+    ${PROJECT_SOURCE_DIR}/source/parser.c
+    ${PROJECT_SOURCE_DIR}/source/scope.c
+    ${PROJECT_SOURCE_DIR}/source/symbol-loader.c
+    ${PROJECT_SOURCE_DIR}/source/symbol.c
+    ${PROJECT_SOURCE_DIR}/source/token.c
+    ${PROJECT_SOURCE_DIR}/source/token-stream.c
 )
 
 # Compile
 
 set(CMAKE_VERBOSE_MAKEFILE off)
 link_directories(${JTK_LIBRARY_DIRS})
-add_executable(zc ${KUSH_COMPILER_SOURCE})
-target_link_libraries(zc ${JTK_LIBRARIES} m)
-target_include_directories(zc SYSTEM PUBLIC ${JTK_INCLUDE_DIRS})
-# target_compile_options(zc PUBLIC -Wall -Wswitch)
-target_compile_options(zc PUBLIC -g -w ${JTK_CFLAGS} ${JTK_CFLAGS_OTHER})
+add_executable(kush ${KUSH_COMPILER_SOURCE})
+target_link_libraries(kush ${JTK_LIBRARIES} m)
+target_include_directories(kush SYSTEM PUBLIC ${JTK_INCLUDE_DIRS})
+# target_compile_options(kush PUBLIC -Wall -Wswitch)
+target_compile_options(kush PUBLIC -g -w ${JTK_CFLAGS} ${JTK_CFLAGS_OTHER})

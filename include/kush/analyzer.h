@@ -16,18 +16,16 @@
 
 // Sunday, January 07, 2018
 
-#ifndef KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H
-#define KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H
+#ifndef KUSH_ANALYZER_H
+#define KUSH_ANALYZER_H
 
-#include <kush/Configuration.h>
+#include <kush/configuration.h>
 #include <kush/compiler.h>
-#include <kush/ContextType.h>
-#include <kush/symbol-table/Scope.h>
-#include <kush/symbol-table/ScopeType.h>
-#include <kush/symbol-table/SymbolTable.h>
+#include <kush/scope.h>
+#include <kush/context.h>
 
 /*******************************************************************************
- * SymbolDefinitionListener                                                    *
+ * Analyzer                                                                    *
  *******************************************************************************/
 
 /**
@@ -36,18 +34,12 @@
  * @since Kush 0.1
  */
 struct Analyzer {
-    k_Compiler_t* compiler;
-    k_ASTListener_t* astListener;
-    k_SymbolTable_t* symbolTable;
-    k_ASTAnnotations_t* scopes;
+    Compiler* compiler;
     const uint8_t* package;
     int32_t packageSize;
-    k_ASTNodeType_t mainComponent;
-    bool classPrepared;
-    uint8_t* className;
-    int32_t classNameSize;
+    Scope* scope;
 };
 
 typedef struct Analyzer Analyzer;
 
-#endif /* KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_DEFINITION_LISTENER_H */
+#endif /* KUSH_ANALYZER_H */

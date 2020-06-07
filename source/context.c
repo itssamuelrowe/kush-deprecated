@@ -36,8 +36,7 @@
 #include <jtk/core/Object.h>
 #include <jtk/collection/Pair.h>
 
-#include <kush/ast/ASTNode.h>
-#include <kush/ast/context/Context.h>
+#include <kush/context.h>
 
 /*******************************************************************************
  * Context                                                                     *
@@ -77,7 +76,7 @@ void k_CompilationUnitContext_delete(k_CompilationUnitContext_t* context) {
 
     jtk_ArrayList_delete(context->importDeclarations);
     jtk_ArrayList_delete(context->annotatedComponentDeclarations);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_CompilationUnitContext_getChildren(k_CompilationUnitContext_t* context, jtk_ArrayList_t* children) {
@@ -109,7 +108,7 @@ void k_ImportDeclarationContext_delete(k_ImportDeclarationContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->identifiers);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ImportDeclarationContext_getChildren(k_ImportDeclarationContext_t* context,
@@ -139,7 +138,7 @@ k_AnnotatedComponentDeclarationContext_t* k_AnnotatedComponentDeclarationContext
 
 void k_AnnotatedComponentDeclarationContext_delete(k_AnnotatedComponentDeclarationContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_AnnotatedComponentDeclarationContext_getChildren(k_AnnotatedComponentDeclarationContext_t* context,
@@ -176,7 +175,7 @@ void k_AnnotationsContext_delete(k_AnnotationsContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->annotations);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_AnnotationsContext_getChildren(k_AnnotationsContext_t* context,
@@ -208,7 +207,7 @@ void k_AnnotationContext_delete(k_AnnotationContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->annotationAttributes);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_AnnotationContext_getChildren(k_AnnotationContext_t* context,
@@ -240,7 +239,7 @@ void k_AnnotationTypeContext_delete(k_AnnotationTypeContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->identifiers);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_AnnotationTypeContext_getChildren(k_AnnotationTypeContext_t* context,
@@ -270,7 +269,7 @@ k_AnnotationAttributeContext_t* k_AnnotationAttributeContext_new(k_ASTNode_t* no
 
 void k_AnnotationAttributeContext_delete(k_AnnotationAttributeContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_AnnotationAttributeContext_getChildren(k_AnnotationAttributeContext_t* context,
@@ -300,7 +299,7 @@ k_ComponentDeclarationContext_t* k_ComponentDeclarationContext_new(k_ASTNode_t* 
 
 void k_ComponentDeclarationContext_delete(k_ComponentDeclarationContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ComponentDeclarationContext_getChildren(k_ComponentDeclarationContext_t* context,
@@ -331,7 +330,7 @@ k_FunctionDeclarationContext_t* k_FunctionDeclarationContext_new(k_ASTNode_t* no
 
 void k_FunctionDeclarationContext_delete(k_FunctionDeclarationContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_FunctionDeclarationContext_getChildren(k_FunctionDeclarationContext_t* context,
@@ -367,7 +366,7 @@ void k_FunctionParametersContext_delete(k_FunctionParametersContext_t* context) 
     jtk_Assert_assertObject(context, "The specified object is null.");
 
     jtk_ArrayList_delete(context->fixedParameters);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_FunctionParametersContext_getChildren(k_FunctionParametersContext_t* context,
@@ -399,7 +398,7 @@ k_FunctionBodyContext_t* k_FunctionBodyContext_new(k_ASTNode_t* node) {
 
 void k_FunctionBodyContext_delete(k_FunctionBodyContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_FunctionBodyContext_getChildren(k_FunctionBodyContext_t* context,
@@ -432,7 +431,7 @@ void k_StatementSuiteContext_delete(k_StatementSuiteContext_t* context) {
 
     jtk_ArrayList_delete(context->statements);
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_StatementSuiteContext_getChildren(k_StatementSuiteContext_t* context,
@@ -466,7 +465,7 @@ k_SimpleStatementContext_t* k_SimpleStatementContext_new(k_ASTNode_t* node) {
 
 void k_SimpleStatementContext_delete(k_SimpleStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_SimpleStatementContext_getChildren(k_SimpleStatementContext_t* context,
@@ -497,7 +496,7 @@ k_StatementContext_t* k_StatementContext_new(k_ASTNode_t* node) {
 void k_StatementContext_delete(k_StatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_StatementContext_getChildren(k_StatementContext_t* context,
@@ -530,7 +529,7 @@ k_EmptyStatementContext_t* k_EmptyStatementContext_new(k_ASTNode_t* node) {
 
 void k_EmptyStatementContext_delete(k_EmptyStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_EmptyStatementContext_getChildren(k_EmptyStatementContext_t* context,
@@ -564,7 +563,7 @@ void k_VariableDeclarationContext_delete(k_VariableDeclarationContext_t* context
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->variableDeclarators);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 /*
@@ -602,7 +601,7 @@ k_VariableDeclaratorContext_t* k_VariableDeclaratorContext_new(k_ASTNode_t* node
 void k_VariableDeclaratorContext_delete(k_VariableDeclaratorContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_VariableDeclaratorContext_getChildren(k_VariableDeclaratorContext_t* context,
@@ -636,7 +635,7 @@ void k_ConstantDeclarationContext_delete(k_ConstantDeclarationContext_t* context
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->constantDeclarators);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ConstantDeclarationContext_getChildren(k_ConstantDeclarationContext_t* context,
@@ -667,7 +666,7 @@ k_ConstantDeclaratorContext_t* k_ConstantDeclaratorContext_new(k_ASTNode_t* node
 void k_ConstantDeclaratorContext_delete(k_ConstantDeclaratorContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ConstantDeclaratorContext_getChildren(k_ConstantDeclaratorContext_t* context,
@@ -699,7 +698,7 @@ k_AssertStatementContext_t* k_AssertStatementContext_new(k_ASTNode_t* node) {
 void k_AssertStatementContext_delete(k_AssertStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_AssertStatementContext_getChildren(k_AssertStatementContext_t* context,
@@ -729,7 +728,7 @@ k_BreakStatementContext_t* k_BreakStatementContext_new(k_ASTNode_t* node) {
 
 void k_BreakStatementContext_delete(k_BreakStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_BreakStatementContext_getChildren(k_BreakStatementContext_t* context,
@@ -760,7 +759,7 @@ k_ContinueStatementContext_t* k_ContinueStatementContext_new(k_ASTNode_t* node) 
 
 void k_ContinueStatementContext_delete(k_ContinueStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ContinueStatementContext_getChildren(k_ContinueStatementContext_t* context,
@@ -792,7 +791,7 @@ k_ReturnStatementContext_t* k_ReturnStatementContext_new(k_ASTNode_t* node) {
 void k_ReturnStatementContext_delete(k_ReturnStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ReturnStatementContext_getChildren(k_ReturnStatementContext_t* context,
@@ -824,7 +823,7 @@ k_ThrowStatementContext_t* k_ThrowStatementContext_new(k_ASTNode_t* node) {
 void k_ThrowStatementContext_delete(k_ThrowStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ThrowStatementContext_getChildren(k_ThrowStatementContext_t* context,
@@ -856,7 +855,7 @@ k_CompoundStatementContext_t* k_CompoundStatementContext_new(k_ASTNode_t* node) 
 void k_CompoundStatementContext_delete(k_CompoundStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_CompoundStatementContext_getChildren(k_CompoundStatementContext_t* context,
@@ -893,7 +892,7 @@ void k_IfStatementContext_delete(k_IfStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->elseIfClauses);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_IfStatementContext_getChildren(k_IfStatementContext_t* context,
@@ -928,7 +927,7 @@ k_IfClauseContext_t* k_IfClauseContext_new(k_ASTNode_t* node) {
 void k_IfClauseContext_delete(k_IfClauseContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_IfClauseContext_getChildren(k_IfClauseContext_t* context,
@@ -960,7 +959,7 @@ k_ElseIfClauseContext_t* k_ElseIfClauseContext_new(k_ASTNode_t* node) {
 void k_ElseIfClauseContext_delete(k_ElseIfClauseContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ElseIfClauseContext_getChildren(k_ElseIfClauseContext_t* context,
@@ -991,7 +990,7 @@ k_ElseClauseContext_t* k_ElseClauseContext_new(k_ASTNode_t* node) {
 void k_ElseClauseContext_delete(k_ElseClauseContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ElseClauseContext_getChildren(k_ElseClauseContext_t* context,
@@ -1022,7 +1021,7 @@ k_IterativeStatementContext_t* k_IterativeStatementContext_new(k_ASTNode_t* node
 void k_IterativeStatementContext_delete(k_IterativeStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_IterativeStatementContext_getChildren(k_IterativeStatementContext_t* context,
@@ -1054,7 +1053,7 @@ k_LabelClauseContext_t* k_LabelClauseContext_new(k_ASTNode_t* node) {
 
 void k_LabelClauseContext_delete(k_LabelClauseContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_LabelClauseContext_getChildren(k_LabelClauseContext_t* context,
@@ -1085,7 +1084,7 @@ k_WhileStatementContext_t* k_WhileStatementContext_new(k_ASTNode_t* node) {
 void k_WhileStatementContext_delete(k_WhileStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_WhileStatementContext_getChildren(k_WhileStatementContext_t* context,
@@ -1118,7 +1117,7 @@ k_ForStatementContext_t* k_ForStatementContext_new(k_ASTNode_t* node) {
 void k_ForStatementContext_delete(k_ForStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ForStatementContext_getChildren(k_ForStatementContext_t* context,
@@ -1152,7 +1151,7 @@ k_ForParameterContext_t* k_ForParameterContext_new(k_ASTNode_t* node) {
 void k_ForParameterContext_delete(k_ForParameterContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ForParameterContext_getChildren(k_ForParameterContext_t* context,
@@ -1184,7 +1183,7 @@ void k_TryStatementContext_delete(k_TryStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->catchClauses);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_TryStatementContext_getChildren(k_TryStatementContext_t* context,
@@ -1218,7 +1217,7 @@ k_TryClauseContext_t* k_TryClauseContext_new(k_ASTNode_t* node) {
 void k_TryClauseContext_delete(k_TryClauseContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_TryClauseContext_getChildren(k_TryClauseContext_t* context,
@@ -1250,7 +1249,7 @@ k_CatchClauseContext_t* k_CatchClauseContext_new(k_ASTNode_t* node) {
 void k_CatchClauseContext_delete(k_CatchClauseContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_CatchClauseContext_getChildren(k_CatchClauseContext_t* context,
@@ -1283,7 +1282,7 @@ void k_CatchFilterContext_delete(k_CatchFilterContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->typeNames);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_CatchFilterContext_getChildren(k_CatchFilterContext_t* context,
@@ -1314,7 +1313,7 @@ void k_TypeNameContext_delete(k_TypeNameContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->identifiers);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_TypeNameContext_getChildren(k_TypeNameContext_t* context,
@@ -1344,7 +1343,7 @@ k_FinallyClauseContext_t* k_FinallyClauseContext_new(k_ASTNode_t* node) {
 void k_FinallyClauseContext_delete(k_FinallyClauseContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_FinallyClauseContext_getChildren(k_FinallyClauseContext_t* context,
@@ -1375,7 +1374,7 @@ k_SynchronizeStatementContext_t* k_SynchronizeStatementContext_new(k_ASTNode_t* 
 void k_SynchronizeStatementContext_delete(k_SynchronizeStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_SynchronizeStatementContext_getChildren(k_SynchronizeStatementContext_t* context,
@@ -1407,7 +1406,7 @@ k_WithStatementContext_t* k_WithStatementContext_new(k_ASTNode_t* node) {
 void k_WithStatementContext_delete(k_WithStatementContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_WithStatementContext_getChildren(k_WithStatementContext_t* context,
@@ -1439,7 +1438,7 @@ void k_WithParametersContext_delete(k_WithParametersContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->withParameters);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_WithParametersContext_getChildren(k_WithParametersContext_t* context,
@@ -1471,7 +1470,7 @@ k_WithParameterContext_t* k_WithParameterContext_new(k_ASTNode_t* node) {
 void k_WithParameterContext_delete(k_WithParameterContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_WithParameterContext_getChildren(k_WithParameterContext_t* context,
@@ -1504,7 +1503,7 @@ k_ClassDeclarationContext_t* k_ClassDeclarationContext_new(k_ASTNode_t* node) {
 void k_ClassDeclarationContext_delete(k_ClassDeclarationContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ClassDeclarationContext_getChildren(k_ClassDeclarationContext_t* context,
@@ -1539,7 +1538,7 @@ void k_ClassExtendsClauseContext_delete(k_ClassExtendsClauseContext_t* context) 
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->typeNames);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ClassExtendsClauseContext_getChildren(k_ClassExtendsClauseContext_t* context,
@@ -1570,7 +1569,7 @@ void k_ClassSuiteContext_delete(k_ClassSuiteContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->classMembers);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ClassSuiteContext_getChildren(k_ClassSuiteContext_t* context,
@@ -1603,7 +1602,7 @@ void k_ClassMemberContext_delete(k_ClassMemberContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->modifiers);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
@@ -1637,7 +1636,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 // void k_ConstructorDeclarationContext_delete(k_ConstructorDeclarationContext_t* context) {
 //     jtk_Assert_assertObject(context, "The specified context is null.");
 
-//     jtdeallocate(context);
+//     deallocate(context);
 // }
 
 // void k_ConstructorDeclarationContext_getChildren(k_ConstructorDeclarationContext_t* context,
@@ -1674,7 +1673,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 // void k_EnumerationDeclarationContext_delete(k_EnumerationDeclarationContext_t* context) {
 //     jtk_Assert_assertObject(context, "The specified context is null.");
 
-//     jtdeallocate(context);
+//     deallocate(context);
 // }
 
 // void k_EnumerationDeclarationContext_getChildren(k_EnumerationDeclarationContext_t* context,
@@ -1708,7 +1707,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 // void k_EnumerationBaseClauseContext_delete(k_EnumerationBaseClauseContext_t* context) {
 //     jtk_Assert_assertObject(context, "The specified context is null.");
 
-//     jtdeallocate(context);
+//     deallocate(context);
 // }
 
 // void k_EnumerationBaseClauseContext_getChildren(k_EnumerationBaseClauseContext_t* context,
@@ -1739,7 +1738,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 //     jtk_Assert_assertObject(context, "The specified context is null.");
 
 //     jtk_ArrayList_delete(context->enumerates);
-//     jtdeallocate(context);
+//     deallocate(context);
 // }
 
 // void k_EnumerationSuiteContext_getChildren(k_EnumerationSuiteContext_t* context,
@@ -1770,7 +1769,7 @@ void k_ClassMemberContext_getChildren(k_ClassMemberContext_t* context,
 // void k_EnumerateContext_delete(k_EnumerateContext_t* context) {
 //     jtk_Assert_assertObject(context, "The specified context is null.");
 
-//     jtdeallocate(context);
+//     deallocate(context);
 // }
 
 // void k_EnumerateContext_getChildren(k_EnumerateContext_t* context,
@@ -1804,7 +1803,7 @@ void k_ExpressionsContext_delete(k_ExpressionsContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->expressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ExpressionsContext_getChildren(k_ExpressionsContext_t* context,
@@ -1834,7 +1833,7 @@ k_ExpressionContext_t* k_ExpressionContext_new(k_ASTNode_t* node) {
 void k_ExpressionContext_delete(k_ExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ExpressionContext_getChildren(k_ExpressionContext_t* context,
@@ -1866,7 +1865,7 @@ k_AssignmentExpressionContext_t* k_AssignmentExpressionContext_new(k_ASTNode_t* 
 void k_AssignmentExpressionContext_delete(k_AssignmentExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_AssignmentExpressionContext_getChildren(k_AssignmentExpressionContext_t* context,
@@ -1902,7 +1901,7 @@ k_ConditionalExpressionContext_t* k_ConditionalExpressionContext_new(k_ASTNode_t
 void k_ConditionalExpressionContext_delete(k_ConditionalExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ConditionalExpressionContext_getChildren(k_ConditionalExpressionContext_t* context,
@@ -1938,7 +1937,7 @@ void k_LogicalOrExpressionContext_delete(k_LogicalOrExpressionContext_t* context
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->logicalAndExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_LogicalOrExpressionContext_getChildren(k_LogicalOrExpressionContext_t* context,
@@ -1971,7 +1970,7 @@ void k_LogicalAndExpressionContext_delete(k_LogicalAndExpressionContext_t* conte
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->inclusiveOrExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_LogicalAndExpressionContext_getChildren(k_LogicalAndExpressionContext_t* context,
@@ -2004,7 +2003,7 @@ void k_InclusiveOrExpressionContext_delete(k_InclusiveOrExpressionContext_t* con
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->exclusiveOrExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_InclusiveOrExpressionContext_getChildren(k_InclusiveOrExpressionContext_t* context,
@@ -2037,7 +2036,7 @@ void k_ExclusiveOrExpressionContext_delete(k_ExclusiveOrExpressionContext_t* con
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->andExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ExclusiveOrExpressionContext_getChildren(k_ExclusiveOrExpressionContext_t* context,
@@ -2070,7 +2069,7 @@ void k_AndExpressionContext_delete(k_AndExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->equalityExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_AndExpressionContext_getChildren(k_AndExpressionContext_t* context,
@@ -2109,7 +2108,7 @@ void k_EqualityExpressionContext_delete(k_EqualityExpressionContext_t* context) 
         jtk_Pair_delete(pair);
     }
     jtk_ArrayList_delete(context->relationalExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_EqualityExpressionContext_getChildren(k_EqualityExpressionContext_t* context,
@@ -2156,7 +2155,7 @@ void k_RelationalExpressionContext_delete(k_RelationalExpressionContext_t* conte
         jtk_Pair_delete(pair);
     }
     jtk_ArrayList_delete(context->shiftExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_RelationalExpressionContext_getChildren(k_RelationalExpressionContext_t* context,
@@ -2203,7 +2202,7 @@ void k_ShiftExpressionContext_delete(k_ShiftExpressionContext_t* context) {
         jtk_Pair_delete(pair);
     }
     jtk_ArrayList_delete(context->additiveExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ShiftExpressionContext_getChildren(k_ShiftExpressionContext_t* context,
@@ -2250,7 +2249,7 @@ void k_AdditiveExpressionContext_delete(k_AdditiveExpressionContext_t* context) 
         jtk_Pair_delete(pair);
     }
     jtk_ArrayList_delete(context->multiplicativeExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_AdditiveExpressionContext_getChildren(k_AdditiveExpressionContext_t* context,
@@ -2296,7 +2295,7 @@ void k_MultiplicativeExpressionContext_delete(k_MultiplicativeExpressionContext_
         jtk_Pair_delete(pair);
     }
     jtk_ArrayList_delete(context->unaryExpressions);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_MultiplicativeExpressionContext_getChildren(k_MultiplicativeExpressionContext_t* context,
@@ -2336,7 +2335,7 @@ k_UnaryExpressionContext_t* k_UnaryExpressionContext_new(k_ASTNode_t* node) {
 void k_UnaryExpressionContext_delete(k_UnaryExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_UnaryExpressionContext_getChildren(k_UnaryExpressionContext_t* context,
@@ -2374,7 +2373,7 @@ void k_PostfixExpressionContext_delete(k_PostfixExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->postfixParts);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_PostfixExpressionContext_getChildren(k_PostfixExpressionContext_t* context,
@@ -2405,7 +2404,7 @@ k_SubscriptContext_t* k_SubscriptContext_new(k_ASTNode_t* node) {
 void k_SubscriptContext_delete(k_SubscriptContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_SubscriptContext_getChildren(k_SubscriptContext_t* context,
@@ -2435,7 +2434,7 @@ k_FunctionArgumentsContext_t* k_FunctionArgumentsContext_new(k_ASTNode_t* node) 
 void k_FunctionArgumentsContext_delete(k_FunctionArgumentsContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_FunctionArgumentsContext_getChildren(k_FunctionArgumentsContext_t* context,
@@ -2467,7 +2466,7 @@ k_MemberAccessContext_t* k_MemberAccessContext_new(k_ASTNode_t* node) {
 void k_MemberAccessContext_delete(k_MemberAccessContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_MemberAccessContext_getChildren(k_MemberAccessContext_t* context,
@@ -2496,7 +2495,7 @@ k_PostfixOperatorContext_t* k_PostfixOperatorContext_new(k_ASTNode_t* node) {
 
 void k_PostfixOperatorContext_delete(k_PostfixOperatorContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_PostfixOperatorContext_getChildren(k_PostfixOperatorContext_t* context,
@@ -2524,7 +2523,7 @@ k_PrimaryExpressionContext_t* k_PrimaryExpressionContext_new(k_ASTNode_t* node) 
 
 void k_PrimaryExpressionContext_delete(k_PrimaryExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_PrimaryExpressionContext_getChildren(k_PrimaryExpressionContext_t* context, jtk_ArrayList_t* children) {
@@ -2553,7 +2552,7 @@ k_MapExpressionContext_t* k_MapExpressionContext_new(k_ASTNode_t* node) {
 void k_MapExpressionContext_delete(k_MapExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_MapExpressionContext_getChildren(k_MapExpressionContext_t* context,
@@ -2584,7 +2583,7 @@ void k_MapEntriesContext_delete(k_MapEntriesContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
     jtk_ArrayList_delete(context->mapEntries);
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_MapEntriesContext_getChildren(k_MapEntriesContext_t* context,
@@ -2615,7 +2614,7 @@ k_MapEntryContext_t* k_MapEntryContext_new(k_ASTNode_t* node) {
 void k_MapEntryContext_delete(k_MapEntryContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_MapEntryContext_getChildren(k_MapEntryContext_t* context,
@@ -2646,7 +2645,7 @@ k_ListExpressionContext_t* k_ListExpressionContext_new(k_ASTNode_t* node) {
 void k_ListExpressionContext_delete(k_ListExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_ListExpressionContext_getChildren(k_ListExpressionContext_t* context,
@@ -2677,7 +2676,7 @@ k_NewExpressionContext_t* k_NewExpressionContext_new(k_ASTNode_t* node) {
 void k_NewExpressionContext_delete(k_NewExpressionContext_t* context) {
     jtk_Assert_assertObject(context, "The specified context is null.");
 
-    jtdeallocate(context);
+    deallocate(context);
 }
 
 void k_NewExpressionContext_getChildren(k_NewExpressionContext_t* context,

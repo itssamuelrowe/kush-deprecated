@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <kush/symbol-table/Analyzer.h>
+#include <kush/analyzer.h>
 
 /*
  * The following text describes a naive algorithm that I developed to analyze
@@ -166,7 +166,7 @@ Primitives primitives = {
 };
 
 
-Context* find(k_Scope_t* scope, const uint8_t* identifier, int32_t size) {
+Context* find(Scope* scope, const uint8_t* identifier, int32_t size) {
     Context* symbol = NULL;
     while (scope != NULL) {
         symbol = resolve(scope, identifier);
@@ -183,7 +183,7 @@ Context* find(k_Scope_t* scope, const uint8_t* identifier, int32_t size) {
 
 // Import
 
-bool import(Analyzer* analyzer, const char* name, int32 size,
+bool import(Analyzer* analyzer, const char* name, int32_t size,
     bool wildcard) {
     Module* module = NULL; // TODO
 
@@ -200,16 +200,16 @@ void defineSymbols(Analyzer* analyzer, CompilationUnit* unit) {
     unit->scope = Scope_forCompilationUnit();
     analyzer->scope = unit->scope;
 
-    int32 structureCount = jtArrayList_getSize(unit->structures);
-    int32 j;
+    int32_t structureCount = jtArrayList_getSize(unit->structures);
+    int32_t j;
     for (j = 0; j < structureCount; j++) {
         Structure* structure = (Structure*)jtArrayList_getValue(
             unit->structures, j);
         defineStructure(analyzer, structure);
     }
 
-    int32 functionCount = jtArrayList_getSize(unit->functions);
-    int32 i;
+    int32_t functionCount = jtArrayList_getSize(unit->functions);
+    int32_t i;
     for (i = 0; i < functionCount; i++) {
         Function* function = (Function*)jtArrayList_getValue(
             unit->functions, i);
@@ -222,11 +222,11 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
     structure->scope = Scope_forStructure(analyzer->scope);
     Scope_addStructure(analyzer->scope, structure);
 
-    int32 limit = jtArrayList_getSize(declaration->variables);
-    int32 i;
+    int32_t limit = jtArrayList_getSize(declaration->variables);
+    int32_t i;
     for (i = 0; i < limit; i++) {
-        Storage* storage =
-            (Storage*)jtArrayList_getValue(declaration->variables, i);
+        Variable* storage =
+            (Variable*)jtArrayList_getValue(declaration->variables, i);
         declarator->parent = structure->scope;
         Scope_addStorage(structure->scope, storage);
     }
@@ -239,19 +239,19 @@ void defineFunction(Analyzer* analyzer, Function* function) {
     Scope_addFunction(analyzer->scope, function);
 
     Scope* scope = defineLocals(analyzer, function->body);
-    int32 parameterCount = jtArrayList_getSize(function->parameters);
-    int32 i;
+    int32_t parameterCount = jtArrayList_getSize(function->parameters);
+    int32_t i;
     for (i = 0; i < parameterCount; i++) {
-        Variable* parameter = (Storage*)jtArrayList_getValue(function->parameters, i);
+        Variable* parameter = (Variable*)jtArrayList_getValue(function->parameters, i);
         Scope_addVariable(scope, parameter);
     }
 }
 
-Scope* defineLocals(Analyzer* analyzer, BlockStatement* block) {
+Scope* defineLocals(Analyzer* analyzer, Block* block) {
     block->scope = analyzer->scope = Scope_forLocal(analyzer->scope);
 
-    int32 limit = jtArrayList_getSize(block->statements);
-    int32 i;
+    int32_t limit = jtArrayList_getSize(block->statements);
+    int32_t i;
     for (i = 0; i < limit; i++) {
         Context* context = (Context*)jtArrayList_getValue(
             block->statements, i);
@@ -271,8 +271,8 @@ Scope* defineLocals(Analyzer* analyzer, BlockStatement* block) {
             case CONTEXT_IF_STATEMENT: {
                 IfStatement* statement = (IfStatement*)context;
                 defineLocals(analyzer, statement->ifClause->body);
-                int32 count = jtArrayList_getSize(statement->elseIfClauses);
-                int32 j;
+                int32_t count = jtArrayList_getSize(statement->elseIfClauses);
+                int32_t j;
                 for (j = 0; j < count; j++) {
                     IfClause* clause = (IfClause*)jtArrayList_getValue(
                         statement->elseIfClauses, j);
@@ -288,8 +288,8 @@ Scope* defineLocals(Analyzer* analyzer, BlockStatement* block) {
                 TryStatement* statement = (TryStatement*)context;
                 defineLocals(analyzer, statement->tryClause);
 
-                int32 count = jtArrayList_getSize(statement->catchClauses);
-                int32 j;
+                int32_t count = jtArrayList_getSize(statement->catchClauses);
+                int32_t j;
                 for (j = 0; j < count; j++) {
                     CatchClause* clause = (CatchClause*)jtArrayList_getValue(
                         statement->catchClauses, j);
@@ -306,8 +306,8 @@ Scope* defineLocals(Analyzer* analyzer, BlockStatement* block) {
 
             case CONTEXT_VARIABLE_DECLARATION: {
                 VariableDeclaration* statement = (VariableDeclaration*)context;
-                int32 count = jtArrayList_getSize(statement->variables);
-                int32 j;
+                int32_t count = jtArrayList_getSize(statement->variables);
+                int32_t j;
                 for (j = 0; j < count; j++) {
                     Variable* variable = (Variable*)jtArrayList_getValue(
                         statement->variables, j);
@@ -355,17 +355,17 @@ void Analyzer_analyze(Analyzer* analyzer, Module* module) {
 // Reset
 
 void Analyzer_reset(Analyzer* analyzer,
-    SymbolTable* symbolTable, const uint8* package, int32 packageSize) {
+    SymbolTable* symbolTable, const uint8* package, int32_t packageSize) {
     analyzer->symbolTable = symbolTable;
     analyzer->package = package;
     analyzer->packageSize = packageSize;
 }
 
 
-uint8* getModuleName(jtArrayList* identifiers, int32* size) {
-    int32 identifierCount = jtArrayList_getSize(identifiers);
+uint8* getModuleName(jtArrayList* identifiers, int32_t* size) {
+    int32_t identifierCount = jtArrayList_getSize(identifiers);
     jtStringBuilder* builder = jtStringBuilder_new();
-    int32 i;
+    int32_t i;
     for (i = 0; i < identifierCount; i++) {
         Token* identifier = (Token*)jtArrayList_getValue(identifiers, i);
         jtStringBuilder_appendEx_z(builder, identifier->text, identifier->length);
@@ -389,12 +389,12 @@ void resolve(Analyzer* analyzer, Module* module) {
         importDefaults(analyzer);
     }
 
-    int32 importCount = jtArrayList_getSize(module->imports);
-    int32 i;
+    int32_t importCount = jtArrayList_getSize(module->imports);
+    int32_t i;
     for (i = 0; i < importCount; i++) {
         ImportDeclaration* declaration = (ImportDeclaration*)jtArrayList_getValue(
             module->imports, i);
-        int32 size;
+        int32_t size;
         uint8* name = getModuleName(declaration->identifiers, &size);
 
         // If a module was previously imported, we should'nt complain.
@@ -410,8 +410,8 @@ void resolve(Analyzer* analyzer, Module* module) {
         jtCString_delete(name);
     }
 
-    int32 functionCount = jtArrayList_getSize(unit->functions);
-    int32 i;
+    int32_t functionCount = jtArrayList_getSize(unit->functions);
+    int32_t i;
     for (i = 0; i < functionCount; i++) {
         Function* function = (Function*)jtArrayList_getValue(
             unit->functions, i);
@@ -419,11 +419,11 @@ void resolve(Analyzer* analyzer, Module* module) {
     }
 }
 
-void resolveLocals(Analyzer* analyzer, BlockStatement* block) {
+void resolveLocals(Analyzer* analyzer, Block* block) {
     analyzer->scope = block->scope;
 
-    int32 limit = jtArrayList_getSize(block->statements);
-    int32 i;
+    int32_t limit = jtArrayList_getSize(block->statements);
+    int32_t i;
     for (i = 0; i < limit; i++) {
         Context* context = (Context*)jtArrayList_getValue(
             block->statements, i);
@@ -443,8 +443,8 @@ void resolveLocals(Analyzer* analyzer, BlockStatement* block) {
             case CONTEXT_IF_STATEMENT: {
                 IfStatement* statement = (IfStatement*)context;
                 resolveLocals(analyzer, statement->ifClause->body);
-                int32 count = jtArrayList_getSize(statement->elseIfClauses);
-                int32 j;
+                int32_t count = jtArrayList_getSize(statement->elseIfClauses);
+                int32_t j;
                 for (j = 0; j < count; j++) {
                     IfClause* clause = (IfClause*)jtArrayList_getValue(
                         statement->elseIfClauses, j);
@@ -460,8 +460,8 @@ void resolveLocals(Analyzer* analyzer, BlockStatement* block) {
                 TryStatement* statement = (TryStatement*)context;
                 resolveLocals(analyzer, statement->tryClause);
 
-                int32 count = jtArrayList_getSize(statement->catchClauses);
-                int32 j;
+                int32_t count = jtArrayList_getSize(statement->catchClauses);
+                int32_t j;
                 for (j = 0; j < count; j++) {
                     CatchClause* clause = (CatchClause*)jtArrayList_getValue(
                         statement->catchClauses, j);
@@ -478,8 +478,8 @@ void resolveLocals(Analyzer* analyzer, BlockStatement* block) {
 
             case CONTEXT_VARIABLE_DECLARATION: {
                 VariableDeclaration* statement = (VariableDeclaration*)context;
-                int32 count = jtArrayList_getSize(statement->variables);
-                int32 j;
+                int32_t count = jtArrayList_getSize(statement->variables);
+                int32_t j;
                 for (j = 0; j < count; j++) {
                     Variable* variable = (Variable*)jtArrayList_getValue(
                         statement->variables, j);
@@ -500,7 +500,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
             BinaryExpression* expression = (BinaryExpression*)context;
             Type* leftType = resolveExpression(analyzer, expression->left);
 
-            int32 count = jtArrayList_getSize(expression->others);
+            int32_t count = jtArrayList_getSize(expression->others);
             if (count == 1) {
                 jtPair* pair = (jtPair*)jtArrayList_getValue(
                     expression->others, 0);
@@ -529,8 +529,8 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
             BinaryExpression* expression = (BinaryExpression*)context;
             Type* leftType = resolveExpression(analyzer, expression->left);
 
-            int32 count = jtArrayList_getSize(expression->others);
-            int32 i;
+            int32_t count = jtArrayList_getSize(expression->others);
+            int32_t i;
             for (i = 0; i < count; i++) {
                 jtPair* pair = (jtPair*)jtArrayList_getValue(
                     expression->others, i);
@@ -580,8 +580,8 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 resolveExpression(expression->primary);
 
             Type* previous = type;
-            int32 count = jtArrayList_getSize(expression->postfixParts);
-            int32 i;
+            int32_t count = jtArrayList_getSize(expression->postfixParts);
+            int32_t i;
             for (i = 0; i < count; i++) {
                 Context* postfix = (Context*)jtArrayList_getValue(
                     expression->postfixParts, i);
@@ -601,7 +601,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                         reportError(analyzer, ERROR_INVALID_FUNCTION_INVOCATION,
                             arguments->parenthesis);
                     }
-                    int32 j;
+                    int32_t j;
                     for (j = 0; j < arguments->expressions->size; j++) {
                         BinaryExpression* argument = (BinaryExpression*)
                             arguments->expressions->values[j];

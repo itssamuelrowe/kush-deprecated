@@ -16,7 +16,7 @@
 
 // Monday, January 08, 2018
 
-#include <kush/symbol-table/Symbol.h>
+#include <kush/Symbol.h>
 #include <kush/Token.h>
 #include <jtk/core/CString.h>
 
@@ -25,17 +25,17 @@
  *******************************************************************************/
 
 k_Symbol_t* k_Symbol_new(k_SymbolCategory_t category,
-    k_ASTNode_t* identifier, k_Scope_t* enclosingScope) {
+    k_ASTNode_t* identifier, Scope* parent) {
     k_Symbol_t* symbol = allocate(k_Symbol_t, 1);
     symbol->category = category;
     symbol->identifier = identifier;
-    symbol->enclosingScope = enclosingScope;
+    symbol->parent = parent;
     symbol->modifiers = 0;
-    symbol->ticket = (enclosingScope != NULL)? enclosingScope->nextTicket++ : -1;
+    symbol->ticket = (parent != NULL)? parent->nextTicket++ : -1;
     symbol->index = -1;
     symbol->flags = 0;
     if (identifier != NULL) {
-        k_Token_t* token = (k_Token_t*)identifier->context;
+        Token* token = (Token*)identifier->context;
         symbol->name = token->text;
         symbol->nameSize = token->length;
     }
@@ -51,24 +51,24 @@ k_Symbol_t* k_Symbol_new(k_SymbolCategory_t category,
 }
 
 k_Symbol_t* k_Symbol_forConstant(k_ASTNode_t* identifier,
-    k_Scope_t* enclosingScope) {
-    return k_Symbol_new(ZEN_SYMBOL_CATEGORY_CONSTANT, identifier, enclosingScope);
+    Scope* parent) {
+    return k_Symbol_new(ZEN_SYMBOL_CATEGORY_CONSTANT, identifier, parent);
 }
 
 k_Symbol_t* k_Symbol_forVariable(k_ASTNode_t* identifier,
-    k_Scope_t* enclosingScope) {
-    return k_Symbol_new(ZEN_SYMBOL_CATEGORY_VARIABLE, identifier, enclosingScope);
+    Scope* parent) {
+    return k_Symbol_new(ZEN_SYMBOL_CATEGORY_VARIABLE, identifier, parent);
 }
 
 k_Symbol_t* k_Symbol_forFunction(k_ASTNode_t* identifier,
-    k_Scope_t* enclosingScope) {
+    Scope* parent) {
     k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_FUNCTION,
-        identifier, enclosingScope);
+        identifier, parent);
     return symbol;
 }
 
 k_Symbol_t* k_Symbol_forClass(k_ASTNode_t* identifier,
-    k_Scope_t* enclosingScope, k_Scope_t* classScope, const uint8_t* name,
+    Scope* parent, Scope* classScope, const uint8_t* name,
     int32_t nameSize, const uint8_t* package, int32_t packageSize) {
     uint8_t* qualifiedName = NULL;
     int32_t qualifiedNameSize = -1;
@@ -93,7 +93,7 @@ k_Symbol_t* k_Symbol_forClass(k_ASTNode_t* identifier,
     uint8_t* descriptor = jtk_CString_newEx(qualifiedName, qualifiedNameSize);
     jtk_Arrays_replace_b(descriptor, qualifiedNameSize, '.', '/');
 
-    k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_CLASS, identifier, enclosingScope);
+    k_Symbol_t* symbol = k_Symbol_new(ZEN_SYMBOL_CATEGORY_CLASS, identifier, parent);
     k_ClassSymbol_t* classSymbol = &symbol->context.asClass;
     classSymbol->qualifiedName = qualifiedName;
     classSymbol->qualifiedNameSize = qualifiedNameSize;
@@ -104,7 +104,7 @@ k_Symbol_t* k_Symbol_forClass(k_ASTNode_t* identifier,
     return symbol;
 }
 
-k_Symbol_t* k_Symbol_forClassAlt(k_Scope_t* classScope, const uint8_t* descriptor,
+k_Symbol_t* k_Symbol_forClassAlt(Scope* classScope, const uint8_t* descriptor,
     int32_t descriptorSize) {
     uint8_t* qualifiedName = jtk_CString_newEx(descriptor,
         descriptorSize);
@@ -122,14 +122,14 @@ k_Symbol_t* k_Symbol_forClassAlt(k_Scope_t* classScope, const uint8_t* descripto
 }
 
 k_Symbol_t* k_Symbol_forLabel(k_ASTNode_t* identifier,
-    k_Scope_t* enclosingScope) {
-    return k_Symbol_new(ZEN_SYMBOL_CATEGORY_LABEL, identifier, enclosingScope);
+    Scope* parent) {
+    return k_Symbol_new(ZEN_SYMBOL_CATEGORY_LABEL, identifier, parent);
 }
 
 k_Symbol_t* k_Symbol_forExternal(k_ASTNode_t* identifier,
-    k_Scope_t* enclosingScope, k_Symbol_t* other) {
+    Scope* parent, k_Symbol_t* other) {
     k_Symbol_t* result = k_Symbol_new(ZEN_SYMBOL_CATEGORY_EXTERNAL,
-        identifier, enclosingScope);
+        identifier, parent);
     result->context.asExternal = other;
 
     return result;
@@ -145,7 +145,7 @@ void k_Symbol_delete(k_Symbol_t* symbol) {
         k_ClassSymbol_destroy(&symbol->context.asClass);
     }
 
-    jtdeallocate(symbol);
+    deallocate(symbol);
 }
 
 // Category
@@ -189,9 +189,9 @@ bool k_Symbol_isExternal(k_Symbol_t* symbol) {
     return (symbol->category == ZEN_SYMBOL_CATEGORY_EXTERNAL);
 }
 
-k_Scope_t* k_Symbol_getEnclosingScope(k_Symbol_t* symbol) {
+Scope* k_Symbol_getEnclosingScope(k_Symbol_t* symbol) {
     jtk_Assert_assertObject(symbol, "The specified symbol is null.");
-    return symbol->enclosingScope;
+    return symbol->parent;
 }
 
 k_ASTNode_t* k_Symbol_getIdentifier(k_Symbol_t* symbol) {

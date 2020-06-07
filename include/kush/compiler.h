@@ -19,12 +19,9 @@
 #ifndef KUSH_COMPILER_COMPILER_H
 #define KUSH_COMPILER_COMPILER_H
 
-#include <kush/Configuration.h>
-#include <kush/ast/ASTNode.h>
-#include <kush/ast/ASTAnnotations.h>
-#include <kush/symbol-table/SymbolTable.h>
-#include <kush/symbol-table/SymbolLoader.h>
+#include <kush/configuration.h>
 #include <kush/error-handler.h>
+#include <kush/symbol-loader.h>
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
@@ -34,11 +31,13 @@
  * Compiler                                                                   *
  ******************************************************************************/
 
+typedef struct Module Module;
+
 /**
  * @author Samuel Rowe
  * @since Kush 0.1
  */
-struct k_Compiler_t {
+struct Compiler {
     bool dumpTokens;
     bool dumpNodes;
     bool footprint;
@@ -47,12 +46,10 @@ struct k_Compiler_t {
     jtk_ArrayList_t* inputFiles;
     int32_t currentFileIndex;
     k_ErrorHandler_t* errorHandler;
-    k_ASTNode_t** compilationUnits;
-    k_SymbolTable_t** symbolTables;
-    k_ASTAnnotations_t** scopes;
+    Module** modules;
     uint8_t** packages;
     int32_t* packageSizes;
-    k_SymbolLoader_t* symbolLoader;
+    SymbolLoader* symbolLoader;
     jtk_HashMap_t* repository;
     jtk_ArrayList_t* trash;
     bool coreApi;
@@ -61,46 +58,19 @@ struct k_Compiler_t {
 /**
  * @memberof Compiler
  */
-typedef struct k_Compiler_t k_Compiler_t;
+typedef struct Compiler Compiler;
 
 // Constructor
 
-k_Compiler_t* k_Compiler_new();
+Compiler* k_Compiler_new();
 
 // Destructor
 
-void k_Compiler_delete(k_Compiler_t* compiler);
-
-// Error
-
-void k_Compiler_printErrors(k_Compiler_t* compiler);
-
-// Phase
-
-void k_Compiler_initialize(k_Compiler_t* compiler);
-void k_Compiler_buildAST(k_Compiler_t* compiler);
-void k_Compiler_analyze(k_Compiler_t* compiler);
-void k_Compiler_generate(k_Compiler_t* compiler);
-void k_Compiler_destroyNestedScopes(k_ASTAnnotations_t* annotations);
-void k_Compiler_destroySymbol(k_Symbol_t* symbol);
-void k_Compiler_destroyScope(k_Scope_t* scope);
-
-// Register
-
-void k_Compiler_registerSymbol(k_Compiler_t* compiler, const uint8_t* identifier,
-    int32_t identifierSize, k_Symbol_t* symbol);
-
-k_Symbol_t* k_Compiler_resolveSymbol(k_Compiler_t* compiler,
-    const uint8_t* name, int32_t nameSize);
-
-// Token
-
-void k_Compiler_printToken(k_Token_t* token);
-void k_Compiler_k_Compiler_printTokens(k_Compiler_t* compiler, jtk_ArrayList_t* tokens);
+void k_Compiler_delete(Compiler* compiler);
 
 // Compiler
 
-bool k_Compiler_compileEx(k_Compiler_t* compiler, char** arguments, int32_t length);
-bool k_Compiler_compile(k_Compiler_t* compiler);
+bool k_Compiler_compileEx(Compiler* compiler, char** arguments, int32_t length);
+bool k_Compiler_compile(Compiler* compiler);
 
 #endif /* KUSH_COMPILER_COMPILER_H */

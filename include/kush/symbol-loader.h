@@ -23,8 +23,7 @@
  * SymbolLoader                                                                *
  *******************************************************************************/
 
-#include <kush/Configuration.h>
-#include <kush/symbol-table/Symbol.h>
+#include <kush/configuration.h>
 
 #include <jtk/collection/Iterator.h>
 #include <jtk/collection/map/HashMap.h>
@@ -47,7 +46,7 @@
  */
 #define KUSH_ENTITY_LOADER_BUFFER_SIZE (3 * 1024)
 
-typedef struct k_Compiler_t k_Compiler_t;
+typedef struct Compiler Compiler;
 
 /**
  * @class SymbolLoader
@@ -55,7 +54,7 @@ typedef struct k_Compiler_t k_Compiler_t;
  * @author Samuel Rowe
  * @since Kush 0.1
  */
-struct k_SymbolLoader_t {
+struct SymbolLoader {
 
     /**
      * The list of directories where the loader looks for the definitions
@@ -70,32 +69,32 @@ struct k_SymbolLoader_t {
      */
     jtk_HashMap_t* symbols;
 
-    k_Compiler_t* compiler;
+    Compiler* compiler;
 
     int32_t index;
     uint8_t* bytes;
     int32_t size;
-    k_Symbol_t* symbol;
+    // k_Symbol_t* symbol;
 };
 
 /**
  * @memberof SymbolLoader
  */
-typedef struct k_SymbolLoader_t k_SymbolLoader_t;
+typedef struct SymbolLoader SymbolLoader;
 
 /* Constructor */
 
-k_SymbolLoader_t* k_SymbolLoader_new(k_Compiler_t* compiler);
-k_SymbolLoader_t* k_SymbolLoader_newWithEntityDirectories(k_Compiler_t* compiler,
-    jtk_Iterator_t* entityDirectoryIterator);
+// SymbolLoader* k_SymbolLoader_new(Compiler* compiler);
+// SymbolLoader* k_SymbolLoader_newWithEntityDirectories(Compiler* compiler,
+//     jtk_Iterator_t* entityDirectoryIterator);
 
 /* Destructor */
 
-void k_SymbolLoader_delete(k_SymbolLoader_t* loader);
+// void k_SymbolLoader_delete(SymbolLoader* loader);
 
 /* Directory */
 
-bool k_SymbolLoader_addDirectory(k_SymbolLoader_t* loader, const uint8_t* directory);
+// bool k_SymbolLoader_addDirectory(SymbolLoader* loader, const uint8_t* directory);
 
 // Find Symbol
 
@@ -108,8 +107,8 @@ bool k_SymbolLoader_addDirectory(k_SymbolLoader_t* loader, const uint8_t* direct
  * @memberof SymbolLoader
  */
 
-k_Symbol_t* k_SymbolLoader_findSymbol(k_SymbolLoader_t* loader,
-    const uint8_t* descriptor, int32_t descriptorSize);
+// k_Symbol_t* k_SymbolLoader_findSymbol(SymbolLoader* loader,
+//     const uint8_t* descriptor, int32_t descriptorSize);
 
 /**
  * It tries to load a class with the specified descriptor from a physical
@@ -118,8 +117,8 @@ k_Symbol_t* k_SymbolLoader_findSymbol(k_SymbolLoader_t* loader,
  *
  * @memberof SymbolLoader
  */
-k_Symbol_t* k_SymbolLoader_loadSymbol(k_SymbolLoader_t* loader,
-    const uint8_t* descriptor, int32_t descriptorSize);
+// k_Symbol_t* k_SymbolLoader_loadSymbol(SymbolLoader* loader,
+//     const uint8_t* descriptor, int32_t descriptorSize);
 
 /**
  * It tries to load a class from the specified regular file path. If the file
@@ -127,8 +126,8 @@ k_Symbol_t* k_SymbolLoader_loadSymbol(k_SymbolLoader_t* loader,
  *
  * @memberof SymbolLoader
  */
-k_Symbol_t* k_SymbolLoader_loadEntityFromHandle(k_SymbolLoader_t* loader,
-    jtk_PathHandle_t* handle);
+// k_Symbol_t* k_SymbolLoader_loadEntityFromHandle(SymbolLoader* loader,
+//     jtk_PathHandle_t* handle);
 
 /**
  * It tries to load a class from the specified regular file handle. If the file
@@ -136,15 +135,15 @@ k_Symbol_t* k_SymbolLoader_loadEntityFromHandle(k_SymbolLoader_t* loader,
  *
  * @memberof SymbolLoader
  */
-k_Symbol_t* k_SymbolLoader_loadSymbolFromHandle(k_SymbolLoader_t* loader,
-    jtk_PathHandle_t* handle);
+// k_Symbol_t* k_SymbolLoader_loadSymbolFromHandle(SymbolLoader* loader,
+//     jtk_PathHandle_t* handle);
 
-k_Symbol_t* k_SymbolLoader_parse(k_SymbolLoader_t* symbolLoader, uint8_t* bytes,
-    int32_t size);
+// k_Symbol_t* k_SymbolLoader_parse(SymbolLoader* symbolLoader, uint8_t* bytes,
+//     int32_t size);
 
 // Ignore Corrupt Entity
 
-bool k_SymbolLoader_shouldIgnoreCorruptEntity(k_SymbolLoader_t* loader);
-void k_SymbolLoader_setIgnoreCorruptEntity(k_SymbolLoader_t* loader, bool ignoreCorruptEntity);
+// bool k_SymbolLoader_shouldIgnoreCorruptEntity(SymbolLoader* loader);
+// void k_SymbolLoader_setIgnoreCorruptEntity(SymbolLoader* loader, bool ignoreCorruptEntity);
 
 #endif /* KUSH_COMPILER_SYMBOL_TABLE_SYMBOL_LOADER_H */

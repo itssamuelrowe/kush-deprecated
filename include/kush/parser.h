@@ -21,7 +21,7 @@
 
 #include <jtk/collection/list/ArrayList.h>
 
-#include <kush/Configuration.h>
+#include <kush/configuration.h>
 #include <kush/TokenStream.h>
 
 /*******************************************************************************
@@ -35,9 +35,9 @@
  * @since Kush 0.1
  */
 struct k_Parser_t {
-    k_Compiler_t* compiler;
-    k_TokenStreat* tokens;
-    k_TokenType_t* followSet;
+    Compiler* compiler;
+    k_TokenStream_t* tokens;
+    TokenType* followSet;
     int32_t followSetSize;
     int32_t followSetCapacity;
     bool recovery;
@@ -54,7 +54,7 @@ typedef struct k_Parser_t k_Parser_t;
 /**
  * @memberof Parser
  */
-k_Parser_t* k_Parser_new(k_Compiler_t* compiler, k_TokenStreat* tokens);
+k_Parser_t* k_Parser_new(Compiler* compiler, k_TokenStream_t* tokens);
 
 // Destructor
 
@@ -82,6 +82,6 @@ void k_Parser_parse(k_Parser_t* parser);
 /**
  * @memberof Parser
  */
-void k_Parser_reset(k_Parser_t* parser, k_TokenStreat* tokens);
+void k_Parser_reset(k_Parser_t* parser, k_TokenStream_t* tokens);
 
 #endif /* KUSH_COMPILER_PARSER_PARSER_H */

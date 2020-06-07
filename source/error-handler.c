@@ -19,6 +19,34 @@
 #include <kush/error-handler.h>
 
 /*******************************************************************************
+ * Error                                                                       *
+ *******************************************************************************/
+
+// Constructor
+
+k_Error_t* k_Error_new(k_ErrorCode_t code, Token* token) {
+    return k_Error_newEx(code, token, k_TOKEN_UNKNOWN);
+}
+
+k_Error_t* k_Error_newEx(k_ErrorCode_t code, Token* token,
+    TokenType expected) {
+    k_Error_t* error = jtallocate(k_Error_t, 1);
+    error->code = code;
+    error->token = token;
+    error->expected = expected;
+
+    return error;
+}
+
+// Destructor
+
+void k_Error_delete(k_Error_t* error) {
+    jtk_Assert_assertObject(error, "The specified error is null.");
+
+    deallocate(error);
+}
+
+/*******************************************************************************
  * ErrorHandler                                                                *
  *******************************************************************************/
 
@@ -51,7 +79,7 @@ void k_ErrorHandler_delete(k_ErrorHandler_t* handler) {
         k_Error_delete(error);
     }
     jtk_ArrayList_delete(handler->errors);
-    jtdeallocate(handler);
+    deallocate(handler);
 }
 
 // Active
@@ -85,8 +113,8 @@ k_ErrorHandler_OnSyntacticalErrorFunction_t k_ErrorHandler_getOnSyntacticalError
 }
 
 void k_ErrorHandler_handleSyntacticalError(k_ErrorHandler_t* handler,
-    k_Parser_t* parser, k_ErrorCode_t errorCode, k_Token_t* token,
-    k_TokenType_t expected) {
+    k_Parser_t* parser, k_ErrorCode_t errorCode, Token* token,
+    TokenType expected) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
     k_Error_t* error = k_Error_newEx(errorCode, token, expected);
@@ -118,7 +146,7 @@ k_ErrorHandler_OnLexicalErrorFunction_t k_ErrorHandler_getOnLexicalError(
 }
 
 void k_ErrorHandler_handleLexicalError(k_ErrorHandler_t* handler,
-    k_Lexer_t* lexer, k_ErrorCode_t errorCode, k_Token_t* token) {
+    k_Lexer_t* lexer, k_ErrorCode_t errorCode, Token* token) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
     k_Error_t* error = k_Error_new(errorCode, token);
@@ -150,7 +178,7 @@ k_ErrorHandler_OnSemanticalErrorFunction_t k_ErrorHandler_getOnSemanticalError(
 }
 
 void k_ErrorHandler_handleSemanticalError(k_ErrorHandler_t* handler,
-    void* origin, k_ErrorCode_t errorCode, k_Token_t* token) {
+    void* origin, k_ErrorCode_t errorCode, Token* token) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
     k_Error_t* error = k_Error_new(errorCode, token);

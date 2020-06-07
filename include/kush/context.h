@@ -20,20 +20,66 @@
 #define KUSH_PARSER_CONTEXT_H
 
 #include <jtk/collection/list/ArrayList.h>
-#include <kush/ContextType.h>
-#include <kush/Token.h>
+#include <kush/token.h>
+
+/*******************************************************************************
+ * Type                                                                        *
+ *******************************************************************************/
+
+#define TYPE_STRUCTURE 0
+#define TYPE_INTEGER 1
+#define TYPE_DECIMAL 2
+#define TYPE_ARRAY 3
+#define TYPE_VOID 4
+#define TYPE_NULL 5
+#define TYPE_STRING 6
+
+typedef struct Type Type;
+typedef struct Structure Structure;
+
+struct Type {
+    uint8_t tag;
+    bool indexable;
+    bool accessible;
+    bool callable;
+    union {
+        struct {
+            Type* base;
+            uint16_t dimensions;
+        } array;
+        struct {
+            uint8_t size;
+        } integer;
+        struct {
+            uint8_t size;
+        } decimal;
+        Structure* structure;
+    };
+};
+
+/*******************************************************************************
+ * Primitives                                                                  *
+ *******************************************************************************/
+
+struct Primitives {
+    Type i8;
+    Type i16;
+    Type i32;
+    Type i64;
+    Type f32;
+    Type f64;
+    Type void_;
+    Type null;
+    Type string;
+};
+
+typedef struct Primitives Primitives;
 
 /*******************************************************************************
  * ContextType                                                                 *
  *******************************************************************************/
 
-/**
- * @class ContextType
- * @ingroup zen_compiler_ast
- * @author Samuel Rowe
- * @since kush 0.1
- */
-enum k_ContextType_t {
+enum ContextType {
 
     K_CONTEXT_UNKNOWN,
 
@@ -102,542 +148,314 @@ enum k_ContextType_t {
     K_CONTEXT_ARRAY_EXPRESSION
 };
 
-/**
- * @memberof ContextType
- */
-typedef enum k_ContextType_t k_ContextType_t;
+typedef enum ContextType ContextType;
 
 /*******************************************************************************
  * Context                                                                     *
  *******************************************************************************/
 
-struct k_Context_t {
-    k_ContextType_t tag;
+struct Context {
+    ContextType tag;
 };
 
-typedef struct k_Context_t k_Context_t;
+typedef struct Context Context;
 
 /*******************************************************************************
  * Module                                                                      *
  *******************************************************************************/
 
-/**
- * @class Module
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_Module_t {
-    k_ContextType_t tag;
+struct Module {
+    ContextType tag;
 	jtk_ArrayList_t* imports;
 	jtk_ArrayList_t* functions;
     jtk_ArrayList_t* structures;
 };
 
-/**
- * @memberof Module
- */
-typedef struct k_Module_t k_Module_t;
-
-/*******************************************************************************
- * BinaryExpression                                                            *
- *******************************************************************************/
-
-/**
- * @memberof BinaryExpression
- */
-typedef struct k_BinaryExpression_t k_BinaryExpression_t;
-
-/**
- * @class BinaryExpression
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_BinaryExpression_t {
-    k_ContextType_t tag;
-    k_BinaryExpression_t* left;
-    jtk_ArrayList_t* others;
-};
-
-/*******************************************************************************
- * VariableDeclaration                                                         *
- *******************************************************************************/
-
-/**
- * @class VariableDeclaration
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_VariableDeclaration_t {
-    k_ContextType_t tag;
-    jtk_ArrayList_t* variables;
-};
-
-/**
- * @memberof VariableDeclaration
- */
-typedef struct k_VariableDeclaration_t k_VariableDeclaration_t;
-
-/*******************************************************************************
- * TryStatement                                                                *
- *******************************************************************************/
-
-/**
- * @class TryStatement
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_TryStatement_t {
-    k_ContextType_t tag;
-    k_BlockStatement_t* tryClause;
-    jtk_ArrayList_t* catchClauses;
-    k_BlockStatement_t* finallyClause;
-};
-
-/**
- * @memberof TryStatement
- */
-typedef struct k_TryStatement_t k_TryStatement_t;
-
-/*******************************************************************************
- * ThrowStatement                                                              *
- *******************************************************************************/
-
-/**
- * @class ThrowStatement
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_ThrowStatement_t {
-    k_ContextType_t tag;
-    k_BinaryExpression_t* expression;
-};
-
-/**
- * @memberof ThrowStatement
- */
-typedef struct k_ThrowStatement_t k_ThrowStatement_t;
-
-/*******************************************************************************
- * ReturnStatement                                                             *
- *******************************************************************************/
-
-/**
- * @class ReturnStatement
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_ReturnStatement_t {
-    k_ContextType_t tag;
-    k_BinaryExpression_t* expression;
-};
-
-/**
- * @memberof ReturnStatement
- */
-typedef struct k_ReturnStatement_t k_ReturnStatement_t;
-
-/*******************************************************************************
- * BlockStatement                                                              *
- *******************************************************************************/
-
-/**
- * @class BlockStatement
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_BlockStatement_t {
-    k_ContextType_t tag;
-    jtk_ArrayList_t* statements;
-};
-
-/**
- * @memberof BlockStatement
- */
-typedef struct k_BlockStatement_t k_BlockStatement_t;
-
-/*******************************************************************************
- * UnaryExpression                                                             *
- *******************************************************************************/
-
-/**
- * @class UnaryExpression
-
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_UnaryExpression_t {
-    k_ContextType_t tag;
-    k_Token_t* operator;
-    k_Context_t* expression; // Unary expression or postfix expression
-};
-
-/**
- * @memberof UnaryExpression
- */
-typedef struct k_UnaryExpression_t k_UnaryExpression_t;
-
-/*******************************************************************************
- * PostfixExpression                                                           *
- *******************************************************************************/
-
-/**
- * @class PostfixExpression
-
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_PostfixExpression_t {
-    k_ContextType_t tag;
-    void* primaryExpression;
-    bool primaryToken;
-    jtk_ArrayList_t* postfixParts; // contexts
-};
-
-/**
- * @memberof PostfixExpression
- */
-typedef struct k_PostfixExpression_t k_PostfixExpression_t;
-
-/*******************************************************************************
- * MemberAccess                                                                *
- *******************************************************************************/
-
-/**
- * @class MemberAccess
-
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_MemberAccess_t {
-    k_ContextType_t tag;
-    k_Token_t* identifier;
-};
-
-/**
- * @memberof MemberAccess
- */
-typedef struct k_MemberAccess_t k_MemberAccess_t;
-
-/*******************************************************************************
- * InitializerExpression                                                               *
- *******************************************************************************/
-
-/**
- * @class InitializerExpression
-
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_InitializerExpression_t {
-    k_ContextType_t tag;
-    jtk_ArrayList_t* entries; // Pair<Token, BinaryExpression>
-};
-
-typedef struct k_InitializerExpression_t k_InitializerExpression_t;
-
-/*******************************************************************************
- * ArrayExpression                                                              *
- *******************************************************************************/
-
-/**
- * @class ArrayExpression
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_ArrayExpression_t {
-    k_ContextType_t tag;
-    jtk_ArrayList_t* expressions;
-};
-
-typedef struct k_ArrayExpression_t k_ArrayExpression_t;
-
-/*******************************************************************************
- * IterativeStatement                                                          *
- *******************************************************************************/
-
-/**
- * @class IterativeStatement
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_IterativeStatement_t {
-    k_ContextType_t tag;
-    k_Token_t* label;
-    bool while;
-    k_Token_t* parameter;
-    k_BinaryExpression_t* expression;
-    k_BlockStatement_t* blockStatement;
-};
-
-/**
- * @memberof IterativeStatement
- */
-typedef struct k_IterativeStatement_t k_IterativeStatement_t;
+typedef struct Module Module;
 
 /*******************************************************************************
  * ImportDeclaration                                                           *
  *******************************************************************************/
 
-/**
- * @class ImportDeclaration
-
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_ImportDeclaration_t {
-    k_ContextType_t tag;
+struct ImportDeclaration {
+    ContextType tag;
     bool wildcard;
     jtk_ArrayList_t* identifiers;
 };
 
-/**
- * @memberof ImportDeclaration
- */
-typedef struct k_ImportDeclaration_t k_ImportDeclaration_t;
+typedef struct ImportDeclaration ImportDeclaration;
 
 /*******************************************************************************
- * IfStatement                                                                 *
+ * BinaryExpression                                                            *
  *******************************************************************************/
 
-/**
- * @class IfStatement
+typedef struct BinaryExpression BinaryExpression;
 
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_IfStatement_t {
-    k_ContextType_t tag;
-    k_IfClause_t* ifClause;
-    jtk_ArrayList_t* elseIfClauses;
-    k_BlockStatement_t* elseClause;
+struct BinaryExpression {
+    ContextType tag;
+    BinaryExpression* left;
+    jtk_ArrayList_t* others;
 };
-
-/**
- * @memberof IfStatement
- */
-typedef struct k_IfStatement_t k_IfStatement_t;
-
-
-/*******************************************************************************
- * IfClause                                                                    *
- *******************************************************************************/
-
-/**
- * @class IfClause
-
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_IfClause_t {
-    k_ContextType_t tag;
-    k_BinaryExpression_t* expression;
-    k_BlockStatement_t* body;
-};
-
-/**
- * @memberof IfClause
- */
-typedef struct k_IfClause_t k_IfClause_t;
-
-/*******************************************************************************
- * FunctionDeclaration                                                         *
- *******************************************************************************/
-
-/**
- * @class FunctionDeclaration
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_FunctionDeclaration_t {
-    k_ContextType_t tag;
-    k_Token_t* identifier;
-    jtk_ArrayList_t* fixedParameters;
-    k_FunctionParameter_t* variableParameter;
-    k_BlockStatement_t* body;
-    k_Token_t* returnType;
-    int32_t returnTypeDimensions;
-};
-
-/**
- * @memberof FunctionDeclaration
- */
-typedef struct k_FunctionDeclaration_t k_FunctionDeclaration_t;
-
-/*******************************************************************************
- * FunctionArguments                                                           *
- *******************************************************************************/
-
-/**
- * @class FunctionArguments
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_FunctionArguments_t {
-    k_ContextType_t tag;
-    k_Token_t* parenthesis;
-    jtk_ArrayList_t* expressions;
-};
-
-/**
- * @memberof FunctionArguments
- */
-typedef struct k_FunctionArguments_t k_FunctionArguments_t;
 
 /*******************************************************************************
  * ConditionalExpression                                                       *
  *******************************************************************************/
 
-/**
- * @memberof ConditionalExpression
- */
-typedef struct k_ConditionalExpression_t k_ConditionalExpression_t;
+typedef struct ConditionalExpression ConditionalExpression;
 
-/**
- * @class ConditionalExpression
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_ConditionalExpression_t {
-    k_ContextType_t tag;
-    k_BinaryExpression_t* logicalOrExpression;
-    k_BinaryExpression_t* thenExpression;
-    k_ConditionalExpression_t* elseExpression;
+struct ConditionalExpression {
+    ContextType tag;
+    BinaryExpression* logicalOrExpression;
+    BinaryExpression* thenExpression;
+    ConditionalExpression* elseExpression;
 };
 
 /*******************************************************************************
- * StructureDeclaration                                                            *
+ * UnaryExpression                                                             *
  *******************************************************************************/
 
-/**
- * @class StructureDeclaration
-
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_StructureDeclaration_t {
-    k_ContextType_t tag;
-    k_Token_t* identifier;
-    jtk_ArrayList_t* variables;
-    k_Type_t* type;
+struct UnaryExpression {
+    ContextType tag;
+    Token* operator;
+    Context* expression; // Unary expression or postfix expression
 };
 
-/**
- * @memberof StructureDeclaration
- */
-typedef struct k_StructureDeclaration_t k_StructureDeclaration_t;
-
+typedef struct UnaryExpression UnaryExpression;
 
 /*******************************************************************************
- * CatchClause                                                                 *
+ * PostfixExpression                                                           *
  *******************************************************************************/
 
-struct k_CatchClause_t {
-    jtk_ArrayList_t* captures;
-    k_Token_t* parameter;
-    k_BlockStatement_t* body;
+struct PostfixExpression {
+    ContextType tag;
+    void* primaryExpression;
+    bool primaryToken;
+    jtk_ArrayList_t* postfixParts; // contexts
 };
 
-typedef struct k_CatchClause_t k_CatchClause_t;
-
-/**
- * @memberof CatchClause
- */
-typedef struct k_CatchClause_t k_CatchClause_t;
+typedef struct PostfixExpression PostfixExpression;
 
 /*******************************************************************************
- * BreakStatement                                                              *
+ * MemberAccess                                                                *
  *******************************************************************************/
 
-/**
- * @class BreakStatement
- * @author Samuel Rowe
- * @since kush 0.1
- */
-struct k_BreakStatement_t {
-    k_ContextType_t tag;
-    k_Token_t* identifier;
+struct MemberAccess {
+    ContextType tag;
+    Token* identifier;
 };
 
-/**
- * @memberof BreakStatement
- */
-typedef struct k_BreakStatement_t k_BreakStatement_t;
+typedef struct MemberAccess MemberAccess;
+
+/*******************************************************************************
+ * InitializerExpression                                                               *
+ *******************************************************************************/
+
+struct InitializerExpression {
+    ContextType tag;
+    jtk_ArrayList_t* entries; // Pair<Token, BinaryExpression>
+};
+
+typedef struct InitializerExpression InitializerExpression;
+
+/*******************************************************************************
+ * ArrayExpression                                                              *
+ *******************************************************************************/
+
+struct ArrayExpression {
+    ContextType tag;
+    jtk_ArrayList_t* expressions;
+};
+
+typedef struct ArrayExpression ArrayExpression;
+
+/*******************************************************************************
+ * FunctionArguments                                                           *
+ *******************************************************************************/
+
+struct FunctionArguments {
+    ContextType tag;
+    Token* parenthesis;
+    jtk_ArrayList_t* expressions;
+};
+
+typedef struct FunctionArguments FunctionArguments;
+
+/*******************************************************************************
+ * Block                                                              *
+ *******************************************************************************/
+
+struct Block {
+    ContextType tag;
+    jtk_ArrayList_t* statements;
+};
+
+typedef struct Block Block;
 
 /*******************************************************************************
  * FunctionParameter                                                           *
  *******************************************************************************/
 
-struct k_FunctionParameter_t {
-    k_ContextType_t tag;
-    k_Token_t* baseType;
+struct FunctionParameter {
+    ContextType tag;
+    Token* baseType;
     int32_t dimensions;
-    k_Token_t* identifier;
+    Token* identifier;
 };
 
-typedef struct k_FunctionParameter_t k_FunctionParameter_t;
+typedef struct FunctionParameter FunctionParameter;
 
 /*******************************************************************************
- * StorageDeclarator                                                           *
+ * Function                                                                    *
  *******************************************************************************/
 
-struct k_StorageDeclarator_t {
-    k_ContextType_t tag;
+struct Function {
+    ContextType tag;
+    Token* identifier;
+    jtk_ArrayList_t* fixedParameters;
+    FunctionParameter* variableParameter;
+    Block* body;
+    Token* returnType;
+    int32_t returnTypeDimensions;
+};
+
+typedef struct Function Function;
+
+/*******************************************************************************
+ * Structure                                                            *
+ *******************************************************************************/
+
+struct Structure {
+    ContextType tag;
+    Token* identifier;
+    jtk_ArrayList_t* variables;
+    Type* type;
+};
+
+typedef struct Structure Structure;
+
+/*******************************************************************************
+ * IfClause                                                                    *
+ *******************************************************************************/
+
+struct IfClause {
+    ContextType tag;
+    BinaryExpression* expression;
+    Block* body;
+};
+
+typedef struct IfClause IfClause;
+
+/*******************************************************************************
+ * IfStatement                                                                 *
+ *******************************************************************************/
+
+struct IfStatement {
+    ContextType tag;
+    IfClause* ifClause;
+    jtk_ArrayList_t* elseIfClauses;
+    Block* elseClause;
+};
+
+typedef struct IfStatement IfStatement;
+
+/*******************************************************************************
+ * IterativeStatement                                                          *
+ *******************************************************************************/
+
+struct k_IterativeStatement_t {
+    ContextType tag;
+    Token* label;
+    bool whileLoop;
+    Token* parameter;
+    BinaryExpression* expression;
+    Block* blockStatement;
+};
+
+typedef struct k_IterativeStatement_t k_IterativeStatement_t;
+
+/*******************************************************************************
+ * TryStatement                                                                *
+ *******************************************************************************/
+
+struct k_TryStatement_t {
+    ContextType tag;
+    Block* tryClause;
+    jtk_ArrayList_t* catchClauses;
+    Block* finallyClause;
+};
+
+typedef struct k_TryStatement_t k_TryStatement_t;
+
+/*******************************************************************************
+ * CatchClause                                                                 *
+ *******************************************************************************/
+
+struct CatchClause {
+    jtk_ArrayList_t* captures;
+    Token* parameter;
+    Block* body;
+};
+
+typedef struct CatchClause CatchClause;
+
+/*******************************************************************************
+ * Variable                                                                    *
+ *******************************************************************************/
+
+struct Variable {
+    ContextType tag;
     bool infer;
     bool constant;
-    k_Token_t* baseType;
+    Token* baseType;
     int32_t dimensions;
-    k_Token_t* identifier;
-    k_BinaryExpression_t* expression;
+    Token* identifier;
+    BinaryExpression* expression;
 };
 
-typedef struct k_StorageDeclarator_t k_StorageDeclarator_t;
+typedef struct Variable Variable;
 
 /*******************************************************************************
- * Type                                                                        *
+ * VariableDeclaration                                                         *
  *******************************************************************************/
 
-#define K_TYPE_STRUCTURE 0
-#define K_TYPE_INTEGER 1
-#define K_TYPE_DECIMAL 2
-#define K_TYPE_ARRAY 3
-#define K_TYPE_VOID 4
-#define K_TYPE_NULL 5
-#define K_TYPE_STRING 6
-
-struct k_Type_t {
-    uint8_t tag;
-    bool indexable;
-    bool accessible;
-    bool callable;
-    union {
-        struct {
-            k_Type_t* base;
-            uint16_t dimensions;
-        } array;
-        struct {
-            uint8_t size;
-        } integer;
-        struct {
-            uint8_t size;
-        } decimal;
-        k_StructureDeclaration_t* structure;
-    };
+struct VariableDeclaration {
+    ContextType tag;
+    jtk_ArrayList_t* variables;
 };
 
-typedef struct k_Type_t k_Type_t;
+typedef struct VariableDeclaration VariableDeclaration;
 
-struct k_Primitives_t {
-    k_Type_t i8;
-    k_Type_t i16;
-    k_Type_t i32;
-    k_Type_t i64;
-    k_Type_t f32;
-    k_Type_t f64;
-    k_Type_t void_;
-    k_Type_t null;
-    k_Type_t string;
+/*******************************************************************************
+ * ThrowStatement                                                              *
+ *******************************************************************************/
+
+struct ThrowStatement {
+    ContextType tag;
+    BinaryExpression* expression;
 };
 
-typedef struct k_Primitives_t k_Primitives_t;
+typedef struct ThrowStatement ThrowStatement;
+
+/*******************************************************************************
+ * ReturnStatement                                                             *
+ *******************************************************************************/
+
+struct k_ReturnStatement_t {
+    ContextType tag;
+    BinaryExpression* expression;
+};
+
+typedef struct k_ReturnStatement_t k_ReturnStatement_t;
+
+/*******************************************************************************
+ * BreakStatement                                                              *
+ *******************************************************************************/
+
+struct k_BreakStatement_t {
+    ContextType tag;
+    Token* identifier;
+};
+
+typedef struct k_BreakStatement_t k_BreakStatement_t;
 
 #endif /* KUSH_PARSER_CONTEXT_H */

@@ -25,7 +25,7 @@
 #include <jtk/core/StringBuilder.h>
 #include <jtk/io/InputStream.h>
 
-#include <kush/Configuration.h>
+#include <kush/configuration.h>
 #include <kush/compiler.h>
 #include <kush/LexerError.h>
 #include <kush/Token.h>
@@ -55,7 +55,7 @@ typedef struct k_ErrorHandler_t k_ErrorHandler_t;
  */
 struct k_Lexer_t {
 
-    k_Compiler_t* compiler;
+    Compiler* compiler;
 
     /**
      * The input stream of characters.
@@ -113,13 +113,13 @@ struct k_Lexer_t {
     /**
      * The token that was most recently emitted.
      */
-    k_Token_t* token;
+    Token* token;
 
     /**
      * The channel on which the next recognized
      * token will be created on.
      */
-    k_TokenChannel_t  channel;
+    TokenChannel  channel;
 
     /**
      * The text consumed so far to recognize the next
@@ -130,7 +130,7 @@ struct k_Lexer_t {
     /**
      * The token type of the next recognized token.
      */
-    k_TokenType_t type;
+    TokenType type;
 
     /**
      * A buffer to store emitted tokens.
@@ -149,7 +149,7 @@ struct k_Lexer_t {
  */
 typedef struct k_Lexer_t k_Lexer_t;
 
-const uint8_t* k_Lexer_getLiteralName(k_TokenType_t type);
+const uint8_t* k_Lexer_getLiteralName(TokenType type);
 
 // Constructor
 
@@ -158,7 +158,7 @@ const uint8_t* k_Lexer_getLiteralName(k_TokenType_t type);
  *
  * @return A new lexer.
  */
-k_Lexer_t* k_Lexer_new(k_Compiler_t* compiler);
+k_Lexer_t* k_Lexer_new(Compiler* compiler);
 
 // Destructor
 
@@ -184,6 +184,6 @@ void k_Lexer_delete(k_Lexer_t* lexer);
  *         is encountered; ignored, otherwise.
  * @return The next recognized token.
  */
-k_Token_t* k_Lexer_nextToken(k_Lexer_t* lexer);
+Token* k_Lexer_nextToken(k_Lexer_t* lexer);
 
 #endif /* KUSH_COMPILER_LEXER_LEXER_H */
