@@ -21,6 +21,7 @@
 
 #include <jtk/collection/list/ArrayList.h>
 #include <kush/token.h>
+#include <kush/scope.h>
 
 /*******************************************************************************
  * Type                                                                        *
@@ -33,6 +34,7 @@
 #define TYPE_VOID 4
 #define TYPE_NULL 5
 #define TYPE_STRING 6
+#define TYPE_BOOLEAN 7
 
 typedef struct Type Type;
 typedef struct Structure Structure;
@@ -71,6 +73,7 @@ struct Primitives {
     Type void_;
     Type null;
     Type string;
+    Type boolean;
 };
 
 typedef struct Primitives Primitives;
@@ -81,71 +84,71 @@ typedef struct Primitives Primitives;
 
 enum ContextType {
 
-    K_CONTEXT_UNKNOWN,
+    CONTEXT_UNKNOWN,
 
-    K_CONTEXT_COMPILATION_UNIT,
+    CONTEXT_COMPILATION_UNIT,
 
-    K_CONTEXT_IMPORT_DECLARATION,
+    CONTEXT_IMPORT_DECLARATION,
 
-    K_CONTEXT_FUNCTION_DECLARATION,
+    CONTEXT_FUNCTION_DECLARATION,
 
-    K_CONTEXT_FUNCTION_PARAMETER,
+    CONTEXT_FUNCTION_PARAMETER,
 
-    K_CONTEXT_BLOCK_STATEMENT,
+    CONTEXT_BLOCSTATEMENT,
 
-    K_CONTEXT_VARIABLE_DECLARATION,
+    CONTEXT_VARIABLE_DECLARATION,
 
-    K_CONTEXT_VARIABLE_DECLARATOR,
+    CONTEXT_VARIABLE_DECLARATOR,
 
-    K_CONTEXT_BREAK_STATEMENT,
+    CONTEXT_BREASTATEMENT,
 
-    K_CONTEXT_RETURN_STATEMENT,
+    CONTEXT_RETURN_STATEMENT,
 
-    K_CONTEXT_THROW_STATEMENT,
+    CONTEXT_THROW_STATEMENT,
 
-    K_CONTEXT_IF_STATEMENT,
+    CONTEXT_IF_STATEMENT,
 
-    K_CONTEXT_IF_CLAUSE,
+    CONTEXT_IF_CLAUSE,
 
-    K_CONTEXT_ITERATIVE_STATEMENT,
+    CONTEXT_ITERATIVE_STATEMENT,
 
-    K_CONTEXT_TRY_STATEMENT,
+    CONTEXT_TRY_STATEMENT,
 
-    K_CONTEXT_CATCH_CLAUSE,
+    CONTEXT_CATCH_CLAUSE,
 
-    K_CONTEXT_STRUCTURE_DECLARATION,
+    CONTEXT_STRUCTURE_DECLARATION,
 
-    K_CONTEXT_ASSIGNMENT_EXPRESSION,
+    CONTEXT_ASSIGNMENT_EXPRESSION,
 
-    K_CONTEXT_CONDITIONAL_EXPRESSION,
+    CONTEXT_CONDITIONAL_EXPRESSION,
 
-    K_CONTEXT_LOGICAL_OR_EXPRESSION,
+    CONTEXT_LOGICAL_OR_EXPRESSION,
 
-    K_CONTEXT_LOGICAL_AND_EXPRESSION,
+    CONTEXT_LOGICAL_AND_EXPRESSION,
 
-    K_CONTEXT_INCLUSIVE_OR_EXPRESSION,
+    CONTEXT_INCLUSIVE_OR_EXPRESSION,
 
-    K_CONTEXT_EXCLUSIVE_OR_EXPRESSION,
+    CONTEXT_EXCLUSIVE_OR_EXPRESSION,
 
-    K_CONTEXT_AND_EXPRESSION,
+    CONTEXT_AND_EXPRESSION,
 
-    K_CONTEXT_EQUALITY_EXPRESSION,
+    CONTEXT_EQUALITY_EXPRESSION,
 
-    K_CONTEXT_RELATIONAL_EXPRESSION,
+    CONTEXT_RELATIONAL_EXPRESSION,
 
-    K_CONTEXT_SHIFT_EXPRESSION,
+    CONTEXT_SHIFT_EXPRESSION,
 
-    K_CONTEXT_ADDITIVE_EXPRESSION,
+    CONTEXT_ADDITIVE_EXPRESSION,
 
-    K_CONTEXT_MULTIPLICATIVE_EXPRESSION,
+    CONTEXT_MULTIPLICATIVE_EXPRESSION,
 
-    K_CONTEXT_UNARY_EXPRESSION,
+    CONTEXT_UNARY_EXPRESSION,
 
-    K_CONTEXT_POSTFIX_EXPRESSION,
+    CONTEXT_POSTFIX_EXPRESSION,
 
-    K_CONTEXT_INITIALIZER_EXPRESSION,
+    CONTEXT_INITIALIZER_EXPRESSION,
 
-    K_CONTEXT_ARRAY_EXPRESSION
+    CONTEXT_ARRAY_EXPRESSION
 };
 
 typedef enum ContextType ContextType;
@@ -169,6 +172,7 @@ struct Module {
 	jtk_ArrayList_t* imports;
 	jtk_ArrayList_t* functions;
     jtk_ArrayList_t* structures;
+    Scope* scope;
 };
 
 typedef struct Module Module;
@@ -287,6 +291,7 @@ typedef struct FunctionArguments FunctionArguments;
 struct Block {
     ContextType tag;
     jtk_ArrayList_t* statements;
+    Scope* scope;
 };
 
 typedef struct Block Block;
@@ -316,6 +321,7 @@ struct Function {
     Block* body;
     Token* returnType;
     int32_t returnTypeDimensions;
+    Scope* scope;
 };
 
 typedef struct Function Function;
@@ -329,6 +335,7 @@ struct Structure {
     Token* identifier;
     jtk_ArrayList_t* variables;
     Type* type;
+    Scope* scope;
 };
 
 typedef struct Structure Structure;
@@ -362,7 +369,7 @@ typedef struct IfStatement IfStatement;
  * IterativeStatement                                                          *
  *******************************************************************************/
 
-struct k_IterativeStatement_t {
+struct IterativeStatement {
     ContextType tag;
     Token* label;
     bool whileLoop;
@@ -371,20 +378,20 @@ struct k_IterativeStatement_t {
     Block* blockStatement;
 };
 
-typedef struct k_IterativeStatement_t k_IterativeStatement_t;
+typedef struct IterativeStatement IterativeStatement;
 
 /*******************************************************************************
  * TryStatement                                                                *
  *******************************************************************************/
 
-struct k_TryStatement_t {
+struct TryStatement {
     ContextType tag;
     Block* tryClause;
     jtk_ArrayList_t* catchClauses;
     Block* finallyClause;
 };
 
-typedef struct k_TryStatement_t k_TryStatement_t;
+typedef struct TryStatement TryStatement;
 
 /*******************************************************************************
  * CatchClause                                                                 *
@@ -440,22 +447,22 @@ typedef struct ThrowStatement ThrowStatement;
  * ReturnStatement                                                             *
  *******************************************************************************/
 
-struct k_ReturnStatement_t {
+struct ReturnStatement_t {
     ContextType tag;
     BinaryExpression* expression;
 };
 
-typedef struct k_ReturnStatement_t k_ReturnStatement_t;
+typedef struct ReturnStatement_t ReturnStatement_t;
 
 /*******************************************************************************
  * BreakStatement                                                              *
  *******************************************************************************/
 
-struct k_BreakStatement_t {
+struct BreakStatement_t {
     ContextType tag;
     Token* identifier;
 };
 
-typedef struct k_BreakStatement_t k_BreakStatement_t;
+typedef struct BreakStatement_t BreakStatement_t;
 
 #endif /* KUSH_PARSER_CONTEXT_H */

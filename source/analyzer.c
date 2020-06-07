@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
+#include <jtk/collection/Pair.h>
+
 #include <kush/analyzer.h>
+#include <kush/error-handler.h>
 
 /*
  * The following text describes a naive algorithm that I developed to analyze
@@ -147,7 +150,7 @@ Primitives primitives = {
     },
 
     .void_ = {
-        .tag = TYPE_VOID
+        .tag = TYPE_VOID,
         .indexable = false,
         .accessible = false
     },
@@ -196,23 +199,23 @@ void importDefaults(Analyzer* analyzer) {
 
 // Define
 
-void defineSymbols(Analyzer* analyzer, CompilationUnit* unit) {
-    unit->scope = Scope_forCompilationUnit();
-    analyzer->scope = unit->scope;
+void defineSymbols(Analyzer* analyzer, Module* module) {
+    module->scope = Scope_forCompilationUnit();
+    analyzer->scope = module->scope;
 
-    int32_t structureCount = jtArrayList_getSize(unit->structures);
+    int32_t structureCount = jtk_ArrayList_getSize(module->structures);
     int32_t j;
     for (j = 0; j < structureCount; j++) {
-        Structure* structure = (Structure*)jtArrayList_getValue(
-            unit->structures, j);
+        Structure* structure = (Structure*)jtk_ArrayList_getValue(
+            module->structures, j);
         defineStructure(analyzer, structure);
     }
 
-    int32_t functionCount = jtArrayList_getSize(unit->functions);
+    int32_t functionCount = jtk_ArrayList_getSize(module->functions);
     int32_t i;
     for (i = 0; i < functionCount; i++) {
-        Function* function = (Function*)jtArrayList_getValue(
-            unit->functions, i);
+        Function* function = (Function*)jtk_ArrayList_getValue(
+            module->functions, i);
         defineFunction(analyzer, function);
     }
 }
@@ -222,11 +225,11 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
     structure->scope = Scope_forStructure(analyzer->scope);
     Scope_addStructure(analyzer->scope, structure);
 
-    int32_t limit = jtArrayList_getSize(declaration->variables);
+    int32_t limit = jtk_ArrayList_getSize(declaration->variables);
     int32_t i;
     for (i = 0; i < limit; i++) {
         Variable* storage =
-            (Variable*)jtArrayList_getValue(declaration->variables, i);
+            (Variable*)jtk_ArrayList_getValue(declaration->variables, i);
         declarator->parent = structure->scope;
         Scope_addStorage(structure->scope, storage);
     }
@@ -239,10 +242,10 @@ void defineFunction(Analyzer* analyzer, Function* function) {
     Scope_addFunction(analyzer->scope, function);
 
     Scope* scope = defineLocals(analyzer, function->body);
-    int32_t parameterCount = jtArrayList_getSize(function->parameters);
+    int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
     int32_t i;
     for (i = 0; i < parameterCount; i++) {
-        Variable* parameter = (Variable*)jtArrayList_getValue(function->parameters, i);
+        Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
         Scope_addVariable(scope, parameter);
     }
 }
@@ -250,10 +253,10 @@ void defineFunction(Analyzer* analyzer, Function* function) {
 Scope* defineLocals(Analyzer* analyzer, Block* block) {
     block->scope = analyzer->scope = Scope_forLocal(analyzer->scope);
 
-    int32_t limit = jtArrayList_getSize(block->statements);
+    int32_t limit = jtk_ArrayList_getSize(block->statements);
     int32_t i;
     for (i = 0; i < limit; i++) {
-        Context* context = (Context*)jtArrayList_getValue(
+        Context* context = (Context*)jtk_ArrayList_getValue(
             block->statements, i);
         switch (context->tag) {
             case CONTEXT_ITERATIVE_STATEMENT: {
@@ -271,10 +274,10 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
             case CONTEXT_IF_STATEMENT: {
                 IfStatement* statement = (IfStatement*)context;
                 defineLocals(analyzer, statement->ifClause->body);
-                int32_t count = jtArrayList_getSize(statement->elseIfClauses);
+                int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
                 int32_t j;
                 for (j = 0; j < count; j++) {
-                    IfClause* clause = (IfClause*)jtArrayList_getValue(
+                    IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
                         statement->elseIfClauses, j);
                     defineLocals(analyzer, clause->body);
                 }
@@ -284,14 +287,14 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                 break;
             }
 
-            case CONTEXTRY_STATEMENT: {
+            case CONTEXT_TRY_STATEMENT: {
                 TryStatement* statement = (TryStatement*)context;
                 defineLocals(analyzer, statement->tryClause);
 
-                int32_t count = jtArrayList_getSize(statement->catchClauses);
+                int32_t count = jtk_ArrayList_getSize(statement->catchClauses);
                 int32_t j;
                 for (j = 0; j < count; j++) {
-                    CatchClause* clause = (CatchClause*)jtArrayList_getValue(
+                    CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
                         statement->catchClauses, j);
                     Scope* scope = defineLocals(clause->body);
                     defineVariable(analyzer, scope, clause->parameter);
@@ -306,10 +309,10 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
 
             case CONTEXT_VARIABLE_DECLARATION: {
                 VariableDeclaration* statement = (VariableDeclaration*)context;
-                int32_t count = jtArrayList_getSize(statement->variables);
+                int32_t count = jtk_ArrayList_getSize(statement->variables);
                 int32_t j;
                 for (j = 0; j < count; j++) {
-                    Variable* variable = (Variable*)jtArrayList_getValue(
+                    Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
                     defineVariable(analyzer->scope, variable);
                 }
@@ -328,7 +331,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
 // Constructor
 
 Analyzer* Analyzer_new(Compiler* compiler) {
-    Analyzer* analyzer = Memory_allocate(Analyzer, 1);
+    Analyzer* analyzer = allocate(Analyzer, 1);
     analyzer->compiler = compiler;
     analyzer->symbolTable = NULL;
     analyzer->package = NULL;
@@ -355,26 +358,26 @@ void Analyzer_analyze(Analyzer* analyzer, Module* module) {
 // Reset
 
 void Analyzer_reset(Analyzer* analyzer,
-    SymbolTable* symbolTable, const uint8* package, int32_t packageSize) {
+    SymbolTable* symbolTable, const uint8_t* package, int32_t packageSize) {
     analyzer->symbolTable = symbolTable;
     analyzer->package = package;
     analyzer->packageSize = packageSize;
 }
 
 
-uint8* getModuleName(jtArrayList* identifiers, int32_t* size) {
-    int32_t identifierCount = jtArrayList_getSize(identifiers);
-    jtStringBuilder* builder = jtStringBuilder_new();
+uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
+    int32_t identifierCount = jtk_ArrayList_getSize(identifiers);
+    jtk_StringBuilder_t* builder = jtStringBuilder_new();
     int32_t i;
     for (i = 0; i < identifierCount; i++) {
-        Token* identifier = (Token*)jtArrayList_getValue(identifiers, i);
+        Token* identifier = (Token*)jtk_ArrayList_getValue(identifiers, i);
         jtStringBuilder_appendEx_z(builder, identifier->text, identifier->length);
         if (i + 1 < identifierCount) {
             jtStringBuilder_append_c(builder, '.');
         }
     }
 
-    uint8* result = jtStringBuilderoCString(builder, size);
+    uint8_t* result = jtStringBuilderoCString(builder, size);
     jtStringBuilder_delete(builder);
 
     return result;
@@ -389,18 +392,18 @@ void resolve(Analyzer* analyzer, Module* module) {
         importDefaults(analyzer);
     }
 
-    int32_t importCount = jtArrayList_getSize(module->imports);
+    int32_t importCount = jtk_ArrayList_getSize(module->imports);
     int32_t i;
     for (i = 0; i < importCount; i++) {
-        ImportDeclaration* declaration = (ImportDeclaration*)jtArrayList_getValue(
+        ImportDeclaration* declaration = (ImportDeclaration*)jtk_ArrayList_getValue(
             module->imports, i);
         int32_t size;
-        uint8* name = getModuleName(declaration->identifiers, &size);
+        uint8_t* name = getModuleName(declaration->identifiers, &size);
 
         // If a module was previously imported, we should'nt complain.
         Module* newModule = import(analyzer, name, size, declaration->wildcard);
         if (newModule == NULL) {
-            Token* lastToken = (Token*)jtArrayList_getValue(declaration->identifiers, -1);
+            Token* lastToken = (Token*)jtk_ArrayList_getValue(declaration->identifiers, -1);
             reportError(analyzer, KUSH_ERROR_UNKNOWN_MODULE, lastToken);
         }
         else {
@@ -410,11 +413,11 @@ void resolve(Analyzer* analyzer, Module* module) {
         jtCString_delete(name);
     }
 
-    int32_t functionCount = jtArrayList_getSize(unit->functions);
+    int32_t functionCount = jtk_ArrayList_getSize(module->functions);
     int32_t i;
     for (i = 0; i < functionCount; i++) {
-        Function* function = (Function*)jtArrayList_getValue(
-            unit->functions, i);
+        Function* function = (Function*)jtk_ArrayList_getValue(
+            module->functions, i);
         resolveLocals(analyzer, function->body);
     }
 }
@@ -422,10 +425,10 @@ void resolve(Analyzer* analyzer, Module* module) {
 void resolveLocals(Analyzer* analyzer, Block* block) {
     analyzer->scope = block->scope;
 
-    int32_t limit = jtArrayList_getSize(block->statements);
+    int32_t limit = jtk_ArrayList_getSize(block->statements);
     int32_t i;
     for (i = 0; i < limit; i++) {
-        Context* context = (Context*)jtArrayList_getValue(
+        Context* context = (Context*)jtk_ArrayList_getValue(
             block->statements, i);
         switch (context->tag) {
             case CONTEXT_ITERATIVE_STATEMENT: {
@@ -443,10 +446,10 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
             case CONTEXT_IF_STATEMENT: {
                 IfStatement* statement = (IfStatement*)context;
                 resolveLocals(analyzer, statement->ifClause->body);
-                int32_t count = jtArrayList_getSize(statement->elseIfClauses);
+                int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
                 int32_t j;
                 for (j = 0; j < count; j++) {
-                    IfClause* clause = (IfClause*)jtArrayList_getValue(
+                    IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
                         statement->elseIfClauses, j);
                     resolveLocals(analyzer, clause->body);
                 }
@@ -456,14 +459,14 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
                 break;
             }
 
-            case CONTEXTRY_STATEMENT: {
+            case CONTEXT_TRY_STATEMENT: {
                 TryStatement* statement = (TryStatement*)context;
                 resolveLocals(analyzer, statement->tryClause);
 
-                int32_t count = jtArrayList_getSize(statement->catchClauses);
+                int32_t count = jtk_ArrayList_getSize(statement->catchClauses);
                 int32_t j;
                 for (j = 0; j < count; j++) {
-                    CatchClause* clause = (CatchClause*)jtArrayList_getValue(
+                    CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
                         statement->catchClauses, j);
                     Scope* scope = resolveLocals(clause->body);
                     defineVariable(analyzer, scope, clause->parameter);
@@ -478,10 +481,10 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
 
             case CONTEXT_VARIABLE_DECLARATION: {
                 VariableDeclaration* statement = (VariableDeclaration*)context;
-                int32_t count = jtArrayList_getSize(statement->variables);
+                int32_t count = jtk_ArrayList_getSize(statement->variables);
                 int32_t j;
                 for (j = 0; j < count; j++) {
-                    Variable* variable = (Variable*)jtArrayList_getValue(
+                    Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
                     defineVariable(analyzer->scope, variable);
                 }
@@ -500,9 +503,9 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
             BinaryExpression* expression = (BinaryExpression*)context;
             Type* leftType = resolveExpression(analyzer, expression->left);
 
-            int32_t count = jtArrayList_getSize(expression->others);
+            int32_t count = jtk_ArrayList_getSize(expression->others);
             if (count == 1) {
-                jtPair* pair = (jtPair*)jtArrayList_getValue(
+                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(
                     expression->others, 0);
                 Type* rightType = resolveExpression(analyzer, pair->right);
 
@@ -529,10 +532,10 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
             BinaryExpression* expression = (BinaryExpression*)context;
             Type* leftType = resolveExpression(analyzer, expression->left);
 
-            int32_t count = jtArrayList_getSize(expression->others);
+            int32_t count = jtk_ArrayList_getSize(expression->others);
             int32_t i;
             for (i = 0; i < count; i++) {
-                jtPair* pair = (jtPair*)jtArrayList_getValue(
+                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(
                     expression->others, i);
                 Type* rightType = resolveExpression(analyzer, pair->right);
 
@@ -550,18 +553,18 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
             Token* operator = expression->operator;
             if (operator != NULL) {
                 TokenType token = operator->tag;
-                if ((token == TOKEN_PLUS) || (token == TOKEN_MINUS)) {
-                    if ((type.tag != TYPE_INTEGER) && (type.tag != TYPE_DECIMAL)) {
+                if ((token == TOKEN_PLUS) || (token == TOKEN_DASH)) {
+                    if ((type->tag != TYPE_INTEGER) && (type->tag != TYPE_DECIMAL)) {
                         reportError(analyzer, ERROR_INCOMPATIBLE_OPERAND, operator);
                     }
                 }
-                else if (token == TOKENILDE) {
-                    if (type.tag != TYPE_INTEGER) {
+                else if (token == TOKEN_TILDE) {
+                    if (type->tag != TYPE_INTEGER) {
                         reportError(analyzer, ERROR_INCOMPATIBLE_OPERAND, operator);
                     }
                 }
-                else if (token == KUSHOKEN_EXCLAMATION_MARK) {
-                    if (type.tag != TYPE_BOOLEAN) {
+                else if (token == TOKEN_EXCLAMATION_MARK) {
+                    if (type->tag != TYPE_BOOLEAN) {
                         reportError(analyzer, ERROR_INCOMPATIBLE_OPERAND, operator);
                     }
                 }
@@ -580,10 +583,10 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 resolveExpression(expression->primary);
 
             Type* previous = type;
-            int32_t count = jtArrayList_getSize(expression->postfixParts);
+            int32_t count = jtk_ArrayList_getSize(expression->postfixParts);
             int32_t i;
             for (i = 0; i < count; i++) {
-                Context* postfix = (Context*)jtArrayList_getValue(
+                Context* postfix = (Context*)jtk_ArrayList_getValue(
                     expression->postfixParts, i);
 
                 Type* postfixType = NULL;
@@ -647,24 +650,24 @@ Type* resolveToken(Analyzer* analyzer, Token* token) {
             break;
         }
 
-        case TOKEN_FLOAT_POINT_LITERAL: {
-            result = &(primitive.f64);
+        case TOKEN_FLOATING_POINT_LITERAL: {
+            result = &(primitives.f64);
             break;
         }
 
         case TOKEN_KEYWORD_TRUE:
         case TOKEN_KEYWORD_FALSE: {
-            result = &(primitive.boolean);
+            result = &(primitives.boolean);
             break;
         }
 
         case TOKEN_STRING_LITERAL: {
-            result = &(primitive.string);
+            result = &(primitives.string);
             break;
         }
 
         case TOKEN_KEYWORD_NULL: {
-            result = &(primitive.null);
+            result = &(primitives.null);
             break;
         }
 
