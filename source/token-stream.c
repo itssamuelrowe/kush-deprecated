@@ -17,11 +17,11 @@
 #include <jtk/collection/array/Arrays.h>
 #include <kush/token-stream.h>
 
-k_TokenStream_t* tokenStreamNew(Compiler* compiler,
-                                   k_Lexer_t* lexer, TokenChannel channel) {
+TokenStream* tokenStreamNew(Compiler* compiler,
+                                   Lexer* lexer, TokenChannel channel) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
 
-    k_TokenStream_t* stream = allocate(k_TokenStream_t, 1);
+    TokenStream* stream = allocate(TokenStream, 1);
     stream->compiler = compiler;
     stream->lexer = lexer;
     stream->tokens = jtk_ArrayList_newWithCapacity(128);
@@ -33,18 +33,18 @@ k_TokenStream_t* tokenStreamNew(Compiler* compiler,
     return stream;
 }
 
-void destroyStaleTokens(k_TokenStream_t* stream) {
+void destroyStaleTokens(TokenStream* stream) {
 }
 
 // TODO: The tokens must be destroyed!
-void k_TokenStream_delete(k_TokenStream_t* stream) {
+void tokenStreamDelete(TokenStream* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
 
     jtk_ArrayList_delete(stream->tokens);
     deallocate(stream);
 }
 
-void k_TokenStream_reset(k_TokenStream_t* stream) {
+void k_TokenStream_reset(TokenStream* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
 
     jtk_ArrayList_clear(stream->tokens);
@@ -52,17 +52,17 @@ void k_TokenStream_reset(k_TokenStream_t* stream) {
     stream->hitEndOfStream = false;
 }
 
-int32_t k_TokenStream_getIndex(k_TokenStream_t* stream) {
+int32_t k_TokenStream_getIndex(TokenStream* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
     return stream->p;
 }
 
-int32_t k_TokenStream_getSize(k_TokenStream_t* stream) {
+int32_t k_TokenStream_getSize(TokenStream* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
     return jtk_ArrayList_getSize(stream->tokens);
 }
 
-void k_TokenStream_consume(k_TokenStream_t* stream) {
+void k_TokenStream_consume(TokenStream* stream) {
     bool skip;
     if (stream->p >= 0) {
         if (stream->hitEndOfStream) {
@@ -89,7 +89,7 @@ void k_TokenStream_consume(k_TokenStream_t* stream) {
     }
 }
 
-bool k_TokenStream_synchronize(k_TokenStream_t* stream, int32_t i) {
+bool k_TokenStream_synchronize(TokenStream* stream, int32_t i) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
     jtk_Assert_assertTrue(i >= 0, "The specified index is invalid.");
 
@@ -102,7 +102,7 @@ bool k_TokenStream_synchronize(k_TokenStream_t* stream, int32_t i) {
     return result;
 }
 
-int32_t k_TokenStream_fetch(k_TokenStream_t* stream, int32_t n) {
+int32_t k_TokenStream_fetch(TokenStream* stream, int32_t n) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     if (stream->hitEndOfStream) {
@@ -112,7 +112,7 @@ int32_t k_TokenStream_fetch(k_TokenStream_t* stream, int32_t n) {
     int32_t oldSize = jtk_ArrayList_getSize(stream->tokens);
     int32_t i;
     for (i = 0; i < n; i++) {
-        Token* token = k_Lexer_nextToken(stream->lexer);
+        Token* token = nextToken(stream->lexer);
         k_Token_setIndex(token, oldSize + i);
         jtk_ArrayList_add(stream->tokens, token);
         jtk_ArrayList_add(stream->trash, token);
@@ -125,7 +125,7 @@ int32_t k_TokenStream_fetch(k_TokenStream_t* stream, int32_t n) {
     return n;
 }
 
-Token* k_TokenStream_getToken(k_TokenStream_t* stream, int32_t index) {
+Token* k_TokenStream_getToken(TokenStream* stream, int32_t index) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Index-out-of-range errors are checked by the
@@ -134,7 +134,7 @@ Token* k_TokenStream_getToken(k_TokenStream_t* stream, int32_t index) {
     return jtk_ArrayList_getValue(stream->tokens, index);
 }
 
-jtk_ArrayList_t* k_TokenStream_getTokens(k_TokenStream_t* stream,
+jtk_ArrayList_t* k_TokenStream_getTokens(TokenStream* stream,
         int32_t startIndex, int32_t stopIndex) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
@@ -154,11 +154,11 @@ jtk_ArrayList_t* k_TokenStream_getTokens(k_TokenStream_t* stream,
     return result;
 }
 
-TokenType k_TokenStream_la(k_TokenStream_t* stream, int32_t i) {
+TokenType k_TokenStream_la(TokenStream* stream, int32_t i) {
     return k_TokenStream_lt(stream, i)->type;
 }
 
-Token* k_TokenStream_lt(k_TokenStream_t* stream, int32_t k) {
+Token* k_TokenStream_lt(TokenStream* stream, int32_t k) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     k_TokenStream_initialize(stream);
@@ -193,7 +193,7 @@ Token* k_TokenStream_lt(k_TokenStream_t* stream, int32_t k) {
     return token;
 }
 
-void k_TokenStream_initialize(k_TokenStream_t* stream) {
+void k_TokenStream_initialize(TokenStream* stream) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     if (stream->p == -1) {
@@ -202,7 +202,7 @@ void k_TokenStream_initialize(k_TokenStream_t* stream) {
     }
 }
 
-int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream,
+int32_t k_TokenStream_getPreviousTokenOnChannel(TokenStream* stream,
         int32_t i, TokenChannel channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
@@ -231,7 +231,7 @@ int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream,
     return -1;
 }
 
-int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream,
+int32_t k_TokenStream_getNextTokenOnChannel(TokenStream* stream,
         int32_t i, TokenChannel channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
@@ -272,7 +272,7 @@ int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream,
     return i;
 }
 
-void k_TokenStream_fill(k_TokenStream_t* stream) {
+void k_TokenStream_fill(TokenStream* stream) {
     k_TokenStream_initialize(stream);
     /* The token stream tries to buffer a 1000 tokens
      * at each iteration. This is repeated until the token
@@ -286,7 +286,7 @@ void k_TokenStream_fill(k_TokenStream_t* stream) {
     } while (fetched == blockSize);
 }
 
-int32_t k_TokenStream_getNumberOfTokens(k_TokenStream_t* stream,
+int32_t k_TokenStream_getNumberOfTokens(TokenStream* stream,
                                         TokenChannel channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 

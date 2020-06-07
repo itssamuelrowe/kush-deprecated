@@ -19,9 +19,9 @@
 int32_t main(int32_t length, char** arguments) {
     jtk_System_initialize();
 
-    Compiler* compiler = k_Compiler_new();
-    bool result = k_Compiler_compileEx(compiler, arguments, length);
-    k_Compiler_delete(compiler);
+    Compiler* compiler = newCompiler();
+    bool result = compileEx(compiler, arguments, length);
+    deleteCompiler(compiler);
 
     return result? 0 : 1;
 }

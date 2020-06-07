@@ -27,19 +27,13 @@
 
 #include <kush/configuration.h>
 #include <kush/compiler.h>
-#include <kush/LexerError.h>
-#include <kush/Token.h>
-#include <kush/TokenType.h>
-#include <kush/TokenChannel.h>
-
-#define KUSH_LEXER_DEFAULT_CHANNEL 0
-#define KUSH_LEXER_HIDDEN_CHANNEL 1
+#include <kush/token.h>
 
 #define KUSH_END_OF_STREAM -1
 
 /* Forward Reference */
 
-typedef struct k_ErrorHandler_t k_ErrorHandler_t;
+typedef struct ErrorHandler ErrorHandler;
 
 /*******************************************************************************
  * Lexer                                                                       *
@@ -49,11 +43,8 @@ typedef struct k_ErrorHandler_t k_ErrorHandler_t;
  * Generates a stream of tokens from an input character stream.
  * The tokens are recognized based on fixed lexical patterns
  * as described by KUSH.
- *
- * @author Samuel Rowe
- * @since  KUSH 1.0
  */
-struct k_Lexer_t {
+struct Lexer {
 
     Compiler* compiler;
 
@@ -135,40 +126,21 @@ struct k_Lexer_t {
     /**
      * A buffer to store emitted tokens.
      *
-     * A single call to k_Lexer_nextToken() may result in
+     * A single call to nextToken() may result in
      * emission of multiple tokens. Therefore, the lexer
      * buffers up tokens.
      */
     jtk_ArrayQueue_t* tokens;
 
-    k_ErrorCode_t errorCode;
+    ErrorCode errorCode;
 };
 
-/**
- * @memberof Lexer
- */
-typedef struct k_Lexer_t k_Lexer_t;
+typedef struct Lexer Lexer;
 
 const uint8_t* k_Lexer_getLiteralName(TokenType type);
 
-// Constructor
-
-/**
- * Creates and returns a new lexer.
- *
- * @return A new lexer.
- */
-k_Lexer_t* k_Lexer_new(Compiler* compiler);
-
-// Destructor
-
-/**
- * Destroys the specified lexer.
- *
- * @param lexer
- *        The lexer to destroy.
- */
-void k_Lexer_delete(k_Lexer_t* lexer);
+Lexer* lexerNew(Compiler* compiler);
+void lexerDelete(Lexer* lexer);
 
 /**
  * The primary interface for the Lexer class. It uses the lookahead
@@ -184,6 +156,6 @@ void k_Lexer_delete(k_Lexer_t* lexer);
  *         is encountered; ignored, otherwise.
  * @return The next recognized token.
  */
-Token* k_Lexer_nextToken(k_Lexer_t* lexer);
+Token* nextToken(Lexer* lexer);
 
 #endif /* KUSH_COMPILER_LEXER_LEXER_H */

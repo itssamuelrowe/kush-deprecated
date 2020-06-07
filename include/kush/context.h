@@ -146,6 +146,12 @@ enum ContextType {
 
     CONTEXT_POSTFIX_EXPRESSION,
 
+    CONTEXT_SUBSCRIPT,
+
+    CONTEXT_FUNCTION_ARGUMENTS,
+
+    CONTEXT_MEMBER_ACCESS,
+
     CONTEXT_INITIALIZER_EXPRESSION,
 
     CONTEXT_ARRAY_EXPRESSION
@@ -232,8 +238,8 @@ typedef struct UnaryExpression UnaryExpression;
 
 struct PostfixExpression {
     ContextType tag;
-    void* primaryExpression;
-    bool primaryToken;
+    void* primary;
+    bool token;
     jtk_ArrayList_t* postfixParts; // contexts
 };
 
@@ -285,6 +291,18 @@ struct FunctionArguments {
 typedef struct FunctionArguments FunctionArguments;
 
 /*******************************************************************************
+ * Subscript                                                                   *
+ *******************************************************************************/
+
+struct Subscript {
+    ContextType tag;
+    Token* bracket;
+    BinaryExpression* expression;
+};
+
+typedef struct Subscript Subscript;
+
+/*******************************************************************************
  * Block                                                              *
  *******************************************************************************/
 
@@ -316,7 +334,7 @@ typedef struct FunctionParameter FunctionParameter;
 struct Function {
     ContextType tag;
     Token* identifier;
-    jtk_ArrayList_t* fixedParameters;
+    jtk_ArrayList_t* parameters;
     FunctionParameter* variableParameter;
     Block* body;
     Token* returnType;
@@ -375,7 +393,7 @@ struct IterativeStatement {
     bool whileLoop;
     Token* parameter;
     BinaryExpression* expression;
-    Block* blockStatement;
+    Block* body;
 };
 
 typedef struct IterativeStatement IterativeStatement;
@@ -417,6 +435,7 @@ struct Variable {
     int32_t dimensions;
     Token* identifier;
     BinaryExpression* expression;
+    Scope* parent;
 };
 
 typedef struct Variable Variable;

@@ -22,66 +22,28 @@
 #include <jtk/collection/list/ArrayList.h>
 
 #include <kush/configuration.h>
-#include <kush/TokenStream.h>
+#include <kush/token-stream.h>
+#include <kush/context.h>
 
 /*******************************************************************************
  * Parser                                                                      *
  *******************************************************************************/
 
-/**
- * @class Parser
- * @ingroup k_compiler_parser
- * @author Samuel Rowe
- * @since Kush 0.1
- */
-struct k_Parser_t {
+struct Parser {
     Compiler* compiler;
-    k_TokenStream_t* tokens;
+    TokenStream* tokens;
     TokenType* followSet;
     int32_t followSetSize;
     int32_t followSetCapacity;
     bool recovery;
-    k_ASTNodeType_t mainComponent;
 };
 
-/**
- * @memberof Parser
- */
-typedef struct k_Parser_t k_Parser_t;
+typedef struct Parser Parser;
 
-// Constructor
-
-/**
- * @memberof Parser
- */
-k_Parser_t* k_Parser_new(Compiler* compiler, k_TokenStream_t* tokens);
-
-// Destructor
-
-/**
- * @memberof Parser
- */
-void k_Parser_delete(k_Parser_t* parser);
-
-// Rule
-
-/**
- * @memberof Parser
- */
-const char* k_Parser_getRuleName(k_ASTNodeType_t type);
-
-// Parse
-
-/**
- * @memberof Parser
- */
-void k_Parser_parse(k_Parser_t* parser);
-
-// Reset
-
-/**
- * @memberof Parser
- */
-void k_Parser_reset(k_Parser_t* parser, k_TokenStream_t* tokens);
+Parser* parserNew(Compiler* compiler, TokenStream* tokens);
+void parserDelete(Parser* parser);
+const char* getRuleName(ContextType type);
+Module* parse(Parser* parser);
+void resetParser(Parser* parser, TokenStream* tokens);
 
 #endif /* KUSH_COMPILER_PARSER_PARSER_H */

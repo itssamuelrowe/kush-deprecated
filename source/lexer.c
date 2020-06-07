@@ -28,18 +28,18 @@
  * Lexer                                                                       *
  *******************************************************************************/
 
-static void consume(k_Lexer_t* lexer);
-static void destroyStaleTokens(k_Lexer_t* lexer);
-static void emit(k_Lexer_t* lexer, Token* token);
-static k_LexerError_t* createError(k_Lexer_t* lexer, const char* message);
-static Token* createToken(k_Lexer_t* lexer);
-static void onNewline(k_Lexer_t* lexer);
-static void reset(k_Lexer_t* lexer, jtk_InputStreat* inputStream);
-static void binaryIntegerLiteral(k_Lexer_t* lexer);
-static void octalIntegerLiteral(k_Lexer_t* lexer);
-static void hexadecimalIntegerLiteral(k_Lexer_t* lexer);
-static void decimalIntegerLiteral(k_Lexer_t* lexer);
-static void integerLiteral(k_Lexer_t* lexer);
+static void consume(Lexer* lexer);
+static void destroyStaleTokens(Lexer* lexer);
+static void emit(Lexer* lexer, Token* token);
+static k_LexerError_t* createError(Lexer* lexer, const char* message);
+static Token* createToken(Lexer* lexer);
+static void onNewline(Lexer* lexer);
+static void reset(Lexer* lexer, jtk_InputStream_t* inputStream);
+static void binaryIntegerLiteral(Lexer* lexer);
+static void octalIntegerLiteral(Lexer* lexer);
+static void hexadecimalIntegerLiteral(Lexer* lexer);
+static void decimalIntegerLiteral(Lexer* lexer);
+static void integerLiteral(Lexer* lexer);
 
 
 #define isBinaryPrefix(c) (c == 'b') || (c == 'B')
@@ -249,13 +249,13 @@ const uint8_t* k_Lexer_getLiteralName(TokenType type) {
 
 /* Constructor */
 
-k_Lexer_t* k_Lexer_new(Compiler* compiler) {
+Lexer* lexerNew(Compiler* compiler) {
     /* The constructor invokes consume() to initialize
      * the LA(1) character. Therefore, we assign negative values
      * to certain attributes.
      */
 
-    k_Lexer_t* lexer = allocate(k_Lexer_t, 1);
+    Lexer* lexer = allocate(Lexer, 1);
     lexer->compiler = compiler;
     lexer->inputStream = NULL;
     lexer->la1 = 0;
@@ -282,7 +282,7 @@ k_Lexer_t* k_Lexer_new(Compiler* compiler) {
 * This function is responsible for the destruction of
 * such tokens.
 */
-void destroyStaleTokens(k_Lexer_t* lexer) {
+void destroyStaleTokens(Lexer* lexer) {
     int32_t size = jtk_ArrayList_getSize(lexer->tokens->list);
     int32_t i;
     for (i = 0; i < size; i++) {
@@ -291,7 +291,7 @@ void destroyStaleTokens(k_Lexer_t* lexer) {
     }
 }
 
-void k_Lexer_delete(k_Lexer_t* lexer) {
+void lexerDelete(Lexer* lexer) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
 
     jtk_StringBuilder_delete(lexer->text);
@@ -302,7 +302,7 @@ void k_Lexer_delete(k_Lexer_t* lexer) {
 
 /* Create Token */
 
-Token* createToken(k_Lexer_t* lexer) {
+Token* createToken(Lexer* lexer) {
     uint8_t* text = jtk_CString_newEx(lexer->text->value, lexer->text->size); // jtk_StringBuilder_toCString(lexer->text);
     int32_t length = jtk_StringBuilder_getSize(lexer->text);
 
@@ -330,21 +330,21 @@ Token* createToken(k_Lexer_t* lexer) {
     return token;
 }
 
-void onNewline(k_Lexer_t* lexer) {
+void onNewline(Lexer* lexer) {
     lexer->line++;
     lexer->column = 1;
 }
 
-k_LexerError_t* createError(k_Lexer_t* lexer, const char* message) {
+k_LexerError_t* createError(Lexer* lexer, const char* message) {
     k_LexerError_t* error = k_LexerError_new(message, "<unknown>" /*lexer->inputStream->path*/, lexer->startLine, lexer->startColumn);
     return error;
 }
 
-bool isInputStart(k_Lexer_t* lexer) {
+bool isInputStart(Lexer* lexer) {
     return (lexer->startLine == 0) && (lexer->startColumn == 0);
 }
 
-void consume(k_Lexer_t* lexer) {
+void consume(Lexer* lexer) {
     jtk_StringBuilder_appendCodePoint(lexer->text, lexer->la1);
 
     lexer->index++;
@@ -365,7 +365,7 @@ void consume(k_Lexer_t* lexer) {
     }
 }
 
-void emit(k_Lexer_t* lexer, Token* token) {
+void emit(Lexer* lexer, Token* token) {
     lexer->token = token;
     jtk_ArrayQueue_enqueue(lexer->tokens, token);
 }
@@ -498,7 +498,7 @@ void emit(k_Lexer_t* lexer, Token* token) {
 *
 */
 
-void binaryIntegerLiteral(k_Lexer_t* lexer) {
+void binaryIntegerLiteral(Lexer* lexer) {
     /* Consume and discard the binary prefix character. */
     consume(lexer);
 
@@ -531,7 +531,7 @@ void binaryIntegerLiteral(k_Lexer_t* lexer) {
     }
 }
 
-void octalIntegerLiteral(k_Lexer_t* lexer) {
+void octalIntegerLiteral(Lexer* lexer) {
     /* Consume and discard the octal prefix character. */
     consume(lexer);
 
@@ -564,7 +564,7 @@ void octalIntegerLiteral(k_Lexer_t* lexer) {
     }
 }
 
-void hexadecimalIntegerLiteral(k_Lexer_t* lexer) {
+void hexadecimalIntegerLiteral(Lexer* lexer) {
     /* Consume and discard the binary prefix character. */
     consume(lexer);
 
@@ -597,7 +597,7 @@ void hexadecimalIntegerLiteral(k_Lexer_t* lexer) {
     }
 }
 
-void decimalIntegerLiteral(k_Lexer_t* lexer) {
+void decimalIntegerLiteral(Lexer* lexer) {
     /* Consume and discard the decimal digit character. */
     consume(lexer);
 
@@ -752,7 +752,7 @@ void decimalIntegerLiteral(k_Lexer_t* lexer) {
  * ;
  *
  */
-void integerLiteral(k_Lexer_t* lexer) {
+void integerLiteral(Lexer* lexer) {
     /* The lexer has recognized an integer literal. */
     lexer->type = TOKEN_INTEGER_LITERAL;
 
@@ -826,7 +826,7 @@ void integerLiteral(k_Lexer_t* lexer) {
  *         }
  *     )
  */
-Token* k_Lexer_nextToken(k_Lexer_t* lexer) {
+Token* nextToken(Lexer* lexer) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
 
     Compiler* compiler = lexer->compiler;
@@ -2042,7 +2042,7 @@ Token* k_Lexer_nextToken(k_Lexer_t* lexer) {
          * Therefore, all types of errors are collectively recorded at this point.
          */
         if (lexer->errorCode != KUSH_ERROR_CODE_NONE) {
-            k_ErrorHandler_handleLexicalError(lexer->compiler->errorHandler,
+            handleLexicalError(lexer->compiler->errorHandler,
                                               lexer, lexer->errorCode, newToken);
         }
     }
@@ -2054,7 +2054,7 @@ Token* k_Lexer_nextToken(k_Lexer_t* lexer) {
 
 // Reset
 
-void reset(k_Lexer_t* lexer, jtk_InputStreat* inputStream) {
+void reset(Lexer* lexer, jtk_InputStream_t* inputStream) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
     jtk_Assert_assertObject(inputStream, "The specified input stream is null.");
 

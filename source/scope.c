@@ -26,7 +26,7 @@ Scope* k_Scope_new(const uint8_t* name, int32_t nameSize,
 
     jtk_ObjectAdapter_t* stringObjectAdapter = jtk_CStringObjectAdapter_getInstance();
 
-    Scope* scope = jtallocate(Scope, 1);
+    Scope* scope = allocate(Scope, 1);
     scope->name = NULL; // jtk_CString_make(name, &nameSize);
     scope->nameSize = nameSize;
     scope->type = type;

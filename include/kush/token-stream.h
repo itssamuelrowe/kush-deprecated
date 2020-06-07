@@ -36,7 +36,7 @@
  */
 // typedef void (*k_OnLexicalError_t)(k_LexicalError_t* error);
 
-struct k_TokenStream_t {
+struct TokenStream {
 
     Compiler* compiler;
 
@@ -44,7 +44,7 @@ struct k_TokenStream_t {
      * The lexer which recognizes and produces tokens on this
      * stream.
      */
-    k_Lexer_t* lexer;
+    Lexer* lexer;
 
     /**
      * The list of all the tokens recognized by the lexer so
@@ -73,28 +73,28 @@ struct k_TokenStream_t {
     jtk_ArrayList_t* trash;
 };
 
-typedef struct k_TokenStream_t k_TokenStream_t;
+typedef struct TokenStream TokenStream;
 
-k_TokenStream_t* tokenStreamNew(Compiler* compiler, k_Lexer_t* lexer,
+TokenStream* tokenStreamNew(Compiler* compiler, Lexer* lexer,
     TokenChannel channel);
-void k_TokenStream_delete(k_TokenStream_t* stream);
-void k_TokenStream_reset(k_TokenStream_t* stream);
-int32_t k_TokenStream_getIndex(k_TokenStream_t* stream);
-int32_t k_TokenStream_getSize(k_TokenStream_t* stream);
-void k_TokenStream_consume(k_TokenStream_t* stream);
-bool k_TokenStream_synchronize(k_TokenStream_t* stream, int32_t i);
-int32_t k_TokenStream_fetch(k_TokenStream_t* stream, int32_t n);
-Token* k_TokenStream_getToken(k_TokenStream_t* stream, int32_t index);
-jtk_ArrayList_t* k_TokenStream_getTokens(k_TokenStream_t* stream, int32_t startIndex, int32_t stopIndex);
-TokenType k_TokenStream_la(k_TokenStream_t* stream, int32_t i);
-Token* k_TokenStream_lt(k_TokenStream_t* stream, int32_t k);
-void k_TokenStream_initialize(k_TokenStream_t* stream);
-int32_t k_TokenStream_getNextTokenOnChannel(k_TokenStream_t* stream, int32_t i, TokenChannel channel);
-int32_t k_TokenStream_getPreviousTokenOnChannel(k_TokenStream_t* stream, int32_t i, TokenChannel channel);
-void k_TokenStream_fill(k_TokenStream_t* stream);
-uint8_t* k_TokenStream_getSourceName(k_TokenStream_t* stream, int32_t* size);
-k_Lexer_t* k_TokenStream_getLexer(k_TokenStream_t* stream);
-uint8_t* k_TokenStream_getText(k_TokenStream_t* stream, int32_t startIndex, int32_t stopIndex, int32_t* size);
-int32_t k_TokenStream_getNumberOfTokens(k_TokenStream_t* stream, TokenChannel channel);
+void tokenStreamDelete(TokenStream* stream);
+void k_TokenStream_reset(TokenStream* stream);
+int32_t k_TokenStream_getIndex(TokenStream* stream);
+int32_t k_TokenStream_getSize(TokenStream* stream);
+void k_TokenStream_consume(TokenStream* stream);
+bool k_TokenStream_synchronize(TokenStream* stream, int32_t i);
+int32_t k_TokenStream_fetch(TokenStream* stream, int32_t n);
+Token* k_TokenStream_getToken(TokenStream* stream, int32_t index);
+jtk_ArrayList_t* k_TokenStream_getTokens(TokenStream* stream, int32_t startIndex, int32_t stopIndex);
+TokenType k_TokenStream_la(TokenStream* stream, int32_t i);
+Token* k_TokenStream_lt(TokenStream* stream, int32_t k);
+void k_TokenStream_initialize(TokenStream* stream);
+int32_t k_TokenStream_getNextTokenOnChannel(TokenStream* stream, int32_t i, TokenChannel channel);
+int32_t k_TokenStream_getPreviousTokenOnChannel(TokenStream* stream, int32_t i, TokenChannel channel);
+void k_TokenStream_fill(TokenStream* stream);
+uint8_t* k_TokenStream_getSourceName(TokenStream* stream, int32_t* size);
+Lexer* k_TokenStream_getLexer(TokenStream* stream);
+uint8_t* k_TokenStream_getText(TokenStream* stream, int32_t startIndex, int32_t stopIndex, int32_t* size);
+int32_t k_TokenStream_getNumberOfTokens(TokenStream* stream, TokenChannel channel);
 
 #endif /* TOKEN_STREAM_H */

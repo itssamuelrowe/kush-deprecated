@@ -34,7 +34,7 @@
  * @author Samuel Rowe
  * @since Kush 0.1
  */
-enum k_ErrorCode_t {
+enum ErrorCode {
     KUSH_ERROR_CODE_NONE = 0,
 
     // Lexcial Errors
@@ -53,6 +53,14 @@ enum k_ErrorCode_t {
     KUSH_ERROR_CODE_TRY_STATEMENT_EXPECTS_CATCH_OR_FINALLY,
 
     // Semantical Errors
+
+    ERROR_INCOMPATIBLE_OPERAND,
+    ERROR_INCOMPATIBLE_OPERAND_TYPES,
+    ERROR_COMBINING_EQUALITY_OPERATORS,
+    ERROR_UNKNOWN_MODULE,
+    ERROR_INVALID_LEFT_OPERAND,
+    ERROR_INVALID_FUNCTION_INVOCATION,
+    ERROR_INVALID_MEMBER_ACCESS,
 
     KUSH_ERROR_CODE_UNDECLARED_CLASS,
     KUSH_ERROR_CODE_INVALID_LVALUE,
@@ -86,215 +94,67 @@ enum k_ErrorCode_t {
     KUSH_ERROR_CODE_COUNT
 };
 
-typedef enum k_ErrorCode_t k_ErrorCode_t;
+typedef enum ErrorCode ErrorCode;
 
 /*******************************************************************************
  * Error                                                                       *
  *******************************************************************************/
 
-/**
- * @class Error
- * @ingroup k_compiler_support
- * @author Samuel Rowe
- * @since Kush 0.1
- */
-struct k_Error_t {
-    k_ErrorCode_t code;
+struct Error {
+    ErrorCode code;
     Token* token;
     TokenType expected;
 };
 
-/**
- * @memberof Error
- */
-typedef struct k_Error_t k_Error_t;
+typedef struct Error Error;
 
-// Constructor
-
-k_Error_t* k_Error_new(k_ErrorCode_t errorCode, Token* token);
-k_Error_t* k_Error_newEx(k_ErrorCode_t errorCode, Token* token, TokenType expected);
+Error* errorNew(ErrorCode errorCode, Token* token);
+Error* errorNewEx(ErrorCode errorCode, Token* token, TokenType expected);
 
 // Destructor
 
-void k_Error_delete(k_Error_t* error);
+void errorDelete(Error* error);
 
 /*******************************************************************************
  * ErrorHandler                                                                *
  *******************************************************************************/
 
-struct k_Lexer_t;
-struct k_Parser_t;
-typedef struct k_Lexer_t k_Lexer_t;
-typedef struct k_Parser_t k_Parser_t;
+typedef struct Lexer Lexer;
+typedef struct Parser Parser;
 
 /* NOTE: The handlers should not maintain any reference to the origin
  * object that they receive. Because errors may persist beyond the lifetime
  * of an origin object.
  */
 
-/**
- * @memberof ErrorHandler
- */
-typedef void (*k_ErrorHandler_HandleLexicalErrorFunction_t)(void* context, k_Lexer_t* lexer, k_Error_t* error);
+typedef void (*OnLexicalErrorFunction)(void* context, Lexer* lexer, Error* error);
+typedef void (*OnSyntaxErrorFunction)(void* context, Parser* parser, Error* error, TokenType expected);
+typedef void (*OnSemanticErrorFunction)(void* context, void* origin, Error* error);
 
-/**
- * @memberof ErrorHandler
- */
-typedef void (*k_ErrorHandler_HandleSyntacticalErrorFunction_t)(void* context, k_Parser_t* parser, k_Error_t* error);
+typedef void (*OnGeneralErrorFunction)(void* context, void* origin, Error* error);
 
-/**
- * @memberof ErrorHandler
- */
-typedef void (*k_ErrorHandler_HandleSemanticalErrorFunction_t)(void* context, void* origin, k_Error_t* error);
-
-/**
- * @memberof ErrorHandler
- */
-typedef void (*k_ErrorHandler_OnLexicalErrorFunction_t)(void* context, k_Lexer_t* lexer, k_Error_t* error);
-
-/**
- * @memberof ErrorHandler
- */
-typedef void (*k_ErrorHandler_OnSyntacticalErrorFunction_t)(void* context, k_Parser_t* parser, k_Error_t* error, TokenType expected);
-
-/**
- * @memberof ErrorHandler
- */
-typedef void (*k_ErrorHandler_OnSemanticalErrorFunction_t)(void* context, void* origin, k_Error_t* error);
-
-/**
- * @memberof ErrorHandler
- */
-typedef void (*k_ErrorHandler_OnGeneralErrorFunction_t)(void* context, void* origin, k_Error_t* error);
-
-/**
- * @class ErrorHandler
- * @author Samuel Rowe
- * @ingroup k_compiler
- * @since Kush 0.1
- */
-struct k_ErrorHandler_t {
-    k_ErrorHandler_HandleLexicalErrorFunction_t handleLexicalError;
-    k_ErrorHandler_HandleSyntacticalErrorFunction_t handleSyntacticalError;
-    k_ErrorHandler_HandleSemanticalErrorFunction_t handleSemanticalError;
-
-    k_ErrorHandler_OnLexicalErrorFunction_t onLexicalError;
-    k_ErrorHandler_OnSyntacticalErrorFunction_t onSyntacticalError;
-    k_ErrorHandler_OnSemanticalErrorFunction_t onSemanticalError;
-    k_ErrorHandler_OnGeneralErrorFunction_t onGeneralError;
+struct ErrorHandler {
+    OnLexicalErrorFunction onLexicalError;
+    OnSyntaxErrorFunction onSyntaxError;
+    OnSemanticErrorFunction onSemanticError;
+    OnGeneralErrorFunction onGeneralError;
 
     jtk_ArrayList_t* errors;
-    bool active;
     void* context;
 };
 
-/**
- * @memberof ErrorHandler
- */
-typedef struct k_ErrorHandler_t k_ErrorHandler_t;
+typedef struct ErrorHandler ErrorHandler;
 
-// Constructor
-
-/**
- * @memberof ErrorHandler
- */
-k_ErrorHandler_t* k_ErrorHandler_new();
-
-// Destructor
-
-/**
- * @memberof ErrorHandler
- */
-void k_ErrorHandler_delete(k_ErrorHandler_t* handler);
-
-// Active
-
-/**
- * @memberof ErrorHandler
- */
-void k_ErrorHandler_setActive(k_ErrorHandler_t* handler, bool active);
-
-/**
- * @memberof ErrorHandler
- */
-bool k_ErrorHandler_isActive(k_ErrorHandler_t* handler);
-
-// Syntactical Error
-
-/**
- * @memberof ErrorHandler
- */
-void k_ErrorHandler_setOnSyntacticalError(k_ErrorHandler_t* handler,
-    k_ErrorHandler_OnSyntacticalErrorFunction_t onSyntacticalError);
-
-/**
- * @memberof ErrorHandler
- */
-k_ErrorHandler_OnSyntacticalErrorFunction_t k_ErrorHandler_getOnSyntacticalError(
-    k_ErrorHandler_t* handler);
-
-/**
- * @memberof ErrorHandler
- */
-void k_ErrorHandler_handleSyntacticalError(k_ErrorHandler_t* handler,
-    k_Parser_t* parser, k_ErrorCode_t errorCode, Token* token,
+ErrorHandler* errorHandlerNew();
+void errorHandlerDelete(ErrorHandler* handler);
+void handleSyntacticalError(ErrorHandler* handler,
+    Parser* parser, ErrorCode errorCode, Token* token,
     TokenType expected);
-
-// Lexical Error
-
-/**
- * @memberof ErrorHandler
- */
-void k_ErrorHandler_setOnLexicalError(k_ErrorHandler_t* handler,
-    k_ErrorHandler_OnLexicalErrorFunction_t onLexicalError);
-
-/**
- * @memberof ErrorHandler
- */
-k_ErrorHandler_OnLexicalErrorFunction_t k_ErrorHandler_getOnLexicalError(
-    k_ErrorHandler_t* handler);
-
-/**
- * @memberof ErrorHandler
- */
-void k_ErrorHandler_handleLexicalError(k_ErrorHandler_t* handler,
-    k_Lexer_t* lexer, k_ErrorCode_t errorCode, Token* token);
-
-// Semantic Error
-
-/**
- * @memberof ErrorHandler
- */
-void k_ErrorHandler_setOnSemanticalError(k_ErrorHandler_t* handler,
-    k_ErrorHandler_OnSemanticalErrorFunction_t onSemanticalError);
-
-/**
- * @memberof ErrorHandler
- */
-k_ErrorHandler_OnSemanticalErrorFunction_t k_ErrorHandler_getOnSemanticalError(
-    k_ErrorHandler_t* handler);
-
-/**
- * @memberof ErrorHandler
- */
-void k_ErrorHandler_handleSemanticalError(k_ErrorHandler_t* handler,
-    void* origin, k_ErrorCode_t errorCode, Token* token);
-
-/**
- * @memberof ErrorHandler
- */
-void k_ErrorHandler_handleGeneralError(k_ErrorHandler_t* handler,
-    void* origin, k_ErrorCode_t errorCode);
-
-// Errors
-
-/**
- * @memberof ErrorHandler
- */
-jtk_ArrayList_t* k_ErrorHandler_getErrors(k_ErrorHandler_t* handler);
-
-int32_t k_ErrorHandler_getErrorCount(k_ErrorHandler_t* handler);
-
-bool k_ErrorHandler_hasErrors(k_ErrorHandler_t* handler);
+void handleLexicalError(ErrorHandler* handler,
+    Lexer* lexer, ErrorCode errorCode, Token* token);
+void handleSemanticalError(ErrorHandler* handler,
+    void* origin, ErrorCode errorCode, Token* token);
+void handleGeneralError(ErrorHandler* handler,
+    void* origin, ErrorCode errorCode);
 
 #endif /* KUSH_COMPILER_SUPPORT_ERROR_HANDLER_H */

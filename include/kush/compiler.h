@@ -45,7 +45,7 @@ struct Compiler {
     jtk_Logger_t* logger;
     jtk_ArrayList_t* inputFiles;
     int32_t currentFileIndex;
-    k_ErrorHandler_t* errorHandler;
+    ErrorHandler* errorHandler;
     Module** modules;
     uint8_t** packages;
     int32_t* packageSizes;
@@ -62,15 +62,15 @@ typedef struct Compiler Compiler;
 
 // Constructor
 
-Compiler* k_Compiler_new();
+Compiler* newCompiler();
 
 // Destructor
 
-void k_Compiler_delete(Compiler* compiler);
+void deleteCompiler(Compiler* compiler);
 
 // Compiler
 
-bool k_Compiler_compileEx(Compiler* compiler, char** arguments, int32_t length);
-bool k_Compiler_compile(Compiler* compiler);
+bool compileEx(Compiler* compiler, char** arguments, int32_t length);
+bool compile(Compiler* compiler);
 
 #endif /* KUSH_COMPILER_COMPILER_H */
