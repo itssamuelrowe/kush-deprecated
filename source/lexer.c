@@ -31,7 +31,6 @@
 static void consume(Lexer* lexer);
 static void destroyStaleTokens(Lexer* lexer);
 static void emit(Lexer* lexer, Token* token);
-static k_LexerError_t* createError(Lexer* lexer, const char* message);
 static Token* createToken(Lexer* lexer);
 static void onNewline(Lexer* lexer);
 static void reset(Lexer* lexer, jtk_InputStream_t* inputStream);
@@ -283,10 +282,10 @@ Lexer* lexerNew(Compiler* compiler) {
 * such tokens.
 */
 void destroyStaleTokens(Lexer* lexer) {
-    int32_t size = jtk_ArrayList_getSize(lexer->tokens->list);
+    int32_t size = jtk_ArrayList_getSize(lexer->tokens->m_list);
     int32_t i;
     for (i = 0; i < size; i++) {
-        Token* token = (Token*)jtk_ArrayList_getValue(lexer->tokens->list, i);
+        Token* token = (Token*)jtk_ArrayList_getValue(lexer->tokens->m_list, i);
         k_Token_delete(token);
     }
 }
@@ -296,14 +295,13 @@ void lexerDelete(Lexer* lexer) {
 
     jtk_StringBuilder_delete(lexer->text);
     jtk_ArrayQueue_delete(lexer->tokens);
-    jtk_ArrayStack_delete(lexer->indentations);
     deallocate(lexer);
 }
 
 /* Create Token */
 
 Token* createToken(Lexer* lexer) {
-    uint8_t* text = jtk_CString_newEx(lexer->text->value, lexer->text->size); // jtk_StringBuilder_toCString(lexer->text);
+    uint8_t* text = jtk_CString_newEx(lexer->text->m_value, lexer->text->m_size); // jtk_StringBuilder_toCString(lexer->text);
     int32_t length = jtk_StringBuilder_getSize(lexer->text);
 
     Compiler* compiler = lexer->compiler;
@@ -333,11 +331,6 @@ Token* createToken(Lexer* lexer) {
 void onNewline(Lexer* lexer) {
     lexer->line++;
     lexer->column = 1;
-}
-
-k_LexerError_t* createError(Lexer* lexer, const char* message) {
-    k_LexerError_t* error = k_LexerError_new(message, "<unknown>" /*lexer->inputStream->path*/, lexer->startLine, lexer->startColumn);
-    return error;
 }
 
 bool isInputStart(Lexer* lexer) {
@@ -857,54 +850,6 @@ Token* nextToken(Lexer* lexer) {
 
             switch (lexer->la1) {
             case KUSH_END_OF_STREAM : {
-                if (!jtk_ArrayStack_isEmpty(lexer->indentations)) {
-                    /* It appears that the lexer has reached the end of
-                     * the stream inside a block. In order to prevent sytax
-                     * errors occuring because of a "missing newline" we emit
-                     * an extra newline token. It may serve as the end of a
-                     * statement. After which, the lexer emits dedentation
-                     * tokens as needed.
-                     *
-                     * NOTE: The lexer is creating an imaginary token here.
-                     *       Therefore, we directly invoke k_Token_new().
-                     */
-                    Token* newlineToken = k_Token_new(
-                                                  TOKEN_CHANNEL_DEFAULT,
-                                                  TOKEN_NEWLINE,
-                                                  "\n",
-                                                  1,
-                                                  lexer->startIndex,    /* inclusive */
-                                                  lexer->index,         /* exclusive */
-                                                  lexer->startLine,     /* inclusive */
-                                                  lexer->line,          /* inclusive */
-                                                  lexer->startColumn,   /* inclusive */
-                                                  lexer->column,         /* inclusive */
-                                                  file
-                                              );
-                    emit(lexer, newlineToken);
-
-                    while (!jtk_ArrayStack_isEmpty(lexer->indentations)) {
-                        /*
-                         * NOTE: The lexer is creating an imaginary token here.
-                         *       Therefore, we directly invoke k_Token_new().
-                         */
-                        Token* dedentationToken = k_Token_new(
-                                                          TOKEN_CHANNEL_DEFAULT,
-                                                          TOKEN_DEDENTATION,
-                                                          "",
-                                                          0,
-                                                          lexer->startIndex,    /* inclusive */
-                                                          lexer->index,         /* exclusive */
-                                                          lexer->startLine,     /* inclusive */
-                                                          lexer->line,          /* inclusive */
-                                                          lexer->startColumn,   /* inclusive */
-                                                          lexer->column,        /* inclusive */
-                                                          file
-                                                      );
-                        emit(lexer, dedentationToken);
-                        jtk_ArrayStack_pop(lexer->indentations);
-                    }
-                }
                 /* The data required for the creating the end-of-stream token.
                  */
                 lexer->type = TOKEN_END_OF_STREAM;
@@ -1839,8 +1784,8 @@ Token* nextToken(Lexer* lexer) {
                         consume(lexer);
                     }
 
-                    uint8_t* text = lexer->text->value; // jtk_StringBuilder_toCString(lexer->text);
-                    int32_t length = lexer->text->size; // lexer->index - lexer->startIndex;
+                    uint8_t* text = lexer->text->m_value; // jtk_StringBuilder_toCString(lexer->text);
+                    int32_t length = lexer->text->m_size; // lexer->index - lexer->startIndex;
 
                     /* TODO: Find a better solution. Given we have access to a sorted
                      * list of keywords, a good idea would be to implement a binary
