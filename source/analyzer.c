@@ -182,6 +182,12 @@ Primitives primitives = {
     }
 };
 
+// String:equals(x, y)
+// x.equals(y)
+// bool k_String_equals(k_Runtime_t* runtime, k_String_t* self, k_String_t* other) {
+//     k_assertObject(self);
+// }
+
 Context* find(Scope* scope, const uint8_t* identifier, int32_t size) {
     Context* symbol = NULL;
     while (scope != NULL) {

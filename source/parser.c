@@ -21,29 +21,34 @@
  * Parser                                                                      *
  *******************************************************************************/
 
-// Match
+// Recover
 
-static void match(Parser* parser, TokenType type);
-static int32_t matchEx(Parser* parser, TokenType* types, int32_t count);
-static Token* matchAndYield(Parser* parser, TokenType type);
-static Token* matchAndYieldEx(Parser* parser, TokenType* types, int32_t count,
-    int32_t* index);
-
-// Recovery
-
+static void recover(Parser* parser);
+static void reportAndRecover(Parser* parser, TokenType expected);
+static bool ensureFollowSetSpace(Parser* parser, int32_t capacity);
 static void pushFollowToken(Parser* parser, TokenType type);
 static void popFollowToken(Parser* parser);
-static void recover(Parser* parser);
+
+// Consume
+
+static Token* consumeAndYield(Parser* parser);
+
+// Match
+
+static int32_t matchEx(Parser* parser, TokenType* types, int32_t count);
+static Token* matchAndYieldEx(Parser* parser, TokenType* types, int32_t count,
+    int32_t* index);
+static Token* matchAndYield(Parser* parser, TokenType type);
 
 // Rules
 
-static bool isStatementFollow(TokenType type);
+static bool isReturnType(TokenType token);
+static bool isComponentFollow(TokenType token);
+static bool isType(TokenType token);
 static bool isSimpleStatementFollow(TokenType type);
-static bool isLiteral(TokenType type);
-static bool isLiteralFollow(TokenType type);
 static bool isCompoundStatementFollow(TokenType type);
-static bool isClassMemberFollow(TokenType type);
-static bool isClassMemberModifier(TokenType type);
+static bool followVariableDeclaration(Parser* parser);
+static bool isStatementFollow(TokenType type);
 static bool isExpressionFollow(TokenType type);
 static bool isAssignmentOperator(TokenType type);
 static bool isEqualityOperator(TokenType type);
@@ -52,93 +57,77 @@ static bool isShiftOperator(TokenType type);
 static bool isAdditiveOperator(TokenType type);
 static bool isMultiplicativeOperator(TokenType type);
 static bool isUnaryExpressionFollow(TokenType type);
-static bool isUnaryOperator(TokenType type);
 static bool isPostfixExpressionFollow(TokenType type);
+static bool isUnaryOperator(TokenType type);
 static bool isPostfixPartFollow(TokenType type);
 static bool isPrimaryExpressionFollow(TokenType type);
+static bool isLiteral(TokenType type);
 
-static void parseCompilationUnit(Parser* parser, k_ASTNode_t* node);
-static void parseImportDeclaration(Parser* parser, k_ASTNode_t* node);
-static void parseComponentDeclaration(Parser* parser, k_ASTNode_t* node);
-static void parseFunctionDeclaration(Parser* parser, k_ASTNode_t* node, uint32_t modifiers);
-static void parseFunctionParameters(Parser* parser, k_ASTNode_t* node);
-static void parseFunctionBody(Parser* parser, k_ASTNode_t* node);
-static void parseStatementSuite(Parser* parser, k_ASTNode_t* node);
-static void parseSimpleStatement(Parser* parser, k_ASTNode_t* node);
-static void parseStatement(Parser* parser, k_ASTNode_t* node);
-static void parseEmptyStatement(Parser* parser, k_ASTNode_t* node);
-static void parseVariableDeclaration(Parser* parser, k_ASTNode_t* node);
-static void parseStorageDeclarator(Parser* parser, k_ASTNode_t* node);
-static void parseBreakStatement(Parser* parser, k_ASTNode_t* node);
-static void parseReturnStatement(Parser* parser, k_ASTNode_t* node);
-static void parseThrowStatement(Parser* parser, k_ASTNode_t* node);
-static void parseCompoundStatement(Parser* parser, k_ASTNode_t* node);
-static void parseIfStatement(Parser* parser, k_ASTNode_t* node);
-static void parseIfClause(Parser* parser, k_ASTNode_t* node);
-static void parseElseIfClause(Parser* parser, k_ASTNode_t* node);
-static void parseElseClause(Parser* parser, k_ASTNode_t* node);
-static void parseIterativeStatement(Parser* parser, k_ASTNode_t* node);
-static void parseLabelClause(Parser* parser, k_ASTNode_t* node);
-static void parseWhileStatement(Parser* parser, k_ASTNode_t* node);
-static void parseForStatement(Parser* parser, k_ASTNode_t* node);
-static void parseTryStatement(Parser* parser, k_ASTNode_t* node);
-static void parseTryClause(Parser* parser, k_ASTNode_t* node);
-static void parseCatchClause(Parser* parser, k_ASTNode_t* node);
-static void parseCatchFilter(Parser* parser, k_ASTNode_t* node);
-static void parseFinallyClause(Parser* parser, k_ASTNode_t* node);
-static void parseStructureDeclaration(Parser* parser, k_ASTNode_t* node);
-static void parseStructureSuite(Parser* parser, k_ASTNode_t* node);
-static void parseStructureMember(Parser* parser, k_ASTNode_t* node);
-static void parseExpressions(Parser* parser, k_ASTNode_t* node);
-static void parseExpression(Parser* parser, k_ASTNode_t* node);
-static void parseAssignmentExpression(Parser* parser, k_ASTNode_t* node);
-static void parseConditionalExpression(Parser* parser, k_ASTNode_t* node);
-static void parseLogicalOrExpression(Parser* parser, k_ASTNode_t* node);
-static void parseLogicalAndExpression(Parser* parser, k_ASTNode_t* node);
-static void parseInclusiveOrExpression(Parser* parser, k_ASTNode_t* node);
-static void parseExclusiveOrExpression(Parser* parser, k_ASTNode_t* node);
-static void parseAndExpression(Parser* parser, k_ASTNode_t* node);
-static void parseEqualityExpression(Parser* parser, k_ASTNode_t* node);
-static void parseRelationalExpression(Parser* parser, k_ASTNode_t* node);
-static void parseShiftExpression(Parser* parser, k_ASTNode_t* node);
-static void parseAdditiveExpression(Parser* parser, k_ASTNode_t* node);
-static void parseMultiplicativeExpression(Parser* parser, k_ASTNode_t* node);
-static void parseUnaryExpression(Parser* parser, k_ASTNode_t* node);
-static void postfixExpression(Parser* parser, k_ASTNode_t* node);
-static void parseSubscript(Parser* parser, k_ASTNode_t* node);
-static void parseFunctionArguments(Parser* parser, k_ASTNode_t* node);
-static void parseMemberAccess(Parser* parser, k_ASTNode_t* node);
-static void parsePostfixOperator(Parser* parser, k_ASTNode_t* node);
-static void parsePrimaryExpression(Parser* parser, k_ASTNode_t* node);
-static void parseLiteral(Parser* parser, k_ASTNode_t* node);
-static void parseInitializerExpression(Parser* parser, k_ASTNode_t* node);
-static void parseInitializerEntries(Parser* parser, k_ASTNode_t* node);
-static void parseInitializerEntry(Parser* parser, k_ASTNode_t* node);
-static void parseArrayExpression(Parser* parser, k_ASTNode_t* node);
+// Rules
+
+static Module* parseModule(Parser* parser);
+static ImportDeclaration* parseImportDeclaration(Parser* parser);
+static Token* parseTypeEx(Parser* parser, int32_t* dimensions, bool includeVoid);
+static Token* parseType(Parser* parser, int32_t* dimensions);
+// TODO: Change this!
+static Token* parseReturnType(Parser* parser, int32_t* dimensions);
+static Function* parseFunctionDeclaration(Parser* parser, uint32_t modifiers);
+static void parseFunctionParameters(Parser* parser, jtk_ArrayList_t* fixedParameters,
+    FunctionParameter** variableParameter);
+static Block* parseBlockStatement(Parser* parser);
+static Context* parseSimpleStatement(Parser* parser);
+static VariableDeclaration* parseVariableDeclaration(Parser* parser);
+static void parseVariableDeclarator(Parser* parser, Variable* declarator);
+static BreakStatement* parseBreakStatement(Parser* parser);
+static ReturnStatement* parseReturnStatement(Parser* parser);
+static ThrowStatement* parseThrowStatement(Parser* parser);
+static Context* parseCompoundStatement(Parser* parser);
+static IfStatement* parseIfStatement(Parser* parser);
+static IfClause* parseIfClause(Parser* parser);
+static IfClause* parseElseIfClause(Parser* parser);
+static IterativeStatement* parseIterativeStatement(Parser* parser);
+static TryStatement* parseTryStatement(Parser* parser);
+static CatchClause* parseCatchClause(Parser* parser);
+static Structure* parseStructureDeclaration(Parser* parser);
+static jtk_ArrayList_t* parseExpressions(Parser* parser);
+static BinaryExpression* parseExpression(Parser* parser);
+static BinaryExpression* parseAssignmentExpression(Parser* parser);
+static ConditionalExpression* parseConditionalExpression(Parser* parser);
+static BinaryExpression* parseLogicalOrExpression(Parser* parser);
+static BinaryExpression parseLogicalAndExpression(Parser* parser);
+static BinaryExpression* parseInclusiveOrExpression(Parser* parser);
+static BinaryExpression* parseExclusiveOrExpression(Parser* parser);
+static BinaryExpression* parseAndExpression(Parser* parser);
+static BinaryExpression* parseEqualityExpression(Parser* parser);
+static BinaryExpression* parseRelationalExpression(Parser* parser);
+static BinaryExpression* parseShiftExpression(Parser* parser);
+static BinaryExpression* parseAdditiveExpression(Parser* parser);
+static BinaryExpression* parseMultiplicativeExpression(Parser* parser);
+static UnaryExpression* parseUnaryExpression(Parser* parser);
+static PostfixExpression* parsePostfixExpression(Parser* parser);
+static FunctionArguments* parseFunctionArguments(Parser* parser);
+static MemberAccess* parseMemberAccess(Parser* parser);
+static void* parsePrimaryExpression(Parser* parser, bool* token);
+static InitializerExpression* parseInitializerExpression(Parser* parser);
+static jtk_Pair_t* parseInitializerEntry(Parser* parser);
+static ArrayExpression* parseArrayExpression(Parser* parser);
 
 static const char ruleNames[][50] = {
-    "<unknown>",
-    "<terminal>",
-
-    "compilationUnit",
+    "module",
     "importDeclaration",
     "functionDeclaration",
-    "functionParameter",
-    "blockStatement",
+    "block",
     "variableDeclaration",
-    "variableDeclarator",
     "breakStatement",
     "returnStatement",
     "throwStatement",
     "ifStatement",
-    "ifClause",
     "iterativeStatement",
     "tryStatement",
-    "catchClause",
     "structureDeclaration",
     "assignmentExpression",
     "conditionalExpression",
-    "condition",
+    "logicalOrExpression",
     "logicalAndExpression",
     "inclusiveOrExpression",
     "exclusiveOrExpression",
@@ -150,6 +139,9 @@ static const char ruleNames[][50] = {
     "multiplicativeExpression",
     "unaryExpression",
     "postfixExpression",
+    "subscript",
+    "functionArguments",
+    "memberAccess"
     "initializerExpression",
     "arrayExpression"
 };
@@ -158,47 +150,6 @@ static const char ruleNames[][50] = {
 #define consume(parser) k_TokenStream_consume((parser)->tokens)
 #define match(parser, type) matchAndYield((parser), type)
 #define lt(parser, count) k_TokenStream_lt((parser)->tokens, (count))
-
-/* Constructor */
-
-Parser* parserNew(Compiler* compiler, TokenStream* tokens) {
-    jtk_Assert_assertObject(compiler, "The specified compiler is null.");
-
-    Parser* parser = allocate(Parser, 1);
-    parser->compiler = compiler;
-    parser->tokens = tokens;
-    parser->followSet = allocate(TokenType, 128);
-    parser->followSetSize = 0;
-    parser->followSetCapacity = 16;
-    parser->recovery = false;
-
-    return parser;
-}
-
-/* Destructor */
-
-void parserDelete(Parser* parser) {
-    jtk_Assert_assertObject(parser, "The specified parser is null.");
-
-    deallocate(parser->followSet);
-    deallocate(parser);
-}
-
-/* Rule Name */
-
-const char* getRuleName(k_ASTNodeType_t type) {
-    return ruleNames[(int32_t)type];
-}
-
-// Reset
-
-void resetParser(Parser* parser, TokenStream* tokens) {
-    jtk_Assert_assertObject(parser, "The specified parser is null.");
-
-    parser->tokens = tokens;
-    parser->followSetSize = 0;
-    parser->recovery = false;
-}
 
 // Recover
 
@@ -397,6 +348,8 @@ Token* matchAndYield(Parser* parser, TokenType type) {
     return lt1;
 }
 
+// Rules
+
 bool isReturnType(TokenType token) {
     return (token == TOKEN_KEYWORD_VOID) ||
         (token == TOKEN_KEYWORD_I8) ||
@@ -533,8 +486,7 @@ bool isRelationalOperator(TokenType type) {
  */
 bool isShiftOperator(TokenType type) {
     return (type == TOKEN_LEFT_ANGLE_BRACKET_2) ||
-           (type == TOKEN_RIGHT_ANGLE_BRACKET_2) ||
-           (type == TOKEN_RIGHT_ANGLE_BRACKET_3);
+           (type == TOKEN_RIGHT_ANGLE_BRACKET_2);
 }
 
 /*
@@ -601,7 +553,7 @@ bool isPostfixPartFollow(TokenType type) {
 
 bool isPrimaryExpressionFollow(TokenType type) {
     bool result = false;
-    if (isLiteralFollow(type)) {
+    if (isLiteral(type)) {
         result = true;
     }
     else {
@@ -635,10 +587,6 @@ bool isLiteral(TokenType type) {
         }
     }
     return result;
-}
-
-bool isLiteralFollow(TokenType type) {
-    return isLiteral(type);
 }
 
 /*
@@ -694,9 +642,9 @@ bool isLiteralFollow(TokenType type) {
  * |    structureDeclaration
  * ;
  */
-k_CompilationUnit_t* parseCompilationUnit(Parser* parser) {
+Module* parseModule(Parser* parser) {
 	/* Create the context of this rule. */
-	k_CompilationUnit_t* context = k_CompilationUnit_new();
+	Module* context = k_CompilationUnit_new();
 
 	/* Zero or more import declarations may occur in the source code.
 	 * Therefore, repeatedly parse import declarations as long as
@@ -711,7 +659,7 @@ k_CompilationUnit_t* parseCompilationUnit(Parser* parser) {
 
     while (isComponentFollow(la(parser, 1))) {
         if (la(parser, 1) == TOKEN_KEYWORD_STRUCT) {
-            k_StructureDeclaration_t* structure = parseStructureDeclaration(parser);
+            Structure* structure = parseStructureDeclaration(parser);
             jtk_ArrayList_add(context->structures, structure);
         }
         else {
@@ -862,7 +810,7 @@ Token* parseReturnType(Parser* parser, int32_t* dimensions) {
  * :    returnType IDENTIFIER functionParameters (functionBody | SEMICOLON)
  * ;
  */
-Function* parseFunctionDeclaration(Parser* parser, k_ASTNode_t* node,
+Function* parseFunctionDeclaration(Parser* parser,
     uint32_t modifiers) {
 	/* If function parameters fails, skip tokens until ';', '{', or '}' is found. */
     pushFollowToken(parser, TOKEN_SEMICOLON);
@@ -1080,7 +1028,7 @@ VariableDeclaration* parseVariableDeclaration(Parser* parser) {
 	Variable* declarator = k_StorageDeclarator_new(infer, constant,
         typeName, dimensions, NULL);
     jtk_ArrayList_add(context->declarators, declarator);
-	parseStorageDeclarator(parser, declarator);
+	parseVariableDeclarator(parser, declarator);
 
 	while (la(parser, 1) == TOKEN_COMMA) {
         /* Consume and discard the ',' token. */
@@ -1089,7 +1037,7 @@ VariableDeclaration* parseVariableDeclaration(Parser* parser) {
 		declarator = k_StorageDeclarator_new(infer, constant,
         typeName, dimensions, NULL);
         jtk_ArrayList_add(context->declarators, declarator);
-		parseStorageDeclarator(parser, declarator);
+		parseVariableDeclarator(parser, declarator);
 	}
 
     return context;
@@ -1100,7 +1048,7 @@ VariableDeclaration* parseVariableDeclaration(Parser* parser) {
  * :    IDENTIFIER ('=' expression)?
  * ;
  */
-void parseStorageDeclarator(Parser* parser, Variable* declarator) {
+void parseVariableDeclarator(Parser* parser, Variable* declarator) {
     declarator->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
 
 	if (la(parser, 1) == TOKEN_EQUAL) {
@@ -1118,8 +1066,8 @@ void parseStorageDeclarator(Parser* parser, Variable* declarator) {
  * :    'break' IDENTIFIER?
  * ;
  */
-k_BreakStatement* parseBreakStatement(Parser* parser) {
-    k_BreakStatement* context = k_BreakStatement_new();
+BreakStatement* parseBreakStatement(Parser* parser) {
+    BreakStatement* context = BreakStatement_new();
 
     /* Match and discard the 'break' token. */
     match(parser, TOKEN_KEYWORD_BREAK);
@@ -1138,8 +1086,8 @@ k_BreakStatement* parseBreakStatement(Parser* parser) {
  * :    'return' expression
  * ;
  */
-k_ReturnStatement* parseReturnStatement(Parser* parser) {
-    k_ReturnStatement* context = k_ReturnStatement_new();
+ReturnStatement* parseReturnStatement(Parser* parser) {
+    ReturnStatement* context = ReturnStatement_new();
 
     /* Match and discard the 'return' token. */
     match(parser, TOKEN_KEYWORD_RETURN);
@@ -1286,8 +1234,8 @@ IfClause* parseElseIfClause(Parser* parser) {
  * :    'let' IDENTIFIER
  * ;
  */
-k_IterativeStatement_t* parseIterativeStatement(Parser* parser) {
-    k_IterativeStatement_t* context = k_IterativeStatement_new();
+IterativeStatement* parseIterativeStatement(Parser* parser) {
+    IterativeStatement* context = k_IterativeStatement_new();
 
 	if (la(parser, 1) == TOKEN_HASH) {
         consume(parser);
@@ -1311,7 +1259,7 @@ k_IterativeStatement_t* parseIterativeStatement(Parser* parser) {
             context->parameter = matchAndYield(parser, TOKEN_IDENTIFIER);
             match(parser, TOKEN_COLON);
             context->expression = parseExpression(parser);
-            context->blockStatement = parseBlockStatement(parser);
+            context->body = parseBlockStatement(parser);
 
 			break;
 		}
@@ -1339,8 +1287,8 @@ k_IterativeStatement_t* parseIterativeStatement(Parser* parser) {
  * :    'finally' blockStatement
  * ;
  */
-k_TryStatement_t* parseTryStatement(Parser* parser) {
-    k_TryStatement_t* context = k_TryStatement_new();
+TryStatement* parseTryStatement(Parser* parser) {
+    TryStatement* context = k_TryStatement_new();
 	bool hasCatch = false;
 	bool hasFinally = false;
 
@@ -1424,8 +1372,8 @@ CatchClause* parseCatchClause(Parser* parser) {
  * :	variableDeclaration ';'
  * ;
  */
-k_StructureDeclaration_t* parseStructureDeclaration(Parser* parser) {
-    k_StructureDeclaration_t* context = k_StructureDeclaration_new();
+Structure* parseStructureDeclaration(Parser* parser) {
+    Structure* context = k_StructureDeclaration_new();
 
     match(parser, TOKEN_KEYWORD_STRUCT);
     context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
@@ -1789,8 +1737,8 @@ PostfixExpression* parsePostfixExpression(Parser* parser) {
  * :	'[' expression ']'
  * ;
  */
-k_Subscript_t* parseSubscript(Parser* parser) {
-    k_Subscript_t* context = k_Subscript_new();
+Subscript* parseSubscript(Parser* parser) {
+    Subscript* context = k_Subscript_new();
 
     context->bracket = matchAndYield(parser, TOKEN_LEFT_SQUARE_BRACKET);
     pushFollowToken(parser, TOKEN_RIGHT_SQUARE_BRACKET);
@@ -1867,7 +1815,7 @@ void* parsePrimaryExpression(Parser* parser, bool* token) {
     *result = false;
 
     TokenType la1 = la(parser, 1);
-    if (isLiteralFollow(la1)) {
+    if (isLiteral(la1)) {
         result = consumeAndYield(parser);
         *token = true;
     }
@@ -1977,4 +1925,46 @@ ArrayExpression* parseArrayExpression(Parser* parser) {
     match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
 
     return context;
+}
+
+
+/* Constructor */
+
+Parser* parserNew(Compiler* compiler, TokenStream* tokens) {
+    jtk_Assert_assertObject(compiler, "The specified compiler is null.");
+
+    Parser* parser = allocate(Parser, 1);
+    parser->compiler = compiler;
+    parser->tokens = tokens;
+    parser->followSet = allocate(TokenType, 128);
+    parser->followSetSize = 0;
+    parser->followSetCapacity = 16;
+    parser->recovery = false;
+
+    return parser;
+}
+
+/* Destructor */
+
+void parserDelete(Parser* parser) {
+    jtk_Assert_assertObject(parser, "The specified parser is null.");
+
+    deallocate(parser->followSet);
+    deallocate(parser);
+}
+
+/* Rule Name */
+
+const char* getRuleName(k_ASTNodeType_t type) {
+    return ruleNames[(int32_t)type];
+}
+
+// Reset
+
+void resetParser(Parser* parser, TokenStream* tokens) {
+    jtk_Assert_assertObject(parser, "The specified parser is null.");
+
+    parser->tokens = tokens;
+    parser->followSetSize = 0;
+    parser->recovery = false;
 }

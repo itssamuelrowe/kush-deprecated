@@ -232,7 +232,7 @@ void deleteBlock(Block* self) {
 // TODO: Include the type context.
 FunctionParameter* newFunctionParameter() {
     FunctionParameter* result = allocate(FunctionParameter, 1);
-    result->tag = CONTEXT_FUNCTION_PARAMETER;
+    result->tag = CONTEXT_FUNCTION_DECLARATION_PARAMETER;
     result->baseType = NULL;
     result->dimensions = 0;
     result->identifier = NULL;
@@ -250,7 +250,7 @@ void deleteFunctionParameter(FunctionParameter* self) {
 // Include type for returnType
 Function* newFunction() {
     Function* result = allocate(Function, 1);
-    result->tag = CONTEXT_FUNCTION;
+    result->tag = CONTEXT_FUNCTION_DECLARATION;
     result->identifier = NULL;
     result->parameters = jtk_ArrayList_new();
     result->variableParameter = NULL;
@@ -272,7 +272,7 @@ void deleteFunction(Function* self) {
 
 Structure* newStructure() {
     Structure* result = allocate(Structure, 1);
-    result->tag = CONTEXT_STRUCTURE;
+    result->tag = CONTEXT_STRUCTURE_DECLARATION;
     result->identifier = NULL;
     result->variables = jtk_ArrayList_new();
     result->type = NULL;
