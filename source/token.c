@@ -15,9 +15,9 @@
  */
 
 #include <jtk/core/CString.h>
-#include <kush/Token.h>
+#include <kush/token.h>
 
-Token* k_Token_new(
+Token* newToken(
     TokenChannel channel,
     TokenType type,
     const uint8_t* text,
@@ -45,7 +45,7 @@ Token* k_Token_new(
     return token;
 }
 
-void k_Token_delete(Token* token) {
+void deleteToken(Token* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
     jtk_CString_delete(token->text);
     jtdeallocate(token);
@@ -165,7 +165,7 @@ uint32_t k_TokenType_toModifiers(TokenType type) {
     uint32_t modifiers = 0;
     switch (type) {
     case TOKEN_KEYWORD_NATIVE: {
-        modifiers |= KUSH_MODIFIER_NATIVE;
+        // modifiers |= KUSH_MODIFIER_NATIVE;
         break;
     }
     }

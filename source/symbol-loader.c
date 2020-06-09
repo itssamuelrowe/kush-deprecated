@@ -29,20 +29,7 @@
 #include <jtk/core/CString.h>
 #include <jtk/core/CStringObjectAdapter.h>
 
-#include <kush/virtual-machine/feb/BinaryEntityFormat.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPool.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolClass.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolDouble.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolField.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolFloat.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolFunction.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolInteger.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolLong.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolString.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolTag.h>
-#include <kush/virtual-machine/feb/constant-pool/ConstantPoolUtf8.h>
-
-#include <kush/SymbolLoader.h>
+#include <kush/symbol-loader.h>
 #include <kush/compiler.h>
 
 /*******************************************************************************

@@ -22,6 +22,8 @@
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
 
+#include <kush/configuration.h>
+
 typedef struct Context Context;
 
 /*******************************************************************************
@@ -108,7 +110,7 @@ void k_Scope_delete(Scope* scope);
 
 // Children Symbols
 
-void k_Scope_getChildrenSymbols(Scope* scope, jtk_ArrayList_t* childrenSymbols);
+void getScopeChildren(Scope* scope, jtk_ArrayList_t* childrenSymbols);
 
 // Context
 

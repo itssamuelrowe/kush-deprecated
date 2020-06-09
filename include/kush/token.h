@@ -198,11 +198,11 @@ struct Token {
 
 typedef struct Token Token;
 
-Token* k_Token_new(TokenChannel channel, TokenType type,
+Token* newToken(TokenChannel channel, TokenType type,
     const uint8_t* text, int32_t length, int32_t startIndex, int32_t stopIndex,
     int32_t startLine, int32_t stopLine, int32_t startColumn, int32_t stopColumn,
     const char* file);
 
-void k_Token_delete(Token* token);
+void deleteToken(Token* token);
 
 #endif /* KUSH_TOKEN_H */

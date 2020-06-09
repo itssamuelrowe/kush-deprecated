@@ -201,7 +201,7 @@ void deleteCompiler(Compiler* compiler) {
             * has to destroy the buffered tokens.
             */
             Token* token = (Token*)jtk_ArrayList_getValue(compiler->trash, i);
-            k_Token_delete(token);
+            deleteToken(token);
         }
         jtk_ArrayList_delete(compiler->trash);
     }

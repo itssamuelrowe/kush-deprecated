@@ -286,7 +286,7 @@ void destroyStaleTokens(Lexer* lexer) {
     int32_t i;
     for (i = 0; i < size; i++) {
         Token* token = (Token*)jtk_ArrayList_getValue(lexer->tokens->m_list, i);
-        k_Token_delete(token);
+        deleteToken(token);
     }
 }
 
@@ -308,7 +308,7 @@ Token* createToken(Lexer* lexer) {
     const char* file = jtk_ArrayList_getValue(compiler->inputFiles,
                        compiler->currentFileIndex);
     Token* token =
-        k_Token_new(
+        newToken(
             lexer->channel,
             lexer->type,
             text,
@@ -898,9 +898,9 @@ Token* nextToken(Lexer* lexer) {
 
                 /*
                  * NOTE: The lexer is creating a custom token here.
-                 *       Therefore, we directly invoke k_Token_new().
+                 *       Therefore, we directly invoke newToken().
                  */
-                Token* newlineToken = k_Token_new(
+                Token* newlineToken = newToken(
                     TOKEN_CHANNEL_DEFAULT,
                     TOKEN_NEWLINE,
                     "\n",

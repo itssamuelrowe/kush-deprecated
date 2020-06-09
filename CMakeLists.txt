@@ -31,8 +31,7 @@ set (
     ${PROJECT_SOURCE_DIR}/source/lexer.c
     ${PROJECT_SOURCE_DIR}/source/parser.c
     ${PROJECT_SOURCE_DIR}/source/scope.c
-    ${PROJECT_SOURCE_DIR}/source/symbol-loader.c
-    ${PROJECT_SOURCE_DIR}/source/symbol.c
+    # ${PROJECT_SOURCE_DIR}/source/symbol-loader.c
     ${PROJECT_SOURCE_DIR}/source/token.c
     ${PROJECT_SOURCE_DIR}/source/token-stream.c
 )
