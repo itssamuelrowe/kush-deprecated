@@ -232,7 +232,6 @@ void deleteBlock(Block* self) {
 // TODO: Include the type context.
 FunctionParameter* newFunctionParameter() {
     FunctionParameter* result = allocate(FunctionParameter, 1);
-    result->tag = CONTEXT_FUNCTION_DECLARATION_PARAMETER;
     result->baseType = NULL;
     result->dimensions = 0;
     result->identifier = NULL;
@@ -292,7 +291,6 @@ void deleteStructure(Structure* self) {
 
 IfClause* newIfClause() {
     IfClause* result = allocate(IfClause, 1);
-    result->tag = CONTEXT_IF_CLAUSE;
     result->expression = NULL;
     result->body = NULL;
     return result;
