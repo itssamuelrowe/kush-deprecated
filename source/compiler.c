@@ -373,7 +373,7 @@ void k_Compiler_buildAST(Compiler* compiler) {
                 }
             }
 
-            jtk_InputStreadestroy(stream);
+            jtk_InputStream_destroy(stream);
         }
     }
 
@@ -596,7 +596,7 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
     }
 
     if ((vmArguments != NULL) && noErrors) {
-        k_kVirtualMachine_main(vmArguments, vmArgumentsSize);
+        // TODO: Start the child process
     }
 
     // TODO: Return true only if the compilation suceeded.

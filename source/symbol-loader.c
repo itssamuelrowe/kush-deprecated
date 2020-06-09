@@ -228,7 +228,7 @@ k_Symbol_t* k_SymbolLoader_loadSymbolFromHandle(SymbolLoader* loader,
         result = k_SymbolLoader_parse(loader, input->values, input->size);
 
         jtk_ByteArray_delete(input);
-        jtk_InputStreadestroy(inputStream);
+        jtk_InputStream_destroy(inputStream);
     }
     else {
         // Warning: Failed to load entity from handle.

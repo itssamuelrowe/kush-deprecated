@@ -219,7 +219,7 @@ void importDefaults(Analyzer* analyzer) {
 // Define
 
 void defineSymbols(Analyzer* analyzer, Module* module) {
-    module->scope = Scope_forCompilationUnit();
+    module->scope = scopeForModule();
     analyzer->scope = module->scope;
 
     int32_t structureCount = jtk_ArrayList_getSize(module->structures);
@@ -240,8 +240,8 @@ void defineSymbols(Analyzer* analyzer, Module* module) {
 }
 
 void defineStructure(Analyzer* analyzer, Structure* structure) {
-    structure->scope = Scope_forStructure(analyzer->scope);
-    Scope_addStructure(analyzer->scope, structure);
+    structure->scope = scopeForStructure(analyzer->scope);
+    scopeAddStructure(analyzer->scope, structure);
 
     int32_t limit = jtk_ArrayList_getSize(structure->variables);
     int32_t i;
@@ -348,14 +348,14 @@ uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
     int32_t i;
     for (i = 0; i < identifierCount; i++) {
         Token* identifier = (Token*)jtk_ArrayList_getValue(identifiers, i);
-        jtStringBuilder_appendEx_z(builder, identifier->text, identifier->length);
+        jtk_StringBuilder_appendEx_z(builder, identifier->text, identifier->length);
         if (i + 1 < identifierCount) {
-            jtStringBuilder_append_c(builder, '.');
+            jtk_StringBuilder_append_c(builder, '.');
         }
     }
 
-    uint8_t* result = jtStringBuilderoCString(builder, size);
-    jtStringBuilder_delete(builder);
+    uint8_t* result = jtk_StringBuilderoCString(builder, size);
+    jtk_StringBuilder_delete(builder);
 
     return result;
 }

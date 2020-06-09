@@ -38,23 +38,23 @@ Scope* k_Scope_new(const uint8_t* name, int32_t nameSize,
     return scope;
 }
 
-Scope* k_Scope_forCompilationUnit() {
+Scope* scopeForModule() {
     return k_Scope_new(NULL, 0, KUSH_SCOPE_COMPILATION_UNIT, NULL, NULL);
 }
 
-Scope* k_Scope_forFunction(Scope* parent) {
+Scope* scopeForFunction(Scope* parent) {
     return k_Scope_new(NULL, 0, KUSH_SCOPE_FUNCTION, parent, NULL);
 }
 
-Scope* k_Scope_forLocal(Scope* parent) {
+Scope* scopeForLocal(Scope* parent) {
     return k_Scope_new(NULL, 0, KUSH_SCOPE_LOCAL, parent, NULL);
 }
 
-Scope* k_Scope_forStructure(Scope* parent) {
+Scope* scopeForStructure(Scope* parent) {
     return k_Scope_new(NULL, 0, KUSH_SCOPE_STRUCTURE, parent, NULL);
 }
 
-void k_Scope_delete(Scope* scope) {
+void deleteScope(Scope* scope) {
     jtk_Assert_assertObject(scope, "The specified scope is null.");
 
     jtk_HashMap_delete(scope->symbols);

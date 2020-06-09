@@ -84,17 +84,17 @@ Scope* k_Scope_new(const uint8_t* name, int32_t nameSize,
 /**
  * @memberof Scope
  */
-Scope* k_Scope_forCompilationUnit();
+Scope* scopeForModule();
 
 /**
  * @memberof Scope
  */
-Scope* k_Scope_forFunction(Scope* parent);
+Scope* scopeForFunction(Scope* parent);
 
 /**
  * @memberof Scope
  */
-Scope* k_Scope_forLocal(Scope* parent);
+Scope* scopeForLocal(Scope* parent);
 
 /**
  * @memberof Scope
@@ -106,7 +106,7 @@ Scope* k_Scope_forClass(Scope* parent);
 /**
  * @memberof Scope
  */
-void k_Scope_delete(Scope* scope);
+void deleteScope(Scope* scope);
 
 // Children Symbols
 

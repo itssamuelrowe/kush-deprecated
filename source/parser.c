@@ -645,7 +645,7 @@ bool isLiteral(TokenType type) {
  */
 Module* parseModule(Parser* parser) {
 	/* Create the context of this rule. */
-	Module* context = k_CompilationUnit_new();
+	Module* context = newModule();
 
 	/* Zero or more import declarations may occur in the source code.
 	 * Therefore, repeatedly parse import declarations as long as
@@ -871,7 +871,7 @@ void parseFunctionParameters(Parser* parser,
                 match(parser, TOKEN_COMMA);
             }
 
-            FunctionParameter* parameter = k_FunctionParameter_new();
+            FunctionParameter* parameter = newFunctionParameter();
             parameter->baseType = parseType(parser, &parameter->dimensions);
             if (la(parser, 1) == TOKEN_ELLIPSIS) {
                 match(parser, TOKEN_ELLIPSIS);
@@ -905,7 +905,7 @@ void parseFunctionParameters(Parser* parser,
  * taken to avoid redundant nodes in the AST.
  */
 Block* parseBlock(Parser* parser) {
-	Block* context = k_StatementSuite_new();
+	Block* context = newBlock();
 
     /* Consume and discard the '{' token. */
     match(parser, TOKEN_LEFT_BRACE);
@@ -1014,7 +1014,7 @@ Context* parseSimpleStatement(Parser* parser) {
  */
 VariableDeclaration* parseVariableDeclaration(Parser* parser, bool onlyVariable,
     bool allowInitializer) {
-	VariableDeclaration* context = k_VariableDeclaration_new();
+	VariableDeclaration* context = newVariableDeclaration();
 
     TokenType la1 = la(parser, 1);
     bool infer = (la1 == TOKEN_KEYWORD_VAR);
@@ -1063,7 +1063,7 @@ void parseVariableDeclarator(Parser* parser, Variable* variable) {
  * ;
  */
 BreakStatement* parseBreakStatement(Parser* parser) {
-    BreakStatement* context = BreakStatement_new();
+    BreakStatement* context = newBreakStatement();
     match(parser, TOKEN_KEYWORD_BREAK);
     if (la(parser, 1) == TOKEN_IDENTIFIER) {
         context->identifier = consumeAndYield(parser);
@@ -1089,7 +1089,7 @@ ReturnStatement* parseReturnStatement(Parser* parser) {
  * ;
  */
 ThrowStatement* parseThrowStatement(Parser* parser) {
-    ThrowStatement* context = k_ThrowStatement_new();
+    ThrowStatement* context = newThrowStatement();
     match(parser, TOKEN_KEYWORD_THROW);
     context->expression = parseExpression(parser);
     return context;
@@ -1142,7 +1142,7 @@ Context* parseCompoundStatement(Parser* parser) {
  * ;
  */
 IfStatement* parseIfStatement(Parser* parser) {
-    IfStatement* context = k_IfStatement_new();
+    IfStatement* context = newIfStatement();
 
     context->ifClause = parseIfClause(parser);
 
@@ -1166,7 +1166,7 @@ IfStatement* parseIfStatement(Parser* parser) {
  * ;
  */
 IfClause* parseIfClause(Parser* parser) {
-    IfClause* context = k_IfClause_new();
+    IfClause* context = newIfClause();
 
 	match(parser, TOKEN_KEYWORD_IF);
     context->expression = parseExpression(parser);
@@ -1180,7 +1180,7 @@ IfClause* parseIfClause(Parser* parser) {
  * ;
  */
 IfClause* parseElseIfClause(Parser* parser) {
-    IfClause* context = k_IfClause_new();
+    IfClause* context = newIfClause();
 
 	match(parser, TOKEN_KEYWORD_ELSE);
 	match(parser, TOKEN_KEYWORD_IF);
@@ -1212,7 +1212,7 @@ IfClause* parseElseIfClause(Parser* parser) {
  * ;
  */
 IterativeStatement* parseIterativeStatement(Parser* parser) {
-    IterativeStatement* context = k_IterativeStatement_new();
+    IterativeStatement* context = newIterativeStatement();
 
 	if (la(parser, 1) == TOKEN_HASH) {
         consume(parser);
@@ -1265,7 +1265,7 @@ IterativeStatement* parseIterativeStatement(Parser* parser) {
  * ;
  */
 TryStatement* parseTryStatement(Parser* parser) {
-    TryStatement* context = k_TryStatement_new();
+    TryStatement* context = newTryStatement();
 	bool hasCatch = false;
 	bool hasFinally = false;
 
@@ -1307,7 +1307,7 @@ TryStatement* parseTryStatement(Parser* parser) {
  * ;
  */
 CatchClause* parseCatchClause(Parser* parser) {
-    CatchClause* context = k_CatchClause_new();
+    CatchClause* context = newCatchClause();
 
     match(parser, TOKEN_KEYWORD_CATCH);
 
@@ -1350,7 +1350,7 @@ CatchClause* parseCatchClause(Parser* parser) {
  * ;
  */
 Structure* parseStructureDeclaration(Parser* parser) {
-    Structure* context = k_StructureDeclaration_new();
+    Structure* context = newStructure();
 
     match(parser, TOKEN_KEYWORD_STRUCT);
     context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
@@ -1429,7 +1429,7 @@ BinaryExpression* parseAssignmentExpression(Parser* parser) {
  * ;
  */
 ConditionalExpression* parseConditionalExpression(Parser* parser) {
-    ConditionalExpression* context = k_ConditionalExpression_new();
+    ConditionalExpression* context = newConditionalExpression();
     context->condition = parseLogicalOrExpression(parser);
 
     if (la(parser, 1) == TOKEN_HOOK) {
@@ -1448,7 +1448,7 @@ ConditionalExpression* parseConditionalExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseLogicalOrExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseLogicalAndExpression(parser);
 
@@ -1468,7 +1468,7 @@ BinaryExpression* parseLogicalOrExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseLogicalAndExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseInclusiveOrExpression(parser);
 
@@ -1488,7 +1488,7 @@ BinaryExpression* parseLogicalAndExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseInclusiveOrExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseExclusiveOrExpression(parser);
 
@@ -1508,7 +1508,7 @@ BinaryExpression* parseInclusiveOrExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseExclusiveOrExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseAndExpression(parser);
 
@@ -1528,7 +1528,7 @@ BinaryExpression* parseExclusiveOrExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseAndExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseEqualityExpression(parser);
 
@@ -1548,7 +1548,7 @@ BinaryExpression* parseAndExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseEqualityExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseRelationalExpression(parser);
 
@@ -1568,7 +1568,7 @@ BinaryExpression* parseEqualityExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseRelationalExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseShiftExpression(parser);
 
@@ -1588,7 +1588,7 @@ BinaryExpression* parseRelationalExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseShiftExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseAdditiveExpression(parser);
 
@@ -1608,7 +1608,7 @@ BinaryExpression* parseShiftExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseAdditiveExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseMultiplicativeExpression(parser);
 
@@ -1628,7 +1628,7 @@ BinaryExpression* parseAdditiveExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseMultiplicativeExpression(Parser* parser) {
-    BinaryExpression* context = k_BinaryExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseUnaryExpression(parser);
 
@@ -1649,7 +1649,7 @@ BinaryExpression* parseMultiplicativeExpression(Parser* parser) {
  * ;
  */
 UnaryExpression* parseUnaryExpression(Parser* parser) {
-    UnaryExpression* context = k_UnaryExpression_new();
+    UnaryExpression* context = newUnaryExpression();
 
     TokenType la1 = la(parser, 1);
     if (isUnaryOperator(la1)) {
@@ -1683,7 +1683,7 @@ UnaryExpression* parseUnaryExpression(Parser* parser) {
  * taken to avoid redundant nodes in the AST.
  */
 PostfixExpression* parsePostfixExpression(Parser* parser) {
-    PostfixExpression* context = k_PostfixExpression_new();
+    PostfixExpression* context = newPostfixExpression();
 
     context->primary = parsePrimaryExpression(parser,
         &context->token);
@@ -1724,7 +1724,7 @@ PostfixExpression* parsePostfixExpression(Parser* parser) {
  * ;
  */
 Subscript* parseSubscript(Parser* parser) {
-    Subscript* context = k_Subscript_new();
+    Subscript* context = newSubscript();
 
     context->bracket = matchAndYield(parser, TOKEN_LEFT_SQUARE_BRACKET);
     pushFollowToken(parser, TOKEN_RIGHT_SQUARE_BRACKET);
@@ -1744,7 +1744,7 @@ Subscript* parseSubscript(Parser* parser) {
  * ;
  */
 FunctionArguments* parseFunctionArguments(Parser* parser) {
-    FunctionArguments* context = k_FunctionArguments_new();
+    FunctionArguments* context = newFunctionArguments();
 
     match(context, TOKEN_LEFT_PARENTHESIS);
 
@@ -1767,7 +1767,7 @@ FunctionArguments* parseFunctionArguments(Parser* parser) {
  * ;
  */
 MemberAccess* parseMemberAccess(Parser* parser) {
-    MemberAccess* context = k_MemberAccess_new();
+    MemberAccess* context = newMemberAccess();
     match(parser, TOKEN_DOT);
     context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
     return context;
@@ -1858,7 +1858,7 @@ void* parsePrimaryExpression(Parser* parser, bool* token) {
  *		 Simply use the isExpressionFollow() function.
  */
 InitializerExpression* parseInitializerExpression(Parser* parser) {
-	InitializerExpression* context = k_InitializerExpression_new();
+	InitializerExpression* context = newInitializerExpression();
 
     match(parser, TOKEN_LEFT_BRACE);
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
@@ -1900,7 +1900,7 @@ jtk_Pair_t* parseInitializerEntry(Parser* parser) {
  * ;
  */
 ArrayExpression* parseArrayExpression(Parser* parser) {
-    ArrayExpression* context = k_ArrayExpression_new();
+    ArrayExpression* context = newArrayExpression();
 
     match(parser, TOKEN_LEFT_SQUARE_BRACKET);
     if (isExpressionFollow(la(parser, 1))) {
@@ -1938,6 +1938,12 @@ void parserDelete(Parser* parser) {
 
     deallocate(parser->followSet);
     deallocate(parser);
+}
+
+// Parse
+
+Module* parse(Parser* parser) {
+    return parseModule(parser);
 }
 
 /* Rule Name */
