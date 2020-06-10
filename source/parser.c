@@ -17,6 +17,53 @@
 #include <jtk/collection/Pair.h>
 #include <kush/parser.h>
 
+/*
+ * The parser analyzes the syntactic structure of the input token sequence.
+ * Here, we implement an LL(k) recursive-descent parser. As of this writing,
+ * the parser needs to lookahead 3 tokens at maximum to choose certain rules,
+ * making k equal 3.
+ *
+ * -----------------------------------------------------------------------------
+ * How is the abstract syntax tree (AST) constructed?
+ * -----------------------------------------------------------------------------
+ *
+ * Each rule allocates a context of a specific type, which forms an AST node.
+ * A context has specific data related for a given rule. It is recognized by
+ * the `tag` attribute. All contexts can be casted to the `Context`
+ * structure and vice versa.
+ *
+ * -----------------------------------------------------------------------------
+ * How are contexts and rule specific data destroyed?
+ * -----------------------------------------------------------------------------
+ *
+ * Every rule is represented by a context. Any object allocated within a rule
+ * should be immediately attached to the context. The function destroyAST()
+ * should be invoked on the root context, which is usually an instance
+ * of the Module structure. However, destroyAST() is perfectly capable of
+ * handling other contexts as roots, too. It implements the visitor pattern
+ * and traverses down the AST destroying each node it encounters and all its
+ * descendants.
+ *
+ * -----------------------------------------------------------------------------
+ * How does the parser recover from syntax errors?
+ * -----------------------------------------------------------------------------
+ *
+ * When the parser encounters an invalid input, the current rule cannot continue,
+ * so the parser recovers by skipping tokens until it a resynchronized state is
+ * achived. The control is then returned to the calling rule.
+ * This technique is known as the panic mode strategy.
+ *
+ * The trick here is to discard tokens only until the lookahead token is
+ * something that the parent rule of the current rule expects. For example,
+ * if there is a syntax error within a throw statement, the parser discards
+ * tokens until a newline token or other relevant token is encountered.
+ *
+ * When the parser encounters an error, it switches to the recovery mode.
+ * This prevents the parser from reporting errors during resynchronization.
+ * The parser remains in the recovery mode until it encounters an expected
+ * token.
+ */
+
 /*******************************************************************************
  * Parser                                                                      *
  *******************************************************************************/
@@ -42,26 +89,7 @@ static Token* matchAndYield(Parser* parser, TokenType type);
 
 // Rules
 
-static bool isReturnType(TokenType token);
-static bool isComponentFollow(TokenType token);
-static bool isType(TokenType token);
-static bool isSimpleStatementFollow(TokenType type);
-static bool isCompoundStatementFollow(TokenType type);
 static bool followVariableDeclaration(Parser* parser);
-static bool isStatementFollow(TokenType type);
-static bool isExpressionFollow(TokenType type);
-static bool isAssignmentOperator(TokenType type);
-static bool isEqualityOperator(TokenType type);
-static bool isRelationalOperator(TokenType type);
-static bool isShiftOperator(TokenType type);
-static bool isAdditiveOperator(TokenType type);
-static bool isMultiplicativeOperator(TokenType type);
-static bool isUnaryExpressionFollow(TokenType type);
-static bool isPostfixExpressionFollow(TokenType type);
-static bool isUnaryOperator(TokenType type);
-static bool isPostfixPartFollow(TokenType type);
-static bool isPrimaryExpressionFollow(TokenType type);
-static bool isLiteral(TokenType type);
 
 // Rules
 
@@ -155,16 +183,6 @@ static const char ruleNames[][50] = {
 
 // Recover
 
-/* When the parser encounters an invalid input, the current rule cannot continue,
- * so the parser recovers by skipping tokens until it a possible resynchronized
- * state is achived. The control is then returned to the calling rule.
- * This technique is known as the panic mode strategy.
- *
- * The trick here is to discard tokens only until the lookahead token is
- * something that the parent rule of the current rule expects. For example,
- * if there is a syntax error within a throw statement, the parser discards
- * tokens until a newline token or other relevant token is encountered.
- */
 void recover(Parser* parser) {
     /* The parser is now in recovery mode; flag other parts of the parser. */
     parser->recovery = true;
@@ -331,7 +349,7 @@ Token* matchAndYield(Parser* parser, TokenType type) {
 
     Token* lt1 = lt(parser, 1);
     if (lt1->type == type) {
-        /* The token expected by the parser was found. If we the parser is
+        /* The token expected by the parser was found. If the parser is
          * in error recovery, turn it off.
          */
         parser->recovery = false;
@@ -351,74 +369,50 @@ Token* matchAndYield(Parser* parser, TokenType type) {
 
 // Rules
 
-bool isReturnType(TokenType token) {
-    return (token == TOKEN_KEYWORD_VOID) ||
-        (token == TOKEN_KEYWORD_I8) ||
-        (token == TOKEN_KEYWORD_I16) ||
-        (token == TOKEN_KEYWORD_I32) ||
-        (token == TOKEN_KEYWORD_I64) ||
-        (token == TOKEN_KEYWORD_F32) ||
-        (token == TOKEN_KEYWORD_F64) ||
-        (token == TOKEN_IDENTIFIER);
-}
+#define isReturnType(token) \
+    (token == TOKEN_KEYWORD_VOID) || \
+    (token == TOKEN_KEYWORD_I8) || \
+    (token == TOKEN_KEYWORD_I16) || \
+    (token == TOKEN_KEYWORD_I32) || \
+    (token == TOKEN_KEYWORD_I64) || \
+    (token == TOKEN_KEYWORD_F32) || \
+    (token == TOKEN_KEYWORD_F64) || \
+    (token == TOKEN_IDENTIFIER)
 
-bool isComponentFollow(TokenType token) {
-    return (token == TOKEN_KEYWORD_STRUCT) || isReturnType(token);
-}
+#define isComponentFollow(token) \
+    (token == TOKEN_KEYWORD_STRUCT) || isReturnType(token)
 
-bool isType(TokenType token) {
-    return (token == TOKEN_KEYWORD_I8) ||
-        (token == TOKEN_KEYWORD_I16) ||
-        (token == TOKEN_KEYWORD_I32) ||
-        (token == TOKEN_KEYWORD_I64) ||
-        (token == TOKEN_KEYWORD_F32) ||
-        (token == TOKEN_KEYWORD_F64) ||
-        (token == TOKEN_IDENTIFIER);
-}
+#define isType(token) \
+    (token == TOKEN_KEYWORD_I8) || \
+    (token == TOKEN_KEYWORD_I16) || \
+    (token == TOKEN_KEYWORD_I32) || \
+    (token == TOKEN_KEYWORD_I64) || \
+    (token == TOKEN_KEYWORD_F32) || \
+    (token == TOKEN_KEYWORD_F64) || \
+    (token == TOKEN_IDENTIFIER)
 
-bool isSimpleStatementFollow(TokenType type) {
-    return (type == TOKEN_SEMICOLON) || // emptyStatement
-        (type == TOKEN_KEYWORD_VAR) || // variableDeclaration
-        (type == TOKEN_KEYWORD_LET) || // variableDeclaration
-        (type == TOKEN_KEYWORD_BREAK) || // breakStatement
-        (type == TOKEN_KEYWORD_RETURN) || // returnStatement
-        (type == TOKEN_KEYWORD_THROW) || // throwStatement
-        isExpressionFollow(type); // expressionStatement (includes IDENTIFIER, which may lead to variableDeclaration, too!)
-}
+// expressionStatement (includes IDENTIFIER, which may lead to variableDeclaration, too!)
+#define isSimpleStatementFollow(type) \
+    (type == TOKEN_SEMICOLON) || \
+    (type == TOKEN_KEYWORD_VAR) || \
+    (type == TOKEN_KEYWORD_LET) || \
+    (type == TOKEN_KEYWORD_BREAK) || \
+    (type == TOKEN_KEYWORD_RETURN) || \
+    (type == TOKEN_KEYWORD_THROW) || \
+    isExpressionFollow(type)
 
-bool isCompoundStatementFollow(TokenType type) {
-    return (type == TOKEN_KEYWORD_IF) || // ifStatement
-		(type == TOKEN_HASH) || // iterativeStatement
-		(type == TOKEN_KEYWORD_WHILE) || // whileStatement
-		(type == TOKEN_KEYWORD_FOR) || // forStatement
-		(type == TOKEN_KEYWORD_TRY); // tryStatement
-}
 
-/* The parser needs to look ahead 3 tokens to differentiate between variable
- * declarations and expressions, recognizing an LL(3) grammar.
- *
- * followVariableDeclaration
- * :    'let'
- * |    'var'
- * |    IDENTIFIER (('[' ']') | IDENTIFIER)
- * ;
- */
-bool followVariableDeclaration(Parser* parser) {
-    TokenType la1 = la(parser, 1);
-    return (la1 == TOKEN_KEYWORD_LET) ||
-           (la1 == TOKEN_KEYWORD_VAR) ||
-           ((la1 == TOKEN_IDENTIFIER) &&
-            (((la(parser, 2) == TOKEN_LEFT_SQUARE_BRACKET) && (la(parser, 3) == TOKEN_RIGHT_SQUARE_BRACKET)) ||
-            (la(parser, 2) == TOKEN_IDENTIFIER)));
-}
+#define isCompoundStatementFollow(type) \
+    (type == TOKEN_KEYWORD_IF) || \
+    (type == TOKEN_HASH) || \
+    (type == TOKEN_KEYWORD_WHILE) || \
+    (type == TOKEN_KEYWORD_FOR) || \
+    (type == TOKEN_KEYWORD_TRY)
 
-bool isStatementFollow(TokenType type) {
-    return isSimpleStatementFollow(type) || isCompoundStatementFollow(type);
-}
 
-bool isExpressionFollow(TokenType type) {
-    return isUnaryExpressionFollow(type);
-}
+
+#define isStatementFollow(type) isSimpleStatementFollow(type) || isCompoundStatementFollow(type)
+#define isExpressionFollow(type) isUnaryExpressionFollow(type)
 
 /*
  * assignmentOperator
@@ -436,20 +430,18 @@ bool isExpressionFollow(TokenType type) {
  * |    '|='
  * ;
  */
-bool isAssignmentOperator(TokenType type) {
-    return (type == TOKEN_EQUAL) ||
-           (type == TOKEN_ASTERISK_EQUAL) ||
-           (type == TOKEN_FORWARD_SLASH_EQUAL) ||
-           (type == TOKEN_MODULUS_EQUAL) ||
-           (type == TOKEN_PLUS_EQUAL) ||
-           (type == TOKEN_DASH_EQUAL) ||
-           (type == TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) ||
-           (type == TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL) ||
-           (type == TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL) ||
-           (type == TOKEN_AMPERSAND_EQUAL) ||
-           (type == TOKEN_CARET_EQUAL) ||
-           (type == TOKEN_VERTICAL_BAR_EQUAL);
-}
+#define isAssignmentOperator(type) \
+    (type == TOKEN_EQUAL) || \
+    (type == TOKEN_ASTERISK_EQUAL) || \
+    (type == TOKEN_FORWARD_SLASH_EQUAL) || \
+    (type == TOKEN_MODULUS_EQUAL) || \
+    (type == TOKEN_PLUS_EQUAL) || \
+    (type == TOKEN_DASH_EQUAL) || \
+    (type == TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) || \
+    (type == TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL) || \
+    (type == TOKEN_AMPERSAND_EQUAL) || \
+    (type == TOKEN_CARET_EQUAL) || \
+    (type == TOKEN_VERTICAL_BAR_EQUAL)
 
 /*
  * equalityOperator
@@ -457,10 +449,8 @@ bool isAssignmentOperator(TokenType type) {
  * |	'!='
  * ;
  */
-bool isEqualityOperator(TokenType type) {
-    return (type == TOKEN_EQUAL_2) ||
-           (type == TOKEN_EXCLAMATION_MARK_EQUAL);
-}
+#define isEqualityOperator(type) \
+    (type == TOKEN_EQUAL_2) || (type == TOKEN_EXCLAMATION_MARK_EQUAL)
 
 /*
  * relationalOperator
@@ -471,12 +461,11 @@ bool isEqualityOperator(TokenType type) {
  * |	'is'
  * ;
  */
-bool isRelationalOperator(TokenType type) {
-    return (type == TOKEN_LEFT_ANGLE_BRACKET) ||
-           (type == TOKEN_RIGHT_ANGLE_BRACKET) ||
-           (type == TOKEN_LEFT_ANGLE_BRACKET_EQUAL) ||
-           (type == TOKEN_RIGHT_ANGLE_BRACKET_EQUAL);
-}
+#define isRelationalOperator(type) \
+    (type == TOKEN_LEFT_ANGLE_BRACKET) || \
+    (type == TOKEN_RIGHT_ANGLE_BRACKET) || \
+    (type == TOKEN_LEFT_ANGLE_BRACKET_EQUAL) || \
+    (type == TOKEN_RIGHT_ANGLE_BRACKET_EQUAL)
 
 /*
  * shiftOperator
@@ -485,10 +474,9 @@ bool isRelationalOperator(TokenType type) {
  * |	'>>>'
  * ;
  */
-bool isShiftOperator(TokenType type) {
-    return (type == TOKEN_LEFT_ANGLE_BRACKET_2) ||
-           (type == TOKEN_RIGHT_ANGLE_BRACKET_2);
-}
+#define isShiftOperator(type) \
+    (type == TOKEN_LEFT_ANGLE_BRACKET_2) || \
+    (type == TOKEN_RIGHT_ANGLE_BRACKET_2)
 
 /*
  * additiveOperator
@@ -496,10 +484,8 @@ bool isShiftOperator(TokenType type) {
  * |	'-'
  * ;
  */
-bool isAdditiveOperator(TokenType type) {
-    return (type == TOKEN_PLUS) ||
-           (type == TOKEN_DASH);
-}
+#define isAdditiveOperator(type) \
+    (type == TOKEN_PLUS) || (type == TOKEN_DASH)
 
 /*
  * multiplicativeOperator
@@ -508,19 +494,15 @@ bool isAdditiveOperator(TokenType type) {
  * |	'%'
  * ;
  */
-bool isMultiplicativeOperator(TokenType type) {
-    return (type == TOKEN_ASTERISK) ||
-           (type == TOKEN_FORWARD_SLASH) ||
-           (type == TOKEN_MODULUS);
-}
+#define isMultiplicativeOperator(type) \
+    (type == TOKEN_ASTERISK) || \
+    (type == TOKEN_FORWARD_SLASH) || \
+    (type == TOKEN_MODULUS)
 
-bool isUnaryExpressionFollow(TokenType type) {
-    return isUnaryOperator(type) || isPostfixExpressionFollow(type);
-}
+#define isUnaryExpressionFollow(type) \
+    isUnaryOperator(type) || isPostfixExpressionFollow(type)
 
-bool isPostfixExpressionFollow(TokenType type) {
-    return isPrimaryExpressionFollow(type);
-}
+#define isPostfixExpressionFollow(type) isPrimaryExpressionFollow(type)
 
 /*
  * unaryOperator
@@ -532,103 +514,36 @@ bool isPostfixExpressionFollow(TokenType type) {
  * // |    '--'
  * ;
  */
-bool isUnaryOperator(TokenType type) {
-    return (type == TOKEN_PLUS) ||
-           (type == TOKEN_DASH) ||
-           (type == TOKEN_TILDE) ||
-           (type == TOKEN_EXCLAMATION_MARK);
-           /*
-           ||
-           (type == TOKEN_PLUS_2) ||
-           (type == TOKEN_DASH_2);
-           */
-}
+#define isUnaryOperator(type) \
+    (type == TOKEN_PLUS) || \
+    (type == TOKEN_DASH) || \
+    (type == TOKEN_TILDE) || \
+    (type == TOKEN_EXCLAMATION_MARK)
 
-bool isPostfixPartFollow(TokenType type) {
-    return (type == TOKEN_LEFT_SQUARE_BRACKET) ||
-           (type == TOKEN_LEFT_PARENTHESIS) ||
-           (type == TOKEN_DOT) ||
-           (type == TOKEN_PLUS_2) ||
-           (type == TOKEN_DASH_2);
-}
+#define isPostfixPartFollow(type) \
+    (type == TOKEN_LEFT_SQUARE_BRACKET) || \
+    (type == TOKEN_LEFT_PARENTHESIS) || \
+    (type == TOKEN_DOT) || \
+    (type == TOKEN_PLUS_2) || \
+    (type == TOKEN_DASH_2)
 
-bool isPrimaryExpressionFollow(TokenType type) {
-    bool result = false;
-    if (isLiteral(type)) {
-        result = true;
-    }
-    else {
-        switch (type) {
-            case TOKEN_KEYWORD_THIS:
-            case TOKEN_IDENTIFIER:
-            case TOKEN_LEFT_PARENTHESIS:
-            case TOKEN_LEFT_BRACE:
-            case TOKEN_LEFT_SQUARE_BRACKET:
-            case TOKEN_LEFT_ANGLE_BRACKET:
-            case TOKEN_KEYWORD_NEW: {
-                result = true;
-                break;
-            }
-        }
-    }
-    return result;
-}
+#define isPrimaryExpressionFollow(type) \
+    isLiteral(type) || \
+    (type == TOKEN_KEYWORD_THIS) || \
+    (type == TOKEN_IDENTIFIER) || \
+    (type == TOKEN_LEFT_PARENTHESIS) || \
+    (type == TOKEN_LEFT_BRACE) || \
+    (type == TOKEN_LEFT_SQUARE_BRACKET) || \
+    (type == TOKEN_LEFT_ANGLE_BRACKET) || \
+    (type == TOKEN_KEYWORD_NEW)
 
-bool isLiteral(TokenType type) {
-    bool result = false;
-    switch (type) {
-        case TOKEN_INTEGER_LITERAL:
-        case TOKEN_FLOATING_POINT_LITERAL:
-        case TOKEN_KEYWORD_TRUE:
-        case TOKEN_KEYWORD_FALSE:
-        case TOKEN_STRING_LITERAL:
-        case TOKEN_KEYWORD_NULL: {
-            result = true;
-            break;
-        }
-    }
-    return result;
-}
-
-/*
- * -----------------------------------------------------------------------------
- * How do we construct the abstract syntax tree?
- * -----------------------------------------------------------------------------
- *
- * Every parent rule allocates and passes an AST node to a child
- * rule, except for the entry rules. In this case, the user has to
- * manually allocate an AST node and pass. A node is associated
- * with a context. A context has specific data related to a given
- * rule. It is recognized by the type attribute within the
- * k_ASTNode_t structure.
- *
- * -----------------------------------------------------------------------------
- * How are abstract syntax trees, contexts, and rule specific data
- * destroyed?
- * -----------------------------------------------------------------------------
- *
- * Every rule receives a node. Note that within the abstract
- * syntax tree this node represents the current rule and not
- * the parent rule. Any allocated object should be immediately
- * attached to the node or the rules context. Because the parser
- * long jumps when a syntax error is discovered. Failing to
- * attach a resource may result in dangling pointers, or worst
- * case scenario: undefined behaviour.
- *
- * A rule first creates its context and attachs it to the
- * given node. Further, any object allocated within a
- * rule is immediately attached to its context. Thus,
- * all allocated objects are destroyed even if the parser
- * long jumps using the contextDestructor function within
- * the k_ASTNode_t structure.
- *
- * The special function k_ASTNode_delete() should be invoked
- * on the root node. k_ASTNode_delete() travereses down the
- * AST destroying each node it encounters and all its descendants.
- * The context of a node is destroyed by invoking the
- * contextDestructor, provided that it is non-null. Otherwise,
- * the context is ignored.
- */
+#define isLiteral(type) \
+    (type == TOKEN_INTEGER_LITERAL) || \
+    (type == TOKEN_FLOATING_POINT_LITERAL) || \
+    (type == TOKEN_KEYWORD_TRUE) || \
+    (type == TOKEN_KEYWORD_FALSE) || \
+    (type == TOKEN_STRING_LITERAL) || \
+    (type == TOKEN_KEYWORD_NULL)
 
 /*
  * compilationUnit
@@ -935,6 +850,24 @@ Block* parseBlock(Parser* parser) {
     popFollowToken(parser);
     /* Consume and discard the '}' token. */
     match(parser, TOKEN_RIGHT_BRACE);
+}
+
+/* The parser needs to look ahead 3 tokens to differentiate between variable
+ * declarations and expressions, recognizing an LL(3) grammar.
+ *
+ * followVariableDeclaration
+ * :    'let'
+ * |    'var'
+ * |    IDENTIFIER (('[' ']') | IDENTIFIER)
+ * ;
+ */
+bool followVariableDeclaration(Parser* parser) {
+    TokenType la1 = la(parser, 1);
+    return (la1 == TOKEN_KEYWORD_LET) ||
+           (la1 == TOKEN_KEYWORD_VAR) ||
+           ((la1 == TOKEN_IDENTIFIER) &&
+            (((la(parser, 2) == TOKEN_LEFT_SQUARE_BRACKET) && (la(parser, 3) == TOKEN_RIGHT_SQUARE_BRACKET)) ||
+            (la(parser, 2) == TOKEN_IDENTIFIER)));
 }
 
 /*
@@ -1915,7 +1848,7 @@ ArrayExpression* parseArrayExpression(Parser* parser) {
 }
 
 
-/* Constructor */
+// Constructor
 
 Parser* parserNew(Compiler* compiler, TokenStream* tokens) {
     jtk_Assert_assertObject(compiler, "The specified compiler is null.");
@@ -1931,7 +1864,7 @@ Parser* parserNew(Compiler* compiler, TokenStream* tokens) {
     return parser;
 }
 
-/* Destructor */
+// Destructor
 
 void parserDelete(Parser* parser) {
     jtk_Assert_assertObject(parser, "The specified parser is null.");
@@ -1944,12 +1877,6 @@ void parserDelete(Parser* parser) {
 
 Module* parse(Parser* parser) {
     return parseModule(parser);
-}
-
-/* Rule Name */
-
-const char* getRuleName(ContextType type) {
-    return ruleNames[(int32_t)type];
 }
 
 // Reset
