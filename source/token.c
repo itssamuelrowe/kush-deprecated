@@ -184,7 +184,6 @@ bool k_TokenType_isAssignmentOperator(TokenType type) {
            (type == TOKEN_DASH_EQUAL) ||
            (type == TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) ||
            (type == TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL) ||
-           (type == TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL) ||
            (type == TOKEN_RIGHT_ANGLE_BRACKET_2_EQUAL) ||
            (type == TOKEN_VERTICAL_BAR_EQUAL);
 }

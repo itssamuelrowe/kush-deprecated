@@ -1432,15 +1432,7 @@ Token* nextToken(Lexer* lexer) {
                 break;
             }
 
-            /* RIGHT_ANGLE_BRACKET_3_EQUAL
-             * :    '>>>='
-             * ;
-             *
-             * RIGHT_ANGLE_BRACKET_3
-             * :    '>>>'
-             * ;
-             *
-             * RIGHT_ANGLE_BRACKET_2_EQUAL
+            /* RIGHT_ANGLE_BRACKET_2_EQUAL
              * :    '>>='
              * ;
              *
@@ -1467,17 +1459,6 @@ Token* nextToken(Lexer* lexer) {
                     if (lexer->la1 == '>') {
                         /* Consume and discard the '>' character. */
                         consume(lexer);
-
-                        if (lexer->la1 == '=') {
-                            /* Consume and discard the '=' character. */
-                            consume(lexer);
-                            /* The lexer has recognized the '>>>=' token. */
-                            lexer->type = TOKEN_RIGHT_ANGLE_BRACKET_3_EQUAL;
-                        }
-                        else {
-                            /* The lexer has recognized the '>>>' token. */
-                            lexer->type = TOKEN_RIGHT_ANGLE_BRACKET_3;
-                        }
                     }
                     else if (lexer->la1 == '=') {
                         /* Consume and discard the '=' character. */
