@@ -28,9 +28,6 @@
 enum TokenType {
     TOKEN_UNKNOWN,
 
-    TOKEN_INDENTATION,
-    TOKEN_DEDENTATION,
-
     TOKEN_WHITESPACE,
     TOKEN_NEWLINE,
     TOKEN_END_OF_STREAM,
@@ -52,8 +49,6 @@ enum TokenType {
     TOKEN_LEFT_PARENTHESIS,
     TOKEN_RIGHT_PARENTHESIS,
 
-    TOKEN_ASTERISK_2_EQUAL,
-    TOKEN_ASTERISK_2,
     TOKEN_ASTERISK_EQUAL,
     TOKEN_ASTERISK,
 
@@ -69,7 +64,6 @@ enum TokenType {
     TOKEN_DASH,
 
     TOKEN_ELLIPSIS,
-    TOKEN_DOT_2,
     TOKEN_DOT,
 
     TOKEN_SINGLE_LINE_COMMENT,
@@ -77,9 +71,7 @@ enum TokenType {
     TOKEN_FORWARD_SLASH_EQUAL,
     TOKEN_FORWARD_SLASH,
 
-    TOKEN_COLON_2,
     TOKEN_COLON,
-
     TOKEN_SEMICOLON,
 
     TOKEN_LEFT_ANGLE_BRACKET_2_EQUAL,
@@ -157,6 +149,8 @@ enum TokenType {
 };
 
 typedef enum TokenType TokenType;
+
+extern char tokenNames[][25];
 
 /*******************************************************************************
  * TokenChannel                                                                *

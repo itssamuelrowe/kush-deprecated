@@ -51,14 +51,16 @@ void buildAST(Compiler* compiler);
 void analyze(Compiler* compiler);
 void generate(Compiler* compiler);
 void k_Compiler_destroyScope(Scope* scope);
-void k_Compiler_printToken(Token* token);
-void k_Compiler_k_Compiler_printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
-
+void printToken(Token* token);
+void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
 
 // Token
 
-void k_Compiler_printToken(Token* token) {
-    printf("[%d-%d:%d-%d:%s:%s]", token->startLine, token->stopLine, token->startColumn + 1, token->stopColumn + 1, token->channel == TOKEN_CHANNEL_DEFAULT? "default" : "hidden", k_Lexer_getLiteralName(token->type));
+void printToken(Token* token) {
+    printf("[%d-%d:%d-%d:%s:%s]", token->startLine, token->stopLine,
+        token->startColumn + 1, token->stopColumn + 1,
+        token->channel == TOKEN_CHANNEL_DEFAULT? "default" : "hidden",
+        tokenNames[(int32_t)token->type]);
     TokenType type = k_Token_getType(token);
     if ((type == TOKEN_IDENTIFIER) || (type == TOKEN_INTEGER_LITERAL) ||
         (type == TOKEN_STRING_LITERAL)) {
@@ -67,7 +69,7 @@ void k_Compiler_printToken(Token* token) {
     puts("");
 }
 
-void k_Compiler_k_Compiler_printTokens(Compiler* compiler, jtk_ArrayList_t* tokens) {
+void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens) {
     int32_t defaultChannel = 0;
     int32_t hiddenChannel = 0;
     int32_t otherChannel = 0;
@@ -86,7 +88,7 @@ void k_Compiler_k_Compiler_printTokens(Compiler* compiler, jtk_ArrayList_t* toke
         else {
             otherChannel++;
         }
-        k_Compiler_printToken(token);
+        printToken(token);
     }
     fflush(stdout);
     fprintf(stdout, "[info] %d tokens were recognized on the default channel.\n", defaultChannel);
@@ -221,10 +223,8 @@ void printErrors(Compiler* compiler) {
         }
 
         if (error->expected != TOKEN_UNKNOWN) {
-            const uint8_t* expectedName = k_Lexer_getLiteralName(error->expected);
-            const uint8_t* actualName = k_Lexer_getLiteralName(token->type);
             sprintf(message0, "Expected token '%s', encountered token '%s'",
-                expectedName, actualName);
+                tokenNames[(int32_t)error->expected], tokenNames[(int32_t)token->type]);
             message = message0;
         }
         fprintf(stderr, "\033[1;31m[error]\033[0m %s:%s:%d-%d: %s\n",
@@ -269,7 +269,7 @@ void buildAST(Compiler* compiler) {
             k_TokenStream_reset(tokens);
             k_TokenStream_fill(tokens);
             if (compiler->dumpTokens) {
-                k_Compiler_k_Compiler_printTokens(compiler, tokens->tokens);
+                printTokens(compiler, tokens->tokens);
             }
             int32_t currentLexicalErrors = compiler->errorHandler->errors->m_size;
 
