@@ -145,9 +145,9 @@ struct ErrorHandler {
 
 typedef struct ErrorHandler ErrorHandler;
 
-ErrorHandler* errorHandlerNew();
-void errorHandlerDelete(ErrorHandler* handler);
-void handleSyntacticalError(ErrorHandler* handler,
+ErrorHandler* newErrorHandler();
+void deleteErrorHandler(ErrorHandler* handler);
+void handleSyntaxError(ErrorHandler* handler,
     Parser* parser, ErrorCode errorCode, Token* token,
     TokenType expected);
 void handleLexicalError(ErrorHandler* handler,

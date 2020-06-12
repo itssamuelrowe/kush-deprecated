@@ -225,7 +225,7 @@ void reportAndRecover(Parser* parser, TokenType expected) {
         Token* lt1 = lt(parser, 1);
         Compiler* compiler = parser->compiler;
         ErrorHandler* errorHandler = compiler->errorHandler;
-        handleSyntacticalError(errorHandler, parser,
+        handleSyntaxError(errorHandler, parser,
             KUSH_ERROR_CODE_UNEXPECTED_TOKEN, lt1, expected);
     }
 
@@ -1222,7 +1222,7 @@ TryStatement* parseTryStatement(Parser* parser) {
          * this is not an error. However, the KUSH specification requires a try
          * clause to be followed by at least a catch or finally clause.
          */
-        handleSyntacticalError(parser->compiler->errorHandler,
+        handleSyntaxError(parser->compiler->errorHandler,
             parser, KUSH_ERROR_CODE_TRY_STATEMENT_EXPECTS_CATCH_OR_FINALLY,
             tryKeyword, TOKEN_UNKNOWN);
 	}

@@ -52,7 +52,7 @@ void errorDelete(Error* error) {
 
 // Constructor
 
-ErrorHandler* new() {
+ErrorHandler* newErrorHandler() {
     ErrorHandler* handler = allocate(ErrorHandler, 1);
     handler->onLexicalError = NULL;
     handler->onSyntaxError = NULL;
@@ -65,7 +65,7 @@ ErrorHandler* new() {
 
 // Destructor
 
-void delete(ErrorHandler* handler) {
+void deleteErrorHandler(ErrorHandler* handler) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");
 
     int32_t errorCount = jtk_ArrayList_getSize(handler->errors);
@@ -78,7 +78,7 @@ void delete(ErrorHandler* handler) {
     deallocate(handler);
 }
 
-void handleSyntacticalError(ErrorHandler* handler,
+void handleSyntaxError(ErrorHandler* handler,
     Parser* parser, ErrorCode errorCode, Token* token,
     TokenType expected) {
     jtk_Assert_assertObject(handler, "The specified error handler is null.");

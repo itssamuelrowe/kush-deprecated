@@ -539,7 +539,7 @@ Compiler* newCompiler() {
     compiler->dumpInstructions = false;
     compiler->inputFiles = jtk_ArrayList_new();
     compiler->currentFileIndex = -1;
-    compiler->errorHandler = new();
+    compiler->errorHandler = newErrorHandler();
     compiler->modules = NULL;
     compiler->packages = NULL;
     compiler->packageSizes = NULL;
@@ -599,7 +599,7 @@ void deleteCompiler(Compiler* compiler) {
     jtk_Iterator_delete(iterator);
     jtk_HashMap_delete(compiler->repository);
 
-    delete(compiler->errorHandler);
+    deleteErrorHandler(compiler->errorHandler);
 
 #ifndef JTK_LOGGER_DISABLE
     jtk_Logger_delete(compiler->logger);
