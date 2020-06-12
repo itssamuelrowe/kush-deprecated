@@ -32,8 +32,7 @@ static void consume(Lexer* lexer);
 static void destroyStaleTokens(Lexer* lexer);
 static void emit(Lexer* lexer, Token* token);
 static Token* createToken(Lexer* lexer);
-static void onNewline(Lexer* lexer);
-static void reset(Lexer* lexer, jtk_InputStream_t* inputStream);
+static void onNewLine(Lexer* lexer);
 static void binaryIntegerLiteral(Lexer* lexer);
 static void octalIntegerLiteral(Lexer* lexer);
 static void hexadecimalIntegerLiteral(Lexer* lexer);
@@ -328,7 +327,7 @@ Token* createToken(Lexer* lexer) {
     return token;
 }
 
-void onNewline(Lexer* lexer) {
+void onNewLine(Lexer* lexer) {
     lexer->line++;
     lexer->column = 1;
 }
@@ -350,11 +349,11 @@ void consume(Lexer* lexer) {
      * working of this function is not finalized. Therefore, the following expression
      * may be subjected to changes.
      */
-    if (!jtk_InputStreaisAvailable(lexer->inputStream)) {
+    if (!jtk_InputStream_isAvailable(lexer->inputStream)) {
         lexer->la1 = KUSH_END_OF_STREAM;
     }
     else {
-        lexer->la1 = jtk_InputStrearead(lexer->inputStream);
+        lexer->la1 = jtk_InputStream_read(lexer->inputStream);
     }
 }
 
@@ -1980,7 +1979,7 @@ Token* nextToken(Lexer* lexer) {
 
 // Reset
 
-void reset(Lexer* lexer, jtk_InputStream_t* inputStream) {
+void resetLexer(Lexer* lexer, jtk_InputStream_t* inputStream) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
     jtk_Assert_assertObject(inputStream, "The specified input stream is null.");
 

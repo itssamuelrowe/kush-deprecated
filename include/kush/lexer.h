@@ -158,4 +158,6 @@ void lexerDelete(Lexer* lexer);
  */
 Token* nextToken(Lexer* lexer);
 
+void resetLexer(Lexer* lexer, jtk_InputStream_t* inputStream);
+
 #endif /* KUSH_COMPILER_LEXER_LEXER_H */

@@ -605,7 +605,7 @@ Module* parseModule(Parser* parser) {
  * taken to avoid redundant nodes in the AST.
  */
 ImportDeclaration* parseImportDeclaration(Parser* parser) {
-	ImportDeclaration* context = k_ImportDeclaration_new();
+	ImportDeclaration* context = newImportDeclaration();
 
 	/* An import statement begins with the 'import' keyword. Therefore,
 	 * we are expecting it.
@@ -733,7 +733,7 @@ Function* parseFunctionDeclaration(Parser* parser,
     pushFollowToken(parser, TOKEN_LEFT_BRACE);
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
 
-    Function* context = k_FunctionDeclaration_new();
+    Function* context = newFunction();
     context->returnType = parseReturnType(parser, &context->returnTypeDimensions);
     context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
     parseFunctionParameters(parser, context->parameters,
@@ -744,7 +744,7 @@ Function* parseFunctionDeclaration(Parser* parser,
     popFollowToken(parser);
     popFollowToken(parser);
 
-    if (k_Modifier_hasNative(modifiers)) {
+    if (false /*k_Modifier_hasNative(modifiers) */) {
         match(parser, TOKEN_SEMICOLON);
     }
     else {
@@ -1341,7 +1341,7 @@ BinaryExpression* parseExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseAssignmentExpression(Parser* parser) {
-    BinaryExpression* context = k_AssignmentExpression_new();
+    BinaryExpression* context = newBinaryExpression();
 
     context->left = parseConditionalExpression(parser);
 

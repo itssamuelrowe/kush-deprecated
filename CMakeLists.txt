@@ -22,7 +22,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/include")
 set (
     KUSH_COMPILER_SOURCE
 
-    ${PROJECT_SOURCE_DIR}/source/analyzer.c
+    # ${PROJECT_SOURCE_DIR}/source/analyzer.c
     ${PROJECT_SOURCE_DIR}/source/compiler.c
     ${PROJECT_SOURCE_DIR}/source/configuration.c
     ${PROJECT_SOURCE_DIR}/source/context.c

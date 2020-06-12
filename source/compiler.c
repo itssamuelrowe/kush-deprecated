@@ -46,10 +46,10 @@ void printErrors(Compiler* compiler);
 
 // Phase
 
-void k_Compiler_initialize(Compiler* compiler);
-void k_Compiler_buildAST(Compiler* compiler);
-void k_Compiler_analyze(Compiler* compiler);
-void k_Compiler_generate(Compiler* compiler);
+void initialize(Compiler* compiler);
+void buildAST(Compiler* compiler);
+void analyze(Compiler* compiler);
+void generate(Compiler* compiler);
 void k_Compiler_destroyScope(Scope* scope);
 void k_Compiler_printToken(Token* token);
 void k_Compiler_k_Compiler_printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
@@ -126,11 +126,11 @@ jtk_InputStream_t* jtk_PathHelper_read(const uint8_t* path) {
 jtk_InputStream_t* jtk_PathHelper_readEx(const uint8_t* path, uint32_t flags) {
     jtk_InputStream_t* result = NULL;
 
-    jtk_FileInputStream_t* fileStream = jtk_FileInputStreanewFromString(path);
+    jtk_FileInputStream_t* fileStream = jtk_FileInputStream_newFromString(path);
     result = fileStream->m_inputStream;
 
     if ((flags & JTK_FILE_OPEN_MODE_BUFFERED) != 0) {
-        jtk_BufferedInputStream_t* bufferedStream = jtk_BufferedInputStreanew(fileStream->m_inputStream);
+        jtk_BufferedInputStream_t* bufferedStream = jtk_BufferedInputStream_new(fileStream->m_inputStream);
         result = bufferedStream->m_inputStream;
     }
 
@@ -151,87 +151,6 @@ uint8_t* jtk_PathHelper_getParent(const uint8_t* path, int32_t size,
 /******************************************************************************
  * Compiler                                                                   *
  ******************************************************************************/
-
-// Constructor
-
-Compiler* newCompiler() {
-    jtk_ObjectAdapter_t* stringObjectAdapter = jtk_CStringObjectAdapter_getInstance();
-
-    Compiler* compiler = allocate(Compiler, 1);
-    compiler->dumpTokens = false;
-    compiler->dumpNodes = false;
-    compiler->footprint = false;
-    compiler->dumpInstructions = false;
-    compiler->inputFiles = jtk_ArrayList_new();
-    compiler->currentFileIndex = -1;
-    compiler->errorHandler = new();
-    compiler->modules = NULL;
-    compiler->packages = NULL;
-    compiler->packageSizes = NULL;
-    compiler->symbolLoader = k_SymbolLoader_new(compiler);
-    compiler->repository = jtk_HashMap_new(stringObjectAdapter, NULL);
-    compiler->trash = NULL;
-    compiler->coreApi = false;
-#ifdef JTK_LOGGER_DISABLE
-    compiler->logger = NULL;
-#else
-    compiler->logger = jtk_Logger_new(jtk_ConsoleLogger_log);
-    jtk_Logger_setLevel(compiler->logger, JTK_LOG_LEVEL_NONE);
-#endif
-
-    return compiler;
-}
-
-// Destructor
-
-void deleteCompiler(Compiler* compiler) {
-    jtk_Assert_assertObject(compiler, "The specified compiler is null.");
-
-    if (compiler->modules != NULL) {
-        deallocate(compiler->modules);
-    }
-
-    if (compiler->trash != NULL) {
-        int32_t size = jtk_ArrayList_getSize(compiler->trash);
-        int32_t i;
-        for (i = 0; i < size; i++) {
-            /* The ownership of the tokens produced by the lexer
-            * is transfered to the token stream which demanded
-            * their creation. Therefore, the token stream
-            * has to destroy the buffered tokens.
-            */
-            Token* token = (Token*)jtk_ArrayList_getValue(compiler->trash, i);
-            deleteToken(token);
-        }
-        jtk_ArrayList_delete(compiler->trash);
-    }
-
-    if (compiler->packages != NULL) {
-        int32_t i;
-        int32_t inputCount = jtk_ArrayList_getSize(compiler->inputFiles);
-        for (i = 0; i < inputCount; i++) {
-            jtk_CString_delete(compiler->packages[i]);
-        }
-        deallocate(compiler->packages);
-        deallocate(compiler->packageSizes);
-    }
-
-    jtk_Iterator_t* iterator = jtk_HashMap_getKeyIterator(compiler->repository);
-    while (jtk_Iterator_hasNext(iterator)) {
-        uint8_t* key = (uint8_t*)jtk_Iterator_getNext(iterator);
-        jtk_CString_delete(key);
-    }
-    jtk_Iterator_delete(iterator);
-    jtk_HashMap_delete(compiler->repository);
-
-    delete(compiler->errorHandler);
-
-#ifndef JTK_LOGGER_DISABLE
-    jtk_Logger_delete(compiler->logger);
-#endif
-    jtk_ArrayList_delete(compiler->inputFiles);
-    deallocate(compiler);
-}
 
 const uint8_t* errorMessages[] = {
     "None",
@@ -284,7 +203,7 @@ const uint8_t* errorMessages[] = {
 };
 
 void printErrors(Compiler* compiler) {
-    jtk_ArrayList_t* errors = getErrors(compiler->errorHandler);
+    jtk_ArrayList_t* errors = compiler->errorHandler->errors;
     int32_t errorCount = jtk_ArrayList_getSize(errors);
     int32_t i;
     for (i = 0; i < errorCount; i++) {
@@ -314,13 +233,13 @@ void printErrors(Compiler* compiler) {
     }
 }
 
-void k_Compiler_initialize(Compiler* compiler) {
+void initialize(Compiler* compiler) {
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     compiler->packages = allocate(uint8_t*, size);
     compiler->packageSizes = allocate(int32_t, size);
 }
 
-void k_Compiler_buildAST(Compiler* compiler) {
+void buildAST(Compiler* compiler) {
     Lexer* lexer = lexerNew(compiler);
     TokenStream* tokens = tokenStreamNew(compiler, lexer, TOKEN_CHANNEL_DEFAULT);
     Parser* parser = parserNew(compiler, tokens);
@@ -342,17 +261,17 @@ void k_Compiler_buildAST(Compiler* compiler) {
             jtk_Arrays_replace_b(package, packageSize, '/', '.');
 
             jtk_InputStream_t* stream = jtk_PathHelper_read(path);
-            k_Lexer_reset(lexer, stream);
+            resetLexer(lexer, stream);
 
             jtk_Logger_info(compiler->logger, "The lexical analysis phase has started.");
 
-            int32_t previousLexicalErrors = getErrorCount(compiler->errorHandler);
+            int32_t previousLexicalErrors = compiler->errorHandler->errors->m_size;
             k_TokenStream_reset(tokens);
             k_TokenStream_fill(tokens);
             if (compiler->dumpTokens) {
                 k_Compiler_k_Compiler_printTokens(compiler, tokens->tokens);
             }
-            int32_t currentLexicalErrors = getErrorCount(compiler->errorHandler);
+            int32_t currentLexicalErrors = compiler->errorHandler->errors->m_size;
 
             jtk_Logger_info(compiler->logger, "The lexical analysis phase is complete.");
 
@@ -386,7 +305,7 @@ void k_Compiler_buildAST(Compiler* compiler) {
     printErrors(compiler);
 }
 
-void k_Compiler_analyze(Compiler* compiler) {
+void analyze(Compiler* compiler) {
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
@@ -409,7 +328,7 @@ void k_Compiler_analyze(Compiler* compiler) {
     printErrors(compiler);
 }
 
-void k_Compiler_generate(Compiler* compiler) {
+void generate(Compiler* compiler) {
     /*
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     int32_t i;
@@ -469,7 +388,7 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
     jtk_Assert_assertObject(compiler, "The specified compiler is null.");
 
     // TODO: Add the --path flag
-    k_SymbolLoader_addDirectory(compiler->symbolLoader, ".");
+    // k_SymbolLoader_addDirectory(compiler->symbolLoader, ".");
 
     char** vmArguments = NULL;
     int32_t vmArgumentsSize = 0;
@@ -578,13 +497,13 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
         fprintf(stderr, "[error] Please specify input files.\n");
     }
     else {
-        k_Compiler_initialize(compiler);
-        k_Compiler_buildAST(compiler);
-        if ((noErrors = !hasErrors(compiler->errorHandler))) {
-            k_Compiler_analyze(compiler);
+        initialize(compiler);
+        buildAST(compiler);
+        if ((noErrors = (compiler->errorHandler->errors->m_size == 0))) {
+            analyze(compiler);
 
-            if ((noErrors = !hasErrors(compiler->errorHandler))) {
-                k_Compiler_generate(compiler);
+            if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
+                generate(compiler);
             }
         }
     }
@@ -605,4 +524,86 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
 
 bool compile(Compiler* compiler) {
     return compileEx(compiler, NULL, -1);
+}
+
+
+// Constructor
+
+Compiler* newCompiler() {
+    jtk_ObjectAdapter_t* stringObjectAdapter = jtk_CStringObjectAdapter_getInstance();
+
+    Compiler* compiler = allocate(Compiler, 1);
+    compiler->dumpTokens = false;
+    compiler->dumpNodes = false;
+    compiler->footprint = false;
+    compiler->dumpInstructions = false;
+    compiler->inputFiles = jtk_ArrayList_new();
+    compiler->currentFileIndex = -1;
+    compiler->errorHandler = new();
+    compiler->modules = NULL;
+    compiler->packages = NULL;
+    compiler->packageSizes = NULL;
+    compiler->symbolLoader = NULL; // k_SymbolLoader_new(compiler);
+    compiler->repository = jtk_HashMap_new(stringObjectAdapter, NULL);
+    compiler->trash = NULL;
+    compiler->coreApi = false;
+#ifdef JTK_LOGGER_DISABLE
+    compiler->logger = NULL;
+#else
+    compiler->logger = jtk_Logger_new(jtk_ConsoleLogger_log);
+    jtk_Logger_setLevel(compiler->logger, JTK_LOG_LEVEL_NONE);
+#endif
+
+    return compiler;
+}
+
+// Destructor
+
+void deleteCompiler(Compiler* compiler) {
+    jtk_Assert_assertObject(compiler, "The specified compiler is null.");
+
+    if (compiler->modules != NULL) {
+        deallocate(compiler->modules);
+    }
+
+    if (compiler->trash != NULL) {
+        int32_t size = jtk_ArrayList_getSize(compiler->trash);
+        int32_t i;
+        for (i = 0; i < size; i++) {
+            /* The ownership of the tokens produced by the lexer
+            * is transfered to the token stream which demanded
+            * their creation. Therefore, the token stream
+            * has to destroy the buffered tokens.
+            */
+            Token* token = (Token*)jtk_ArrayList_getValue(compiler->trash, i);
+            deleteToken(token);
+        }
+        jtk_ArrayList_delete(compiler->trash);
+    }
+
+    if (compiler->packages != NULL) {
+        int32_t i;
+        int32_t inputCount = jtk_ArrayList_getSize(compiler->inputFiles);
+        for (i = 0; i < inputCount; i++) {
+            jtk_CString_delete(compiler->packages[i]);
+        }
+        deallocate(compiler->packages);
+        deallocate(compiler->packageSizes);
+    }
+
+    jtk_Iterator_t* iterator = jtk_HashMap_getKeyIterator(compiler->repository);
+    while (jtk_Iterator_hasNext(iterator)) {
+        uint8_t* key = (uint8_t*)jtk_Iterator_getNext(iterator);
+        jtk_CString_delete(key);
+    }
+    jtk_Iterator_delete(iterator);
+    jtk_HashMap_delete(compiler->repository);
+
+    delete(compiler->errorHandler);
+
+#ifndef JTK_LOGGER_DISABLE
+    jtk_Logger_delete(compiler->logger);
+#endif
+    jtk_ArrayList_delete(compiler->inputFiles);
+    deallocate(compiler);
 }

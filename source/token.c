@@ -48,7 +48,7 @@ Token* newToken(
 void deleteToken(Token* token) {
     jtk_Assert_assertObject(token, "The specified token is null.");
     jtk_CString_delete(token->text);
-    jtdeallocate(token);
+    deallocate(token);
 }
 
 TokenChannel k_Token_getChannel(Token* token) {
