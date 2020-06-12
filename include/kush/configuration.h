@@ -39,6 +39,9 @@
     #define NULL 0
 #endif
 
+#define KUSH_VERSION_MAJOR 0
+#define KUSH_VERSION_MINOR 1
+
 #define allocate(type, units) (type*)allocate0(sizeof (type) * (units))
 #define deallocate(object) free(object)
 #define k_Assert_assertObject(object, message) assert((object) != NULL)

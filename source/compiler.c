@@ -39,6 +39,7 @@
 #include <kush/lexer.h>
 #include <kush/parser.h>
 #include <kush/error-handler.h>
+#include <kush/configuration.h>
 
 // Error
 
@@ -470,6 +471,10 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
                     invalidCommandLine = true;
                 }
             }
+            else if(strcmp(arguments[i], "--version") == 0) {
+								printf("kush v%d.%d\n", KUSH_VERSION_MAJOR, KUSH_VERSION_MINOR);
+								exit(0);
+						}
             else {
                 printf("[error] Unknown flag `%s`\n", arguments[i]);
             }
