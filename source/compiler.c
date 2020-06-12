@@ -263,32 +263,27 @@ void buildAST(Compiler* compiler) {
             jtk_InputStream_t* stream = jtk_PathHelper_read(path);
             resetLexer(lexer, stream);
 
-            jtk_Logger_info(compiler->logger, "The lexical analysis phase has started.");
-
             int32_t previousLexicalErrors = compiler->errorHandler->errors->m_size;
             k_TokenStream_reset(tokens);
             k_TokenStream_fill(tokens);
+
+            int32_t currentLexicalErrors = compiler->errorHandler->errors->m_size;
+
             if (compiler->dumpTokens) {
                 printTokens(compiler, tokens->tokens);
             }
-            int32_t currentLexicalErrors = compiler->errorHandler->errors->m_size;
+            else {
+                /* Perform syntax analysis for the current input source file only if
+                 * there are no lexical errors.
+                 */
+                if (previousLexicalErrors == currentLexicalErrors) {
+                    resetParser(parser, tokens);
+                    Module* module = parse(parser);
+                    compiler->modules[i] = module;
 
-            jtk_Logger_info(compiler->logger, "The lexical analysis phase is complete.");
-
-            /* Perform syntax analysis for the current input source file only if
-             * there are no lexical errors.
-             */
-            if (previousLexicalErrors == currentLexicalErrors) {
-                jtk_Logger_info(compiler->logger, "The syntactical analysis phase has started.");
-
-                resetParser(parser, tokens);
-                Module* module = parse(parser);
-                compiler->modules[i] = module;
-
-                jtk_Logger_info(compiler->logger, "The syntactical analysis phase is complete.");
-
-                if (compiler->dumpNodes) {
-                    // TODO
+                    if (compiler->dumpNodes) {
+                        // TODO
+                    }
                 }
             }
 
@@ -499,7 +494,7 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
     else {
         initialize(compiler);
         buildAST(compiler);
-        if ((noErrors = (compiler->errorHandler->errors->m_size == 0))) {
+        if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
             analyze(compiler);
 
             if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
@@ -507,7 +502,6 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
             }
         }
     }
-
 
     if (compiler->footprint) {
         int32_t footprint = k_Memory_getFootprint();
