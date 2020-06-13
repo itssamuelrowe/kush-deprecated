@@ -95,10 +95,9 @@ static bool followVariableDeclaration(Parser* parser);
 
 static Module* parseModule(Parser* parser);
 static ImportDeclaration* parseImportDeclaration(Parser* parser);
-static Token* parseTypeEx(Parser* parser, int32_t* dimensions, bool includeVoid);
-static Token* parseType(Parser* parser, int32_t* dimensions);
-// TODO: Change this!
-static Token* parseReturnType(Parser* parser, int32_t* dimensions);
+static Type* parseTypeEx(Parser* parser, bool includeVoid);
+static Type* parseType(Parser* parser);
+static Type* parseReturnType(Parser* parser);
 static Function* parseFunctionDeclaration(Parser* parser, uint32_t modifiers);
 static void parseFunctionParameters(Parser* parser, jtk_ArrayList_t* fixedParameters,
     FunctionParameter** variableParameter);
@@ -106,7 +105,8 @@ static Block* parseBlock(Parser* parser);
 static Context* parseSimpleStatement(Parser* parser);
 static VariableDeclaration* parseVariableDeclaration(Parser* parser, bool onlyVariable,
     bool allowInitializer);
-static void parseVariableDeclarator(Parser* parser, Variable* variable);
+void parseVariableDeclarator(Parser* parser, bool infer, bool constant,
+    Type* type, jtk_ArrayList_t* variables);
 static BreakStatement* parseBreakStatement(Parser* parser);
 static ReturnStatement* parseReturnStatement(Parser* parser);
 static ThrowStatement* parseThrowStatement(Parser* parser);
@@ -657,39 +657,63 @@ ImportDeclaration* parseImportDeclaration(Parser* parser) {
     return context;
 }
 
-Token* parseTypeEx(Parser* parser, int32_t* dimensions, bool includeVoid) {
-    int32_t index;
-    static const TokenType returnTypes[] = {
+Type* parseTypeEx(Parser* parser, bool includeVoid) {
+    static const Type* types[] = {
+        &primitives.unknown,
+        &primitives.boolean,
+        &primitives.i8,
+        &primitives.i16,
+        &primitives.i32,
+        &primitives.i64,
+        &primitives.ui8,
+        &primitives.ui16,
+        &primitives.ui32,
+        &primitives.ui64,
+        &primitives.f32,
+        &primitives.f64,
+        &primitives.void_,
+    };
+    static const TokenType tokens[] = {
+        TOKEN_IDENTIFIER,
         TOKEN_KEYWORD_BOOLEAN,
         TOKEN_KEYWORD_I8,
         TOKEN_KEYWORD_I16,
         TOKEN_KEYWORD_I32,
         TOKEN_KEYWORD_I64,
+        TOKEN_KEYWORD_UI8,
+        TOKEN_KEYWORD_UI16,
+        TOKEN_KEYWORD_UI32,
+        TOKEN_KEYWORD_UI64,
         TOKEN_KEYWORD_F32,
         TOKEN_KEYWORD_F64,
-        TOKEN_KEYWORD_VOID,
-        TOKEN_IDENTIFIER
+        TOKEN_KEYWORD_VOID
     };
-    static const TokenType types[] = {
-        TOKEN_KEYWORD_BOOLEAN,
-        TOKEN_KEYWORD_I8,
-        TOKEN_KEYWORD_I16,
-        TOKEN_KEYWORD_I32,
-        TOKEN_KEYWORD_I64,
-        TOKEN_KEYWORD_F32,
-        TOKEN_KEYWORD_F64,
-        TOKEN_IDENTIFIER
-    };
-    Token* token = matchAndYieldEx(parser, includeVoid? returnTypes : types,
-        includeVoid? 9 : 8, &index);
 
-    *dimensions = 0;
-    while (la(parser, 1) == TOKEN_LEFT_SQUARE_BRACKET) {
-        *dimensions++;
-        match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
+    int32_t index;
+    Type* type = NULL;
+    Token* token = matchAndYieldEx(parser, types,
+        includeVoid? 13 : 12, &index);
+    if (token != NULL) {
+        int32_t dimensions = 0;
+        while (la(parser, 1) == TOKEN_LEFT_SQUARE_BRACKET) {
+            dimensions++;
+            match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
+        }
+
+        if (dimensions == 0) {
+            type = types[index];
+        }
+        else {
+            // TODO: Register the new array type in the symbol table so we
+            // don't have to create new instances every time.
+            type = newType(TYPE_ARRAY, true, true, false, NULL);
+            type->array.array = NULL; // TODO: Assign the array structure.
+            type->array.base = types[index];
+            type->array.dimensions = dimensions;
+        }
     }
 
-    return token;
+    return type;
 }
 
 /**
@@ -707,8 +731,8 @@ Token* parseTypeEx(Parser* parser, int32_t* dimensions, bool includeVoid) {
  * :    componentType ('[' ']')*
  * ;
  */
-Token* parseType(Parser* parser, int32_t* dimensions) {
-    return parseTypeEx(parser, dimensions, false);
+Type* parseType(Parser* parser) {
+    return parseTypeEx(parser, false);
 }
 
 /**
@@ -717,8 +741,8 @@ Token* parseType(Parser* parser, int32_t* dimensions) {
  * |    'void'
  * ;
  */
-Token* parseReturnType(Parser* parser, int32_t* dimensions) {
-    return parseTypeEx(parser, dimensions, true);
+Type* parseReturnType(Parser* parser) {
+    return parseTypeEx(parser, true);
 }
 
 /*
@@ -734,7 +758,7 @@ Function* parseFunctionDeclaration(Parser* parser,
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
 
     Function* context = newFunction();
-    context->returnType = parseReturnType(parser, &context->returnTypeDimensions);
+    context->returnType = parseReturnType(parser);
     context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
     parseFunctionParameters(parser, context->parameters,
         &context->variableParameter);
@@ -787,7 +811,7 @@ void parseFunctionParameters(Parser* parser,
             }
 
             FunctionParameter* parameter = newFunctionParameter();
-            parameter->baseType = parseType(parser, &parameter->dimensions);
+            parameter->type = parseType(parser);
             if (la(parser, 1) == TOKEN_ELLIPSIS) {
                 match(parser, TOKEN_ELLIPSIS);
                 *variableParameter = parameter;
@@ -952,25 +976,17 @@ VariableDeclaration* parseVariableDeclaration(Parser* parser, bool onlyVariable,
     TokenType la1 = la(parser, 1);
     bool infer = (la1 == TOKEN_KEYWORD_VAR);
     bool constant = (la1 == TOKEN_KEYWORD_LET);
-    Token* typeName = NULL;
-    int32_t dimensions = -1;
+    Type* type = NULL;
 
     if (!infer && !constant) {
-        dimensions = 0;
-        typeName = parseType(parser, &dimensions);
+        type = parseType(parser);
     }
 
-	Variable* variable = newVariable(infer, constant,
-        typeName, dimensions, NULL);
-    jtk_ArrayList_add(context->variables, variable);
-	parseVariableDeclarator(parser, variable);
+	parseVariableDeclarator(parser, infer, constant, type, context->variables);
 
 	while (la(parser, 1) == TOKEN_COMMA) {
         consume(parser);
-
-		variable = newVariable(infer, constant, typeName, dimensions, NULL);
-        jtk_ArrayList_add(context->variables, variable);
-		parseVariableDeclarator(parser, variable);
+		parseVariableDeclarator(parser, infer, constant, type, context->variables);
 	}
 
     return context;
@@ -981,13 +997,18 @@ VariableDeclaration* parseVariableDeclaration(Parser* parser, bool onlyVariable,
  * :    IDENTIFIER ('=' expression)?
  * ;
  */
-void parseVariableDeclarator(Parser* parser, Variable* variable) {
-    variable->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
+void parseVariableDeclarator(Parser* parser, bool infer, bool constant,
+    Type* type, jtk_ArrayList_t* variables) {
+    Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
+    BinaryExpression* expression = NULL;
 
 	if (la(parser, 1) == TOKEN_EQUAL) {
 		consume(parser);
-        variable->expression = parseExpression(parser);
+        expression = parseExpression(parser);
 	}
+
+    Variable* variable = newVariable(infer, constant, type, identifier, expression, NULL);
+    jtk_ArrayList_add(variables, variable);
 }
 
 /*
