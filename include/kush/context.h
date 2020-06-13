@@ -539,6 +539,9 @@ struct ThrowStatement {
 
 typedef struct ThrowStatement ThrowStatement;
 
+ThrowStatement* newThrowStatement();
+void deleteThrowStatement(ThrowStatement* self);
+
 /*******************************************************************************
  * ReturnStatement                                                             *
  *******************************************************************************/
