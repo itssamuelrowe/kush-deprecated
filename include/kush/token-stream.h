@@ -78,7 +78,7 @@ typedef struct TokenStream TokenStream;
 TokenStream* tokenStreamNew(Compiler* compiler, Lexer* lexer,
     TokenChannel channel);
 void tokenStreamDelete(TokenStream* stream);
-void k_TokenStream_reset(TokenStream* stream);
+void resetTokenStream(TokenStream* stream);
 int32_t k_TokenStream_getIndex(TokenStream* stream);
 int32_t k_TokenStream_getSize(TokenStream* stream);
 void k_TokenStream_consume(TokenStream* stream);
@@ -91,7 +91,7 @@ Token* k_TokenStream_lt(TokenStream* stream, int32_t k);
 void k_TokenStream_initialize(TokenStream* stream);
 int32_t k_TokenStream_getNextTokenOnChannel(TokenStream* stream, int32_t i, TokenChannel channel);
 int32_t k_TokenStream_getPreviousTokenOnChannel(TokenStream* stream, int32_t i, TokenChannel channel);
-void k_TokenStream_fill(TokenStream* stream);
+void fillTokenStream(TokenStream* stream);
 uint8_t* k_TokenStream_getSourceName(TokenStream* stream, int32_t* size);
 Lexer* k_TokenStream_getLexer(TokenStream* stream);
 uint8_t* k_TokenStream_getText(TokenStream* stream, int32_t startIndex, int32_t stopIndex, int32_t* size);

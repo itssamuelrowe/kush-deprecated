@@ -44,7 +44,7 @@ void tokenStreamDelete(TokenStream* stream) {
     deallocate(stream);
 }
 
-void k_TokenStream_reset(TokenStream* stream) {
+void resetTokenStream(TokenStream* stream) {
     jtk_Assert_assertObject(stream, "The specified token stream is null.");
 
     jtk_ArrayList_clear(stream->tokens);
@@ -272,7 +272,7 @@ int32_t k_TokenStream_getNextTokenOnChannel(TokenStream* stream,
     return i;
 }
 
-void k_TokenStream_fill(TokenStream* stream) {
+void fillTokenStream(TokenStream* stream) {
     k_TokenStream_initialize(stream);
     /* The token stream tries to buffer a 1000 tokens
      * at each iteration. This is repeated until the token
@@ -293,7 +293,7 @@ int32_t k_TokenStream_getNumberOfTokens(TokenStream* stream,
     /* Fetch all the tokens from the input stream before computing
      * the number of tokens on the specified channel.
      */
-    k_TokenStream_fill(stream);
+    fillTokenStream(stream);
 
     int32_t n = 0;
     int32_t size = jtk_ArrayList_getSize(stream->tokens);

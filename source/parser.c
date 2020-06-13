@@ -49,14 +49,14 @@
  * -----------------------------------------------------------------------------
  *
  * When the parser encounters an invalid input, the current rule cannot continue,
- * so the parser recovers by skipping tokens until it a resynchronized state is
+ * so the parser recovers by skipping tokens until a resynchronized state is
  * achived. The control is then returned to the calling rule.
  * This technique is known as the panic mode strategy.
  *
  * The trick here is to discard tokens only until the lookahead token is
  * something that the parent rule of the current rule expects. For example,
  * if there is a syntax error within a throw statement, the parser discards
- * tokens until a newline token or other relevant token is encountered.
+ * tokens until a semicolon token or other relevant token is encountered.
  *
  * When the parser encounters an error, it switches to the recovery mode.
  * This prevents the parser from reporting errors during resynchronization.
@@ -691,7 +691,7 @@ Type* parseTypeEx(Parser* parser, bool includeVoid) {
 
     int32_t index;
     Type* type = NULL;
-    Token* token = matchAndYieldEx(parser, types,
+    Token* token = matchAndYieldEx(parser, tokens,
         includeVoid? 13 : 12, &index);
     if (token != NULL) {
         int32_t dimensions = 0;
@@ -1700,7 +1700,7 @@ Subscript* parseSubscript(Parser* parser) {
 FunctionArguments* parseFunctionArguments(Parser* parser) {
     FunctionArguments* context = newFunctionArguments();
 
-    match(context, TOKEN_LEFT_PARENTHESIS);
+    match(parser, TOKEN_LEFT_PARENTHESIS);
 
     if (isExpressionFollow(la(parser, 1))) {
         pushFollowToken(parser, TOKEN_RIGHT_PARENTHESIS);
