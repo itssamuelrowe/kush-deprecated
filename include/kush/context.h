@@ -191,6 +191,9 @@ struct Module {
 
 typedef struct Module Module;
 
+Module* newModule();
+void deleteModule(Module* self);
+
 /*******************************************************************************
  * ImportDeclaration                                                           *
  *******************************************************************************/
@@ -203,6 +206,9 @@ struct ImportDeclaration {
 
 typedef struct ImportDeclaration ImportDeclaration;
 
+ImportDeclaration* newImportDeclaration();
+void deleteImportDeclaration(ImportDeclaration* self);
+
 /*******************************************************************************
  * BinaryExpression                                                            *
  *******************************************************************************/
@@ -214,6 +220,9 @@ struct BinaryExpression {
     BinaryExpression* left;
     jtk_ArrayList_t* others;
 };
+
+BinaryExpression* newBinaryExpression();
+void deleteBinaryExpression(BinaryExpression* self);
 
 /*******************************************************************************
  * ConditionalExpression                                                       *
@@ -228,6 +237,9 @@ struct ConditionalExpression {
     ConditionalExpression* otherwise;
 };
 
+ConditionalExpression* newConditionalExpression();
+void deleteConditionalExpression(ConditionalExpression* self);
+
 /*******************************************************************************
  * UnaryExpression                                                             *
  *******************************************************************************/
@@ -239,6 +251,9 @@ struct UnaryExpression {
 };
 
 typedef struct UnaryExpression UnaryExpression;
+
+UnaryExpression* newUnaryExpression();
+void deleteUnaryExpression(UnaryExpression* self);
 
 /*******************************************************************************
  * PostfixExpression                                                           *
@@ -253,6 +268,9 @@ struct PostfixExpression {
 
 typedef struct PostfixExpression PostfixExpression;
 
+PostfixExpression* newPostfixExpression();
+void deletePostfixExpression(PostfixExpression* self);
+
 /*******************************************************************************
  * MemberAccess                                                                *
  *******************************************************************************/
@@ -263,6 +281,9 @@ struct MemberAccess {
 };
 
 typedef struct MemberAccess MemberAccess;
+
+MemberAccess* newMemberAccess();
+void deleteMemberAccess(MemberAccess* self);
 
 /*******************************************************************************
  * InitializerExpression                                                               *
@@ -275,6 +296,9 @@ struct InitializerExpression {
 
 typedef struct InitializerExpression InitializerExpression;
 
+InitializerExpression* newInitializerExpression();
+void deleteInitializerExpression(InitializerExpression* self);
+
 /*******************************************************************************
  * ArrayExpression                                                              *
  *******************************************************************************/
@@ -285,6 +309,9 @@ struct ArrayExpression {
 };
 
 typedef struct ArrayExpression ArrayExpression;
+
+ArrayExpression* newArrayExpression();
+void deleteArrayExpression(ArrayExpression* self);
 
 /*******************************************************************************
  * FunctionArguments                                                           *
@@ -298,6 +325,9 @@ struct FunctionArguments {
 
 typedef struct FunctionArguments FunctionArguments;
 
+FunctionArguments* newFunctionArguments();
+void deleteFunctionArguments(FunctionArguments* self);
+
 /*******************************************************************************
  * Subscript                                                                   *
  *******************************************************************************/
@@ -309,6 +339,9 @@ struct Subscript {
 };
 
 typedef struct Subscript Subscript;
+
+Subscript* newSubscript();
+void deleteSubscript(Subscript* self);
 
 /*******************************************************************************
  * Block                                                              *
@@ -322,6 +355,9 @@ struct Block {
 
 typedef struct Block Block;
 
+Block* newBlock();
+void deleteBlock(Block* self);
+
 /*******************************************************************************
  * FunctionParameter                                                           *
  *******************************************************************************/
@@ -333,6 +369,9 @@ struct FunctionParameter {
 };
 
 typedef struct FunctionParameter FunctionParameter;
+
+FunctionParameter* newFunctionParameter();
+void deleteFunctionParameter(FunctionParameter* self);
 
 /*******************************************************************************
  * Function                                                                    *
@@ -350,6 +389,9 @@ struct Function {
 
 typedef struct Function Function;
 
+Function* newFunction();
+void deleteFunction(Function* self);
+
 /*******************************************************************************
  * Structure                                                            *
  *******************************************************************************/
@@ -364,6 +406,9 @@ struct Structure {
 
 typedef struct Structure Structure;
 
+Structure* newStructure();
+void deleteStructure(Structure* self);
+
 /*******************************************************************************
  * IfClause                                                                    *
  *******************************************************************************/
@@ -375,6 +420,9 @@ struct IfClause {
 };
 
 typedef struct IfClause IfClause;
+
+IfClause* newIfClause();
+void deleteIfClause(IfClause* self);
 
 /*******************************************************************************
  * IfStatement                                                                 *
@@ -388,6 +436,9 @@ struct IfStatement {
 };
 
 typedef struct IfStatement IfStatement;
+
+IfStatement* newIfStatement();
+void deleteIfStatement(IfStatement* self);
 
 /*******************************************************************************
  * IterativeStatement                                                          *
@@ -404,6 +455,9 @@ struct IterativeStatement {
 
 typedef struct IterativeStatement IterativeStatement;
 
+IterativeStatement* newIterativeStatement();
+void deleteIterativeStatement(IterativeStatement* self);
+
 /*******************************************************************************
  * TryStatement                                                                *
  *******************************************************************************/
@@ -416,6 +470,9 @@ struct TryStatement {
 };
 
 typedef struct TryStatement TryStatement;
+
+TryStatement* newTryStatement();
+void deleteTryStatement(TryStatement* self);
 
 /*******************************************************************************
  * CatchClause                                                                 *
@@ -431,6 +488,9 @@ struct CatchClause {
 };
 
 typedef struct CatchClause CatchClause;
+
+CatchClause* newCatchClause();
+void deleteCatchClause(CatchClause* self);
 
 /*******************************************************************************
  * Variable                                                                    *
@@ -465,6 +525,9 @@ struct VariableDeclaration {
 
 typedef struct VariableDeclaration VariableDeclaration;
 
+VariableDeclaration* newVariableDeclaration();
+void deleteVariableDeclaration(VariableDeclaration* self);
+
 /*******************************************************************************
  * ThrowStatement                                                              *
  *******************************************************************************/
@@ -487,6 +550,9 @@ struct ReturnStatement {
 
 typedef struct ReturnStatement ReturnStatement;
 
+ReturnStatement* newReturnStatement();
+void deleteReturnStatement(ReturnStatement* self);
+
 /*******************************************************************************
  * BreakStatement                                                              *
  *******************************************************************************/
@@ -497,5 +563,8 @@ struct BreakStatement {
 };
 
 typedef struct BreakStatement BreakStatement;
+
+BreakStatement* newBreakStatement();
+void deleteBreakStatement(BreakStatement* self);
 
 #endif /* KUSH_PARSER_CONTEXT_H */

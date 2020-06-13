@@ -264,8 +264,8 @@ void buildAST(Compiler* compiler) {
             resetLexer(lexer, stream);
 
             int32_t previousLexicalErrors = compiler->errorHandler->errors->m_size;
-            k_TokenStream_reset(tokens);
-            k_TokenStream_fill(tokens);
+            resetTokenStream(tokens);
+            fillTokenStream(tokens);
 
             int32_t currentLexicalErrors = compiler->errorHandler->errors->m_size;
 
@@ -279,7 +279,7 @@ void buildAST(Compiler* compiler) {
                 if (previousLexicalErrors == currentLexicalErrors) {
                     resetParser(parser, tokens);
                     Module* module = parse(parser);
-                    compiler->modules[i] = module;
+                    // compiler->modules[i] = module;
 
                     if (compiler->dumpNodes) {
                         // TODO
@@ -306,18 +306,13 @@ void analyze(Compiler* compiler) {
     for (i = 0; i < size; i++) {
         compiler->currentFileIndex = i;
         Module* module = compiler->modules[i];
-        jtk_Logger_info(compiler->logger, "Starting definition phase...");
-        // TODO
-        jtk_Logger_info(compiler->logger, "The symbol definition phase is complete.");
+        // definition
     }
 
     for (i = 0; i < size; i++) {
         compiler->currentFileIndex = i;
         Module* module = compiler->modules[i];
-
-        jtk_Logger_info(compiler->logger, "Starting symbol resolution phase...");
-        // TODO
-        jtk_Logger_info(compiler->logger, "The symbol resolution phase is complete.");
+        // resolution
     }
 
     printErrors(compiler);
@@ -495,11 +490,11 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
         initialize(compiler);
         buildAST(compiler);
         if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
-            analyze(compiler);
+            // analyze(compiler);
 
-            if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
-                generate(compiler);
-            }
+            // if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
+            //     generate(compiler);
+            // }
         }
     }
 
