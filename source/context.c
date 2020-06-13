@@ -21,6 +21,126 @@
 /* Delete only what was allocated in the constructor. */
 
 /*******************************************************************************
+ * Type                                                                        *
+ *******************************************************************************/
+
+Type* newType(uint8_t tag, bool indexable, bool accessible, bool callable,
+    Token* identifier) {
+    Type* type = allocate(Type, 1);
+    type->tag = tag;
+    type->indexable = indexable;
+    type->accessible = accessible;
+    type->callable = callable;
+    type->identifier = identifier;
+
+    return type;
+}
+
+void deleteType(Type* type) {
+    deallocate(type);
+}
+
+/*******************************************************************************
+ * Primitives                                                                  *
+ *******************************************************************************/
+
+Primitives primitives = {
+    .boolean = {
+        .tag = TYPE_BOOLEAN,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL
+    },
+
+    .i8 = {
+        .tag = TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
+        .integer = {
+            .size = 1
+        }
+    },
+
+    .i16 = {
+        .tag = TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL,
+        .integer = {
+            .size = 2
+        }
+    },
+
+    .i32 = {
+        .tag = TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL,
+        .integer = {
+            .size = 4
+        }
+    },
+
+    .i64 = {
+        .tag = TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL,
+        .integer = {
+            .size = 8
+        }
+    },
+
+    .f32 = {
+        .tag = TYPE_DECIMAL,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL,
+        .decimal = {
+            .size = 4
+        }
+    },
+
+    .f64 = {
+        .tag = TYPE_DECIMAL,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL,
+        .decimal = {
+            .size = 8
+        }
+    },
+
+    .void_ = {
+        .tag = TYPE_VOID,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL
+    },
+
+    .null = {
+        .tag = TYPE_NULL,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL
+    },
+
+    .string = {
+        .tag = TYPE_STRING,
+        .indexable = true,
+        .accessible = true,
+        .identifier = NULL
+    },
+
+    .unknown = {
+        .tag = TYPE_UNKONWN,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL
+    }
+};
+
+/*******************************************************************************
  * Module                                                                      *
  *******************************************************************************/
 
@@ -232,8 +352,7 @@ void deleteBlock(Block* self) {
 // TODO: Include the type context.
 FunctionParameter* newFunctionParameter() {
     FunctionParameter* result = allocate(FunctionParameter, 1);
-    result->baseType = NULL;
-    result->dimensions = 0;
+    result->type = NULL;
     result->identifier = NULL;
     return result;
 }
@@ -255,7 +374,6 @@ Function* newFunction() {
     result->variableParameter = NULL;
     result->body = NULL;
     result->returnType = NULL;
-    result->returnTypeDimensions = 0;
     result->scope = NULL;
     return result;
 }
@@ -376,12 +494,12 @@ void deleteCatchClause(CatchClause* self) {
  *******************************************************************************/
 
 // TODO: Update with Type
-Variable* newVariable() {
+Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
+    BinaryExpression* expression, Scope* parent) {
     Variable* result = allocate(Variable, 1);
     result->infer = false;
     result->constant = false;
-    result->baseType = NULL;
-    result->dimensions = 0;
+    result->type = NULL;
     result->identifier = NULL;
     result->expression = NULL;
     result->parent = NULL;

@@ -35,6 +35,7 @@
 #define TYPE_NULL 5
 #define TYPE_STRING 6
 #define TYPE_BOOLEAN 7
+#define TYPE_UNKONWN 8
 
 typedef struct Type Type;
 typedef struct Structure Structure;
@@ -44,8 +45,10 @@ struct Type {
     bool indexable;
     bool accessible;
     bool callable;
+    Token* identifier;
     union {
         struct {
+            Type* array;
             Type* base;
             uint16_t dimensions;
         } array;
@@ -59,24 +62,35 @@ struct Type {
     };
 };
 
+Type* newType(uint8_t tag, bool indexable, bool accessible, bool callable,
+    Token* identifier);
+void deleteType(Type* type);
+
 /*******************************************************************************
  * Primitives                                                                  *
  *******************************************************************************/
 
 struct Primitives {
+    Type boolean;
     Type i8;
     Type i16;
     Type i32;
     Type i64;
+    Type ui8;
+    Type ui16;
+    Type ui32;
+    Type ui64;
     Type f32;
     Type f64;
     Type void_;
     Type null;
     Type string;
-    Type boolean;
+    Type unknown;
 };
 
 typedef struct Primitives Primitives;
+
+extern Primitives primitives;
 
 /*******************************************************************************
  * ContextType                                                                 *
@@ -314,8 +328,7 @@ typedef struct Block Block;
 
 struct FunctionParameter {
     ContextType tag;
-    Token* baseType;
-    int32_t dimensions;
+    Type* type;
     Token* identifier;
 };
 
@@ -331,8 +344,7 @@ struct Function {
     jtk_ArrayList_t* parameters;
     FunctionParameter* variableParameter;
     Block* body;
-    Token* returnType;
-    int32_t returnTypeDimensions;
+    Type* returnType;
     Scope* scope;
 };
 
@@ -430,14 +442,17 @@ typedef struct CatchClause CatchClause;
 struct Variable {
     bool infer;
     bool constant;
-    Token* baseType;
-    int32_t dimensions;
+    Type* type;
     Token* identifier;
     BinaryExpression* expression;
     Scope* parent;
 };
 
 typedef struct Variable Variable;
+
+Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
+    BinaryExpression* expression, Scope* parent);
+void deleteVariable(Variable* variable);
 
 /*******************************************************************************
  * VariableDeclaration                                                         *
