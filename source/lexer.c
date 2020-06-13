@@ -90,161 +90,6 @@ static void integerLiteral(Lexer* lexer);
 
 #define isIntegerSuffix(c) (c == 'l') || (c == 'L')
 
-uint8_t k_Lexer_literalNames[][25] = {
-    { '<', 'u', 'n', 'k', 'n', 'o', 'w', 'n', '>', '\0' },
-
-    { '<', 'i', 'n', 'd', 'e', 'n', 't', 'a', 't', 'i', 'o', 'n', '>', '\0' },
-    { '<', 'd', 'e', 'd', 'e', 'n', 't', 'a', 't', 'i', 'o', 'n', '>', '\0' },
-
-    { '<', 'w', 'h', 'i', 't', 'e', '_', 's', 'p', 'a', 'c', 'e', '>', '\0' },
-    { '<', 'n', 'e', 'w', 'l', 'i', 'n', 'e', '>', '\0' },
-    { '<', 'e', 'n', 'd', '_', 'o', 'f', '_', 's', 't', 'r', 'e', 'a', 'm', '>', '\0' },
-
-    { '!', '=', '\0' },
-    { '!', '\0' },
-
-    { '@', '\0' },
-
-    { '#', '\0' },
-
-    { '%', '=', '\0' },
-    { '%', '\0' },
-
-    { '&', '&', '\0' },
-    { '&', '=', '\0' },
-    { '&', '\0' },
-
-    { '(', '\0' },
-    { ')', '\0' },
-
-    { '*', '*', '=', '\0' },
-    { '*', '*', '\0' },
-    { '*', '=', '\0' },
-    { '*', '\0' },
-
-    { '+', '+', '\0' },
-    { '+', '=', '\0' },
-    { '+', '\0' },
-
-    { ',', '\0' },
-
-    { '-', '-', '\0' },
-    { '-', '>', '\0' },
-    { '-', '=', '\0' },
-    { '-', '\0' },
-
-    { '.', '.', '.', '\0' },
-    { '.', '.', '\0' },
-    { '.', '\0' },
-
-    { 's', 'i', 'n', 'g', 'l', 'e', '_', 'l', 'i', 'n', 'e', '_', 'c', 'o', 'm', 'm', 'e', 'n', 't', '\0' },
-    { 'm', 'u', 'l', 't', 'i', '_', 'l', 'i', 'n', 'e', '_', 'c', 'o', 'm', 'm', 'e', 'n', 't', '\0' },
-    { '/', '\0' },
-    { '/', '=', '\0' },
-
-    { ':', ':', '\0' },
-    { ':', '\0' },
-
-    { ';', '\0' },
-
-    { '<', '<', '=', '\0' },
-    { '<', '<', '\0' },
-    { '<', '=', '\0' },
-    { '<', '\0' },
-
-    { '>', '>', '>', '=', '\0' },
-    { '>', '>', '>', '\0' },
-    { '>', '>', '=', '\0' },
-    { '>', '>', '\0' },
-    { '>', '=', '\0' },
-    { '>', '\0' },
-
-    { '=', '=', '\0' },
-    { '=', '\0' },
-
-    { '?', '\0' },
-
-    { '{', '\0' },
-    { '}', '\0' },
-
-    { '[', '\0' },
-    { ']', '\0' },
-
-    { '^', '=', '\0' },
-    { '^', '\0' },
-
-    { '|', '|', '\0' },
-    { '|', '=', '\0' },
-    { '|', '\0' },
-
-    { '~', '=', '\0' },
-    { '~', '\0' },
-
-    { '<', 'i', 'd', 'e', 'n', 't', 'i', 'f', 'i', 'e', 'r', '>', '\0' },
-
-    { 'd', 'o', '\0' },
-    { 'i', 'f', '\0' },
-    { 'i', 'n', '\0' },
-    { 'i', 's', '\0' },
-    { 'o', 'r', '\0' },
-
-    { 'a', 'n', 'd', '\0' },
-    { 'f', 'o', 'r', '\0' },
-    /* { 'n', 'a', 'n', '\0' }, */
-    { 'n', 'e', 'w', '\0' },
-    { 't', 'r', 'y', '\0' },
-    { 'v', 'a', 'r', '\0' },
-
-    { 'c', 'a', 's', 'e', '\0' },
-    { 'e', 'l', 's', 'e', '\0' },
-    { 'e', 'n', 'u', 'm', '\0' },
-    { 'n', 'u', 'l', 'l', '\0' },
-    { 't', 'h', 'e', 'n', '\0' },
-    { 't', 'h', 'i', 's', '\0' },
-    { 't', 'r', 'u', 'e', '\0' },
-    { 'w', 'i', 't', 'h', '\0' },
-
-    { 'b', 'r', 'e', 'a', 'k', '\0' },
-    { 'c', 'a', 't', 'c', 'h', '\0' },
-    { 'c', 'l', 'a', 's', 's', '\0' },
-    { 'f', 'a', 'l', 's', 'e', '\0' },
-    { 'f', 'i', 'n', 'a', 'l', '\0' },
-    { 't', 'h', 'r', 'o', 'w', '\0' },
-    { 'w', 'h', 'i', 'l', 'e', '\0' },
-
-    { 'a', 's', 's', 'e', 'r', 't', '\0' },
-    { 'i', 'm', 'p', 'o', 'r', 't', '\0' },
-    { 'n', 'a', 't', 'i', 'v', 'e', '\0' },
-    { 'p', 'u', 'b', 'l', 'i', 'c', '\0' },
-    { 'r', 'e', 't', 'u', 'r', 'n', '\0' },
-    { 's', 'e', 'c', 'r', 'e', 't', '\0' },
-    { 's', 't', 'a', 't', 'i', 'c', '\0' },
-    /* { 's', 'w', 'i', 't', 'c', 'h', '\0' }, */
-
-    { 'a', 'b','s', 't', 'r', 'a', 'c', 't', '\0' },
-    /* { 'd', 'e', 'f', 'a', 'u', 'l', 't', '\0' }, */
-    { 'f', 'i', 'n', 'a', 'l', 'l', 'y', '\0' },
-    /* { 'p', 'a', 'c', 'k', 'a', 'g', 'e', '\0' }, */
-    { 'p', 'r', 'i', 'v', 'a', 't', 'e', '\0' },
-
-    { 'c', 'o', 'n', 't', 'i', 'n', 'u', 'e', '\0' },
-    { 'f', 'u', 'n', 'c', 't', 'i', 'o', 'n', '\0' },
-
-    { 's', 'y', 'n', 'c', 'h', 'r', 'o', 'n', 'i', 'z', 'e', '\0' },
-
-    { '<', 'i', 'n', 't', 'e', 'g', 'e', 'r', '_', 'l', 'i', 't', 'e', 'r', 'a', 'l', '>', '\0' },
-
-    { '<', 's', 't', 'r', 'i', 'n', 'g', '_', 'l', 'i', 't', 'e', 'r', 'a', 'l', '>', '\0' },
-
-    { '<', 'f', 'l', 'o', 'a', 't', 'i', 'n', 'g', '_', 'p', 'o', 'i', 'n', 't', '_', 'l', 'i', 't', 'e', 'r', 'a', 'l', '>', '\0' },
-};
-
-/* Literal Name */
-
-const uint8_t* k_Lexer_getLiteralName(TokenType type) {
-    return k_Lexer_literalNames[(int32_t)type];
-}
-
 /* Constructor */
 
 Lexer* lexerNew(Compiler* compiler) {
@@ -1063,22 +908,7 @@ Token* nextToken(Lexer* lexer) {
                 /* Consume and discard the '*' character. */
                 consume(lexer);
 
-                if (lexer->la1 == '*') {
-                    /* Consume and discard the '*' character. */
-                    consume(lexer);
-
-                    if (lexer->la1 == '=') {
-                        /* Consume and discard the '=' character. */
-                        consume(lexer);
-                        /* The lexer has recognized the '**=' token. */
-                        lexer->type = TOKEN_ASTERISK_2_EQUAL;
-                    }
-                    else {
-                        /* The lexer has recognized the '**' token. */
-                        lexer->type = TOKEN_ASTERISK_2;
-                    }
-                }
-                else if (lexer->la1 == '=') {
+                if (lexer->la1 == '=') {
                     /* Consume and discard the '=' character. */
                     consume(lexer);
                     /* The lexer has recognized the '*=' token. */
@@ -1211,8 +1041,7 @@ Token* nextToken(Lexer* lexer) {
                         lexer->type = TOKEN_ELLIPSIS;
                     }
                     else {
-                        /* The lexer has recognized the '..' token. */
-                        lexer->type = TOKEN_DOT_2;
+                        printf("[internal error] Two consecutive dots cannot be recognized right now. Please consider using spacing.\n");
                     }
                 }
                 else {
@@ -1343,10 +1172,7 @@ Token* nextToken(Lexer* lexer) {
                 break;
             }
 
-            /* COLON_2
-             * :    '::'
-             * ;
-             *
+            /*
              * COLON
              * :    ':'
              * ;
@@ -1354,18 +1180,8 @@ Token* nextToken(Lexer* lexer) {
             case ':' : {
                 /* Consume and discard the ':' character. */
                 consume(lexer);
-
-                if (lexer->la1 == ':') {
-                    /* Consume and discard the ':' character. */
-                    consume(lexer);
-
-                    /* The lexer has recognized the '::' token. */
-                    lexer->type = TOKEN_COLON_2;
-                }
-                else {
-                    /* The lexer has recognized the ':' token. */
-                    lexer->type = TOKEN_COLON;
-                }
+                /* The lexer has recognized the ':' token. */
+                lexer->type = TOKEN_COLON;
 
                 break;
             }
@@ -1782,145 +1598,145 @@ Token* nextToken(Lexer* lexer) {
                     lexer->type = TOKEN_IDENTIFIER;
                     switch (text[0]) {
                     case 'b' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_BOOLEAN], 7)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_BOOLEAN], 7)) {
                             lexer->type = TOKEN_KEYWORD_BOOLEAN;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_BREAK], 5)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_BREAK], 5)) {
                             lexer->type = TOKEN_KEYWORD_BREAK;
                         }
                         break;
                     }
 
                     case 'c': {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_CATCH], 5)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_CATCH], 5)) {
                             lexer->type = TOKEN_KEYWORD_CATCH;
                         }
                         break;
                     }
 
                     case 'd' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_ELSE], 4)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_ELSE], 4)) {
                             lexer->type = TOKEN_KEYWORD_ELSE;
                         }
                         break;
                     }
 
                     case 'f' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_F32], 3)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_F32], 3)) {
                             lexer->type = TOKEN_KEYWORD_F32;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_F64], 3)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_F64], 3)) {
                             lexer->type = TOKEN_KEYWORD_F64;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_FALSE], 5)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_FALSE], 5)) {
                             lexer->type = TOKEN_KEYWORD_FALSE;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_FINALLY], 7)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_FINALLY], 7)) {
                             lexer->type = TOKEN_KEYWORD_FINALLY;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_FOR], 3)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_FOR], 3)) {
                             lexer->type = TOKEN_KEYWORD_FOR;
                         }
                         break;
                     }
 
                     case 'i' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_I16], 3)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_I16], 3)) {
                             lexer->type = TOKEN_KEYWORD_I16;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_I32], 3)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_I32], 3)) {
                             lexer->type = TOKEN_KEYWORD_I32;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_I64], 3)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_I64], 3)) {
                             lexer->type = TOKEN_KEYWORD_I64;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_I8], 2)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_I8], 2)) {
                             lexer->type = TOKEN_KEYWORD_I8;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_IF], 2)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_IF], 2)) {
                             lexer->type = TOKEN_KEYWORD_IF;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_IMPORT], 3)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_IMPORT], 3)) {
                             lexer->type = TOKEN_KEYWORD_IMPORT;
                         }
                         break;
                     }
 
                     case 'l' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_LET], 3)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_LET], 3)) {
                             lexer->type = TOKEN_KEYWORD_LET;
                         }
                         break;
                     }
                     case 'n' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_NATIVE], 6)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_NATIVE], 6)) {
                             lexer->type = TOKEN_KEYWORD_NATIVE;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_NEW], 3)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_NEW], 3)) {
                             lexer->type = TOKEN_KEYWORD_NEW;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_NULL], 4)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_NULL], 4)) {
                             lexer->type = TOKEN_KEYWORD_NULL;
                         }
                         break;
                     }
                     case 'r' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_RETURN], 6)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_RETURN], 6)) {
                             lexer->type = TOKEN_KEYWORD_RETURN;
                         }
                         break;
                     }
                     case 's' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_STRUCT], 5)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_STRUCT], 5)) {
                             lexer->type = TOKEN_KEYWORD_STRUCT;
                         }
                         break;
                     }
                     case 't' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_THIS], 4)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_THIS], 4)) {
                             lexer->type = TOKEN_KEYWORD_THIS;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_THROW], 5)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_THROW], 5)) {
                             lexer->type = TOKEN_KEYWORD_THROW;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_TRUE], 4)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_TRUE], 4)) {
                             lexer->type = TOKEN_KEYWORD_TRUE;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_TRY], 3)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_TRY], 3)) {
                             lexer->type = TOKEN_KEYWORD_TRY;
                         }
                         break;
                     }
                     case 'u' : {
-												if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_UI16], 4)) {
+												if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_UI16], 4)) {
                             lexer->type = TOKEN_KEYWORD_UI16;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_UI32], 4)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_UI32], 4)) {
                             lexer->type = TOKEN_KEYWORD_UI32;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_UI64], 4)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_UI64], 4)) {
                             lexer->type = TOKEN_KEYWORD_UI64;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_UI8], 3)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_UI8], 3)) {
                             lexer->type = TOKEN_KEYWORD_UI8;
                         }
                         break;
 
 										}
                     case 'v' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_VAR], 3)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_VAR], 3)) {
                             lexer->type = TOKEN_KEYWORD_VAR;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_VOID], 4)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_VOID], 4)) {
                             lexer->type = TOKEN_KEYWORD_VOID;
                         }
                         break;
                     }
                     case 'w' : {
-                        if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_WITH], 4)) {
+                        if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_WITH], 4)) {
                             lexer->type = TOKEN_KEYWORD_WITH;
                         }
-                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_WHILE], 5)) {
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_WHILE], 5)) {
                             lexer->type = TOKEN_KEYWORD_WHILE;
                         }
                         break;

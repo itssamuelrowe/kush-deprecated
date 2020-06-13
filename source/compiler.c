@@ -51,14 +51,16 @@ void buildAST(Compiler* compiler);
 void analyze(Compiler* compiler);
 void generate(Compiler* compiler);
 void k_Compiler_destroyScope(Scope* scope);
-void k_Compiler_printToken(Token* token);
-void k_Compiler_k_Compiler_printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
-
+void printToken(Token* token);
+void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
 
 // Token
 
-void k_Compiler_printToken(Token* token) {
-    printf("[%d-%d:%d-%d:%s:%s]", token->startLine, token->stopLine, token->startColumn + 1, token->stopColumn + 1, token->channel == TOKEN_CHANNEL_DEFAULT? "default" : "hidden", k_Lexer_getLiteralName(token->type));
+void printToken(Token* token) {
+    printf("[%d-%d:%d-%d:%s:%s]", token->startLine, token->stopLine,
+        token->startColumn + 1, token->stopColumn + 1,
+        token->channel == TOKEN_CHANNEL_DEFAULT? "default" : "hidden",
+        tokenNames[(int32_t)token->type]);
     TokenType type = k_Token_getType(token);
     if ((type == TOKEN_IDENTIFIER) || (type == TOKEN_INTEGER_LITERAL) ||
         (type == TOKEN_STRING_LITERAL)) {
@@ -67,7 +69,7 @@ void k_Compiler_printToken(Token* token) {
     puts("");
 }
 
-void k_Compiler_k_Compiler_printTokens(Compiler* compiler, jtk_ArrayList_t* tokens) {
+void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens) {
     int32_t defaultChannel = 0;
     int32_t hiddenChannel = 0;
     int32_t otherChannel = 0;
@@ -86,7 +88,7 @@ void k_Compiler_k_Compiler_printTokens(Compiler* compiler, jtk_ArrayList_t* toke
         else {
             otherChannel++;
         }
-        k_Compiler_printToken(token);
+        printToken(token);
     }
     fflush(stdout);
     fprintf(stdout, "[info] %d tokens were recognized on the default channel.\n", defaultChannel);
@@ -221,10 +223,8 @@ void printErrors(Compiler* compiler) {
         }
 
         if (error->expected != TOKEN_UNKNOWN) {
-            const uint8_t* expectedName = k_Lexer_getLiteralName(error->expected);
-            const uint8_t* actualName = k_Lexer_getLiteralName(token->type);
             sprintf(message0, "Expected token '%s', encountered token '%s'",
-                expectedName, actualName);
+                tokenNames[(int32_t)error->expected], tokenNames[(int32_t)token->type]);
             message = message0;
         }
         fprintf(stderr, "\033[1;31m[error]\033[0m %s:%s:%d-%d: %s\n",
@@ -263,32 +263,27 @@ void buildAST(Compiler* compiler) {
             jtk_InputStream_t* stream = jtk_PathHelper_read(path);
             resetLexer(lexer, stream);
 
-            jtk_Logger_info(compiler->logger, "The lexical analysis phase has started.");
-
             int32_t previousLexicalErrors = compiler->errorHandler->errors->m_size;
             k_TokenStream_reset(tokens);
             k_TokenStream_fill(tokens);
-            if (compiler->dumpTokens) {
-                k_Compiler_k_Compiler_printTokens(compiler, tokens->tokens);
-            }
+
             int32_t currentLexicalErrors = compiler->errorHandler->errors->m_size;
 
-            jtk_Logger_info(compiler->logger, "The lexical analysis phase is complete.");
+            if (compiler->dumpTokens) {
+                printTokens(compiler, tokens->tokens);
+            }
+            else {
+                /* Perform syntax analysis for the current input source file only if
+                 * there are no lexical errors.
+                 */
+                if (previousLexicalErrors == currentLexicalErrors) {
+                    resetParser(parser, tokens);
+                    Module* module = parse(parser);
+                    compiler->modules[i] = module;
 
-            /* Perform syntax analysis for the current input source file only if
-             * there are no lexical errors.
-             */
-            if (previousLexicalErrors == currentLexicalErrors) {
-                jtk_Logger_info(compiler->logger, "The syntactical analysis phase has started.");
-
-                resetParser(parser, tokens);
-                Module* module = parse(parser);
-                compiler->modules[i] = module;
-
-                jtk_Logger_info(compiler->logger, "The syntactical analysis phase is complete.");
-
-                if (compiler->dumpNodes) {
-                    // TODO
+                    if (compiler->dumpNodes) {
+                        // TODO
+                    }
                 }
             }
 
@@ -499,7 +494,7 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
     else {
         initialize(compiler);
         buildAST(compiler);
-        if ((noErrors = (compiler->errorHandler->errors->m_size == 0))) {
+        if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
             analyze(compiler);
 
             if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
@@ -507,7 +502,6 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
             }
         }
     }
-
 
     if (compiler->footprint) {
         int32_t footprint = k_Memory_getFootprint();

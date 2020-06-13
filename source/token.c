@@ -17,6 +17,127 @@
 #include <jtk/core/CString.h>
 #include <kush/token.h>
 
+char tokenNames[][25] = {
+    "<unknown>",
+
+    "<whitespace>",
+    "<newline>",
+    "<eof>",
+
+    "!=",
+    "!",
+
+    "@",
+
+    "#",
+
+    "%=",
+    "%",
+
+    "&&",
+    "&=",
+    "&",
+
+    "(",
+    ")",
+
+    "*=",
+    "*",
+
+    "++",
+    "+=",
+    "+",
+
+    ",",
+
+    "--",
+    "->",
+    "-=",
+    "-",
+
+    "...",
+    ".",
+
+    "<single_line_comment>",
+    "<multiline_comment>",
+    "/=",
+    "/",
+
+    ":",
+    ";",
+
+    "<<=",
+    "<<",
+    "<=",
+    "<",
+
+    ">>=",
+    ">>",
+    ">=",
+    ">",
+
+    "==",
+    "=",
+
+    "?",
+
+    "{",
+    "}",
+
+    "[",
+    "]",
+
+    "^=",
+    "^",
+
+    "||",
+    "|=",
+    "|",
+
+    "~=",
+    "~",
+
+    "<identifier>",
+
+    "boolean",
+    "break",
+    "catch",
+    "else",
+    "f32",
+    "f64",
+    "false",
+    "finally",
+    "for",
+    "i16",
+    "i32",
+    "i64",
+    "i8",
+    "if",
+    "import",
+    "let",
+    "native",
+    "new",
+    "null",
+    "return",
+    "struct",
+    "this",
+    "throw",
+    "true",
+    "try",
+    "ui16",
+    "ui32",
+    "ui64",
+    "ui8",
+    "var",
+    "void",
+    "with",
+    "while",
+
+    "<integer_literal>",
+    "<string_literal>",
+    "<floating_point_literal>"
+};
+
 Token* newToken(
     TokenChannel channel,
     TokenType type,
@@ -178,7 +299,6 @@ bool k_TokenType_isAssignmentOperator(TokenType type) {
     return (type == TOKEN_EQUAL) ||
            (type == TOKEN_MODULUS_EQUAL) ||
            (type == TOKEN_AMPERSAND_EQUAL) ||
-           (type == TOKEN_ASTERISK_2_EQUAL) ||
            (type == TOKEN_ASTERISK_EQUAL) ||
            (type == TOKEN_PLUS_EQUAL) ||
            (type == TOKEN_DASH_EQUAL) ||
