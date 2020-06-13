@@ -696,6 +696,7 @@ Type* parseTypeEx(Parser* parser, bool includeVoid) {
     if (token != NULL) {
         int32_t dimensions = 0;
         while (la(parser, 1) == TOKEN_LEFT_SQUARE_BRACKET) {
+            consume(parser);
             dimensions++;
             match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
         }
@@ -934,10 +935,6 @@ Context* parseSimpleStatement(Parser* parser) {
     else {
         switch (la1) {
             case TOKEN_SEMICOLON: {
-                /* Match and discard the ';' token. An empty statement is not part
-                 * of the AST.
-                 */
-                match(parser, TOKEN_SEMICOLON);
                 break;
             }
 
@@ -953,6 +950,11 @@ Context* parseSimpleStatement(Parser* parser) {
 
             case TOKEN_KEYWORD_THROW: {
                 result = parseThrowStatement(parser);
+                break;
+            }
+
+            default: {
+                printf("[internal error] Control should not reach here.\n");
                 break;
             }
         }
@@ -1312,14 +1314,15 @@ Structure* parseStructureDeclaration(Parser* parser) {
     match(parser, TOKEN_LEFT_BRACE);
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
 
-    do {
+    while (isType(la(parser, 1))) {
         pushFollowToken(parser, TOKEN_SEMICOLON);
+
         VariableDeclaration* declaration = parseVariableDeclaration(parser, true, false); // typed, expression
-        match(parser, TOKEN_SEMICOLON);
-        popFollowToken(parser);
         jtk_ArrayList_add(context->variables, declaration);
+        match(parser, TOKEN_SEMICOLON);
+
+        popFollowToken(parser);
     }
-    while (isType(la(parser, 1)));
 
     popFollowToken(parser);
     match(parser, TOKEN_RIGHT_BRACE);
