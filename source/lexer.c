@@ -745,7 +745,7 @@ Token* nextToken(Lexer* lexer) {
                  *       Therefore, we directly invoke newToken().
                  */
                 Token* newlineToken = newToken(
-                    TOKEN_CHANNEL_DEFAULT,
+                    TOKEN_CHANNEL_HIDDEN,
                     TOKEN_NEWLINE,
                     "\n",
                     1,
