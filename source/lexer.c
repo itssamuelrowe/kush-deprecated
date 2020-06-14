@@ -1690,6 +1690,9 @@ Token* nextToken(Lexer* lexer) {
                         if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_STRUCT], 6)) {
                             lexer->type = TOKEN_KEYWORD_STRUCT;
                         }
+                        else if (jtk_CString_equals(text, length, k_Lexer_literalNames[(int32_t)TOKEN_KEYWORD_STRING], 6)) {
+                            lexer->type = TOKEN_KEYWORD_STRING;
+                        }
                         break;
                     }
                     case 't' : {
