@@ -145,7 +145,7 @@ void handleSyntaxError(ErrorHandler* handler,
     TokenType expected);
 void handleLexicalError(ErrorHandler* handler,
     Lexer* lexer, ErrorCode errorCode, Token* token);
-void handleSemanticalError(ErrorHandler* handler,
+void handleSemanticError(ErrorHandler* handler,
     void* origin, ErrorCode errorCode, Token* token);
 void handleGeneralError(ErrorHandler* handler,
     void* origin, ErrorCode errorCode);

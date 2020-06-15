@@ -39,6 +39,7 @@
 #include <kush/lexer.h>
 #include <kush/parser.h>
 #include <kush/error-handler.h>
+#include <kush/analyzer.h>
 
 // Error
 
@@ -46,13 +47,12 @@ void printErrors(Compiler* compiler);
 
 // Phase
 
-void initialize(Compiler* compiler);
-void buildAST(Compiler* compiler);
-void analyze(Compiler* compiler);
-void generate(Compiler* compiler);
-void k_Compiler_destroyScope(Scope* scope);
-void printToken(Token* token);
-void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
+static void initialize(Compiler* compiler);
+static void buildAST(Compiler* compiler);
+static void analyze(Compiler* compiler);
+static void generate(Compiler* compiler);
+static void printToken(Token* token);
+static void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
 
 // Token
 
@@ -239,6 +239,7 @@ void printErrors(Compiler* compiler) {
 
 void initialize(Compiler* compiler) {
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
+    compiler->modules = allocate(Module*, size);
     compiler->packages = allocate(uint8_t* , size);
     compiler->packageSizes = allocate(int32_t, size);
 }
@@ -283,7 +284,7 @@ void buildAST(Compiler* compiler) {
                 if (previousLexicalErrors == currentLexicalErrors) {
                     resetParser(parser, tokens);
                     Module* module = parse(parser);
-                    // compiler->modules[i] = module;
+                    compiler->modules[i] = module;
 
                     if (compiler->dumpNodes) {
                         // TODO
@@ -305,21 +306,24 @@ void buildAST(Compiler* compiler) {
 }
 
 void analyze(Compiler* compiler) {
+    Analyzer* analyzer = newAnalyzer();
+
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
         compiler->currentFileIndex = i;
         Module* module = compiler->modules[i];
-        // definition
+        defineSymbols(analyzer, module);
     }
 
-    for (i = 0; i < size; i++) {
-        compiler->currentFileIndex = i;
-        Module* module = compiler->modules[i];
-        // resolution
-    }
+    // for (i = 0; i < size; i++) {
+    //     compiler->currentFileIndex = i;
+    //     Module* module = compiler->modules[i];
+    //     resolveSymbols(analyzer, module);
+    // }
 
     printErrors(compiler);
+    deleteAnalyzer(analyzer);
 }
 
 void generate(Compiler* compiler) {
@@ -507,7 +511,7 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
             initialize(compiler);
             buildAST(compiler);
             if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
-                // analyze(compiler);
+                analyze(compiler);
 
                 // if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
                 //     generate(compiler);

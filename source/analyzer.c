@@ -144,30 +144,9 @@ void importDefaults(Analyzer* analyzer) {
 
 // Define
 
-void defineSymbols(Analyzer* analyzer, Module* module) {
-    module->scope = scopeForModule();
-    analyzer->scope = module->scope;
-
-    int32_t structureCount = jtk_ArrayList_getSize(module->structures);
-    int32_t j;
-    for (j = 0; j < structureCount; j++) {
-        Structure* structure = (Structure*)jtk_ArrayList_getValue(
-            module->structures, j);
-        defineStructure(analyzer, structure);
-    }
-
-    int32_t functionCount = jtk_ArrayList_getSize(module->functions);
-    int32_t i;
-    for (i = 0; i < functionCount; i++) {
-        Function* function = (Function*)jtk_ArrayList_getValue(
-            module->functions, i);
-        defineFunction(analyzer, function);
-    }
-}
-
 void defineStructure(Analyzer* analyzer, Structure* structure) {
     structure->scope = scopeForStructure(analyzer->scope);
-    scopeAddStructure(analyzer->scope, structure);
+    // scopeAddStructure(analyzer->scope, structure);
 
     int32_t limit = jtk_ArrayList_getSize(structure->variables);
     int32_t i;
@@ -175,26 +154,26 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
         Variable* variable =
             (Variable*)jtk_ArrayList_getValue(structure->variables, i);
         variable->parent = structure->scope;
-        scopeAddVariable(structure->scope, variable);
+        // scopeAddVariable(structure->scope, variable);
     }
 }
 
 void defineFunction(Analyzer* analyzer, Function* function) {
     function->scope = analyzer->scope =
-        Scope_forFunction(analyzer->scope);
-    Scope_addFunction(analyzer->scope, function);
+        scopeForFunction(analyzer->scope);
+    // scopeAddFunction(analyzer->scope, function);
 
     Scope* scope = defineLocals(analyzer, function->body);
     int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
     int32_t i;
     for (i = 0; i < parameterCount; i++) {
         Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
-        Scope_addVariable(scope, parameter);
+        // scopeAddVariable(scope, parameter);
     }
 }
 
 Scope* defineLocals(Analyzer* analyzer, Block* block) {
-    block->scope = analyzer->scope = Scope_forLocal(analyzer->scope);
+    block->scope = analyzer->scope = scopeForLocal(analyzer->scope);
 
     int32_t limit = jtk_ArrayList_getSize(block->statements);
     int32_t i;
@@ -205,11 +184,11 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
             case CONTEXT_ITERATIVE_STATEMENT: {
                 IterativeStatement* statement = (IterativeStatement*)context;
                 if (statement->label != NULL) {
-                    scopeAddLabel(analyzer->scope, &statement->label);
+                    // scopeAddLabel(analyzer->scope, &statement->label);
                 }
                 Scope* localScope = defineLocals(analyzer, statement->body);
                 if (statement->parameter != NULL) {
-                    scopeAddVariable(localScope, statement->parameter);
+                    // scopeAddVariable(localScope, statement->parameter);
                 }
 
                 break;
@@ -241,7 +220,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                     CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
                         statement->catchClauses, j);
                     Scope* scope = defineLocals(analyzer, clause->body);
-                    defineVariable(analyzer, scope, clause->parameter);
+                    // defineVariable(analyzer, scope, clause->parameter);
                 }
 
                 if (statement->finallyClause != NULL) {
@@ -258,7 +237,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                 for (j = 0; j < count; j++) {
                     Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
-                    defineVariable(analyzer->scope, variable);
+                    // defineVariable(analyzer->scope, variable);
                 }
                 break;
             }
@@ -267,6 +246,8 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
 
     analyzer->scope = analyzer->scope->parent;
 }
+
+// Resolve
 
 uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
     int32_t identifierCount = jtk_ArrayList_getSize(identifiers);
@@ -280,48 +261,10 @@ uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
         }
     }
 
-    uint8_t* result = jtk_StringBuilderoCString(builder, size);
+    uint8_t* result = jtk_StringBuilder_toCString(builder, size);
     jtk_StringBuilder_delete(builder);
 
     return result;
-}
-
-void resolve(Analyzer* analyzer, Module* module) {
-    Compiler* compiler = analyzer->compiler;
-    ErrorHandler* handler = compiler->errorHandler;
-
-    analyzer->scope = module->scope;
-    if (!analyzer->compiler->coreApi) {
-        importDefaults(analyzer);
-    }
-
-    int32_t importCount = jtk_ArrayList_getSize(module->imports);
-    int32_t i;
-    for (i = 0; i < importCount; i++) {
-        ImportDeclaration* declaration = (ImportDeclaration*)jtk_ArrayList_getValue(
-            module->imports, i);
-        int32_t size;
-        uint8_t* name = getModuleName(declaration->identifiers, &size);
-
-        // If a module was previously imported, we should'nt complain.
-        Module* newModule = NULL; // import(analyzer, name, size, declaration->wildcard);
-        if (newModule == NULL) {
-            Token* lastToken = (Token*)jtk_ArrayList_getValue(declaration->identifiers, -1);
-            reportError(analyzer, ERROR_UNKNOWN_MODULE, lastToken);
-        }
-        else {
-            // TODO
-        }
-
-        jtk_CString_delete(name);
-    }
-
-    int32_t functionCount = jtk_ArrayList_getSize(module->functions);
-    for (i = 0; i < functionCount; i++) {
-        Function* function = (Function*)jtk_ArrayList_getValue(
-            module->functions, i);
-        resolveLocals(analyzer, function->body);
-    }
 }
 
 Scope* resolveLocals(Analyzer* analyzer, Block* block) {
@@ -336,11 +279,11 @@ Scope* resolveLocals(Analyzer* analyzer, Block* block) {
             case CONTEXT_ITERATIVE_STATEMENT: {
                 IterativeStatement* statement = (IterativeStatement*)context;
                 if (statement->label != NULL) {
-                    scopeAddLabel(analyzer->scope, &statement->label);
+                    // scopeAddLabel(analyzer->scope, &statement->label);
                 }
                 Scope* localScope = resolveLocals(analyzer, statement->body);
                 if (statement->parameter != NULL) {
-                    scopeAddVariable(localScope, statement->parameter);
+                    // scopeAddVariable(localScope, statement->parameter);
                 }
 
                 break;
@@ -372,7 +315,7 @@ Scope* resolveLocals(Analyzer* analyzer, Block* block) {
                     CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
                         statement->catchClauses, j);
                     Scope* localScope = resolveLocals(analyzer, clause->body);
-                    defineVariable(analyzer, localScope, clause->parameter);
+                    // defineVariable(analyzer, localScope, clause->parameter);
                 }
 
                 if (statement->finallyClause != NULL) {
@@ -389,7 +332,7 @@ Scope* resolveLocals(Analyzer* analyzer, Block* block) {
                 for (j = 0; j < count; j++) {
                     Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
-                    defineVariable(analyzer->scope, variable);
+                    // defineVariable(analyzer->scope, variable);
                 }
                 break;
             }
@@ -400,6 +343,8 @@ Scope* resolveLocals(Analyzer* analyzer, Block* block) {
 }
 
 Type* resolveExpression(Analyzer* analyzer, Context* context) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+
     switch (context->tag) {
         case CONTEXT_RELATIONAL_EXPRESSION:
         case CONTEXT_EQUALITY_EXPRESSION: {
@@ -413,11 +358,13 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 Type* rightType = resolveExpression(analyzer, pair->m_right);
 
                 if (leftType != rightType) {
-                    reportError(analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES, pair->m_left);
+                    handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES, pair->m_left);
                 }
             }
             else if (count > 1) {
-                reportError(analyzer, ERROR_COMBINING_EQUALITY_OPERATORS);
+                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(
+                    expression->others, 1);
+                handleSemanticError(handler, analyzer, ERROR_CANNOT_COMBINE_EQUALITY_OPERATORS, pair->m_left);
             }
 
             break;
@@ -443,7 +390,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 Type* rightType = resolveExpression(analyzer, pair->m_right);
 
                 if (leftType != rightType) {
-                    reportError(analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES, pair->m_left);
+                    handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES, pair->m_left);
                 }
             }
 
@@ -458,17 +405,17 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 TokenType token = operator->type;
                 if ((token == TOKEN_PLUS) || (token == TOKEN_DASH)) {
                     if ((type->tag != TYPE_INTEGER) && (type->tag != TYPE_DECIMAL)) {
-                        reportError(analyzer, ERROR_INCOMPATIBLE_OPERAND, operator);
+                        handleSemanticError(handler, analyzer, ERROR_INVALID_OPERAND, operator);
                     }
                 }
                 else if (token == TOKEN_TILDE) {
                     if (type->tag != TYPE_INTEGER) {
-                        reportError(analyzer, ERROR_INCOMPATIBLE_OPERAND, operator);
+                        handleSemanticError(handler, analyzer, ERROR_INVALID_OPERAND, operator);
                     }
                 }
                 else if (token == TOKEN_EXCLAMATION_MARK) {
                     if (type->tag != TYPE_BOOLEAN) {
-                        reportError(analyzer, ERROR_INCOMPATIBLE_OPERAND, operator);
+                        handleSemanticError(handler, analyzer, ERROR_INVALID_OPERAND, operator);
                     }
                 }
                 else {
@@ -482,7 +429,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
         case CONTEXT_POSTFIX_EXPRESSION: {
             PostfixExpression* expression = (PostfixExpression*)context;
             Type* type = expression->token?
-                resolveTokenType(analyzer, (Token*)expression->primary) :
+                resolveToken(analyzer, (Token*)expression->primary) :
                 resolveExpression(analyzer, expression->primary);
 
             Type* previous = type;
@@ -497,14 +444,14 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                     Subscript* subscript = (Subscript*)postfix;
                     resolveExpression(analyzer, subscript->expression);
                     if (!previous->indexable) {
-                        reportError(analyzer, ERROR_INVALID_LEFT_OPERAND,
+                        handleSemanticError(handler, analyzer, ERROR_INVALID_LEFT_OPERAND,
                             subscript->bracket);
                     }
                 }
                 else if (postfix->tag == CONTEXT_FUNCTION_ARGUMENTS) {
                     FunctionArguments* arguments = (FunctionArguments*)postfix;
                     if (!previous->callable) {
-                        reportError(analyzer, ERROR_INVALID_FUNCTION_INVOCATION,
+                        handleSemanticError(handler, analyzer, ERROR_NON_CALLABLE_TYPE,
                             arguments->parenthesis);
                     }
                     int32_t j;
@@ -517,7 +464,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 else if (postfix->tag == CONTEXT_MEMBER_ACCESS) {
                     MemberAccess* access = (MemberAccess*)postfix;
                     if (!previous->accessible) {
-                        reportError(analyzer, ERROR_INVALID_MEMBER_ACCESS,
+                        handleSemanticError(handler, analyzer, ERROR_NON_ACCESSIBLE_TYPE,
                             access->identifier);
                     }
                     // resolve the type of the member
@@ -583,7 +530,7 @@ Type* resolveToken(Analyzer* analyzer, Token* token) {
 
 // Constructor
 
-Analyzer* Analyzer_new(Compiler* compiler) {
+Analyzer* newAnalyzer(Compiler* compiler) {
     Analyzer* analyzer = allocate(Analyzer, 1);
     analyzer->compiler = compiler;
     analyzer->package = NULL;
@@ -594,23 +541,76 @@ Analyzer* Analyzer_new(Compiler* compiler) {
 
 // Destructor
 
-void Analyzer_delete(Analyzer* analyzer) {
-    jtAssert_assertObject(analyzer, "The specified analyzer is null.");
+void deleteAnalyzer(Analyzer* analyzer) {
+    jtk_Assert_assertObject(analyzer, "The specified analyzer is null.");
 
-    jtMemory_deallocate(analyzer);
-}
-
-// Analyze
-
-void Analyzer_analyze(Analyzer* analyzer, Module* module) {
-    defineSymbols(analyzer, module);
-    resolveSymbols(analyzer, module);
+    deallocate(analyzer);
 }
 
 // Reset
 
-void Analyzer_reset(Analyzer* analyzer,
-    const uint8_t* package, int32_t packageSize) {
-    analyzer->package = package;
-    analyzer->packageSize = packageSize;
+void resetAnalyzer(Analyzer* analyzer) {
+}
+
+// Define
+
+void defineSymbols(Analyzer* analyzer, Module* module) {
+    module->scope = scopeForModule();
+    analyzer->scope = module->scope;
+
+    int32_t structureCount = jtk_ArrayList_getSize(module->structures);
+    int32_t j;
+    for (j = 0; j < structureCount; j++) {
+        Structure* structure = (Structure*)jtk_ArrayList_getValue(
+            module->structures, j);
+        defineStructure(analyzer, structure);
+    }
+
+    int32_t functionCount = jtk_ArrayList_getSize(module->functions);
+    int32_t i;
+    for (i = 0; i < functionCount; i++) {
+        Function* function = (Function*)jtk_ArrayList_getValue(
+            module->functions, i);
+        defineFunction(analyzer, function);
+    }
+}
+
+// Resolve
+
+void resolveSymbols(Analyzer* analyzer, Module* module) {
+    Compiler* compiler = analyzer->compiler;
+    ErrorHandler* handler = compiler->errorHandler;
+
+    analyzer->scope = module->scope;
+    if (!analyzer->compiler->coreApi) {
+        importDefaults(analyzer);
+    }
+
+    int32_t importCount = jtk_ArrayList_getSize(module->imports);
+    int32_t i;
+    for (i = 0; i < importCount; i++) {
+        ImportDeclaration* declaration = (ImportDeclaration*)jtk_ArrayList_getValue(
+            module->imports, i);
+        int32_t size;
+        uint8_t* name = getModuleName(declaration->identifiers, &size);
+
+        // If a module was previously imported, we should'nt complain.
+        Module* newModule = NULL; // import(analyzer, name, size, declaration->wildcard);
+        if (newModule == NULL) {
+            Token* lastToken = (Token*)jtk_ArrayList_getValue(declaration->identifiers, -1);
+            handleSemanticError(handler, analyzer, ERROR_UNKNOWN_MODULE, lastToken);
+        }
+        else {
+            // TODO
+        }
+
+        jtk_CString_delete(name);
+    }
+
+    int32_t functionCount = jtk_ArrayList_getSize(module->functions);
+    for (i = 0; i < functionCount; i++) {
+        Function* function = (Function*)jtk_ArrayList_getValue(
+            module->functions, i);
+        resolveLocals(analyzer, function->body);
+    }
 }
