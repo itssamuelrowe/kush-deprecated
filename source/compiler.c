@@ -370,7 +370,7 @@ void printHelp() {
         "    --run           Run the virtual machine after compiling the source files.\n"
         "    --log           Generate log messages. This flag is valid only if log messages were enabled at compile time.\n"
         "    --help          Print the help message.\n"
-        "    --version       Print the current version of the compiler\n"
+        "    --version       Print the current version of the compiler.\n"
         );
 }
 
@@ -416,11 +416,9 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
                 }
             }
             else if (strcmp(arguments[i], "--version") == 0) {
-                printf("kush v%d.%d\n", KUSH_VERSION_MAJOR, KUSH_VERSION_MINOR);
                 showVersion = true;
             }
             else if (strcmp(arguments[i], "--help") == 0) {
-                printHelp();
                 showHelp = true;
             }
             else if (strcmp(arguments[i], "--log") == 0) {
@@ -487,34 +485,39 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
         }
     }
 
-    if (showHelp || showVersion) {
-        return true;
+    if (showVersion) {
+        printf("kush v%d.%d\n", KUSH_VERSION_MAJOR, KUSH_VERSION_MINOR);
     }
-
-    int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
-    bool noErrors = false;
-    if (size == 0) {
-        fprintf(stderr, "[error] Please specify input files.\n");
+    else if (showHelp) {
+        printHelp();
     }
     else {
-        initialize(compiler);
-        buildAST(compiler);
-        if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
-            // analyze(compiler);
 
-            // if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
-            //     generate(compiler);
-            // }
+        int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
+        bool noErrors = false;
+        if (size == 0) {
+            fprintf(stderr, "[error] Please specify input files.\n");
         }
-    }
+        else {
+            initialize(compiler);
+            buildAST(compiler);
+            if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
+                // analyze(compiler);
 
-    if (compiler->footprint) {
-        int32_t footprint = k_Memory_getFootprint();
-        printf("Memory Footprint = %.2f KB\n", footprint / 1024.0f);
-    }
+                // if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
+                //     generate(compiler);
+                // }
+            }
+        }
 
-    if ((vmArguments != NULL) && noErrors) {
-        // TODO: Start the child process
+        if (compiler->footprint) {
+            int32_t footprint = k_Memory_getFootprint();
+            printf("Memory Footprint = %.2f KB\n", footprint / 1024.0f);
+        }
+
+        if ((vmArguments != NULL) && noErrors) {
+            // TODO: Start the child process
+        }
     }
 
     // TODO: Return true only if the compilation suceeded.
