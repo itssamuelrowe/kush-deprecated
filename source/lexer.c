@@ -745,7 +745,7 @@ Token* nextToken(Lexer* lexer) {
                  *       Therefore, we directly invoke newToken().
                  */
                 Token* newlineToken = newToken(
-                    TOKEN_CHANNEL_DEFAULT,
+                    TOKEN_CHANNEL_HIDDEN,
                     TOKEN_NEWLINE,
                     "\n",
                     1,
@@ -1689,6 +1689,9 @@ Token* nextToken(Lexer* lexer) {
                     case 's' : {
                         if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_STRUCT], 6)) {
                             lexer->type = TOKEN_KEYWORD_STRUCT;
+                        }
+                        else if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_STRING], 6)) {
+                            lexer->type = TOKEN_KEYWORD_STRING;
                         }
                         break;
                     }
