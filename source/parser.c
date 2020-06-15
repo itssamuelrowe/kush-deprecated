@@ -587,7 +587,7 @@ Module* parseModule(Parser* parser) {
         }
         else {
             Function* function = parseFunctionDeclaration(parser, 0);
-            jtk_ArrayList_add(context->structures, function);
+            jtk_ArrayList_add(context->functions, function);
         }
     }
 
@@ -782,6 +782,8 @@ Function* parseFunctionDeclaration(Parser* parser,
     else {
 	    context->body = parseBlock(parser);
     }
+
+    return context;
 }
 
 /*
@@ -880,6 +882,8 @@ Block* parseBlock(Parser* parser) {
     popFollowToken(parser);
     /* Consume and discard the '}' token. */
     match(parser, TOKEN_RIGHT_BRACE);
+
+    return context;
 }
 
 #define isPrimitiveType(token) \
@@ -983,6 +987,8 @@ Context* parseSimpleStatement(Parser* parser) {
     popFollowToken(parser);
     /* Match and discard the newline token. */
 	match(parser, TOKEN_SEMICOLON);
+
+    return result;
 }
 
 /*

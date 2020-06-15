@@ -16,8 +16,8 @@
 
 // Saturday, November 25, 2017
 
-#ifndef KUSH_SCOPE_H
-#define KUSH_SCOPE_H
+#ifndef SCOPE_H
+#define SCOPE_H
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/map/HashMap.h>
@@ -25,169 +25,50 @@
 #include <kush/configuration.h>
 
 typedef struct Context Context;
+typedef struct Module Module;
+typedef struct Structure Structure;
+typedef struct Function Function;
+typedef struct Block Block;
+typedef struct Symbol Symbol;
 
 /*******************************************************************************
  * ScopeType                                                                   *
  *******************************************************************************/
 
-/**
- * @class ScopeType
- * @ingroup k_compiler_symbolTable
- * @author Samuel Rowe
- * @since Kush 0.1
- */
-enum k_ScopeType_t {
-    KUSH_SCOPE_COMPILATION_UNIT,
-    KUSH_SCOPE_STRUCTURE,
-    KUSH_SCOPE_FUNCTION,
-    KUSH_SCOPE_LOCAL
+enum ScopeType {
+    SCOPE_MODULE,
+    SCOPE_STRUCTURE,
+    SCOPE_FUNCTION,
+    SCOPE_LOCAL
 };
 
-/**
- * @memberof ScopeType
- */
-typedef enum k_ScopeType_t k_ScopeType_t;
+typedef enum ScopeType ScopeType;
 
 /*******************************************************************************
  * Scope                                                                       *
  *******************************************************************************/
 
-/**
- * @memberof Scope
- */
+#define isCompilationUnitScope(scope) ((scope)->type == SCOPE_MODULE)
+#define isStructureScope(scope) ((scope)->type == SCOPE_STRUCTURE)
+#define isFunctionScope(scope) ((scope)->type == SCOPE_FUNCTION)
+#define isLocalScope(scope) ((scope)->type == SCOPE_LOCAL)
+
 typedef struct Scope Scope;
 
-/**
- * @class Scope
- * @ingroup k_compiler_symbolTable
- * @author Samuel Rowe
- * @since Kush 0.1
- */
 struct Scope {
-    uint8_t* name;
-    int32_t nameSize;
-    k_ScopeType_t type;
+    ScopeType type;
     Scope* parent;
-    jtk_HashMap_t* symbols;
-    int32_t nextTicket;
     Context* symbol;
+    jtk_HashMap_t* symbols;
 };
 
-// Constructor
-
-/**
- * @memberof Scope
- */
-Scope* k_Scope_new(const uint8_t* name, int32_t nameSize,
-    k_ScopeType_t type, Scope* parent, Context* symbol);
-
-/**
- * @memberof Scope
- */
-Scope* scopeForModule();
-
-/**
- * @memberof Scope
- */
-Scope* scopeForFunction(Scope* parent);
-
-/**
- * @memberof Scope
- */
-Scope* scopeForLocal(Scope* parent);
-
-/**
- * @memberof Scope
- */
-Scope* k_Scope_forClass(Scope* parent);
-
-// Destructor
-
-/**
- * @memberof Scope
- */
+Scope* newScope(ScopeType type, Scope* parent, Context* symbol);
 void deleteScope(Scope* scope);
+Scope* scopeForModule(Module* module);
+Scope* scopeForStructure(Scope* parent, Structure* structure);
+Scope* scopeForFunction(Scope* parent, Function* function);
+Scope* scopeForLocal(Scope* parent, Block* block);
+void defineSymbol(Scope* scope, Symbol* symbol);
+Symbol* resolveSymbol(Scope* scope, const uint8_t* name);
 
-// Children Symbols
-
-void getScopeChildren(Scope* scope, jtk_ArrayList_t* childrenSymbols);
-
-// Context
-
-void* k_Scope_getContext(Scope* scope);
-
-// Scope Type
-
-/**
- * @memberof Scope
- */
-bool k_Scope_isEnumerationScope(Scope* scope);
-
-/**
- * @memberof Scope
- */
-bool k_Scope_isClassScope(Scope* scope);
-
-/**
- * @memberof Scope
- */
-bool k_Scope_isFunctionScope(Scope* scope);
-
-/**
- * @memberof Scope
- */
-bool k_Scope_isCompilationUnitScope(Scope* scope);
-
-/**
- * @memberof Scope
- */
-bool k_Scope_isLocalScope(Scope* scope);
-
-// Define
-
-/**
- * @memberof Scope
- */
-void k_Scope_define(Scope* scope, Context* symbol);
-
-/**
- * @memberof Scope
- */
-void k_Scope_defineEx(Scope* scope, const uint8_t* descriptor,
-    int32_t descriptorSize, Context* symbol);
-
-// Enclosing Scope
-
-/**
- * @memberof Scope
- */
-Scope* k_Scope_getEnclosingScope(Scope* scope);
-
-// Name
-
-/**
- * @memberof Scope
- */
-const uint8_t* k_Scope_getName(Scope* scope);
-
-// Resolve
-
-/**
- * @memberof Scope
- */
-Context* k_Scope_resolve(Scope* scope, uint8_t* identifier);
-
-/**
- * @memberof Scope
- */
-Scope* k_Scope_resolveQualifiedSymbol(Scope* scope,
-    const uint8_t* name, int32_t nameSize);
-
-// Type
-
-/**
- * @memberof Scope
- */
-k_ScopeType_t k_Scope_getType(Scope* scope);
-
-#endif /* KUSH_SCOPE_H */
+#endif /* SCOPE_H */

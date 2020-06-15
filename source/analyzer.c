@@ -145,7 +145,7 @@ void importDefaults(Analyzer* analyzer) {
 // Define
 
 void defineStructure(Analyzer* analyzer, Structure* structure) {
-    structure->scope = scopeForStructure(analyzer->scope);
+    structure->scope = scopeForStructure(analyzer->scope, structure);
     // scopeAddStructure(analyzer->scope, structure);
 
     int32_t limit = jtk_ArrayList_getSize(structure->variables);
@@ -160,7 +160,7 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
 
 void defineFunction(Analyzer* analyzer, Function* function) {
     function->scope = analyzer->scope =
-        scopeForFunction(analyzer->scope);
+        scopeForFunction(analyzer->scope, function);
     // scopeAddFunction(analyzer->scope, function);
 
     Scope* scope = defineLocals(analyzer, function->body);
@@ -173,7 +173,7 @@ void defineFunction(Analyzer* analyzer, Function* function) {
 }
 
 Scope* defineLocals(Analyzer* analyzer, Block* block) {
-    block->scope = analyzer->scope = scopeForLocal(analyzer->scope);
+    block->scope = analyzer->scope = scopeForLocal(analyzer->scope, block);
 
     int32_t limit = jtk_ArrayList_getSize(block->statements);
     int32_t i;
@@ -245,6 +245,8 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
     }
 
     analyzer->scope = analyzer->scope->parent;
+
+    return NULL;
 }
 
 // Resolve
@@ -340,6 +342,8 @@ Scope* resolveLocals(Analyzer* analyzer, Block* block) {
     }
 
     analyzer->scope = analyzer->scope->parent;
+
+    return NULL;
 }
 
 Type* resolveExpression(Analyzer* analyzer, Context* context) {
@@ -485,6 +489,8 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
             break;
         }
     }
+
+    return NULL;
 }
 
 Type* resolveToken(Analyzer* analyzer, Token* token) {
@@ -555,7 +561,7 @@ void resetAnalyzer(Analyzer* analyzer) {
 // Define
 
 void defineSymbols(Analyzer* analyzer, Module* module) {
-    module->scope = scopeForModule();
+    module->scope = scopeForModule(module);
     analyzer->scope = module->scope;
 
     int32_t structureCount = jtk_ArrayList_getSize(module->structures);

@@ -497,6 +497,7 @@ void deleteCatchClause(CatchClause* self) {
 Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
     BinaryExpression* expression, Scope* parent) {
     Variable* result = allocate(Variable, 1);
+    result->tag = CONTEXT_VARIABLE;
     result->infer = false;
     result->constant = false;
     result->type = NULL;

@@ -616,7 +616,7 @@ k_Symbol_t* k_SymbolLoader_parse(SymbolLoader* loader, uint8_t* bytes,
 
                 k_ConstantPoolUtf8_t* descriptor = loader->constantPool.entries[reference];
 
-                Scope* classScope = k_Scope_forClass(NULL);
+                Scope* classScope = scopeForStructure(NULL);
                 loader->symbol = k_Symbol_forClassAlt( classScope, descriptor->bytes,
                     descriptor->length);
                 classScope->symbol = loader->symbol;

@@ -110,6 +110,8 @@ enum ContextType {
 
     CONTEXT_VARIABLE_DECLARATION,
 
+    CONTEXT_VARIABLE,
+
     CONTEXT_BREAK_STATEMENT,
 
     CONTEXT_RETURN_STATEMENT,
@@ -176,6 +178,16 @@ struct Context {
 };
 
 typedef struct Context Context;
+
+/*******************************************************************************
+ * Symbol                                                                      *
+ *******************************************************************************/
+
+struct Symbol {
+    ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
+};
 
 /*******************************************************************************
  * Module                                                                      *
@@ -379,6 +391,8 @@ void deleteFunctionParameter(FunctionParameter* self);
 
 struct Function {
     ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
     Token* identifier;
     jtk_ArrayList_t* parameters;
     FunctionParameter* variableParameter;
@@ -398,6 +412,8 @@ void deleteFunction(Function* self);
 
 struct Structure {
     ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
     Token* identifier;
     jtk_ArrayList_t* variables;
     Type* type;
@@ -500,6 +516,9 @@ void deleteCatchClause(CatchClause* self);
  * Not part of the AST.
  */
 struct Variable {
+    ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
     bool infer;
     bool constant;
     Type* type;
