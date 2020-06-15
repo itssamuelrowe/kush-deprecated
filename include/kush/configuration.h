@@ -31,7 +31,7 @@
  */
 #ifndef JTK_LOGGER_DISABLE
     // #define JTK_LOGGER_DISABLE
- #endif
+#endif
 
 #include <jtk/Configuration.h>
 
