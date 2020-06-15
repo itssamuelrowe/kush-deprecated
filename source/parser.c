@@ -382,11 +382,17 @@ Token* matchAndYield(Parser* parser, TokenType type) {
 #define isComponentFollow(token) \
     (token == TOKEN_KEYWORD_STRUCT) || isReturnType(token)
 
+// TODO: Add the string keyword.
 #define isType(token) \
+    (token == TOKEN_KEYWORD_BOOLEAN) || \
     (token == TOKEN_KEYWORD_I8) || \
     (token == TOKEN_KEYWORD_I16) || \
     (token == TOKEN_KEYWORD_I32) || \
     (token == TOKEN_KEYWORD_I64) || \
+    (token == TOKEN_KEYWORD_UI8) || \
+    (token == TOKEN_KEYWORD_UI16) || \
+    (token == TOKEN_KEYWORD_UI32) || \
+    (token == TOKEN_KEYWORD_UI64) || \
     (token == TOKEN_KEYWORD_F32) || \
     (token == TOKEN_KEYWORD_F64) || \
     (token == TOKEN_IDENTIFIER)
@@ -399,6 +405,7 @@ Token* matchAndYield(Parser* parser, TokenType type) {
     (type == TOKEN_KEYWORD_BREAK) || \
     (type == TOKEN_KEYWORD_RETURN) || \
     (type == TOKEN_KEYWORD_THROW) || \
+    isType(type) || \
     isExpressionFollow(type)
 
 
@@ -854,7 +861,7 @@ Block* parseBlock(Parser* parser) {
      */
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
 
-    do {
+    while (true) {
         TokenType la1 = la(parser, 1);
         if (isSimpleStatementFollow(la1)) {
             Context* statement = parseSimpleStatement(parser);
@@ -864,8 +871,10 @@ Block* parseBlock(Parser* parser) {
             Context* statement = parseCompoundStatement(parser);
             jtk_ArrayList_add(context->statements, statement);
         }
+        else {
+            break;
+        }
     }
-    while (isStatementFollow(la(parser, 1)));
 
     /* Pop the '}' token from the follow set. */
     popFollowToken(parser);
@@ -886,6 +895,7 @@ bool followVariableDeclaration(Parser* parser) {
     TokenType la1 = la(parser, 1);
     return (la1 == TOKEN_KEYWORD_LET) ||
            (la1 == TOKEN_KEYWORD_VAR) ||
+           isType(la1) ||
            ((la1 == TOKEN_IDENTIFIER) &&
             (((la(parser, 2) == TOKEN_LEFT_SQUARE_BRACKET) && (la(parser, 3) == TOKEN_RIGHT_SQUARE_BRACKET)) ||
             (la(parser, 2) == TOKEN_IDENTIFIER)));
