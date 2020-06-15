@@ -120,6 +120,7 @@ char tokenNames[][25] = {
     "null",
     "return",
     "struct",
+    "string",
     "this",
     "throw",
     "true",

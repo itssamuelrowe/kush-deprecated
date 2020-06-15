@@ -1614,7 +1614,7 @@ Token* nextToken(Lexer* lexer) {
                         break;
                     }
 
-                    case 'd' : {
+                    case 'e' : {
                         if (jtk_CString_equals(text, length, tokenNames[(int32_t)TOKEN_KEYWORD_ELSE], 4)) {
                             lexer->type = TOKEN_KEYWORD_ELSE;
                         }
