@@ -882,6 +882,19 @@ Block* parseBlock(Parser* parser) {
     match(parser, TOKEN_RIGHT_BRACE);
 }
 
+#define isPrimitiveType(token) \
+    (token == TOKEN_KEYWORD_BOOLEAN) || \
+    (token == TOKEN_KEYWORD_I8) || \
+    (token == TOKEN_KEYWORD_I16) || \
+    (token == TOKEN_KEYWORD_I32) || \
+    (token == TOKEN_KEYWORD_I64) || \
+    (token == TOKEN_KEYWORD_UI8) || \
+    (token == TOKEN_KEYWORD_UI16) || \
+    (token == TOKEN_KEYWORD_UI32) || \
+    (token == TOKEN_KEYWORD_UI64) || \
+    (token == TOKEN_KEYWORD_F32) || \
+    (token == TOKEN_KEYWORD_F64)
+
 /* The parser needs to look ahead 3 tokens to differentiate between variable
  * declarations and expressions, recognizing an LL(3) grammar.
  *
@@ -895,7 +908,7 @@ bool followVariableDeclaration(Parser* parser) {
     TokenType la1 = la(parser, 1);
     return (la1 == TOKEN_KEYWORD_LET) ||
            (la1 == TOKEN_KEYWORD_VAR) ||
-           isType(la1) ||
+           isPrimitiveType(la1) ||
            ((la1 == TOKEN_IDENTIFIER) &&
             (((la(parser, 2) == TOKEN_LEFT_SQUARE_BRACKET) && (la(parser, 3) == TOKEN_RIGHT_SQUARE_BRACKET)) ||
             (la(parser, 2) == TOKEN_IDENTIFIER)));
