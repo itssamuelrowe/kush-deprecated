@@ -151,7 +151,6 @@ bool isUndefined(Scope* scope, const uint8_t* identifier) {
 void defineStructure(Analyzer* analyzer, Structure* structure) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
 
-    structure->scope = scopeForStructure(analyzer->scope, structure);
     if (isUndefined(analyzer->scope, structure->name)) {
         defineSymbol(analyzer->scope, structure);
     }
@@ -159,6 +158,8 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
         handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_STRUCTURE,
             structure->identifier);
     }
+
+    structure->scope = scopeForStructure(analyzer->scope, structure);
 
     int32_t limit = jtk_ArrayList_getSize(structure->variables);
     int32_t i;
@@ -171,21 +172,39 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
 }
 
 void defineFunction(Analyzer* analyzer, Function* function) {
-    function->scope = analyzer->scope =
-        scopeForFunction(analyzer->scope, function);
-    defineSymbol(analyzer->scope, function);
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+
+    if (isUndefined(analyzer->scope, function->name)) {
+        defineSymbol(analyzer->scope, function);
+    }
+    else {
+        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_FUNCTION,
+            function->identifier);
+    }
+
+    function->scope = scopeForFunction(analyzer->scope, function);
+    analyzer->scope = function->scope;
 
     Scope* scope = defineLocals(analyzer, function->body);
-    int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
-    int32_t i;
-    for (i = 0; i < parameterCount; i++) {
-        Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
-        defineSymbol(scope, parameter);
-    }
+    // int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
+    // int32_t i;
+    // for (i = 0; i < parameterCount; i++) {
+    //     Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
+    //     defineSymbol(scope, parameter);
+    // }
+
+    analyzer->scope = analyzer->scope->parent;
+}
+
+void defineLocal(Analyzer* analyzer, Context* symbol) {
+
 }
 
 Scope* defineLocals(Analyzer* analyzer, Block* block) {
-    block->scope = analyzer->scope = scopeForLocal(analyzer->scope, block);
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+
+    block->scope = scopeForLocal(analyzer->scope, block);
+    analyzer->scope = block->scope;
 
     int32_t limit = jtk_ArrayList_getSize(block->statements);
     int32_t i;
@@ -233,7 +252,15 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                     CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
                         statement->catchClauses, j);
                     Scope* localScope = defineLocals(analyzer, clause->body);
-                    defineSymbol(localScope, clause->parameter);
+
+                    // TODO: Convert catch parameter to variable.
+                    // if (isUndefined(localScope, clause->identifier->text)) {
+                    //     defineSymbol(localScope, clause->parameter);
+                    // }
+                    // else {
+                    //     handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_CATCH_PARAMETER,
+                    //         clause->identifier);
+                    // }
                 }
 
                 if (statement->finallyClause != NULL) {
@@ -250,7 +277,13 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                 for (j = 0; j < count; j++) {
                     Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
-                    defineSymbol(analyzer->scope, variable);
+                    if (isUndefined(analyzer->scope, variable->name)) {
+                        defineSymbol(analyzer->scope, variable);
+                    }
+                    else {
+                        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_VARIABLE,
+                            variable->identifier);
+                    }
                 }
                 break;
             }
@@ -592,6 +625,8 @@ void defineSymbols(Analyzer* analyzer, Module* module) {
             module->functions, i);
         defineFunction(analyzer, function);
     }
+
+    analyzer->scope = analyzer->scope->parent;
 }
 
 // Resolve

@@ -57,7 +57,7 @@ Scope* scopeForLocal(Scope* parent, Block* block) {
 }
 
 void defineSymbol(Scope* scope, Symbol* symbol) {
-    bool result = jtk_HashMap_putStrictly(scope->symbols, symbol->name, &symbol->nameSize);
+    bool result = jtk_HashMap_putStrictly(scope->symbols, symbol->name, symbol);
     if (!result) {
         fprintf(stderr, "[internal error] defineSymbol() invoked to redefine a symbol.\n");
     }
@@ -67,7 +67,7 @@ Symbol* resolveSymbol(Scope* scope, const uint8_t* name) {
     Scope* current = scope;
     Symbol* result = NULL;
     while ((current != NULL) && (result == NULL)) {
-        result = jtk_HashMap_getValue(scope->symbols, (Context*)name);
+        result = jtk_HashMap_getValue(current->symbols, (void*)name);
         current = current->parent;
     }
     return result;

@@ -372,12 +372,18 @@ Token* matchAndYield(Parser* parser, TokenType type) {
 
 #define isReturnType(token) \
     (token == TOKEN_KEYWORD_VOID) || \
+    (token == TOKEN_KEYWORD_BOOLEAN) || \
     (token == TOKEN_KEYWORD_I8) || \
     (token == TOKEN_KEYWORD_I16) || \
     (token == TOKEN_KEYWORD_I32) || \
     (token == TOKEN_KEYWORD_I64) || \
+    (token == TOKEN_KEYWORD_UI8) || \
+    (token == TOKEN_KEYWORD_UI16) || \
+    (token == TOKEN_KEYWORD_UI32) || \
+    (token == TOKEN_KEYWORD_UI64) || \
     (token == TOKEN_KEYWORD_F32) || \
     (token == TOKEN_KEYWORD_F64) || \
+    (token == TOKEN_KEYWORD_STRING) || \
     (token == TOKEN_IDENTIFIER)
 
 #define isComponentFollow(token) \
@@ -396,6 +402,7 @@ Token* matchAndYield(Parser* parser, TokenType type) {
     (token == TOKEN_KEYWORD_UI64) || \
     (token == TOKEN_KEYWORD_F32) || \
     (token == TOKEN_KEYWORD_F64) || \
+    (token == TOKEN_KEYWORD_STRING) || \
     (token == TOKEN_IDENTIFIER)
 
 // expressionStatement (includes IDENTIFIER, which may lead to variableDeclaration, too!)
@@ -409,7 +416,6 @@ Token* matchAndYield(Parser* parser, TokenType type) {
     isType(type) || \
     isExpressionFollow(type)
 
-
 #define isCompoundStatementFollow(type) \
     (type == TOKEN_KEYWORD_IF) || \
     (type == TOKEN_HASH) || \
@@ -417,9 +423,8 @@ Token* matchAndYield(Parser* parser, TokenType type) {
     (type == TOKEN_KEYWORD_FOR) || \
     (type == TOKEN_KEYWORD_TRY)
 
-
-
 #define isStatementFollow(type) isSimpleStatementFollow(type) || isCompoundStatementFollow(type)
+
 #define isExpressionFollow(type) isUnaryExpressionFollow(type)
 
 /*
@@ -823,7 +828,7 @@ void parseFunctionParameters(Parser* parser,
                 match(parser, TOKEN_COMMA);
             }
 
-            // TODO: Make FunctionParameter a symbol.
+            // TODO: Convert FunctionParameter to Variable.
             FunctionParameter* parameter = newFunctionParameter();
             parameter->type = parseType(parser);
             if (la(parser, 1) == TOKEN_ELLIPSIS) {
