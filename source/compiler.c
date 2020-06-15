@@ -77,7 +77,7 @@ void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens) {
     int32_t limit = jtk_ArrayList_getSize(tokens);
     int32_t i;
     for (i = 0; i < limit; i++) {
-        Token* token = (Token*)jtk_ArrayList_getValue(tokens, i);
+        Token* token = (Token* )jtk_ArrayList_getValue(tokens, i);
         TokenChannel channel = k_Token_getChannel(token);
         if (channel == TOKEN_CHANNEL_DEFAULT) {
             defaultChannel++;
@@ -93,10 +93,9 @@ void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens) {
     fflush(stdout);
     fprintf(stdout, "[info] %d tokens were recognized on the default channel.\n", defaultChannel);
     fprintf(stdout, "[info] %d tokens were recognized on the hidden channel.\n", hiddenChannel);
-    fprintf(stdout, "[info] %d tokens were recognized on other channels.%s\n", otherChannel, (otherChannel > 0)? " This is surprising to me." : "");
+    fprintf(stdout, "[info] %d tokens were recognized on other channels.%s\n", otherChannel, (otherChannel > 0) ? " This is surprising to me." : "");
     fprintf(stdout, "[info] %d tokens were recognized in total.\n", limit);
 }
-
 
 /******************************************************************************
  * PathHelper                                                                 *
@@ -113,7 +112,7 @@ bool jtk_PathHelper_exists(const uint8_t* path) {
     int32_t result = fstat(path, &buffer);
     return result == 0 && S_ISREG(buffer.st_mode);
     */
-   return true;
+    return true;
 }
 
 #define JTK_FILE_OPEN_MODE_BUFFERED (1 << 0)
@@ -140,14 +139,14 @@ jtk_InputStream_t* jtk_PathHelper_readEx(const uint8_t* path, uint32_t flags) {
 }
 
 uint8_t* jtk_PathHelper_getParent(const uint8_t* path, int32_t size,
-    int32_t* resultSize) {
-    size = size < 0? jtk_CString_getSize(path) : size;
+                                  int32_t* resultSize) {
+    size = size < 0 ? jtk_CString_getSize(path) : size;
 
     int32_t index = jtk_CString_findLast_c(path, size, JTK_PATH_ELEMENT_SEPARATOR);
     if (resultSize != NULL) {
-        *resultSize = index < 0? 0 : index;
+        *resultSize = index < 0 ? 0 : index;
     }
-    return index < 0? NULL : jtk_CString_substringEx(path, size, 0, index);
+    return index < 0 ? NULL : jtk_CString_substringEx(path, size, 0, index);
 }
 
 /******************************************************************************
@@ -228,14 +227,14 @@ void printErrors(Compiler* compiler) {
             message = message0;
         }
         fprintf(stderr, "\033[1;31m[error]\033[0m %s:%s:%d-%d: %s\n",
-            token->file, lineNumbers, token->startColumn,
-            token->stopColumn, message);
+                token->file, lineNumbers, token->startColumn,
+                token->stopColumn, message);
     }
 }
 
 void initialize(Compiler* compiler) {
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
-    compiler->packages = allocate(uint8_t*, size);
+    compiler->packages = allocate(uint8_t* , size);
     compiler->packageSizes = allocate(int32_t, size);
 }
 
@@ -342,7 +341,7 @@ void generate(Compiler* compiler) {
 }
 
 jtk_ArrayList_t* k_CString_split_c(const uint8_t* sequence, int32_t size,
-    uint8_t value, bool inclusive) {
+                                   uint8_t value, bool inclusive) {
     jtk_ArrayList_t* result = jtk_ArrayList_new();
     int32_t i;
     for (i = 0; i < size; i++) {
@@ -352,7 +351,7 @@ jtk_ArrayList_t* k_CString_split_c(const uint8_t* sequence, int32_t size,
         }
         int32_t stopIndex = ((i < size) && inclusive) ? i + 1 : i;
         uint8_t* substring = jtk_CString_substringEx(sequence, size, startIndex,
-            stopIndex);
+                                                     stopIndex);
         jtk_ArrayList_add(result, substring);
     }
     return result;
@@ -371,6 +370,7 @@ void printHelp() {
         "    --run           Run the virtual machine after compiling the source files.\n"
         "    --log           Generate log messages. This flag is valid only if log messages were enabled at compile time.\n"
         "    --help          Print the help message.\n"
+        "    --version       Print the current version of the compiler.\n"
         );
 }
 
@@ -385,6 +385,8 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
 
     bool invalidCommandLine = false;
     int32_t i;
+    bool showVersion = false;
+    bool showHelp = false;
     for (i = 1; i < length; i++) {
         if (arguments[i][0] == '-') {
             if (strcmp(arguments[i], "--tokens") == 0) {
@@ -413,9 +415,11 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
                     invalidCommandLine = true;
                 }
             }
+            else if (strcmp(arguments[i], "--version") == 0) {
+                showVersion = true;
+            }
             else if (strcmp(arguments[i], "--help") == 0) {
-                printHelp();
-                exit(0);
+                showHelp = true;
             }
             else if (strcmp(arguments[i], "--log") == 0) {
                 if ((i + 1) < length) {
@@ -459,11 +463,11 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
                         invalidCommandLine = true;
                     }
 
-                    #ifdef JTK_LOGGER_DISABLE
-                        printf("[warning] The logger was disabled at compile time. Please consider building k without the `JTK_LOGGER_DISABLE` constant in 'Configuration.h'.\n");
-                    #else
-                        jtk_Logger_setLevel(compiler->logger, level);
-                    #endif
+#ifdef JTK_LOGGER_DISABLE
+    printf("[warning] The logger was disabled at compile time. Please consider building k without the `JTK_LOGGER_DISABLE` constant in 'Configuration.h'.\n");
+#else
+    jtk_Logger_setLevel(compiler->logger, level);
+#endif
                 }
                 else {
                     printf("[error] The `--log` flag expects argument specifying log level.");
@@ -481,30 +485,39 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
         }
     }
 
-    int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
-    bool noErrors = false;
-    if (size == 0) {
-        fprintf(stderr, "[error] Please specify input files.\n");
+    if (showVersion) {
+        printf("kush v%d.%d\n", KUSH_VERSION_MAJOR, KUSH_VERSION_MINOR);
+    }
+    else if (showHelp) {
+        printHelp();
     }
     else {
-        initialize(compiler);
-        buildAST(compiler);
-        if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
-            // analyze(compiler);
 
-            // if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
-            //     generate(compiler);
-            // }
+        int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
+        bool noErrors = false;
+        if (size == 0) {
+            fprintf(stderr, "[error] Please specify input files.\n");
         }
-    }
+        else {
+            initialize(compiler);
+            buildAST(compiler);
+            if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
+                // analyze(compiler);
 
-    if (compiler->footprint) {
-        int32_t footprint = k_Memory_getFootprint();
-        printf("Memory Footprint = %.2f KB\n", footprint / 1024.0f);
-    }
+                // if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
+                //     generate(compiler);
+                // }
+            }
+        }
 
-    if ((vmArguments != NULL) && noErrors) {
-        // TODO: Start the child process
+        if (compiler->footprint) {
+            int32_t footprint = k_Memory_getFootprint();
+            printf("Memory Footprint = %.2f KB\n", footprint / 1024.0f);
+        }
+
+        if ((vmArguments != NULL) && noErrors) {
+            // TODO: Start the child process
+        }
     }
 
     // TODO: Return true only if the compilation suceeded.
@@ -514,7 +527,6 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
 bool compile(Compiler* compiler) {
     return compileEx(compiler, NULL, -1);
 }
-
 
 // Constructor
 
@@ -582,7 +594,7 @@ void deleteCompiler(Compiler* compiler) {
 
     jtk_Iterator_t* iterator = jtk_HashMap_getKeyIterator(compiler->repository);
     while (jtk_Iterator_hasNext(iterator)) {
-        uint8_t* key = (uint8_t*)jtk_Iterator_getNext(iterator);
+        uint8_t* key = (uint8_t* )jtk_Iterator_getNext(iterator);
         jtk_CString_delete(key);
     }
     jtk_Iterator_delete(iterator);
@@ -593,6 +605,7 @@ void deleteCompiler(Compiler* compiler) {
 #ifndef JTK_LOGGER_DISABLE
     jtk_Logger_delete(compiler->logger);
 #endif
+
     jtk_ArrayList_delete(compiler->inputFiles);
     deallocate(compiler);
 }

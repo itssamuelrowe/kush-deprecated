@@ -31,13 +31,16 @@
  */
 #ifndef JTK_LOGGER_DISABLE
     // #define JTK_LOGGER_DISABLE
- #endif
+#endif
 
 #include <jtk/Configuration.h>
 
 #ifndef NULL
     #define NULL 0
 #endif
+
+#define KUSH_VERSION_MAJOR 0
+#define KUSH_VERSION_MINOR 1
 
 #define allocate(type, units) (type*)allocate0(sizeof (type) * (units))
 #define deallocate(object) free(object)
