@@ -833,7 +833,7 @@ void parseFunctionParameters(Parser* parser,
 
 /*
  * block
- * |    '{' statement+ '}'
+ * |    '{' statement* '}'
  * ;
  *
  * statement
@@ -863,10 +863,6 @@ Block* parseBlock(Parser* parser) {
         else if (isCompoundStatementFollow(la1)) {
             Context* statement = parseCompoundStatement(parser);
             jtk_ArrayList_add(context->statements, statement);
-        }
-        else {
-            // TODO: Expected simple or compound statement
-            reportAndRecover(parser, TOKEN_KEYWORD_VAR);
         }
     }
     while (isStatementFollow(la(parser, 1)));
@@ -982,6 +978,9 @@ VariableDeclaration* parseVariableDeclaration(Parser* parser, bool onlyVariable,
 
     if (!infer && !constant) {
         type = parseType(parser);
+    }
+    else {
+        consume(parser);
     }
 
 	parseVariableDeclarator(parser, infer, constant, type, context->variables);
