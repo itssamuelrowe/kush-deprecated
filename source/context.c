@@ -16,6 +16,7 @@
 
 // Sunday, June 07 2020
 
+#include <jtk/core/CString.h>
 #include <kush/context.h>
 
 /* Delete only what was allocated in the constructor. */
@@ -498,12 +499,14 @@ Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
     BinaryExpression* expression, Scope* parent) {
     Variable* result = allocate(Variable, 1);
     result->tag = CONTEXT_VARIABLE;
-    result->infer = false;
-    result->constant = false;
-    result->type = NULL;
-    result->identifier = NULL;
-    result->expression = NULL;
-    result->parent = NULL;
+    result->nameSize = identifier->length;
+    result->name = jtk_CString_newEx(identifier->text, result->nameSize);
+    result->infer = infer;
+    result->constant = constant;
+    result->type = type;
+    result->identifier = identifier;
+    result->expression = expression;
+    result->parent = parent;
 
     return result;
 }

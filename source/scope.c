@@ -45,21 +45,21 @@ Scope* scopeForModule(Module* module) {
 }
 
 Scope* scopeForStructure(Scope* parent, Structure* structure) {
-    return newScope(SCOPE_STRUCTURE, parent, structure);
+    return newScope(SCOPE_STRUCTURE, parent, (Context*)structure);
 }
 
 Scope* scopeForFunction(Scope* parent, Function* function) {
-    return newScope(SCOPE_FUNCTION, parent, function);
+    return newScope(SCOPE_FUNCTION, parent, (Context*)function);
 }
 
 Scope* scopeForLocal(Scope* parent, Block* block) {
-    return newScope(SCOPE_LOCAL, parent, block);
+    return newScope(SCOPE_LOCAL, parent, (Context*)block);
 }
 
 void defineSymbol(Scope* scope, Symbol* symbol) {
     bool result = jtk_HashMap_putStrictly(scope->symbols, symbol->name, &symbol->nameSize);
     if (!result) {
-        fprintf(stderr, "[internal error] k_Scope_define() invoked to redefine a symbol.\n");
+        fprintf(stderr, "[internal error] defineSymbol() invoked to redefine a symbol.\n");
     }
 }
 
@@ -67,7 +67,8 @@ Symbol* resolveSymbol(Scope* scope, const uint8_t* name) {
     Scope* current = scope;
     Symbol* result = NULL;
     while ((current != NULL) && (result == NULL)) {
-        result = jtk_HashMap_getValue(scope->symbols, name);
+        result = jtk_HashMap_getValue(scope->symbols, (Context*)name);
+        current = current->parent;
     }
     return result;
 }

@@ -144,9 +144,21 @@ void importDefaults(Analyzer* analyzer) {
 
 // Define
 
+bool isUndefined(Scope* scope, const uint8_t* identifier) {
+    return resolveSymbol(scope, identifier) == NULL;
+}
+
 void defineStructure(Analyzer* analyzer, Structure* structure) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+
     structure->scope = scopeForStructure(analyzer->scope, structure);
-    // scopeAddStructure(analyzer->scope, structure);
+    if (isUndefined(analyzer->scope, structure->name)) {
+        defineSymbol(analyzer->scope, structure);
+    }
+    else {
+        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_STRUCTURE,
+            structure->identifier);
+    }
 
     int32_t limit = jtk_ArrayList_getSize(structure->variables);
     int32_t i;
@@ -154,21 +166,21 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
         Variable* variable =
             (Variable*)jtk_ArrayList_getValue(structure->variables, i);
         variable->parent = structure->scope;
-        // scopeAddVariable(structure->scope, variable);
+        defineSymbol(structure->scope, variable);
     }
 }
 
 void defineFunction(Analyzer* analyzer, Function* function) {
     function->scope = analyzer->scope =
         scopeForFunction(analyzer->scope, function);
-    // scopeAddFunction(analyzer->scope, function);
+    defineSymbol(analyzer->scope, function);
 
     Scope* scope = defineLocals(analyzer, function->body);
     int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
     int32_t i;
     for (i = 0; i < parameterCount; i++) {
         Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
-        // scopeAddVariable(scope, parameter);
+        defineSymbol(scope, parameter);
     }
 }
 
@@ -183,12 +195,13 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
         switch (context->tag) {
             case CONTEXT_ITERATIVE_STATEMENT: {
                 IterativeStatement* statement = (IterativeStatement*)context;
-                if (statement->label != NULL) {
-                    // scopeAddLabel(analyzer->scope, &statement->label);
-                }
+                // TODO: Loops should be converted to Symbol!
+                // if (statement->label != NULL) {
+                //     defineSymbol(analyzer->scope, &statement->label);
+                // }
                 Scope* localScope = defineLocals(analyzer, statement->body);
                 if (statement->parameter != NULL) {
-                    // scopeAddVariable(localScope, statement->parameter);
+                    defineSymbol(localScope, statement->parameter);
                 }
 
                 break;
@@ -219,8 +232,8 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                 for (j = 0; j < count; j++) {
                     CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
                         statement->catchClauses, j);
-                    Scope* scope = defineLocals(analyzer, clause->body);
-                    // defineVariable(analyzer, scope, clause->parameter);
+                    Scope* localScope = defineLocals(analyzer, clause->body);
+                    defineSymbol(localScope, clause->parameter);
                 }
 
                 if (statement->finallyClause != NULL) {
@@ -237,7 +250,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                 for (j = 0; j < count; j++) {
                     Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
-                    // defineVariable(analyzer->scope, variable);
+                    defineSymbol(analyzer->scope, variable);
                 }
                 break;
             }
@@ -246,7 +259,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
 
     analyzer->scope = analyzer->scope->parent;
 
-    return NULL;
+    return block->scope;
 }
 
 // Resolve

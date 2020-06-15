@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <jtk/core/CString.h>
 #include <jtk/collection/Pair.h>
 #include <kush/parser.h>
 
@@ -768,6 +769,8 @@ Function* parseFunctionDeclaration(Parser* parser,
     Function* context = newFunction();
     context->returnType = parseReturnType(parser);
     context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
+    context->nameSize = context->identifier->length;
+    context->name = jtk_CString_newEx(context->identifier->text, context->nameSize);
     parseFunctionParameters(parser, context->parameters,
         &context->variableParameter);
 
@@ -820,6 +823,7 @@ void parseFunctionParameters(Parser* parser,
                 match(parser, TOKEN_COMMA);
             }
 
+            // TODO: Make FunctionParameter a symbol.
             FunctionParameter* parameter = newFunctionParameter();
             parameter->type = parseType(parser);
             if (la(parser, 1) == TOKEN_ELLIPSIS) {
@@ -1334,10 +1338,12 @@ CatchClause* parseCatchClause(Parser* parser) {
  * ;
  */
 Structure* parseStructureDeclaration(Parser* parser) {
-    Structure* context = newStructure();
-
     match(parser, TOKEN_KEYWORD_STRUCT);
+
+    Structure* context = newStructure();
     context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
+    context->nameSize = context->identifier->length;
+    context->name = jtk_CString_newEx(context->identifier->text, context->nameSize);
 
     match(parser, TOKEN_LEFT_BRACE);
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
