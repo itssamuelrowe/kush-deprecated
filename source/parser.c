@@ -1802,10 +1802,7 @@ void* parsePrimaryExpression(Parser* parser, bool* token) {
             }
 
             case TOKEN_LEFT_BRACE: {
-                consume(parser);
-                pushFollowToken(parser, TOKEN_RIGHT_BRACE);
                 result = parseInitializerExpression(parser);
-                popFollowToken(parser);
                 break;
             }
 
@@ -1842,7 +1839,7 @@ InitializerExpression* parseInitializerExpression(Parser* parser) {
     match(parser, TOKEN_LEFT_BRACE);
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
 
-    if (isExpressionFollow(la(parser, 1))) {
+    if (la(parser, 1) == TOKEN_IDENTIFIER) {
         jtk_Pair_t* entry = parseInitializerEntry(parser);
         jtk_ArrayList_add(context->entries, entry);
 
