@@ -650,11 +650,11 @@ k_Symbol_t* k_SymbolLoader_parse(SymbolLoader* loader, uint8_t* bytes,
                 }
             }
             else {
-                handleGeneralError(errorHandler, loader, KUSH_ERROR_CODE_INVALID_FEB_VERSION);
+                handleGeneralError(errorHandler, loader, ERROR_INVALID_FEB_VERSION);
             }
         }
         else {
-            handleGeneralError(errorHandler, loader, KUSH_ERROR_CODE_CORRUPTED_BINARY_ENTITY);
+            handleGeneralError(errorHandler, loader, ERROR_CORRUPTED_BINARY_ENTITY);
         }
     }
 

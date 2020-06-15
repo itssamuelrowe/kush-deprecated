@@ -114,7 +114,7 @@ Lexer* lexerNew(Compiler* compiler) {
     lexer->text = jtk_StringBuilder_new();
     lexer->type = TOKEN_UNKNOWN;
     lexer->tokens = jtk_ArrayQueue_new();
-    lexer->errorCode = KUSH_ERROR_CODE_NONE;
+    lexer->errorCode = ERROR_NONE;
 
     return lexer;
 }
@@ -355,14 +355,14 @@ void binaryIntegerLiteral(Lexer* lexer) {
             }
 
             if (previous == '_') {
-                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = ERROR_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
         }
     }
     else {
-        lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+        lexer->errorCode = ERROR_EXPECTED_DIGIT_AFTER_UNDERSCORE;
         /* Consume and discard the invalid character. */
         consume(lexer);
     }
@@ -388,14 +388,14 @@ void octalIntegerLiteral(Lexer* lexer) {
             }
 
             if (previous == '_') {
-                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = ERROR_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
         }
     }
     else {
-        lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+        lexer->errorCode = ERROR_EXPECTED_DIGIT_AFTER_UNDERSCORE;
         /* Consume and discard the invalid character. */
         consume(lexer);
     }
@@ -421,14 +421,14 @@ void hexadecimalIntegerLiteral(Lexer* lexer) {
             }
 
             if (previous == '_') {
-                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = ERROR_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
         }
     }
     else {
-        lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+        lexer->errorCode = ERROR_EXPECTED_DIGIT_AFTER_UNDERSCORE;
         /* Consume and discard the invalid character. */
         consume(lexer);
     }
@@ -454,7 +454,7 @@ void decimalIntegerLiteral(Lexer* lexer) {
             }
 
             if (previous == '_') {
-                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = ERROR_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
@@ -479,13 +479,13 @@ void decimalIntegerLiteral(Lexer* lexer) {
             }
 
             if (previous == '_') {
-                lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+                lexer->errorCode = ERROR_EXPECTED_DIGIT_AFTER_UNDERSCORE;
                 /* Consume and discard the invalid character. */
                 consume(lexer);
             }
         }
         else {
-            lexer->errorCode = KUSH_ERROR_CODE_EXPECTED_DIGIT_AFTER_UNDERSCORE;
+            lexer->errorCode = ERROR_EXPECTED_DIGIT_AFTER_UNDERSCORE;
             /* Consume and discard the invalid character. */
             consume(lexer);
         }
@@ -610,7 +610,7 @@ void integerLiteral(Lexer* lexer) {
             decimalIntegerLiteral(lexer);
         }
         else if (isLetter(lexer->la1)) {
-            lexer->errorCode = KUSH_ERROR_CODE_INVALID_INTEGER_LITERAL_PREFIX;
+            lexer->errorCode = ERROR_INVALID_INTEGER_LITERAL_PREFIX;
         }
     }
     else {
@@ -689,7 +689,7 @@ Token* nextToken(Lexer* lexer) {
             lexer->startIndex = lexer->index;
             lexer->startLine = lexer->line;
             lexer->startColumn = lexer->column;
-            lexer->errorCode = KUSH_ERROR_CODE_NONE;
+            lexer->errorCode = ERROR_NONE;
 
 
             switch (lexer->la1) {
@@ -1108,7 +1108,7 @@ Token* nextToken(Lexer* lexer) {
                     do {
                         while (lexer->la1 != '*') {
                             if (lexer->la1 == KUSH_END_OF_STREAM) {
-                                lexer->errorCode = KUSH_ERROR_CODE_UNTERMINATED_MULTI_LINE_COMMENT;
+                                lexer->errorCode = ERROR_UNTERMINATED_MULTI_LINE_COMMENT;
                                 break;
                             }
 
@@ -1504,7 +1504,7 @@ Token* nextToken(Lexer* lexer) {
 
                 while (lexer->la1 != terminator) {
                     if ((lexer->la1 == KUSH_END_OF_STREAM) || (lexer->la1 == '\n')) {
-                        lexer->errorCode = KUSH_ERROR_CODE_UNTERMINATED_STRING_LITERAL;
+                        lexer->errorCode = ERROR_UNTERMINATED_STRING_LITERAL;
                         break;
                     }
                     else if (lexer->la1 == '\\') {
@@ -1528,13 +1528,13 @@ Token* nextToken(Lexer* lexer) {
                                     consume(lexer);
                                 }
                                 else {
-                                    lexer->errorCode = KUSH_ERROR_CODE_MALFORMED_UNICODE_CHARACTER_SEQUENCE;
+                                    lexer->errorCode = ERROR_MALFORMED_UNICODE_CHARACTER_SEQUENCE;
                                     break;
                                 }
                             }
                         }
                         else {
-                            lexer->errorCode = KUSH_ERROR_CODE_INVALID_ESCAPE_SEQUENCE;
+                            lexer->errorCode = ERROR_INVALID_ESCAPE_SEQUENCE;
 
                             /* Consume and discard the unknown escape sequence. */
                             consume(lexer);
@@ -1767,7 +1767,7 @@ Token* nextToken(Lexer* lexer) {
                     // }
                 }
                 else {
-                    lexer->errorCode = KUSH_ERROR_CODE_UNKNOWN_CHARACTER;
+                    lexer->errorCode = ERROR_UNKNOWN_CHARACTER;
 
                     /* Consume and discard the unknown character. */
                     consume(lexer);
@@ -1785,7 +1785,7 @@ Token* nextToken(Lexer* lexer) {
         /* Unlike the parser, the lexer does not support error recovery strategies.
          * Therefore, all types of errors are collectively recorded at this point.
          */
-        if (lexer->errorCode != KUSH_ERROR_CODE_NONE) {
+        if (lexer->errorCode != ERROR_NONE) {
             handleLexicalError(lexer->compiler->errorHandler,
                                               lexer, lexer->errorCode, newToken);
         }
@@ -1816,7 +1816,7 @@ void resetLexer(Lexer* lexer, jtk_InputStream_t* inputStream) {
     lexer->token = NULL;
     lexer->channel = TOKEN_CHANNEL_DEFAULT;
     lexer->type = TOKEN_UNKNOWN;
-    lexer->errorCode = KUSH_ERROR_CODE_NONE;
+    lexer->errorCode = ERROR_NONE;
 
     jtk_StringBuilder_clear(lexer->text);
     jtk_ArrayQueue_clear(lexer->tokens);

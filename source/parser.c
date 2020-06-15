@@ -226,7 +226,7 @@ void reportAndRecover(Parser* parser, TokenType expected) {
         Compiler* compiler = parser->compiler;
         ErrorHandler* errorHandler = compiler->errorHandler;
         handleSyntaxError(errorHandler, parser,
-            KUSH_ERROR_CODE_UNEXPECTED_TOKEN, lt1, expected);
+            ERROR_UNEXPECTED_TOKEN, lt1, expected);
     }
 
     /* Try to resychronize the parser with the input. */
@@ -1268,7 +1268,7 @@ TryStatement* parseTryStatement(Parser* parser) {
          * clause to be followed by at least a catch or finally clause.
          */
         handleSyntaxError(parser->compiler->errorHandler,
-            parser, KUSH_ERROR_CODE_TRY_STATEMENT_EXPECTS_CATCH_OR_FINALLY,
+            parser, ERROR_TRY_STATEMENT_EXPECTS_CATCH_OR_FINALLY,
             tryKeyword, TOKEN_UNKNOWN);
 	}
 

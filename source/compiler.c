@@ -157,7 +157,6 @@ const uint8_t* errorMessages[] = {
     "None",
 
     // Lexical Errors
-
     "Unterminated string literal",
     "Unterminated multi-line comment",
     "Malformed unicode character sequence; expected four hexadecimal digits",
@@ -167,40 +166,46 @@ const uint8_t* errorMessages[] = {
     "Expected digit after underscore in integer literal",
 
     // Syntactical Errors
-
     "Unexpected token",
-    "The try statement expects at least one catch or finally clause.",
+    "Try statement expects at least one catch or finally clause",
 
     // Semantical Errors
 
-    "Undeclared class",
-    "Variable required on left-hand side of assignment",
-    "Name refers to a non-class symbol",
-    "No suitable constructor found",
+    // Errors related to binary expressions
+    "Invalid left operand",
+    "Invalid right operand",
+    "Incompatible operand types",
+    "Cannot combine equality operators",
+    "Type does not support invoking",
+    "Type does not support indexing",
+    "Type does not support accessing",
+
+    // Errors related to unary expressions
+    "Invalid operand",
+
+    // Errors related to declaration
+    "Unknown module",
+    "Undeclared structure",
     "Undeclared identifier",
-    "Variable treated as function",
-    "Static initializer with parameters",
     "Redeclaration of symbol as function",
     "Redeclaration of symbol as parameter",
     "Redeclaration of symbol as variable parameter",
-    "Multiple function overloads with variable parameter",
-    "Duplicate function overload",
-    "Function declaration exceeds parameter threshold",
     "Redeclaration of symbol as variable",
     "Redeclaration of symbol as constant",
     "Redeclaration of symbol as label",
     "Redeclaration of symbol as loop parameter",
     "Redeclaration of symbol as catch parameter",
-    "Redeclaration of symbol as class",
-    "Unknown class",
+    "Redeclaration of symbol as structure",
     "Redeclaration of symbol previously imported",
-    "Cannot declare function and class in the same compilation unit",
-    "Function declaration causes another function to exceed parameter threshold",
+
+    // General errors
+    "Corrupted module",
+    "Invalid module version",
 
     // General Errors
 
     "Corrupted binary entity",
-    "Binary entity encoded in unrecognizable FEB version"
+    "Invalid module version"
 };
 
 void printErrors(Compiler* compiler) {
