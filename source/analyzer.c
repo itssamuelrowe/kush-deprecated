@@ -119,7 +119,7 @@ Context* find(Scope* scope, const uint8_t* identifier, int32_t size) {
     while (scope != NULL) {
         symbol = NULL; // scopeResolve(scope, identifier, size);
         if (symbol != NULL) {
-            break;
+           break;
         }
         else {
             scope = scope->parent;
@@ -205,10 +205,6 @@ void defineFunction(Analyzer* analyzer, Function* function) {
     analyzer->scope = analyzer->scope->parent;
 }
 
-void defineLocal(Analyzer* analyzer, Context* symbol) {
-
-}
-
 // TODO: Assign variables their parent scopes!
 Scope* defineLocals(Analyzer* analyzer, Block* block) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
@@ -238,7 +234,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                     defineSymbol(localScope, statement->parameter);
                 }
 
-                break;
+               break;
             }
 
             case CONTEXT_IF_STATEMENT: {
@@ -254,7 +250,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                 if (statement->elseClause != NULL) {
                     defineLocals(analyzer, statement->elseClause);
                 }
-                break;
+               break;
             }
 
             case CONTEXT_TRY_STATEMENT: {
@@ -282,7 +278,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                     defineLocals(analyzer, statement->finallyClause);
                 }
 
-                break;
+               break;
             }
 
             case CONTEXT_VARIABLE_DECLARATION: {
@@ -300,7 +296,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                             variable->identifier);
                     }
                 }
-                break;
+               break;
             }
         }
     }
@@ -349,7 +345,7 @@ Scope* resolveLocals(Analyzer* analyzer, Block* block) {
                     // scopeAddVariable(localScope, statement->parameter);
                 }
 
-                break;
+               break;
             }
 
             case CONTEXT_IF_STATEMENT: {
@@ -365,7 +361,7 @@ Scope* resolveLocals(Analyzer* analyzer, Block* block) {
                 if (statement->elseClause != NULL) {
                     resolveLocals(analyzer, statement->elseClause);
                 }
-                break;
+               break;
             }
 
             case CONTEXT_TRY_STATEMENT: {
@@ -385,7 +381,7 @@ Scope* resolveLocals(Analyzer* analyzer, Block* block) {
                     resolveLocals(analyzer, statement->finallyClause);
                 }
 
-                break;
+               break;
             }
 
             case CONTEXT_VARIABLE_DECLARATION: {
@@ -397,7 +393,7 @@ Scope* resolveLocals(Analyzer* analyzer, Block* block) {
                         statement->variables, j);
                     // defineVariable(analyzer->scope, variable);
                 }
-                break;
+               break;
             }
         }
     }
@@ -432,7 +428,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 handleSemanticError(handler, analyzer, ERROR_CANNOT_COMBINE_EQUALITY_OPERATORS, pair->m_left);
             }
 
-            break;
+           break;
         }
 
         case CONTEXT_ASSIGNMENT_EXPRESSION:
@@ -459,7 +455,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 }
             }
 
-            break;
+           break;
         }
 
         case CONTEXT_UNARY_EXPRESSION: {
@@ -488,7 +484,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 }
             }
 
-            break;
+           break;
         }
 
         case CONTEXT_POSTFIX_EXPRESSION: {
@@ -536,18 +532,18 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 }
             }
 
-            break;
+           break;
         }
 
         case CONTEXT_INITIALIZER_EXPRESSION: {
             InitializerExpression* expression = (InitializerExpression*)context;
             // TODO
-            break;
+           break;
         }
 
         case CONTEXT_ARRAY_EXPRESSION: {
             ArrayExpression* expression = (ArrayExpression*)context;
-            break;
+           break;
         }
     }
 
@@ -559,33 +555,33 @@ Type* resolveToken(Analyzer* analyzer, Token* token) {
     switch (token->type) {
         case TOKEN_IDENTIFIER: {
             // TODO
-            break;
+           break;
         }
 
         case TOKEN_INTEGER_LITERAL: {
             result = &(primitives.i32);
-            break;
+           break;
         }
 
         case TOKEN_FLOATING_POINT_LITERAL: {
             result = &(primitives.f64);
-            break;
+           break;
         }
 
         case TOKEN_KEYWORD_TRUE:
         case TOKEN_KEYWORD_FALSE: {
             result = &(primitives.boolean);
-            break;
+           break;
         }
 
         case TOKEN_STRING_LITERAL: {
             result = &(primitives.string);
-            break;
+           break;
         }
 
         case TOKEN_KEYWORD_NULL: {
             result = &(primitives.null);
-            break;
+           break;
         }
 
         default: {
@@ -661,6 +657,119 @@ void defineSymbols(Analyzer* analyzer, Module* module) {
 
 // Resolve
 
+void resolveVariable(Analyzer* analyzer, Variable* variable) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    VariableType* variableType = variable->variableType;
+    Token* token = variableType->token;
+    Type* type = NULL;
+    switch (token->type) {
+        case TOKEN_KEYWORD_BOOLEAN: {
+           type = &primitives.boolean;
+           break;
+        }
+
+        case TOKEN_KEYWORD_I8: {
+           type = &primitives.i8;
+           break;
+        }
+
+        case TOKEN_KEYWORD_I16: {
+           type = &primitives.i16;
+           break;
+        }
+
+        case TOKEN_KEYWORD_I32: {
+           type = &primitives.i32;
+           break;
+        }
+
+        case TOKEN_KEYWORD_I64: {
+           type = &primitives.i64;
+           break;
+        }
+
+        case TOKEN_KEYWORD_UI8: {
+           type = &primitives.ui8;
+           break;
+        }
+
+        case TOKEN_KEYWORD_UI16: {
+           type = &primitives.ui16;
+           break;
+        }
+
+        case TOKEN_KEYWORD_UI32: {
+           type = &primitives.ui32;
+           break;
+        }
+
+        case TOKEN_KEYWORD_UI64: {
+           type = &primitives.ui64;
+           break;
+        }
+
+        case TOKEN_KEYWORD_F32: {
+           type = &primitives.f32;
+           break;
+        }
+
+        case TOKEN_KEYWORD_F64: {
+           type = &primitives.f64;
+           break;
+        }
+
+        case TOKEN_KEYWORD_STRING: {
+           type = &primitives.string;
+           break;
+        }
+
+        case TOKEN_IDENTIFIER: {
+            Context* context = resolveSymbol(analyzer->scope, token->text);
+            if (context == NULL) {
+                handleSemanticError(handler, analyzer, ERROR_UNDECLARED_TYPE,
+                    token);
+            }
+            else if (context->tag != CONTEXT_STRUCTURE_DECLARATION) {
+                handleSemanticError(handler, analyzer, ERROR_INVALID_TYPE,
+                    token);
+            }
+
+            break;
+        }
+
+        default: {
+            printf("[internal error] Control should not reach here.");
+           break;
+        }
+    }
+
+    if (variableType->dimensions > 0) {
+        // TODO
+    }
+    else {
+
+    }
+}
+
+void resolveStructure(Analyzer* analyzer, Structure* structure) {
+    analyzer->scope = structure->scope;
+
+    int32_t count = jtk_ArrayList_getSize(structure->variables);
+    int32_t i;
+    for (i = 0; i < count; i++) {
+        VariableDeclaration* declaration = (VariableDeclaration*)jtk_ArrayList_getValue(
+            structure->variables, i);
+        int32_t limit = jtk_ArrayList_getSize(declaration->variables);
+        int32_t j;
+        for (j = 0; j < limit; j++) {
+            Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+            resolveVariable(analyzer, variable);
+        }
+    }
+
+    analyzer->scope = analyzer->scope->parent;
+}
+
 void resolveSymbols(Analyzer* analyzer, Module* module) {
     Compiler* compiler = analyzer->compiler;
     ErrorHandler* handler = compiler->errorHandler;
@@ -691,10 +800,19 @@ void resolveSymbols(Analyzer* analyzer, Module* module) {
         jtk_CString_delete(name);
     }
 
+    int32_t structureCount = jtk_ArrayList_getSize(module->structures);
+    for (i = 0; i < structureCount; i++) {
+        Structure* structure = (Structure*)jtk_ArrayList_getValue(
+            module->structures, i);
+        resolveStructure(analyzer, structure);
+    }
+
     int32_t functionCount = jtk_ArrayList_getSize(module->functions);
     for (i = 0; i < functionCount; i++) {
         Function* function = (Function*)jtk_ArrayList_getValue(
             module->functions, i);
         resolveLocals(analyzer, function->body);
     }
+
+    analyzer->scope = analyzer->scope->parent;
 }

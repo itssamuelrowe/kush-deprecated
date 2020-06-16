@@ -185,7 +185,7 @@ const uint8_t* errorMessages[] = {
 
     // Errors related to declaration
     "Unknown module",
-    "Undeclared structure",
+    "Undeclared type",
     "Undeclared identifier",
     "Redeclaration of symbol as function",
     "Redeclaration of symbol as parameter",
@@ -197,6 +197,7 @@ const uint8_t* errorMessages[] = {
     "Redeclaration of symbol as catch parameter",
     "Redeclaration of symbol as structure",
     "Redeclaration of symbol previously imported",
+    "Invalid type",
 
     // General errors
     "Corrupted module",
@@ -316,11 +317,11 @@ void analyze(Compiler* compiler) {
         defineSymbols(analyzer, module);
     }
 
-    // for (i = 0; i < size; i++) {
-    //     compiler->currentFileIndex = i;
-    //     Module* module = compiler->modules[i];
-    //     resolveSymbols(analyzer, module);
-    // }
+    for (i = 0; i < size; i++) {
+        compiler->currentFileIndex = i;
+        Module* module = compiler->modules[i];
+        resolveSymbols(analyzer, module);
+    }
 
     printErrors(compiler);
     deleteAnalyzer(analyzer);

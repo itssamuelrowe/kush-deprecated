@@ -371,6 +371,20 @@ Block* newBlock();
 void deleteBlock(Block* self);
 
 /*******************************************************************************
+ * VariableType                                                                *
+ *******************************************************************************/
+
+struct VariableType {
+    Token* token;
+    int32_t dimensions;
+};
+
+typedef struct VariableType VariableType;
+
+VariableType* newVariableType(Token* token, int32_t dimensions);
+void deleteVariableType(VariableType* self);
+
+/*******************************************************************************
  * Variable                                                                    *
  *******************************************************************************/
 
@@ -383,6 +397,7 @@ struct Variable {
     int32_t nameSize;
     bool infer;
     bool constant;
+    VariableType* variableType;
     Type* type;
     Token* identifier;
     BinaryExpression* expression;
@@ -391,8 +406,8 @@ struct Variable {
 
 typedef struct Variable Variable;
 
-Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
-    BinaryExpression* expression, Scope* parent);
+Variable* newVariable(bool infer, bool constant, VariableType* variableType,
+    Token* identifier, BinaryExpression* expression, Scope* parent);
 void deleteVariable(Variable* variable);
 
 /*******************************************************************************
@@ -425,6 +440,7 @@ struct Structure {
     uint8_t* name;
     int32_t nameSize;
     Token* identifier;
+    // TODO: Rename variables to declarations.
     jtk_ArrayList_t* variables;
     Type* type;
     Scope* scope;
@@ -432,7 +448,8 @@ struct Structure {
 
 typedef struct Structure Structure;
 
-Structure* newStructure();
+Structure* newStructure(const uint8_t* name, int32_t nameSize,
+    Token* identifier, jtk_ArrayList_t* variables);
 void deleteStructure(Structure* self);
 
 /*******************************************************************************

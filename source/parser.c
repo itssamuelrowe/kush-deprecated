@@ -96,9 +96,9 @@ static bool followVariableDeclaration(Parser* parser);
 
 static Module* parseModule(Parser* parser);
 static ImportDeclaration* parseImportDeclaration(Parser* parser);
-static Type* parseTypeEx(Parser* parser, bool includeVoid);
-static Type* parseType(Parser* parser);
-static Type* parseReturnType(Parser* parser);
+static VariableType* parseTypeEx(Parser* parser, bool includeVoid);
+static VariableType* parseType(Parser* parser);
+static VariableType* parseReturnType(Parser* parser);
 static Function* parseFunctionDeclaration(Parser* parser, uint32_t modifiers);
 static void parseFunctionParameters(Parser* parser, jtk_ArrayList_t* fixedParameters,
     Variable** variableParameter);
@@ -107,7 +107,7 @@ static Context* parseSimpleStatement(Parser* parser);
 static VariableDeclaration* parseVariableDeclaration(Parser* parser, bool onlyVariable,
     bool allowInitializer);
 void parseVariableDeclarator(Parser* parser, bool infer, bool constant,
-    Type* type, jtk_ArrayList_t* variables);
+    VariableType* variableType, jtk_ArrayList_t* variables);
 static BreakStatement* parseBreakStatement(Parser* parser);
 static ReturnStatement* parseReturnStatement(Parser* parser);
 static ThrowStatement* parseThrowStatement(Parser* parser);
@@ -670,22 +670,7 @@ ImportDeclaration* parseImportDeclaration(Parser* parser) {
     return context;
 }
 
-Type* parseTypeEx(Parser* parser, bool includeVoid) {
-    static const Type* types[] = {
-        &primitives.unknown,
-        &primitives.boolean,
-        &primitives.i8,
-        &primitives.i16,
-        &primitives.i32,
-        &primitives.i64,
-        &primitives.ui8,
-        &primitives.ui16,
-        &primitives.ui32,
-        &primitives.ui64,
-        &primitives.f32,
-        &primitives.f64,
-        &primitives.void_,
-    };
+VariableType* parseTypeEx(Parser* parser, bool includeVoid) {
     static const TokenType tokens[] = {
         TOKEN_IDENTIFIER,
         TOKEN_KEYWORD_BOOLEAN,
@@ -701,33 +686,16 @@ Type* parseTypeEx(Parser* parser, bool includeVoid) {
         TOKEN_KEYWORD_F64,
         TOKEN_KEYWORD_VOID
     };
-
     int32_t index;
-    Type* type = NULL;
-    Token* token = matchAndYieldEx(parser, tokens,
-        includeVoid? 13 : 12, &index);
-    if (token != NULL) {
-        int32_t dimensions = 0;
-        while (la(parser, 1) == TOKEN_LEFT_SQUARE_BRACKET) {
-            consume(parser);
-            dimensions++;
-            match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
-        }
-
-        if (dimensions == 0) {
-            type = types[index];
-        }
-        else {
-            // TODO: Register the new array type in the symbol table so we
-            // don't have to create new instances every time.
-            type = newType(TYPE_ARRAY, true, true, false, NULL);
-            type->array.array = NULL; // TODO: Assign the array structure.
-            type->array.base = types[index];
-            type->array.dimensions = dimensions;
-        }
+    Token* token = matchAndYieldEx(parser, tokens, includeVoid? 13 : 12, &index);
+    int32_t dimensions = 0;
+    while (la(parser, 1) == TOKEN_LEFT_SQUARE_BRACKET) {
+        consume(parser);
+        dimensions++;
+        match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
     }
 
-    return type;
+    return newVariableType(token, dimensions);
 }
 
 /**
@@ -745,7 +713,7 @@ Type* parseTypeEx(Parser* parser, bool includeVoid) {
  * :    componentType ('[' ']')*
  * ;
  */
-Type* parseType(Parser* parser) {
+VariableType* parseType(Parser* parser) {
     return parseTypeEx(parser, false);
 }
 
@@ -755,7 +723,7 @@ Type* parseType(Parser* parser) {
  * |    'void'
  * ;
  */
-Type* parseReturnType(Parser* parser) {
+VariableType* parseReturnType(Parser* parser) {
     return parseTypeEx(parser, true);
 }
 
@@ -1016,20 +984,20 @@ VariableDeclaration* parseVariableDeclaration(Parser* parser, bool onlyVariable,
     TokenType la1 = la(parser, 1);
     bool infer = (la1 == TOKEN_KEYWORD_VAR);
     bool constant = (la1 == TOKEN_KEYWORD_LET);
-    Type* type = NULL;
+    VariableType* variableType = NULL;
 
     if (!infer && !constant) {
-        type = parseType(parser);
+        variableType = parseType(parser);
     }
     else {
         consume(parser);
     }
 
-	parseVariableDeclarator(parser, infer, constant, type, context->variables);
+	parseVariableDeclarator(parser, infer, constant, variableType, context->variables);
 
 	while (la(parser, 1) == TOKEN_COMMA) {
         consume(parser);
-		parseVariableDeclarator(parser, infer, constant, type, context->variables);
+		parseVariableDeclarator(parser, infer, constant, variableType, context->variables);
 	}
 
     return context;
@@ -1041,7 +1009,7 @@ VariableDeclaration* parseVariableDeclaration(Parser* parser, bool onlyVariable,
  * ;
  */
 void parseVariableDeclarator(Parser* parser, bool infer, bool constant,
-    Type* type, jtk_ArrayList_t* variables) {
+    VariableType* variableType, jtk_ArrayList_t* variables) {
     Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
     BinaryExpression* expression = NULL;
 
@@ -1050,7 +1018,7 @@ void parseVariableDeclarator(Parser* parser, bool infer, bool constant,
         expression = parseExpression(parser);
 	}
 
-    Variable* variable = newVariable(infer, constant, type, identifier, expression, NULL);
+    Variable* variable = newVariable(infer, constant, variableType, identifier, expression, NULL);
     jtk_ArrayList_add(variables, variable);
 }
 
@@ -1354,19 +1322,17 @@ CatchClause* parseCatchClause(Parser* parser) {
 Structure* parseStructureDeclaration(Parser* parser) {
     match(parser, TOKEN_KEYWORD_STRUCT);
 
-    Structure* context = newStructure();
-    context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
-    context->nameSize = context->identifier->length;
-    context->name = jtk_CString_newEx(context->identifier->text, context->nameSize);
+    Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
 
     match(parser, TOKEN_LEFT_BRACE);
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
 
+    jtk_ArrayList_t* variables = jtk_ArrayList_new();
     while (isType(la(parser, 1))) {
         pushFollowToken(parser, TOKEN_SEMICOLON);
 
         VariableDeclaration* declaration = parseVariableDeclaration(parser, true, false); // typed, expression
-        jtk_ArrayList_add(context->variables, declaration);
+        jtk_ArrayList_add(variables, declaration);
         match(parser, TOKEN_SEMICOLON);
 
         popFollowToken(parser);
@@ -1375,7 +1341,8 @@ Structure* parseStructureDeclaration(Parser* parser) {
     popFollowToken(parser);
     match(parser, TOKEN_RIGHT_BRACE);
 
-    return context;
+    return newStructure(identifier->text, identifier->length, identifier,
+        variables);
 }
 
 /**
