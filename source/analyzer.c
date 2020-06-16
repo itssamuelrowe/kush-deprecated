@@ -174,14 +174,6 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
 void defineFunction(Analyzer* analyzer, Function* function) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
 
-    if (isUndefined(analyzer->scope, function->name)) {
-        defineSymbol(analyzer->scope, function);
-    }
-    else {
-        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_FUNCTION,
-            function->identifier);
-    }
-
     function->scope = scopeForFunction(analyzer->scope, function);
     analyzer->scope = function->scope;
 
@@ -607,6 +599,8 @@ void resetAnalyzer(Analyzer* analyzer) {
 // Define
 
 void defineSymbols(Analyzer* analyzer, Module* module) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+
     module->scope = scopeForModule(module);
     analyzer->scope = module->scope;
 
@@ -620,6 +614,19 @@ void defineSymbols(Analyzer* analyzer, Module* module) {
 
     int32_t functionCount = jtk_ArrayList_getSize(module->functions);
     int32_t i;
+    for (i = 0; i < functionCount; i++) {
+        Function* function = (Function*)jtk_ArrayList_getValue(
+            module->functions, i);
+
+        if (isUndefined(analyzer->scope, function->name)) {
+            defineSymbol(analyzer->scope, function);
+        }
+        else {
+            handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_FUNCTION,
+                function->identifier);
+        }
+    }
+
     for (i = 0; i < functionCount; i++) {
         Function* function = (Function*)jtk_ArrayList_getValue(
             module->functions, i);
