@@ -233,7 +233,7 @@ struct BinaryExpression {
     jtk_ArrayList_t* others;
 };
 
-BinaryExpression* newBinaryExpression();
+BinaryExpression* newBinaryExpression(ContextType tag);
 void deleteBinaryExpression(BinaryExpression* self);
 
 /*******************************************************************************
@@ -244,6 +244,7 @@ typedef struct ConditionalExpression ConditionalExpression;
 
 struct ConditionalExpression {
     ContextType tag;
+    Token* hook;
     BinaryExpression* condition;
     BinaryExpression* then;
     ConditionalExpression* otherwise;

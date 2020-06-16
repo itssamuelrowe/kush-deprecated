@@ -80,6 +80,9 @@ enum ErrorCode {
     ERROR_REDECLARATION_PREVIOUSLY_IMPORTED,
     ERROR_INVALID_TYPE,
 
+    // Errors related to types
+    ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+
     // General Errors
 
     ERROR_CORRUPTED_MODULE,

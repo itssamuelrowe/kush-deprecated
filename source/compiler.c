@@ -199,6 +199,9 @@ const uint8_t* errorMessages[] = {
     "Redeclaration of symbol previously imported",
     "Invalid type",
 
+    // Errors related to types
+    "Expected boolean expression",
+
     // General errors
     "Corrupted module",
     "Invalid module version",

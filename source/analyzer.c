@@ -387,11 +387,9 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
                 handleSemanticError(handler, analyzer, ERROR_INVALID_TYPE,
                     token);
             }
-
-            fflush(stdout);
-
-            // TODO: Find the type.
-
+            else {
+                type = ((Structure*)context)->type;
+            }
             break;
         }
 
@@ -542,6 +540,16 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
                 }
                 break;
             }
+
+            case CONTEXT_ASSIGNMENT_EXPRESSION: {
+                resolveExpression(analyzer, context);
+                break;
+            }
+
+            default: {
+                printf("[internal error] Control should not here.\n");
+                break;
+            }
         }
     }
 
@@ -551,11 +559,36 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
 Type* resolveExpression(Analyzer* analyzer, Context* context) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
 
+    Type* result = NULL;
     switch (context->tag) {
+        case CONTEXT_CONDITIONAL_EXPRESSION: {
+            ConditionalExpression* expression = (ConditionalExpression*)context;
+            Type* conditionType = result = resolveExpression(analyzer, expression->condition);
+
+            if (expression->then != NULL) {
+                Type* thenType = resolveExpression(analyzer, expression->then);
+                Type* elseType = resolveExpression(analyzer, expression->otherwise);
+
+                if (conditionType != &primitives.boolean) {
+                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                        expression->hook);
+                }
+
+                if (thenType != elseType) {
+                    handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                        expression->hook);
+                }
+
+                result = thenType;
+            }
+
+            break;
+        }
+
         case CONTEXT_RELATIONAL_EXPRESSION:
         case CONTEXT_EQUALITY_EXPRESSION: {
             BinaryExpression* expression = (BinaryExpression*)context;
-            Type* leftType = resolveExpression(analyzer, expression->left);
+            Type* leftType = result = resolveExpression(analyzer, expression->left);
 
             int32_t count = jtk_ArrayList_getSize(expression->others);
             if (count == 1) {
@@ -573,7 +606,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                 handleSemanticError(handler, analyzer, ERROR_CANNOT_COMBINE_EQUALITY_OPERATORS, pair->m_left);
             }
 
-           break;
+            break;
         }
 
         case CONTEXT_ASSIGNMENT_EXPRESSION:
@@ -586,7 +619,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
         case CONTEXT_ADDITIVE_EXPRESSION:
         case CONTEXT_MULTIPLICATIVE_EXPRESSION: {
             BinaryExpression* expression = (BinaryExpression*)context;
-            Type* leftType = resolveExpression(analyzer, expression->left);
+            Type* leftType = result = resolveExpression(analyzer, expression->left);
 
             int32_t count = jtk_ArrayList_getSize(expression->others);
             int32_t i;
@@ -595,6 +628,9 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
                     expression->others, i);
                 Type* rightType = resolveExpression(analyzer, pair->m_right);
 
+                // TODO: If one of the types is string and the operator is + or *,
+                // then do not report an error.
+                // Only integers, floats, and strings support most of these operators.
                 if (leftType != rightType) {
                     handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES, pair->m_left);
                 }
@@ -605,7 +641,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
 
         case CONTEXT_UNARY_EXPRESSION: {
             UnaryExpression* expression = (UnaryExpression*)context;
-            Type* type = resolveExpression(analyzer, expression->expression);
+            Type* type = result = resolveExpression(analyzer, expression->expression);
             Token* operator = expression->operator;
             if (operator != NULL) {
                 TokenType token = operator->type;
@@ -634,7 +670,7 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
 
         case CONTEXT_POSTFIX_EXPRESSION: {
             PostfixExpression* expression = (PostfixExpression*)context;
-            Type* type = expression->token?
+            Type* type = result = expression->token?
                 resolveToken(analyzer, (Token*)expression->primary) :
                 resolveExpression(analyzer, expression->primary);
 
@@ -692,41 +728,44 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
         }
     }
 
-    return NULL;
+    return result;
 }
 
 Type* resolveToken(Analyzer* analyzer, Token* token) {
     Type* result = NULL;
     switch (token->type) {
         case TOKEN_IDENTIFIER: {
-            // TODO
-           break;
+            Context* context = resolveSymbol(analyzer->scope, token->text);
+            if (context->tag == CONTEXT_VARIABLE) {
+
+            }
+            break;
         }
 
         case TOKEN_INTEGER_LITERAL: {
             result = &(primitives.i32);
-           break;
+            break;
         }
 
         case TOKEN_FLOATING_POINT_LITERAL: {
             result = &(primitives.f64);
-           break;
+            break;
         }
 
         case TOKEN_KEYWORD_TRUE:
         case TOKEN_KEYWORD_FALSE: {
             result = &(primitives.boolean);
-           break;
+            break;
         }
 
         case TOKEN_STRING_LITERAL: {
             result = &(primitives.string);
-           break;
+            break;
         }
 
         case TOKEN_KEYWORD_NULL: {
             result = &(primitives.null);
-           break;
+            break;
         }
 
         default: {

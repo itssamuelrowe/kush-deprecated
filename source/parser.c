@@ -1380,7 +1380,7 @@ BinaryExpression* parseExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseAssignmentExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_ASSIGNMENT_EXPRESSION);
 
     context->left = parseConditionalExpression(parser);
 
@@ -1405,7 +1405,7 @@ ConditionalExpression* parseConditionalExpression(Parser* parser) {
     context->condition = parseLogicalOrExpression(parser);
 
     if (la(parser, 1) == TOKEN_HOOK) {
-        consume(parser);
+        context->hook = consumeAndYield(parser);
         context->then = parseExpression(parser);
         match(parser, TOKEN_COLON);
         context->otherwise = parseConditionalExpression(parser);
@@ -1420,7 +1420,7 @@ ConditionalExpression* parseConditionalExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseLogicalOrExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_LOGICAL_OR_EXPRESSION);
 
     context->left = parseLogicalAndExpression(parser);
 
@@ -1440,7 +1440,7 @@ BinaryExpression* parseLogicalOrExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseLogicalAndExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_LOGICAL_AND_EXPRESSION);
 
     context->left = parseInclusiveOrExpression(parser);
 
@@ -1460,7 +1460,7 @@ BinaryExpression* parseLogicalAndExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseInclusiveOrExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_INCLUSIVE_OR_EXPRESSION);
 
     context->left = parseExclusiveOrExpression(parser);
 
@@ -1480,7 +1480,7 @@ BinaryExpression* parseInclusiveOrExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseExclusiveOrExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_EXCLUSIVE_OR_EXPRESSION);
 
     context->left = parseAndExpression(parser);
 
@@ -1500,7 +1500,7 @@ BinaryExpression* parseExclusiveOrExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseAndExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_AND_EXPRESSION);
 
     context->left = parseEqualityExpression(parser);
 
@@ -1520,7 +1520,7 @@ BinaryExpression* parseAndExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseEqualityExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_EQUALITY_EXPRESSION);
 
     context->left = parseRelationalExpression(parser);
 
@@ -1540,7 +1540,7 @@ BinaryExpression* parseEqualityExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseRelationalExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_RELATIONAL_EXPRESSION);
 
     context->left = parseShiftExpression(parser);
 
@@ -1560,7 +1560,7 @@ BinaryExpression* parseRelationalExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseShiftExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_SHIFT_EXPRESSION);
 
     context->left = parseAdditiveExpression(parser);
 
@@ -1580,7 +1580,7 @@ BinaryExpression* parseShiftExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseAdditiveExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_ADDITIVE_EXPRESSION);
 
     context->left = parseMultiplicativeExpression(parser);
 
@@ -1600,7 +1600,7 @@ BinaryExpression* parseAdditiveExpression(Parser* parser) {
  * ;
  */
 BinaryExpression* parseMultiplicativeExpression(Parser* parser) {
-    BinaryExpression* context = newBinaryExpression();
+    BinaryExpression* context = newBinaryExpression(CONTEXT_MULTIPLICATIVE_EXPRESSION);
 
     context->left = parseUnaryExpression(parser);
 

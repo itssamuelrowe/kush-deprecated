@@ -204,6 +204,7 @@ void deleteBinaryExpression(BinaryExpression* self) {
 ConditionalExpression* newConditionalExpression() {
     ConditionalExpression* result = allocate(ConditionalExpression, 1);
     result->tag = CONTEXT_CONDITIONAL_EXPRESSION;
+    result->hook = NULL;
     result->condition = NULL;
     result->then = NULL;
     result->otherwise = NULL;
