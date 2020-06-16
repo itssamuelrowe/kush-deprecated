@@ -401,7 +401,6 @@ struct Variable {
     Type* type;
     Token* identifier;
     BinaryExpression* expression;
-    Scope* parent;
 };
 
 typedef struct Variable Variable;
@@ -441,7 +440,7 @@ struct Structure {
     int32_t nameSize;
     Token* identifier;
     // TODO: Rename variables to declarations.
-    jtk_ArrayList_t* variables;
+    jtk_ArrayList_t* declarations;
     Type* type;
     Scope* scope;
 };

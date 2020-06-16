@@ -379,7 +379,7 @@ Structure* newStructure(const uint8_t* name, int32_t nameSize,
     result->nameSize = nameSize;
     result->name = jtk_CString_newEx(name, nameSize);
     result->identifier = NULL;
-    result->variables = variables;
+    result->declarations = variables;
     result->type = newType(TYPE_STRUCTURE, false, true, false, identifier);
     result->scope = NULL;
 
@@ -509,7 +509,6 @@ Variable* newVariable(bool infer, bool constant, VariableType* variableType, Tok
     result->type = NULL;
     result->identifier = identifier;
     result->expression = expression;
-    result->parent = parent;
 
     return result;
 }

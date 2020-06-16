@@ -161,13 +161,24 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
 
     structure->scope = scopeForStructure(analyzer->scope, structure);
 
-    int32_t limit = jtk_ArrayList_getSize(structure->variables);
+    int32_t count = jtk_ArrayList_getSize(structure->declarations);
     int32_t i;
-    for (i = 0; i < limit; i++) {
-        Variable* variable =
-            (Variable*)jtk_ArrayList_getValue(structure->variables, i);
-        variable->parent = structure->scope;
-        defineSymbol(structure->scope, variable);
+    for (i = 0; i < count; i++) {
+        VariableDeclaration* declaration =
+            (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+
+        int32_t limit = jtk_ArrayList_getSize(declaration->variables);
+        int32_t j;
+        for (j = 0; j < limit; j++) {
+            Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+            if (isUndefined(structure->scope, variable->name)) {
+                defineSymbol(structure->scope, variable);
+            }
+            else {
+                handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_VARIABLE,
+                    variable->identifier);
+            }
+        }
     }
 }
 
@@ -754,11 +765,11 @@ void resolveVariable(Analyzer* analyzer, Variable* variable) {
 void resolveStructure(Analyzer* analyzer, Structure* structure) {
     analyzer->scope = structure->scope;
 
-    int32_t count = jtk_ArrayList_getSize(structure->variables);
+    int32_t count = jtk_ArrayList_getSize(structure->declarations);
     int32_t i;
     for (i = 0; i < count; i++) {
         VariableDeclaration* declaration = (VariableDeclaration*)jtk_ArrayList_getValue(
-            structure->variables, i);
+            structure->declarations, i);
         int32_t limit = jtk_ArrayList_getSize(declaration->variables);
         int32_t j;
         for (j = 0; j < limit; j++) {
