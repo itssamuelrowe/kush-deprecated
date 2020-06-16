@@ -740,7 +740,7 @@ Function* parseFunctionDeclaration(Parser* parser,
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
 
     Function* context = newFunction();
-    context->returnType = parseReturnType(parser);
+    context->returnVariableType = parseReturnType(parser);
     context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
     context->nameSize = context->identifier->length;
     context->name = jtk_CString_newEx(context->identifier->text, context->nameSize);

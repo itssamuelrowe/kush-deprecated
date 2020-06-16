@@ -101,6 +101,7 @@ static void importDefaults(Analyzer* analyzer);
 static void defineStructure(Analyzer* analyzer, Structure* structure);
 static void defineFunction(Analyzer* analyzer, Function* function);
 static Scope* defineLocals(Analyzer* analyzer, Block* block);
+Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType);
 static uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size);
 static void resolveVariable(Analyzer* analyzer, Variable* variable);
 void resolveStructure(Analyzer* analyzer, Structure* structure);
@@ -108,6 +109,8 @@ static void resolveFunction(Analyzer* analyzer, Function* function);
 static void resolveLocals(Analyzer* analyzer, Block* block);
 static Type* resolveExpression(Analyzer* analyzer, Context* context);
 static Type* resolveToken(Analyzer* analyzer, Token* token);
+
+#define invalidate(analyzer) analyzer->scope = analyzer->scope->parent
 
 // String:equals(x, y)
 // x.equals(y)
@@ -309,9 +312,8 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
 
 // Resolve
 
-void resolveVariable(Analyzer* analyzer, Variable* variable) {
+Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    VariableType* variableType = variable->variableType;
     Token* token = variableType->token;
     Type* type = NULL;
     switch (token->type) {
@@ -386,6 +388,8 @@ void resolveVariable(Analyzer* analyzer, Variable* variable) {
                     token);
             }
 
+            // TODO: Find the type.
+
             break;
         }
 
@@ -401,6 +405,13 @@ void resolveVariable(Analyzer* analyzer, Variable* variable) {
     else {
 
     }
+
+    return type;
+}
+
+void resolveVariable(Analyzer* analyzer, Variable* variable) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    variable->type = resolveVariableType(analyzer, variable->variableType);
 }
 
 void resolveStructure(Analyzer* analyzer, Structure* structure) {
@@ -422,10 +433,8 @@ void resolveStructure(Analyzer* analyzer, Structure* structure) {
     invalidate(analyzer);
 }
 
-#define invalidate(analyzer) analyzer->scope = analyzer->scope->parent
-
 void resolveFunction(Analyzer* analyzer, Function* function) {
-    // TODO: resolve return type
+    function->returnType = resolveVariableType(analyzer, function->returnVariableType);
 
     int32_t count = jtk_ArrayList_getSize(function->parameters);
     int32_t i;

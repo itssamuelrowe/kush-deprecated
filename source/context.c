@@ -358,6 +358,7 @@ Function* newFunction() {
     result->parameters = jtk_ArrayList_new();
     result->variableParameter = NULL;
     result->body = NULL;
+    result->returnVariableType = NULL;
     result->returnType = NULL;
     result->scope = NULL;
     return result;

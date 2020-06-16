@@ -421,6 +421,7 @@ struct Function {
     jtk_ArrayList_t* parameters;
     Variable* variableParameter;
     Block* body;
+    VariableType* returnVariableType;
     Type* returnType;
     Scope* scope;
 };
