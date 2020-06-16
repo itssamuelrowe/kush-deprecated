@@ -347,22 +347,6 @@ void deleteBlock(Block* self) {
 }
 
 /*******************************************************************************
- * FunctionParameter                                                           *
- *******************************************************************************/
-
-// TODO: Include the type context.
-FunctionParameter* newFunctionParameter() {
-    FunctionParameter* result = allocate(FunctionParameter, 1);
-    result->type = NULL;
-    result->identifier = NULL;
-    return result;
-}
-
-void deleteFunctionParameter(FunctionParameter* self) {
-    deallocate(self);
-}
-
-/*******************************************************************************
  * Function                                                                    *
  *******************************************************************************/
 

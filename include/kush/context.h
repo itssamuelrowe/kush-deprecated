@@ -396,21 +396,6 @@ Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
 void deleteVariable(Variable* variable);
 
 /*******************************************************************************
- * FunctionParameter                                                           *
- *******************************************************************************/
-
-struct FunctionParameter {
-    ContextType tag;
-    Type* type;
-    Token* identifier;
-};
-
-typedef struct FunctionParameter FunctionParameter;
-
-FunctionParameter* newFunctionParameter();
-void deleteFunctionParameter(FunctionParameter* self);
-
-/*******************************************************************************
  * Function                                                                    *
  *******************************************************************************/
 
@@ -420,7 +405,7 @@ struct Function {
     int32_t nameSize;
     Token* identifier;
     jtk_ArrayList_t* parameters;
-    FunctionParameter* variableParameter;
+    Variable* variableParameter;
     Block* body;
     Type* returnType;
     Scope* scope;

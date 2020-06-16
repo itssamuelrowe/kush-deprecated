@@ -101,7 +101,7 @@ static Type* parseType(Parser* parser);
 static Type* parseReturnType(Parser* parser);
 static Function* parseFunctionDeclaration(Parser* parser, uint32_t modifiers);
 static void parseFunctionParameters(Parser* parser, jtk_ArrayList_t* fixedParameters,
-    FunctionParameter** variableParameter);
+    Variable** variableParameter);
 static Block* parseBlock(Parser* parser);
 static Context* parseSimpleStatement(Parser* parser);
 static VariableDeclaration* parseVariableDeclaration(Parser* parser, bool onlyVariable,
@@ -816,7 +816,7 @@ Function* parseFunctionDeclaration(Parser* parser,
  * taken to avoid redundant nodes in the AST.
  */
 void parseFunctionParameters(Parser* parser,
-    jtk_ArrayList_t* fixedParameters, FunctionParameter** variableParameter) {
+    jtk_ArrayList_t* fixedParameters, Variable** variableParameter) {
     match(parser, TOKEN_LEFT_PARENTHESIS);
     pushFollowToken(parser, TOKEN_RIGHT_PARENTHESIS);
 
@@ -828,19 +828,23 @@ void parseFunctionParameters(Parser* parser,
                 match(parser, TOKEN_COMMA);
             }
 
-            // TODO: Convert FunctionParameter to Variable.
-            FunctionParameter* parameter = newFunctionParameter();
-            parameter->type = parseType(parser);
+            bool variadic = false;
+            Type* type = parseType(parser);
             if (la(parser, 1) == TOKEN_ELLIPSIS) {
-                match(parser, TOKEN_ELLIPSIS);
+                consume(parser);
+                variadic = true;
+            }
+            Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
+            first = false;
+
+            Variable* parameter = newVariable(false, false, type, identifier, NULL, NULL);
+            if (variadic) {
                 *variableParameter = parameter;
                 break;
             }
             else {
                 jtk_ArrayList_add(fixedParameters, parameter);
             }
-            parameter->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
-            first = false;
         }
         while (la(parser, 1) == TOKEN_COMMA);
     }

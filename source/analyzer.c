@@ -155,7 +155,7 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
         defineSymbol(analyzer->scope, structure);
     }
     else {
-        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_STRUCTURE,
+        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_STRUCTURE,
             structure->identifier);
     }
 
@@ -177,13 +177,30 @@ void defineFunction(Analyzer* analyzer, Function* function) {
     function->scope = scopeForFunction(analyzer->scope, function);
     analyzer->scope = function->scope;
 
-    Scope* scope = defineLocals(analyzer, function->body);
-    // int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
-    // int32_t i;
-    // for (i = 0; i < parameterCount; i++) {
-    //     Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
-    //     defineSymbol(scope, parameter);
-    // }
+    int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
+    int32_t i;
+    for (i = 0; i < parameterCount; i++) {
+        Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
+        if (isUndefined(function->scope, parameter->name)) {
+            defineSymbol(function->scope, parameter);
+        }
+        else {
+            handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_PARAMETER,
+                parameter->identifier);
+        }
+    }
+
+    if (function->variableParameter != NULL) {
+        if (isUndefined(function->scope, function->name)) {
+            defineSymbol(function->scope, function->variableParameter);
+        }
+        else {
+            handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_VARIABLE_PARAMETER,
+                function->variableParameter->identifier);
+        }
+    }
+
+    defineLocals(analyzer, function->body);
 
     analyzer->scope = analyzer->scope->parent;
 }
@@ -212,7 +229,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                     defineSymbol(analyzer->scope, statement);
                 }
                 else {
-                    handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_LABEL,
+                    handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_LABEL,
                         statement->label);
                 }
 
@@ -256,7 +273,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                         defineSymbol(localScope, parameter);
                     }
                     else {
-                        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_CATCH_PARAMETER,
+                        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_CATCH_PARAMETER,
                             parameter->identifier);
                     }
                 }
@@ -279,7 +296,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                         defineSymbol(analyzer->scope, variable);
                     }
                     else {
-                        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_VARIABLE,
+                        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_VARIABLE,
                             variable->identifier);
                     }
                 }
@@ -628,7 +645,7 @@ void defineSymbols(Analyzer* analyzer, Module* module) {
             defineSymbol(analyzer->scope, function);
         }
         else {
-            handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_FUNCTION,
+            handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_FUNCTION,
                 function->identifier);
         }
     }
