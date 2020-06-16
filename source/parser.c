@@ -1207,9 +1207,12 @@ IfClause* parseElseIfClause(Parser* parser) {
 IterativeStatement* parseIterativeStatement(Parser* parser) {
     IterativeStatement* context = newIterativeStatement();
 
+    // TODO: Should context->name really be allocated? Can't we just reuse context->label->text?
 	if (la(parser, 1) == TOKEN_HASH) {
         consume(parser);
 	    context->label = matchAndYield(parser, TOKEN_IDENTIFIER);
+        context->nameSize = context->label->length;
+        context->name = jtk_CString_newEx(context->label->text, context->nameSize);
 	}
 
 	switch (la(parser, 1)) {

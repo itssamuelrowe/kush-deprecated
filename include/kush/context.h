@@ -487,6 +487,8 @@ void deleteIfStatement(IfStatement* self);
 
 struct IterativeStatement {
     ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
     Token* label;
     bool whileLoop;
     Token* parameter;

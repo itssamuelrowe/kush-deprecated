@@ -207,10 +207,15 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
         switch (context->tag) {
             case CONTEXT_ITERATIVE_STATEMENT: {
                 IterativeStatement* statement = (IterativeStatement*)context;
-                // TODO: Loops should be converted to Symbol!
-                // if (statement->label != NULL) {
-                //     defineSymbol(analyzer->scope, &statement->label);
-                // }
+
+                if ((statement->name != NULL) && isUndefined(analyzer->scope, statement->name)) {
+                    defineSymbol(analyzer->scope, statement);
+                }
+                else {
+                    handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_LABEL,
+                        statement->label);
+                }
+
                 Scope* localScope = defineLocals(analyzer, statement->body);
                 if (statement->parameter != NULL) {
                     defineSymbol(localScope, statement->parameter);

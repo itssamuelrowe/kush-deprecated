@@ -444,6 +444,8 @@ IterativeStatement* newIterativeStatement() {
     IterativeStatement* result = allocate(IterativeStatement, 1);
     result->tag = CONTEXT_ITERATIVE_STATEMENT;
     result->label = NULL;
+    result->name = NULL;
+    result->nameSize = 0;
     result->whileLoop = false;
     result->parameter = NULL;
     result->expression = NULL;
