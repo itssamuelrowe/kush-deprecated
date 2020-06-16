@@ -371,6 +371,31 @@ Block* newBlock();
 void deleteBlock(Block* self);
 
 /*******************************************************************************
+ * Variable                                                                    *
+ *******************************************************************************/
+
+/**
+ * Not part of the AST.
+ */
+struct Variable {
+    ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
+    bool infer;
+    bool constant;
+    Type* type;
+    Token* identifier;
+    BinaryExpression* expression;
+    Scope* parent;
+};
+
+typedef struct Variable Variable;
+
+Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
+    BinaryExpression* expression, Scope* parent);
+void deleteVariable(Variable* variable);
+
+/*******************************************************************************
  * FunctionParameter                                                           *
  *******************************************************************************/
 
@@ -499,7 +524,7 @@ void deleteTryStatement(TryStatement* self);
  */
 struct CatchClause {
     jtk_ArrayList_t* captures;
-    Token* parameter;
+    Variable* parameter;
     Block* body;
 };
 
@@ -507,31 +532,6 @@ typedef struct CatchClause CatchClause;
 
 CatchClause* newCatchClause();
 void deleteCatchClause(CatchClause* self);
-
-/*******************************************************************************
- * Variable                                                                    *
- *******************************************************************************/
-
-/**
- * Not part of the AST.
- */
-struct Variable {
-    ContextType tag;
-    uint8_t* name;
-    int32_t nameSize;
-    bool infer;
-    bool constant;
-    Type* type;
-    Token* identifier;
-    BinaryExpression* expression;
-    Scope* parent;
-};
-
-typedef struct Variable Variable;
-
-Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
-    BinaryExpression* expression, Scope* parent);
-void deleteVariable(Variable* variable);
 
 /*******************************************************************************
  * VariableDeclaration                                                         *

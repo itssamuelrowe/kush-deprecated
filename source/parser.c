@@ -1323,7 +1323,9 @@ CatchClause* parseCatchClause(Parser* parser) {
         }
 	}
 
-    context->parameter = matchAndYield(parser, TOKEN_IDENTIFIER);
+    Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
+    context->parameter = newVariable(false, true, &primitives.string, identifier,
+        NULL, NULL);
     context->body = parseBlock(parser);
 
     return context;

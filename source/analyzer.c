@@ -192,6 +192,7 @@ void defineLocal(Analyzer* analyzer, Context* symbol) {
 
 }
 
+// TODO: Assign variables their parent scopes!
 Scope* defineLocals(Analyzer* analyzer, Block* block) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
 
@@ -243,16 +244,16 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                 for (j = 0; j < count; j++) {
                     CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
                         statement->catchClauses, j);
+                    Variable* parameter = clause->parameter;
                     Scope* localScope = defineLocals(analyzer, clause->body);
 
-                    // TODO: Convert catch parameter to variable.
-                    // if (isUndefined(localScope, clause->identifier->text)) {
-                    //     defineSymbol(localScope, clause->parameter);
-                    // }
-                    // else {
-                    //     handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_CATCH_PARAMETER,
-                    //         clause->identifier);
-                    // }
+                    if (isUndefined(localScope, parameter->identifier->text)) {
+                        defineSymbol(localScope, parameter);
+                    }
+                    else {
+                        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_OF_SYMBOL_AS_CATCH_PARAMETER,
+                            parameter->identifier);
+                    }
                 }
 
                 if (statement->finallyClause != NULL) {
