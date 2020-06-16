@@ -388,14 +388,21 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
                     token);
             }
 
+            fflush(stdout);
+
             // TODO: Find the type.
 
             break;
         }
 
+        case TOKEN_KEYWORD_VOID: {
+            type = &primitives.void_;
+            break;
+        }
+
         default: {
-            printf("[internal error] Control should not reach here.");
-           break;
+            printf("[internal error] Control should not reach here.\n");
+            break;
         }
     }
 
@@ -481,15 +488,12 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
         switch (context->tag) {
             case CONTEXT_ITERATIVE_STATEMENT: {
                 IterativeStatement* statement = (IterativeStatement*)context;
-                if (statement->label != NULL) {
-                    // scopeAddLabel(analyzer->scope, &statement->label);
-                }
+                // if (statement->parameter != NULL) {
+                //     resolveVariable(analyzer, statement->parameter);
+                // }
                 resolveLocals(analyzer, statement->body);
-                if (statement->parameter != NULL) {
-                    // scopeAddVariable(localScope, statement->parameter);
-                }
 
-               break;
+                break;
             }
 
             case CONTEXT_IF_STATEMENT: {
@@ -505,7 +509,7 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
                 if (statement->elseClause != NULL) {
                     resolveLocals(analyzer, statement->elseClause);
                 }
-               break;
+                break;
             }
 
             case CONTEXT_TRY_STATEMENT: {
@@ -518,14 +522,13 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
                     CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
                         statement->catchClauses, j);
                     resolveLocals(analyzer, clause->body);
-                    // defineVariable(analyzer, localScope, clause->parameter);
                 }
 
                 if (statement->finallyClause != NULL) {
                     resolveLocals(analyzer, statement->finallyClause);
                 }
 
-               break;
+                break;
             }
 
             case CONTEXT_VARIABLE_DECLARATION: {
@@ -535,9 +538,9 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
                 for (j = 0; j < count; j++) {
                     Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
-                    // defineVariable(analyzer->scope, variable);
+                    resolveVariable(analyzer, variable);
                 }
-               break;
+                break;
             }
         }
     }
