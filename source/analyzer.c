@@ -127,7 +127,7 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
 #define invalidate(analyzer) analyzer->scope = analyzer->scope->parent
 
-#define controlError() printf("[internal error] %s:%d: Control should not reach here.", __FILE__, __LINE__);
+#define controlError() printf("[internal error] %s:%d: Control should not reach here.\n", __FILE__, __LINE__);
 
 // String:equals(x, y)
 // x.equals(y)
@@ -866,8 +866,9 @@ Type* resolveSubscript(Analyzer* analyzer, Subscript* subscript, Type* previous)
     return result;
 }
 
-// TODO: Add the function type!
-Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments, Type* previous) {
+// TODO: Check if the argument type matches the parameter type.
+Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
+    Type* previous) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     Type* result = NULL;
     if (!previous->callable) {
@@ -875,14 +876,20 @@ Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
             arguments->parenthesis);
     }
     else {
-        int32_t j;
-        for (j = 0; j < arguments->expressions->m_size; j++) {
-            BinaryExpression* argument = (BinaryExpression*)jtk_ArrayList_getValue(
-                arguments->expressions, j);
-            Type* argumentType = resolveExpression(analyzer, argument);
-            // TODO: Check if the argument type matches the parameter type.
+        if (previous->tag == TYPE_FUNCTION) {
+            Function* function = previous->function;
+            int32_t j;
+            for (j = 0; j < arguments->expressions->m_size; j++) {
+                BinaryExpression* argument = (BinaryExpression*)jtk_ArrayList_getValue(
+                    arguments->expressions, j);
+                Type* argumentType = resolveExpression(analyzer, argument);
+                // ...
+            }
+            result = function->returnType;
         }
-        // TODO: Find the result of the function call.
+        else {
+            controlError();
+        }
     }
     return result;
 }
@@ -954,6 +961,9 @@ Type* resolveToken(Analyzer* analyzer, Token* token) {
             Context* context = resolveSymbol(analyzer->scope, token->text);
             if (context->tag == CONTEXT_VARIABLE) {
                 result = ((Variable*)context)->type;
+            }
+            else if (context->tag == CONTEXT_FUNCTION_DECLARATION) {
+                result = ((Function*)context)->type;
             }
             else {
                 handleSemanticError(handler, analyzer, ERROR_EXPECTED_VARIABLE,

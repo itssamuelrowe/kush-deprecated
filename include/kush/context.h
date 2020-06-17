@@ -35,7 +35,8 @@
 #define TYPE_NULL 5
 #define TYPE_STRING 6
 #define TYPE_BOOLEAN 7
-#define TYPE_UNKONWN 8
+#define TYPE_FUNCTION 8
+#define TYPE_UNKONWN 9
 
 typedef struct Type Type;
 typedef struct Structure Structure;
@@ -59,6 +60,7 @@ struct Type {
             uint8_t size;
         } decimal;
         Structure* structure;
+        Function* function;
     };
 };
 
@@ -424,12 +426,15 @@ struct Function {
     Block* body;
     VariableType* returnVariableType;
     Type* returnType;
+    Type* type;
     Scope* scope;
 };
 
 typedef struct Function Function;
 
-Function* newFunction();
+Function* newFunction(const uint8_t* name, int32_t nameSize, Token* identifier,
+    jtk_ArrayList_t* parameters, Variable* variableParameter,
+    Block* body, VariableType* returnVariableType);
 void deleteFunction(Function* self);
 
 /*******************************************************************************

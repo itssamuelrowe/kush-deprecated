@@ -351,17 +351,25 @@ void deleteBlock(Block* self) {
  * Function                                                                    *
  *******************************************************************************/
 
-// Include type for returnType
-Function* newFunction() {
+Function* newFunction(const uint8_t* name, int32_t nameSize, Token* identifier,
+    jtk_ArrayList_t* parameters, Variable* variableParameter,
+    Block* body, VariableType* returnVariableType) {
     Function* result = allocate(Function, 1);
     result->tag = CONTEXT_FUNCTION_DECLARATION;
+    result->nameSize = nameSize;
+    result->name = jtk_CString_newEx(name, nameSize);
     result->identifier = NULL;
-    result->parameters = jtk_ArrayList_new();
-    result->variableParameter = NULL;
-    result->body = NULL;
-    result->returnVariableType = NULL;
+    result->parameters = parameters;
+    result->variableParameter = variableParameter;
+    result->body = body;
+    result->returnVariableType = returnVariableType;
     result->returnType = NULL;
+    result->type = newType(TYPE_FUNCTION, false, false, true, identifier);
     result->scope = NULL;
+
+    // TODO: Probably move this to newType(), or some overloaded version of it?
+    result->type->function = result;
+
     return result;
 }
 

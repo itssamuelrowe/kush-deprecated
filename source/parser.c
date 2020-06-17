@@ -739,27 +739,27 @@ Function* parseFunctionDeclaration(Parser* parser,
     pushFollowToken(parser, TOKEN_LEFT_BRACE);
     pushFollowToken(parser, TOKEN_RIGHT_BRACE);
 
-    Function* context = newFunction();
-    context->returnVariableType = parseReturnType(parser);
-    context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
-    context->nameSize = context->identifier->length;
-    context->name = jtk_CString_newEx(context->identifier->text, context->nameSize);
-    parseFunctionParameters(parser, context->parameters,
-        &context->variableParameter);
+    VariableType* returnVariableType = parseReturnType(parser);
+    Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
+    jtk_ArrayList_t* parameters = jtk_ArrayList_new();
+    Variable* variableParameter = NULL;
+    parseFunctionParameters(parser, parameters, &variableParameter);
 
     /* Pop the ';', '{', and '}' tokens from the follow set. */
     popFollowToken(parser);
     popFollowToken(parser);
     popFollowToken(parser);
 
+    Block* body = NULL;
     if (false /*k_Modifier_hasNative(modifiers) */) {
         match(parser, TOKEN_SEMICOLON);
     }
     else {
-	    context->body = parseBlock(parser);
+	    body = parseBlock(parser);
     }
 
-    return context;
+    return newFunction(identifier->text, identifier->length, identifier,
+        parameters, variableParameter, body, returnVariableType);
 }
 
 /*
