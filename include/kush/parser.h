@@ -38,6 +38,8 @@ struct Parser {
     bool recovery;
 };
 
+extern const char ruleNames[][50];
+
 typedef struct Parser Parser;
 
 Parser* parserNew(Compiler* compiler, TokenStream* tokens);

@@ -274,6 +274,7 @@ void destroyPrimitives() {
 
 Module* newModule() {
     Module* result = allocate(Module, 1);
+    result->tag = CONTEXT_MODULE;
     result->imports = jtk_ArrayList_new();
     result->functions = jtk_ArrayList_new();
     result->structures = jtk_ArrayList_new();

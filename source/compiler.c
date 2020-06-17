@@ -309,7 +309,7 @@ void buildAST(Compiler* compiler) {
                     compiler->modules[i] = module;
 
                     if (compiler->dumpNodes) {
-                        // TODO
+                        printNodes(compiler, module, 0);
                     }
                 }
             }
@@ -514,7 +514,6 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
         printHelp();
     }
     else {
-
         int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
         bool noErrors = false;
         if (size == 0) {
@@ -633,4 +632,261 @@ void deleteCompiler(Compiler* compiler) {
 
     jtk_ArrayList_delete(compiler->inputFiles);
     deallocate(compiler);
+}
+
+/******************************************************************************
+ * printNodes                                                                  *
+ ******************************************************************************/
+
+static void printType(Type* type); //DONE
+static void printStructures(Compiler* compiler, Module* module); //DONE
+static void printBinary(Compiler* compiler, BinaryExpression* expression);
+static void printConditional(Compiler* compiler, ConditionalExpression* expression);
+static void printUnary(Compiler* compiler, UnaryExpression* expression);
+static void printSubscript(Compiler* compiler, Subscript* subscript);
+static void printFunctionArguments(Compiler* compiler, FunctionArguments* arguments);
+static void printMemberAccess(Compiler* compiler, MemberAccess* access);
+static void printPostfix(Compiler* compiler, PostfixExpression* expression);
+static void printInitializer(Compiler* compiler, ArrayExpression* expression);
+static void printArray(Compiler* compiler, ArrayExpression* expression);
+static void printExpression(Compiler* compiler, Context* context);
+static void printIndentation(int32_t depth);
+static void printBlock(Compiler* compiler, Block* block, int32_t depth);
+static void printFunction(Compiler* compiler, Function* function);
+static void printFunctions(Compiler* compiler, Module* module);
+
+void printType(Type* type) {
+    const char* output = NULL;
+    if (type == &primitives.boolean) {
+        output = "bool";
+    }
+    else if (type == &primitives.i8) {
+        output = "int8_t";
+    }
+    else if (type == &primitives.i16) {
+        output = "int16_t";
+    }
+    else if (type == &primitives.i32) {
+        output = "int32_t";
+    }
+    else if (type == &primitives.i64) {
+        output = "int64_t";
+    }
+    else if (type == &primitives.ui8) {
+        output = "uint8_t";
+    }
+    else if (type == &primitives.ui16) {
+        output = "uint16_t";
+    }
+    else if (type == &primitives.ui32) {
+        output = "uint32_t";
+    }
+    else if (type == &primitives.ui64) {
+        output = "uint64_t";
+    }
+    else if (type == &primitives.f32) {
+        output = "float";
+    }
+    else if (type == &primitives.f64) {
+        output = "double";
+    }
+    else if (type == &primitives.void_) {
+        output = "void";
+    }
+    else if (type == &primitives.string) {
+        output = "String*";
+    }
+    printf("%s", output);
+}
+
+
+void printStructures(Compiler* compiler, Module* module) {
+    int32_t structureCount = jtk_ArrayList_getSize(module->structures);
+    int32_t j;
+    for (j = 0; j < structureCount; j++) {
+        Structure* structure = (Structure*)jtk_ArrayList_getValue(
+            module->structures, j);
+        printf("struct %s", structure->identifier->text);
+        
+        int32_t limit = jtk_ArrayList_getSize(structure->variables);
+        int32_t i;
+        for (i = 0; i < limit; i++) {
+            Variable* variable = (Variable*)jtk_ArrayList_getValue(structure->variables, i);
+            printf("    ");
+            //printType(variable->type);
+            printf(" %s;\n", variable->identifier->text);
+        }
+    }
+    printf("\n");
+}
+
+void printFunctions(Compiler* compiler, Module* module) {
+    int32_t functionCount = jtk_ArrayList_getSize(module->functions);
+    int32_t i;
+    for (i = 0; i < functionCount; i++) {
+        Function* function = (Function*)jtk_ArrayList_getValue(
+            module->functions, i);
+        printFunction(compiler, function);
+    }
+}
+
+void printFunction(Compiler* compiler, Function* function) {
+    printType(function->returnType);
+    printf(" %s(", function->identifier->text);
+
+    int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
+    int32_t i;
+    for (i = 0; i < parameterCount; i++) {
+        FunctionParameter* parameter = (FunctionParameter*)jtk_ArrayList_getValue(function->variableParameter, i);
+        printType(parameter->type);
+        printf(" %s", parameter->identifier->text);
+        if (i + 1 < parameterCount) {
+            printf(", ");
+        }
+    }
+    printf(") ");
+     
+    printBlock(compiler, function->body, 0);
+    printf("\n");
+
+}
+
+
+void printBlock(Compiler* compiler, Block* block, int32_t depth) {
+    
+    int32_t limit = jtk_ArrayList_getSize(block->statements);
+    if (limit > 0) {
+        depth++;
+        printIndentation(depth);
+
+        int32_t i;
+        for (i = 0; i < limit; i++) {
+            Context* context = (Context*)jtk_ArrayList_getValue(
+                block->statements, i);
+            switch (context->tag) {
+                case CONTEXT_ITERATIVE_STATEMENT: {
+                    IterativeStatement* statement = (IterativeStatement*)context;
+
+                    if (statement->label->text != NULL) {
+                        printf("%s: ", statement->label->text);
+                    }
+
+                    if (statement->whileLoop) {
+                        printf("while");
+                        //generateExpression(compiler, (Context*)statement->expression);
+                        printf(") ");
+                    }
+
+                    printBlock(compiler, statement->body, depth);
+
+                    if (statement->label->text != NULL) {
+                        printIndentation(depth);
+                        printf("__%sExit:\n", statement->label->text);
+                    }
+
+                    break;
+                }
+
+                case CONTEXT_IF_STATEMENT: {
+                    
+                    IfStatement* statement = (IfStatement*)context;
+                    printf("if (");
+                    
+                    //printExpression(compiler, (Context*)statement->ifClause->expression);
+                    
+                    printf(") ");
+                    
+                    printBlock(compiler, statement->ifClause->body, depth);
+
+                    int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
+                    int32_t j;
+                    for (j = 0; j < count; j++) {
+                        printIndentation(depth);
+                        IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
+                            statement->elseIfClauses, j);
+                        printf("else if (");
+                        //printExpression(compiler, (Context*)clause->expression);
+                        printf(") ");
+                        printBlock(compiler, clause->body, depth);
+                    }
+
+                    if (statement->elseClause != NULL) {
+                        printIndentation(depth);
+                        printf("else ");
+                        printBlock(compiler, statement->elseClause, depth);
+                    }
+
+                    break;
+                }
+
+                case CONTEXT_VARIABLE_DECLARATION: {
+                    VariableDeclaration* statement = (VariableDeclaration*)context;
+                    int32_t count = jtk_ArrayList_getSize(statement->variables);
+                    int32_t j;
+                    for (j = 0; j < count; j++) {
+                        Variable* variable = (Variable*)jtk_ArrayList_getValue(
+                            statement->variables, j);
+                        printType(variable->type);
+                        printf(" %s", variable->identifier->text);
+                        if (variable->expression != NULL) {
+                            printf(" = ");
+                            //printExpression(compiler, (Context*)variable->expression);
+                        }
+                        printf(";\n");
+                    }
+                    break;
+                }
+
+                case CONTEXT_ASSIGNMENT_EXPRESSION: {
+                    //printExpression(compiler, context);
+                    printf(";\n");
+                    break;
+                }
+
+                case CONTEXT_BREAK_STATEMENT: {
+                    BreakStatement* statement = (BreakStatement*)context;
+                    if (statement->identifier != NULL) {
+                        printf("goto __%sExit;\n", statement->identifier->text);
+                    }
+                    else {
+                        printf("break;\n");
+                    }
+                    break;
+                }
+
+
+                case CONTEXT_RETURN_STATEMENT: {
+                    ReturnStatement* statement = (ReturnStatement*)context;
+                    printf("return ");
+                    //printExpression(compiler, (Context*)statement->expression);
+                    printf(";\n");
+
+                    break;
+                }
+
+            }
+            if (i + 1 < limit) {
+                printIndentation(depth);
+            }
+        }
+        printIndentation(depth - 1);
+    }
+    else {
+        printIndentation(depth);
+    }
+
+    printf("}\n");    
+}
+
+
+void printNodes(Compiler* compiler, Module* module, int depth) {
+    printStructures(compiler, module);
+    printFunctions(compiler, module);
+}
+
+void printIndentation(int depth) {
+    int32_t d;
+    for (d = 0; d < depth; d++) {
+        printf("    ");
+    }
 }
