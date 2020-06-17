@@ -22,6 +22,7 @@
 
 #warning "TODO: Report invalid lvalue"
 #warning "TODO: Print the line where the error occurs"
+#warning "TODO: Report an error when no return statement is present."
 
 /*
  * The following text describes a naive algorithm that I developed to analyze
@@ -574,26 +575,28 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
     invalidate(analyzer);
 }
 
+/* Return the type of the first expression, even if there are errors in the
+ * right hand side.
+ */
 Type* resolveAssignment(Analyzer* analyzer, BinaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* leftType = resolveExpression(analyzer, expression->left);
+    Type* result = resolveExpression(analyzer, expression->left);
 
     int32_t count = jtk_ArrayList_getSize(expression->others);
-    if ((leftType != NULL) && (count > 0)) {
+    if ((result != NULL) && (count > 0)) {
         int32_t i;
-        for (i = 0; (i < count) && (leftType != NULL); i++) {
+        for (i = 0; i < count; i++) {
             jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
             Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
 
-            if (leftType != rightType) {
+            if ((rightType != NULL) && (result != rightType)) {
                 handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
                     (Token*)pair->m_left);
-                leftType = NULL;
             }
         }
     }
 
-    return leftType;
+    return result;
 }
 
 // TODO: `condition? object : null` should work
@@ -602,22 +605,25 @@ Type* resolveConditional(Analyzer* analyzer, ConditionalExpression* expression) 
     Type* conditionType = resolveExpression(analyzer, expression->condition);
     Type* result = conditionType;
 
-    if ((conditionType != NULL) && (expression->hook != NULL)) {
-        Type* thenType = resolveExpression(analyzer, expression->then);
-        Type* elseType = resolveExpression(analyzer, expression->otherwise);
-
-        if (conditionType != &primitives.boolean) {
+    if (expression->hook != NULL) {
+        if ((conditionType != NULL) && (conditionType != &primitives.boolean)) {
             handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
                 expression->hook);
             result = NULL;
         }
-        else if (thenType != elseType) {
-            handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
-                expression->hook);
-            result = NULL;
-        }
-        else {
-            result = thenType;
+
+        Type* thenType = resolveExpression(analyzer, expression->then);
+        Type* elseType = resolveExpression(analyzer, expression->otherwise);
+
+        result = NULL;
+        if ((thenType != NULL) && (elseType != NULL)) {
+            if (thenType != elseType) {
+                handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                    expression->hook);
+            }
+            else {
+                result = thenType;
+            }
         }
     }
 
@@ -626,70 +632,79 @@ Type* resolveConditional(Analyzer* analyzer, ConditionalExpression* expression) 
 
 Type* resolveLogical(Analyzer* analyzer, BinaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+    Type* result = resolveExpression(analyzer, (Context*)expression->left);
 
     int32_t count = jtk_ArrayList_getSize(expression->others);
-    if ((leftType != NULL) && (count > 0)) {
+    if ((result != NULL) && (count > 0)) {
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
 
-        if (leftType->tag != TYPE_BOOLEAN) {
+        if (result->tag != TYPE_BOOLEAN) {
             handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION_ON_LEFT,
                 (Token*)pair->m_left);
-            leftType = NULL;
+            result = NULL;
         }
         else {
             int32_t i;
-            for (i = 0; (i < count) && (leftType != NULL); i++) {
+            for (i = 0; (i < count) && (result != NULL); i++) {
                 pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
                 Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
 
-                if (rightType->tag != TYPE_BOOLEAN) {
-                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION_ON_RIGHT,
-                        (Token*)pair->m_left);
-                    leftType = NULL;
+                result = NULL;
+                if (rightType != NULL) {
+                    if (rightType->tag != TYPE_BOOLEAN) {
+                        handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION_ON_RIGHT,
+                            (Token*)pair->m_left);
+                    }
+                    else {
+                        result = &primitives.boolean;
+                    }
                 }
             }
         }
     }
 
-    return leftType;
+    return result;
 }
 
 Type* resolveBitwise(Analyzer* analyzer, BinaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+    Type* result = resolveExpression(analyzer, (Context*)expression->left);
 
     int32_t count = jtk_ArrayList_getSize(expression->others);
-    if ((leftType != NULL) && (count > 0)) {
+    if ((result != NULL) && (count > 0)) {
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
 
-        if (leftType->tag != TYPE_INTEGER) {
+        if (result->tag != TYPE_INTEGER) {
             handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION_ON_LEFT,
                 (Token*)pair->m_left);
-            leftType = NULL;
+            result = NULL;
         }
         else {
-            Type* previousType = leftType;
+            Type* previousType = result;
             int32_t i;
-            for (i = 0; (i < count) && (leftType != NULL); i++) {
+            for (i = 0; (i < count) && (result != NULL); i++) {
                 pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
                 Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
 
-                if (rightType->tag != TYPE_INTEGER) {
-                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION_ON_RIGHT,
-                        (Token*)pair->m_left);
-                    leftType = NULL;
-                }
-                else if (previousType != rightType) {
-                    handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
-                        (Token*)pair->m_left);
-                    leftType = NULL;
+                result = NULL;
+                if (rightType != NULL) {
+                    if (rightType->tag != TYPE_INTEGER) {
+                        handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION_ON_RIGHT,
+                            (Token*)pair->m_left);
+                    }
+                    else if (previousType != rightType) {
+                        handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                            (Token*)pair->m_left);
+                    }
+                    else {
+                        result = rightType;
+                    }
                 }
             }
         }
     }
 
-    return leftType;
+    return result;
 }
 
 /* TODO: In the future, we might allow `a == b == c`. Right now, the definition
@@ -697,24 +712,26 @@ Type* resolveBitwise(Analyzer* analyzer, BinaryExpression* expression) {
  */
 Type* resolveEquality(Analyzer* analyzer, BinaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+    Type* result = resolveExpression(analyzer, (Context*)expression->left);
 
     int32_t count = jtk_ArrayList_getSize(expression->others);
-    if ((leftType != NULL) && (count > 0)) {
+    if ((result != NULL) && (count > 0)) {
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
         Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
 
-        if (leftType != rightType) {
-            handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
-                (Token*)pair->m_left);
-            leftType = NULL;
-        }
-        else {
-            leftType = &primitives.boolean;
+        result = NULL;
+        if (rightType != NULL) {
+            if (result != rightType) {
+                handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                    (Token*)pair->m_left);
+            }
+            else {
+                result = &primitives.boolean;
+            }
         }
     }
 
-    return leftType;
+    return result;
 }
 
 /* TODO: In the future, we might allow `a < b < c`. Right now, the definition
@@ -722,103 +739,107 @@ Type* resolveEquality(Analyzer* analyzer, BinaryExpression* expression) {
  */
 Type* resolveRelational(Analyzer* analyzer, BinaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+    Type* result = resolveExpression(analyzer, (Context*)expression->left);
 
     int32_t count = jtk_ArrayList_getSize(expression->others);
-    if ((leftType != NULL) && (count > 0)) {
+    if ((result != NULL) && (count > 0)) {
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
         Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
 
-        if ((leftType->tag != TYPE_INTEGER) && (leftType->tag != TYPE_DECIMAL)) {
-            handleSemanticError(handler, analyzer, ERROR_INVALID_LEFT_OPERAND,
-                (Token*)pair->m_left);
-            leftType = NULL;
-        }
-        else if ((rightType->tag != TYPE_INTEGER) && (rightType->tag != TYPE_DECIMAL)) {
-            handleSemanticError(handler, analyzer, ERROR_INVALID_RIGHT_OPERAND,
-                (Token*)pair->m_left);
-            leftType = NULL;
-        }
-        else if (leftType != rightType) {
-            handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
-                (Token*)pair->m_left);
-            leftType = NULL;
-        }
-        else {
-            leftType = &primitives.boolean;
+        if (rightType != NULL) {
+            if ((result->tag != TYPE_INTEGER) && (result->tag != TYPE_DECIMAL)) {
+                handleSemanticError(handler, analyzer, ERROR_INVALID_LEFT_OPERAND,
+                    (Token*)pair->m_left);
+                result = NULL;
+            }
+            else if ((result->tag != TYPE_INTEGER) && (result->tag != TYPE_DECIMAL)) {
+                handleSemanticError(handler, analyzer, ERROR_INVALID_RIGHT_OPERAND,
+                    (Token*)pair->m_left);
+                result = NULL;
+            }
+            else if (result != rightType) {
+                handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                    (Token*)pair->m_left);
+                result = NULL;
+            }
+            else {
+                result = &primitives.boolean;
+            }
         }
     }
 
-    return leftType;
+    return result;
 }
 
 Type* resolveShift(Analyzer* analyzer, BinaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+    Type* result = resolveExpression(analyzer, (Context*)expression->left);
 
     int32_t count = jtk_ArrayList_getSize(expression->others);
-    if ((leftType != NULL) && (count > 0)) {
+    if ((result != NULL) && (count > 0)) {
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
 
-        if (leftType->tag != TYPE_INTEGER) {
+        if (result->tag != TYPE_INTEGER) {
             handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION_ON_LEFT,
                 (Token*)pair->m_left);
-            leftType = NULL;
+            result = NULL;
         }
         else {
             int32_t i;
-            for (i = 0; (i < count) && (leftType != NULL); i++) {
+            for (i = 0; (i < count) && (result != NULL); i++) {
                 pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
-                Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
+                result = resolveExpression(analyzer, (Context*)pair->m_right);
 
-                if (rightType->tag != TYPE_INTEGER) {
+                if (result->tag != TYPE_INTEGER) {
                     handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION_ON_RIGHT,
                         (Token*)pair->m_left);
-                    leftType = NULL;
+                    result = NULL;
                 }
             }
         }
     }
 
-    return leftType;
+    return result;
 }
 
 /* TODO: Overload + and * for strings! */
 Type* resolveArithmetic(Analyzer* analyzer, BinaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+    Type* result = resolveExpression(analyzer, (Context*)expression->left);
 
     int32_t count = jtk_ArrayList_getSize(expression->others);
-    if ((leftType != NULL) && (count > 0)) {
+    if ((result != NULL) && (count > 0)) {
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
 
-        if ((leftType->tag != TYPE_INTEGER) && (leftType->tag != TYPE_DECIMAL)) {
+        if ((result->tag != TYPE_INTEGER) && (result->tag != TYPE_DECIMAL)) {
             handleSemanticError(handler, analyzer, ERROR_INVALID_LEFT_OPERAND,
                 (Token*)pair->m_left);
-            leftType = NULL;
+            result = NULL;
         }
         else {
-            Type* previousType = leftType;
+            Type* previousType = result;
             int32_t i;
-            for (i = 0; (i < count) && (leftType != NULL); i++) {
+            for (i = 0; (i < count) && (result != NULL); i++) {
                 pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
-                Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
+                result = resolveExpression(analyzer, (Context*)pair->m_right);
 
-                if ((rightType->tag != TYPE_INTEGER) && (rightType->tag != TYPE_DECIMAL)) {
-                    handleSemanticError(handler, analyzer, ERROR_INVALID_RIGHT_OPERAND,
-                        (Token*)pair->m_left);
-                    leftType = NULL;
-                }
-                else if (previousType != rightType) {
-                    handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
-                        (Token*)pair->m_left);
-                    leftType = NULL;
+                if (result != NULL) {
+                    if ((result->tag != TYPE_INTEGER) && (result->tag != TYPE_DECIMAL)) {
+                        handleSemanticError(handler, analyzer, ERROR_INVALID_RIGHT_OPERAND,
+                            (Token*)pair->m_left);
+                        result = NULL;
+                    }
+                    else if (previousType != result) {
+                        handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                            (Token*)pair->m_left);
+                        result = NULL;
+                    }
                 }
             }
         }
     }
 
-    return leftType;
+    return result;
 }
 
 Type* resolveUnary(Analyzer* analyzer, UnaryExpression* expression) {

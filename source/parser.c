@@ -1376,7 +1376,7 @@ BinaryExpression* parseExpression(Parser* parser) {
 
 /*
  * assignmentExpression
- * :	conditionalExpression (assignmentOperator assignmentExpression)?
+ * :	conditionalExpression (assignmentOperator conditionalExpression)*
  * ;
  */
 BinaryExpression* parseAssignmentExpression(Parser* parser) {
@@ -1384,12 +1384,12 @@ BinaryExpression* parseAssignmentExpression(Parser* parser) {
 
     context->left = parseConditionalExpression(parser);
 
-    if (isAssignmentOperator(la(parser, 1))) {
+    while (isAssignmentOperator(la(parser, 1))) {
         jtk_Pair_t* pair = jtk_Pair_new();
         jtk_ArrayList_add(context->others, pair);
 
         pair->m_left = consumeAndYield(parser);
-        pair->m_right = parseAssignmentExpression(parser);
+        pair->m_right = parseConditionalExpression(parser);
     }
 
     return context;
@@ -1464,7 +1464,7 @@ BinaryExpression* parseInclusiveOrExpression(Parser* parser) {
 
     context->left = parseExclusiveOrExpression(parser);
 
-    if (la(parser, 1) == TOKEN_VERTICAL_BAR) {
+    while (la(parser, 1) == TOKEN_VERTICAL_BAR) {
         jtk_Pair_t* pair = jtk_Pair_new();
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseExclusiveOrExpression(parser);
