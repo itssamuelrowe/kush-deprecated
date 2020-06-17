@@ -385,6 +385,9 @@ Structure* newStructure(const uint8_t* name, int32_t nameSize,
     result->type = newType(TYPE_STRUCTURE, false, true, false, identifier);
     result->scope = NULL;
 
+    // TODO: Probably move this to newType(), or some overloaded version of it?
+    result->type->structure = result;
+
     return result;
 }
 

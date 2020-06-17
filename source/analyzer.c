@@ -20,6 +20,9 @@
 #include <kush/analyzer.h>
 #include <kush/error-handler.h>
 
+#warning "TODO: Report invalid lvalue"
+#warning "TODO: Print the line where the error occurs"
+
 /*
  * The following text describes a naive algorithm that I developed to analyze
  * if the left-value evaluates to a placeholder. I am not sure if the algorithm
@@ -101,16 +104,30 @@ static void importDefaults(Analyzer* analyzer);
 static void defineStructure(Analyzer* analyzer, Structure* structure);
 static void defineFunction(Analyzer* analyzer, Function* function);
 static Scope* defineLocals(Analyzer* analyzer, Block* block);
-Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType);
+static Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType);
 static uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size);
 static void resolveVariable(Analyzer* analyzer, Variable* variable);
-void resolveStructure(Analyzer* analyzer, Structure* structure);
+static void resolveStructure(Analyzer* analyzer, Structure* structure);
 static void resolveFunction(Analyzer* analyzer, Function* function);
 static void resolveLocals(Analyzer* analyzer, Block* block);
-static Type* resolveExpression(Analyzer* analyzer, Context* context);
+static Type* resolveAssignment(Analyzer* analyzer, BinaryExpression* expression);
+static Type* resolveConditional(Analyzer* analyzer, ConditionalExpression* expression);
+static Type* resolveLogical(Analyzer* analyzer, BinaryExpression* expression);
+static Type* resolveBitwise(Analyzer* analyzer, BinaryExpression* expression);
+static Type* resolveEquality(Analyzer* analyzer, BinaryExpression* expression);
+static Type* resolveRelational(Analyzer* analyzer, BinaryExpression* expression);
+static Type* resolveShift(Analyzer* analyzer, BinaryExpression* expression);
+static Type* resolveArithmetic(Analyzer* analyzer, BinaryExpression* expression);
+static Type* resolveUnary(Analyzer* analyzer, UnaryExpression* expression);
+static Type* resolvePostfix(Analyzer* analyzer, PostfixExpression* expression);
 static Type* resolveToken(Analyzer* analyzer, Token* token);
+static Type* resolveInitializer(Analyzer* analyzer, InitializerExpression* expression);
+static Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression);
+static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
 #define invalidate(analyzer) analyzer->scope = analyzer->scope->parent
+
+#define controlError() printf("[internal error] %s:%d: Control should not reach here.", __FILE__, __LINE__);
 
 // String:equals(x, y)
 // x.equals(y)
@@ -414,6 +431,7 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
     return type;
 }
 
+// TODO: Type inference
 void resolveVariable(Analyzer* analyzer, Variable* variable) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     variable->type = resolveVariableType(analyzer, variable->variableType);
@@ -556,175 +574,372 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
     invalidate(analyzer);
 }
 
-Type* resolveExpression(Analyzer* analyzer, Context* context) {
+Type* resolveAssignment(Analyzer* analyzer, BinaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* leftType = resolveExpression(analyzer, expression->left);
 
-    Type* result = NULL;
-    switch (context->tag) {
-        case CONTEXT_CONDITIONAL_EXPRESSION: {
-            ConditionalExpression* expression = (ConditionalExpression*)context;
-            Type* conditionType = result = resolveExpression(analyzer, expression->condition);
+    int32_t count = jtk_ArrayList_getSize(expression->others);
+    if ((leftType != NULL) && (count > 0)) {
+        int32_t i;
+        for (i = 0; (i < count) && (leftType != NULL); i++) {
+            jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
+            Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
 
-            if (expression->then != NULL) {
-                Type* thenType = resolveExpression(analyzer, expression->then);
-                Type* elseType = resolveExpression(analyzer, expression->otherwise);
+            if (leftType != rightType) {
+                handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                    (Token*)pair->m_left);
+                leftType = NULL;
+            }
+        }
+    }
 
-                if (conditionType != &primitives.boolean) {
-                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
-                        expression->hook);
+    return leftType;
+}
+
+// TODO: `condition? object : null` should work
+Type* resolveConditional(Analyzer* analyzer, ConditionalExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* conditionType = resolveExpression(analyzer, expression->condition);
+    Type* result = conditionType;
+
+    if ((conditionType != NULL) && (expression->hook != NULL)) {
+        Type* thenType = resolveExpression(analyzer, expression->then);
+        Type* elseType = resolveExpression(analyzer, expression->otherwise);
+
+        if (conditionType != &primitives.boolean) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                expression->hook);
+            result = NULL;
+        }
+        else if (thenType != elseType) {
+            handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                expression->hook);
+            result = NULL;
+        }
+        else {
+            result = thenType;
+        }
+    }
+
+    return result;
+}
+
+Type* resolveLogical(Analyzer* analyzer, BinaryExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+
+    int32_t count = jtk_ArrayList_getSize(expression->others);
+    if ((leftType != NULL) && (count > 0)) {
+        jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
+
+        if (leftType->tag != TYPE_BOOLEAN) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION_ON_LEFT,
+                (Token*)pair->m_left);
+            leftType = NULL;
+        }
+        else {
+            int32_t i;
+            for (i = 0; (i < count) && (leftType != NULL); i++) {
+                pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
+                Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
+
+                if (rightType->tag != TYPE_BOOLEAN) {
+                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION_ON_RIGHT,
+                        (Token*)pair->m_left);
+                    leftType = NULL;
                 }
+            }
+        }
+    }
 
-                if (thenType != elseType) {
+    return leftType;
+}
+
+Type* resolveBitwise(Analyzer* analyzer, BinaryExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+
+    int32_t count = jtk_ArrayList_getSize(expression->others);
+    if ((leftType != NULL) && (count > 0)) {
+        jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
+
+        if (leftType->tag != TYPE_INTEGER) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION_ON_LEFT,
+                (Token*)pair->m_left);
+            leftType = NULL;
+        }
+        else {
+            Type* previousType = leftType;
+            int32_t i;
+            for (i = 0; (i < count) && (leftType != NULL); i++) {
+                pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
+                Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
+
+                if (rightType->tag != TYPE_INTEGER) {
+                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION_ON_RIGHT,
+                        (Token*)pair->m_left);
+                    leftType = NULL;
+                }
+                else if (previousType != rightType) {
                     handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
-                        expression->hook);
-                }
-
-                result = thenType;
-            }
-
-            break;
-        }
-
-        case CONTEXT_RELATIONAL_EXPRESSION:
-        case CONTEXT_EQUALITY_EXPRESSION: {
-            BinaryExpression* expression = (BinaryExpression*)context;
-            Type* leftType = result = resolveExpression(analyzer, expression->left);
-
-            int32_t count = jtk_ArrayList_getSize(expression->others);
-            if (count == 1) {
-                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(
-                    expression->others, 0);
-                Type* rightType = resolveExpression(analyzer, pair->m_right);
-
-                if (leftType != rightType) {
-                    handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES, pair->m_left);
+                        (Token*)pair->m_left);
+                    leftType = NULL;
                 }
             }
-            else if (count > 1) {
-                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(
-                    expression->others, 1);
-                handleSemanticError(handler, analyzer, ERROR_CANNOT_COMBINE_EQUALITY_OPERATORS, pair->m_left);
-            }
-
-            break;
         }
+    }
 
-        case CONTEXT_ASSIGNMENT_EXPRESSION:
-        case CONTEXT_LOGICAL_OR_EXPRESSION:
-        case CONTEXT_LOGICAL_AND_EXPRESSION:
-        case CONTEXT_INCLUSIVE_OR_EXPRESSION:
-        case CONTEXT_EXCLUSIVE_OR_EXPRESSION:
-        case CONTEXT_AND_EXPRESSION:
-        case CONTEXT_SHIFT_EXPRESSION:
-        case CONTEXT_ADDITIVE_EXPRESSION:
-        case CONTEXT_MULTIPLICATIVE_EXPRESSION: {
-            BinaryExpression* expression = (BinaryExpression*)context;
-            Type* leftType = result = resolveExpression(analyzer, expression->left);
+    return leftType;
+}
 
-            int32_t count = jtk_ArrayList_getSize(expression->others);
+/* TODO: In the future, we might allow `a == b == c`. Right now, the definition
+ * phase ensures that the equality operators are not combined.
+ */
+Type* resolveEquality(Analyzer* analyzer, BinaryExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+
+    int32_t count = jtk_ArrayList_getSize(expression->others);
+    if ((leftType != NULL) && (count > 0)) {
+        jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
+        Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
+
+        if (leftType != rightType) {
+            handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                (Token*)pair->m_left);
+            leftType = NULL;
+        }
+        else {
+            leftType = &primitives.boolean;
+        }
+    }
+
+    return leftType;
+}
+
+/* TODO: In the future, we might allow `a < b < c`. Right now, the definition
+ * phase ensures that the equality operators are not combined.
+ */
+Type* resolveRelational(Analyzer* analyzer, BinaryExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+
+    int32_t count = jtk_ArrayList_getSize(expression->others);
+    if ((leftType != NULL) && (count > 0)) {
+        jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
+        Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
+
+        if ((leftType->tag != TYPE_INTEGER) && (leftType->tag != TYPE_DECIMAL)) {
+            handleSemanticError(handler, analyzer, ERROR_INVALID_LEFT_OPERAND,
+                (Token*)pair->m_left);
+            leftType = NULL;
+        }
+        else if ((rightType->tag != TYPE_INTEGER) && (rightType->tag != TYPE_DECIMAL)) {
+            handleSemanticError(handler, analyzer, ERROR_INVALID_RIGHT_OPERAND,
+                (Token*)pair->m_left);
+            leftType = NULL;
+        }
+        else if (leftType != rightType) {
+            handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                (Token*)pair->m_left);
+            leftType = NULL;
+        }
+        else {
+            leftType = &primitives.boolean;
+        }
+    }
+
+    return leftType;
+}
+
+Type* resolveShift(Analyzer* analyzer, BinaryExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+
+    int32_t count = jtk_ArrayList_getSize(expression->others);
+    if ((leftType != NULL) && (count > 0)) {
+        jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
+
+        if (leftType->tag != TYPE_INTEGER) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION_ON_LEFT,
+                (Token*)pair->m_left);
+            leftType = NULL;
+        }
+        else {
             int32_t i;
-            for (i = 0; i < count; i++) {
-                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(
-                    expression->others, i);
-                Type* rightType = resolveExpression(analyzer, pair->m_right);
+            for (i = 0; (i < count) && (leftType != NULL); i++) {
+                pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
+                Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
 
-                // TODO: If one of the types is string and the operator is + or *,
-                // then do not report an error.
-                // Only integers, floats, and strings support most of these operators.
-                if (leftType != rightType) {
-                    handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES, pair->m_left);
+                if (rightType->tag != TYPE_INTEGER) {
+                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION_ON_RIGHT,
+                        (Token*)pair->m_left);
+                    leftType = NULL;
                 }
             }
-
-           break;
         }
+    }
 
-        case CONTEXT_UNARY_EXPRESSION: {
-            UnaryExpression* expression = (UnaryExpression*)context;
-            Type* type = result = resolveExpression(analyzer, expression->expression);
-            Token* operator = expression->operator;
-            if (operator != NULL) {
-                TokenType token = operator->type;
-                if ((token == TOKEN_PLUS) || (token == TOKEN_DASH)) {
-                    if ((type->tag != TYPE_INTEGER) && (type->tag != TYPE_DECIMAL)) {
-                        handleSemanticError(handler, analyzer, ERROR_INVALID_OPERAND, operator);
-                    }
-                }
-                else if (token == TOKEN_TILDE) {
-                    if (type->tag != TYPE_INTEGER) {
-                        handleSemanticError(handler, analyzer, ERROR_INVALID_OPERAND, operator);
-                    }
-                }
-                else if (token == TOKEN_EXCLAMATION_MARK) {
-                    if (type->tag != TYPE_BOOLEAN) {
-                        handleSemanticError(handler, analyzer, ERROR_INVALID_OPERAND, operator);
-                    }
-                }
-                else {
-                    printf("[internal error] Control should not reach here.\n");
-                }
-            }
+    return leftType;
+}
 
-           break;
+/* TODO: Overload + and * for strings! */
+Type* resolveArithmetic(Analyzer* analyzer, BinaryExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* leftType = resolveExpression(analyzer, (Context*)expression->left);
+
+    int32_t count = jtk_ArrayList_getSize(expression->others);
+    if ((leftType != NULL) && (count > 0)) {
+        jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
+
+        if ((leftType->tag != TYPE_INTEGER) && (leftType->tag != TYPE_DECIMAL)) {
+            handleSemanticError(handler, analyzer, ERROR_INVALID_LEFT_OPERAND,
+                (Token*)pair->m_left);
+            leftType = NULL;
         }
-
-        case CONTEXT_POSTFIX_EXPRESSION: {
-            PostfixExpression* expression = (PostfixExpression*)context;
-            Type* type = result = expression->token?
-                resolveToken(analyzer, (Token*)expression->primary) :
-                resolveExpression(analyzer, expression->primary);
-
-            Type* previous = type;
-            int32_t count = jtk_ArrayList_getSize(expression->postfixParts);
+        else {
+            Type* previousType = leftType;
             int32_t i;
-            for (i = 0; i < count; i++) {
-                Context* postfix = (Context*)jtk_ArrayList_getValue(
-                    expression->postfixParts, i);
+            for (i = 0; (i < count) && (leftType != NULL); i++) {
+                pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
+                Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
 
-                Type* postfixType = NULL;
-                if (postfix->tag == CONTEXT_SUBSCRIPT) {
-                    Subscript* subscript = (Subscript*)postfix;
-                    resolveExpression(analyzer, subscript->expression);
-                    if (!previous->indexable) {
-                        handleSemanticError(handler, analyzer, ERROR_INVALID_LEFT_OPERAND,
-                            subscript->bracket);
-                    }
+                if ((rightType->tag != TYPE_INTEGER) && (rightType->tag != TYPE_DECIMAL)) {
+                    handleSemanticError(handler, analyzer, ERROR_INVALID_RIGHT_OPERAND,
+                        (Token*)pair->m_left);
+                    leftType = NULL;
                 }
-                else if (postfix->tag == CONTEXT_FUNCTION_ARGUMENTS) {
-                    FunctionArguments* arguments = (FunctionArguments*)postfix;
-                    if (!previous->callable) {
-                        handleSemanticError(handler, analyzer, ERROR_NON_CALLABLE_TYPE,
-                            arguments->parenthesis);
-                    }
-                    int32_t j;
-                    for (j = 0; j < arguments->expressions->m_size; j++) {
-                        BinaryExpression* argument = (BinaryExpression*)
-                            arguments->expressions->m_values[j];
-                        resolveExpression(analyzer, argument);
-                    }
-                }
-                else if (postfix->tag == CONTEXT_MEMBER_ACCESS) {
-                    MemberAccess* access = (MemberAccess*)postfix;
-                    if (!previous->accessible) {
-                        handleSemanticError(handler, analyzer, ERROR_NON_ACCESSIBLE_TYPE,
-                            access->identifier);
-                    }
-                    // resolve the type of the member
+                else if (previousType != rightType) {
+                    handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
+                        (Token*)pair->m_left);
+                    leftType = NULL;
                 }
             }
-
-           break;
         }
+    }
 
-        case CONTEXT_INITIALIZER_EXPRESSION: {
-            InitializerExpression* expression = (InitializerExpression*)context;
-            // TODO
-           break;
+    return leftType;
+}
+
+Type* resolveUnary(Analyzer* analyzer, UnaryExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* result = resolveExpression(analyzer, expression->expression);
+
+    Token* operator = expression->operator;
+    if ((result != NULL) && (operator != NULL)) {
+        TokenType token = operator->type;
+        if ((token == TOKEN_PLUS) || (token == TOKEN_DASH)) {
+            if ((result->tag != TYPE_INTEGER) && (result->tag != TYPE_DECIMAL)) {
+                handleSemanticError(handler, analyzer, ERROR_INVALID_OPERAND, operator);
+            }
         }
+        else if (token == TOKEN_TILDE) {
+            if (result->tag != TYPE_INTEGER) {
+                handleSemanticError(handler, analyzer, ERROR_INVALID_OPERAND, operator);
+            }
+        }
+        else if (token == TOKEN_EXCLAMATION_MARK) {
+            if (result->tag != TYPE_BOOLEAN) {
+                handleSemanticError(handler, analyzer, ERROR_INVALID_OPERAND, operator);
+            }
+        }
+        else {
+            printf("[internal error] Control should not reach here.\n");
+        }
+    }
 
-        case CONTEXT_ARRAY_EXPRESSION: {
-            ArrayExpression* expression = (ArrayExpression*)context;
-           break;
+    return result;
+}
+
+Type* resolveSubscript(Analyzer* analyzer, Subscript* subscript, Type* previous) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* result = NULL;
+    if (!previous->indexable) {
+        handleSemanticError(handler, analyzer, ERROR_INVALID_LEFT_OPERAND,
+            subscript->bracket);
+    }
+    else {
+        Type* indexType = resolveExpression(analyzer, subscript->expression);
+        // TODO: Check if the index type is integer.
+        // TODO: Find the result of the subscript.
+    }
+    return result;
+}
+
+// TODO: Add the function type!
+Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments, Type* previous) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* result = NULL;
+    if (!previous->callable) {
+        handleSemanticError(handler, analyzer, ERROR_NON_CALLABLE_TYPE,
+            arguments->parenthesis);
+    }
+    else {
+        int32_t j;
+        for (j = 0; j < arguments->expressions->m_size; j++) {
+            BinaryExpression* argument = (BinaryExpression*)jtk_ArrayList_getValue(
+                arguments->expressions, j);
+            Type* argumentType = resolveExpression(analyzer, argument);
+            // TODO: Check if the argument type matches the parameter type.
+        }
+        // TODO: Find the result of the function call.
+    }
+    return result;
+}
+
+Type* resolveMemberAccess(Analyzer* analyzer, MemberAccess* access, Type* previous) {
+    Type* result = NULL;
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    if (!previous->accessible) {
+        handleSemanticError(handler, analyzer, ERROR_NON_ACCESSIBLE_TYPE,
+            access->identifier);
+    }
+    else {
+        Token* identifier = access->identifier;
+        if (previous->tag == TYPE_STRUCTURE) {
+            Structure* structure = previous->structure;
+            Variable* variable = resolveMember(structure->scope, identifier->text);
+
+            if (variable == NULL) {
+                handleSemanticError(handler, analyzer, ERROR_UNDECLARED_MEMBER,
+                    access->identifier);
+            }
+            else {
+                result = variable->type;
+            }
+        }
+        else {
+            printf("[internal error] This is a valid condition (for example, `array.length`). However, it is yet to be implemented.\n");
+        }
+    }
+    return result;
+}
+
+Type* resolvePostfix(Analyzer* analyzer, PostfixExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* type = expression->token?
+        resolveToken(analyzer, (Token*)expression->primary) :
+        resolveExpression(analyzer, expression->primary);
+    Type* result = type;
+
+    int32_t count = jtk_ArrayList_getSize(expression->postfixParts);
+    int32_t i;
+    for (i = 0; (i < count) && (result != NULL); i++) {
+        Context* postfix = (Context*)jtk_ArrayList_getValue(
+            expression->postfixParts, i);
+
+        if (postfix->tag == CONTEXT_SUBSCRIPT) {
+            result = resolveSubscript(analyzer, (Subscript*)postfix, result);
+        }
+        else if (postfix->tag == CONTEXT_FUNCTION_ARGUMENTS) {
+            result = resolveFunctionArguments(analyzer, (FunctionArguments*)postfix, result);
+        }
+        else if (postfix->tag == CONTEXT_MEMBER_ACCESS) {
+            result = resolveMemberAccess(analyzer, (MemberAccess*)postfix, result);
+        }
+        else {
+            controlError();
+            break;
         }
     }
 
@@ -732,39 +947,45 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
 }
 
 Type* resolveToken(Analyzer* analyzer, Token* token) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
     Type* result = NULL;
     switch (token->type) {
         case TOKEN_IDENTIFIER: {
             Context* context = resolveSymbol(analyzer->scope, token->text);
             if (context->tag == CONTEXT_VARIABLE) {
-
+                result = ((Variable*)context)->type;
+            }
+            else {
+                handleSemanticError(handler, analyzer, ERROR_EXPECTED_VARIABLE,
+                    token);
+                result = NULL;
             }
             break;
         }
 
         case TOKEN_INTEGER_LITERAL: {
-            result = &(primitives.i32);
+            result = &primitives.i32;
             break;
         }
 
         case TOKEN_FLOATING_POINT_LITERAL: {
-            result = &(primitives.f64);
+            result = &primitives.f64;
             break;
         }
 
         case TOKEN_KEYWORD_TRUE:
         case TOKEN_KEYWORD_FALSE: {
-            result = &(primitives.boolean);
+            result = &primitives.boolean;
             break;
         }
 
         case TOKEN_STRING_LITERAL: {
-            result = &(primitives.string);
+            result = &primitives.string;
             break;
         }
 
         case TOKEN_KEYWORD_NULL: {
-            result = &(primitives.null);
+            result = &primitives.null;
             break;
         }
 
@@ -772,6 +993,92 @@ Type* resolveToken(Analyzer* analyzer, Token* token) {
             printf("[internal error] Control should not reach here.\n");
         }
     }
+    return result;
+}
+
+Type* resolveInitializer(Analyzer* analyzer, InitializerExpression* expression) {
+    return NULL;
+}
+
+Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
+    return NULL;
+}
+
+Type* resolveExpression(Analyzer* analyzer, Context* context) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+
+    Type* result = NULL;
+    switch (context->tag) {
+        case CONTEXT_ASSIGNMENT_EXPRESSION: {
+            result = resolveAssignment(analyzer, (BinaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_CONDITIONAL_EXPRESSION: {
+            result = resolveConditional(analyzer, (ConditionalExpression*)context);
+            break;
+        }
+
+        case CONTEXT_LOGICAL_OR_EXPRESSION:
+        case CONTEXT_LOGICAL_AND_EXPRESSION: {
+            result = resolveLogical(analyzer, (BinaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_INCLUSIVE_OR_EXPRESSION:
+        case CONTEXT_EXCLUSIVE_OR_EXPRESSION:
+        case CONTEXT_AND_EXPRESSION: {
+            result = resolveBitwise(analyzer, (BinaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_EQUALITY_EXPRESSION: {
+            result = resolveEquality(analyzer, (BinaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_RELATIONAL_EXPRESSION: {
+            result = resolveRelational(analyzer, (BinaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_SHIFT_EXPRESSION: {
+            result = resolveShift(analyzer, (BinaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_ADDITIVE_EXPRESSION:
+        case CONTEXT_MULTIPLICATIVE_EXPRESSION: {
+            result = resolveArithmetic(analyzer, (BinaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_UNARY_EXPRESSION: {
+            result = resolveUnary(analyzer, (UnaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_POSTFIX_EXPRESSION: {
+            result = resolvePostfix(analyzer, (PostfixExpression*)context);
+            break;
+        }
+
+        case CONTEXT_INITIALIZER_EXPRESSION: {
+            result = resolveInitializer(analyzer, (InitializerExpression*)context);
+           break;
+        }
+
+        case CONTEXT_ARRAY_EXPRESSION: {
+            result = resolveArray(analyzer, (ArrayExpression*)context);
+           break;
+        }
+
+        default: {
+            controlError();
+            break;
+        }
+    }
+
     return result;
 }
 

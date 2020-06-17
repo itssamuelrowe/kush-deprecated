@@ -178,7 +178,7 @@ static const char ruleNames[][50] = {
 };
 
 #define la(parser, count) k_TokenStream_la((parser)->tokens, (count))
-#define consume(parser) k_TokenStream_consume((parser)->tokens)
+#define consume(parser) consumeToken((parser)->tokens)
 #define match(parser, type) matchAndYield((parser), type)
 #define lt(parser, count) k_TokenStream_lt((parser)->tokens, (count))
 

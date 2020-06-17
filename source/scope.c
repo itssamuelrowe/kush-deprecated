@@ -72,3 +72,7 @@ Symbol* resolveSymbol(Scope* scope, const uint8_t* name) {
     }
     return result;
 }
+
+Symbol* resolveMember(Scope* scope, const uint8_t* name) {
+    return jtk_HashMap_getValue(scope->symbols, (void*)name);
+}

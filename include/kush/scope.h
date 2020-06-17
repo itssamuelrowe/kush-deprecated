@@ -70,5 +70,6 @@ Scope* scopeForFunction(Scope* parent, Function* function);
 Scope* scopeForLocal(Scope* parent, Block* block);
 void defineSymbol(Scope* scope, Symbol* symbol);
 Symbol* resolveSymbol(Scope* scope, const uint8_t* name);
+Symbol* resolveMember(Scope* scope, const uint8_t* name);
 
 #endif /* SCOPE_H */

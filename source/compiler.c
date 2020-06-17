@@ -61,7 +61,7 @@ void printToken(Token* token) {
         token->startColumn + 1, token->stopColumn + 1,
         token->channel == TOKEN_CHANNEL_DEFAULT? "default" : "hidden",
         tokenNames[(int32_t)token->type]);
-    TokenType type = k_Token_getType(token);
+    TokenType type = token->type;
     if ((type == TOKEN_IDENTIFIER) || (type == TOKEN_INTEGER_LITERAL) ||
         (type == TOKEN_STRING_LITERAL)) {
         printf(" %.*s", token->length, token->text);
@@ -172,9 +172,6 @@ const uint8_t* errorMessages[] = {
     // Semantical Errors
 
     // Errors related to binary expressions
-    "Invalid left operand",
-    "Invalid right operand",
-    "Incompatible operand types",
     "Cannot combine equality operators",
     "Type does not support invoking",
     "Type does not support indexing",
@@ -186,6 +183,7 @@ const uint8_t* errorMessages[] = {
     // Errors related to declaration
     "Unknown module",
     "Undeclared type",
+    "Undeclared member",
     "Undeclared identifier",
     "Redeclaration of symbol as function",
     "Redeclaration of symbol as parameter",
@@ -201,6 +199,14 @@ const uint8_t* errorMessages[] = {
 
     // Errors related to types
     "Expected boolean expression",
+    "Expected boolean expression on left",
+    "Expected boolean expression on right",
+    "Expected integer expression on left",
+    "Expected integer expression on right",
+    "Invalid left operand",
+    "Invalid right operand",
+    "Incompatible operand types",
+    "Expected variable",
 
     // General errors
     "Corrupted module",
