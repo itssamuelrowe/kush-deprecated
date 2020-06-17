@@ -409,8 +409,10 @@ void deleteStructure(Structure* self) {
 
 IfClause* newIfClause() {
     IfClause* result = allocate(IfClause, 1);
+    // result->tag = ...;
     result->expression = NULL;
     result->body = NULL;
+    result->token = NULL;
     return result;
 }
 
@@ -424,6 +426,7 @@ void deleteIfClause(IfClause* self) {
 
 IfStatement* newIfStatement() {
     IfStatement* result = allocate(IfStatement, 1);
+    result->tag = CONTEXT_IF_STATEMENT;
     result->ifClause = NULL;
     result->elseIfClauses = jtk_ArrayList_new();
     result->elseClause = NULL;
@@ -445,7 +448,7 @@ IterativeStatement* newIterativeStatement() {
     result->label = NULL;
     result->name = NULL;
     result->nameSize = 0;
-    result->whileLoop = false;
+    result->keyword = NULL;
     result->parameter = NULL;
     result->expression = NULL;
     result->body = NULL;

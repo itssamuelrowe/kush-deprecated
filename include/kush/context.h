@@ -466,6 +466,7 @@ struct IfClause {
     ContextType tag;
     BinaryExpression* expression;
     Block* body;
+    Token* token;
 };
 
 typedef struct IfClause IfClause;
@@ -498,7 +499,7 @@ struct IterativeStatement {
     uint8_t* name;
     int32_t nameSize;
     Token* label;
-    bool whileLoop;
+    Token* keyword;
     Token* parameter;
     BinaryExpression* expression;
     Block* body;

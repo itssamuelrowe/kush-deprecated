@@ -243,12 +243,14 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
             case CONTEXT_ITERATIVE_STATEMENT: {
                 IterativeStatement* statement = (IterativeStatement*)context;
 
-                if ((statement->name != NULL) && isUndefined(analyzer->scope, statement->name)) {
-                    defineSymbol(analyzer->scope, statement);
-                }
-                else {
-                    handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_LABEL,
-                        statement->label);
+                if (statement->name != NULL) {
+                    if (isUndefined(analyzer->scope, statement->name)) {
+                        defineSymbol(analyzer->scope, statement);
+                    }
+                    else {
+                        handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_LABEL,
+                            statement->label);
+                    }
                 }
 
                 Scope* localScope = defineLocals(analyzer, statement->body);
@@ -432,6 +434,7 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
     return type;
 }
 
+// TODO: Disallow var and let keywords in structures!
 void resolveVariable(Analyzer* analyzer, Variable* variable) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     Type* initializerType = NULL;
@@ -508,6 +511,7 @@ uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
 }
 
 void resolveLocals(Analyzer* analyzer, Block* block) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
     analyzer->scope = block->scope;
 
     int32_t limit = jtk_ArrayList_getSize(block->statements);
@@ -518,6 +522,14 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
         switch (context->tag) {
             case CONTEXT_ITERATIVE_STATEMENT: {
                 IterativeStatement* statement = (IterativeStatement*)context;
+                if (statement->keyword->type == TOKEN_KEYWORD_WHILE) {
+                    Type* conditionType = resolveExpression(analyzer, statement->expression);
+                    if (conditionType->tag != TYPE_BOOLEAN) {
+                        handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                            statement->keyword);
+                    }
+                }
+                // TODO:
                 // if (statement->parameter != NULL) {
                 //     resolveVariable(analyzer, statement->parameter);
                 // }
@@ -528,12 +540,20 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
 
             case CONTEXT_IF_STATEMENT: {
                 IfStatement* statement = (IfStatement*)context;
+                Type* conditionType = resolveExpression(analyzer, statement->ifClause->expression);
+                if (conditionType->tag != TYPE_BOOLEAN) {
+                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                        statement->ifClause->token);
+                }
                 resolveLocals(analyzer, statement->ifClause->body);
+
                 int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
                 int32_t j;
                 for (j = 0; j < count; j++) {
                     IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
                         statement->elseIfClauses, j);
+                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                        clause->token);
                     resolveLocals(analyzer, clause->body);
                 }
                 if (statement->elseClause != NULL) {
@@ -579,7 +599,7 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
             }
 
             default: {
-                printf("[internal error] Control should not here.\n");
+                controlError();
                 break;
             }
         }

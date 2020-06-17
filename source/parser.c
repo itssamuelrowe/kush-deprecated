@@ -1140,7 +1140,7 @@ IfStatement* parseIfStatement(Parser* parser) {
 IfClause* parseIfClause(Parser* parser) {
     IfClause* context = newIfClause();
 
-	match(parser, TOKEN_KEYWORD_IF);
+	context->token = matchAndYield(parser, TOKEN_KEYWORD_IF);
     context->expression = parseExpression(parser);
     context->body = parseBlock(parser);
 
@@ -1155,7 +1155,7 @@ IfClause* parseElseIfClause(Parser* parser) {
     IfClause* context = newIfClause();
 
 	match(parser, TOKEN_KEYWORD_ELSE);
-	match(parser, TOKEN_KEYWORD_IF);
+	context->token = matchAndYield(parser, TOKEN_KEYWORD_IF);
     context->expression = parseExpression(parser);
     context->body = parseBlock(parser);
 
@@ -1194,19 +1194,16 @@ IterativeStatement* parseIterativeStatement(Parser* parser) {
         context->name = jtk_CString_newEx(context->label->text, context->nameSize);
 	}
 
-	switch (la(parser, 1)) {
+    TokenType la1 = la(parser, 1);
+    context->keyword = consumeAndYield(parser);
+	switch (la1) {
 		case TOKEN_KEYWORD_WHILE: {
-            context->whileLoop = true;
-            consume(parser);
             context->expression = parseExpression(parser);
             context->body = parseBlock(parser);
-
 			break;
 		}
 
 		case TOKEN_KEYWORD_FOR: {
-            context->whileLoop = false;
-            consume(parser);
             match(parser, TOKEN_KEYWORD_LET);
             context->parameter = matchAndYield(parser, TOKEN_IDENTIFIER);
             match(parser, TOKEN_COLON);
