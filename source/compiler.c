@@ -168,6 +168,7 @@ const uint8_t* errorMessages[] = {
     // Syntactical Errors
     "Unexpected token",
     "Try statement expects at least one catch or finally clause",
+    "Variable initializer expected",
 
     // Semantical Errors
 
@@ -196,6 +197,7 @@ const uint8_t* errorMessages[] = {
     "Redeclaration of symbol as structure",
     "Redeclaration of symbol previously imported",
     "Invalid type",
+    "Incompatible variable initializer",
 
     // Errors related to types
     "Expected boolean expression",

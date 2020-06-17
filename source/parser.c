@@ -1013,6 +1013,13 @@ void parseVariableDeclarator(Parser* parser, bool infer, bool constant,
     Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
     BinaryExpression* expression = NULL;
 
+    TokenType la1 = la(parser, 1);
+    if ((infer || constant) && (la1 != TOKEN_EQUAL)) {
+        ErrorHandler* errorHandler = parser->compiler->errorHandler;
+        handleSyntaxError(errorHandler, parser,
+            ERROR_VARIABLE_INITIALIZER_EXPECTED, identifier, TOKEN_UNKNOWN);
+    }
+
 	if (la(parser, 1) == TOKEN_EQUAL) {
 		consume(parser);
         expression = parseExpression(parser);

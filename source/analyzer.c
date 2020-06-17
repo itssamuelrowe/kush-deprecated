@@ -432,10 +432,23 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
     return type;
 }
 
-// TODO: Type inference
 void resolveVariable(Analyzer* analyzer, Variable* variable) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    variable->type = resolveVariableType(analyzer, variable->variableType);
+    Type* initializerType = NULL;
+    if (variable->expression != NULL) {
+        initializerType = resolveExpression(analyzer, variable->expression);
+    }
+
+    if (variable->infer || variable->constant) {
+        variable->type = initializerType;
+    }
+    else {
+        variable->type = resolveVariableType(analyzer, variable->variableType);
+        if ((variable->expression != NULL) && (variable->type != initializerType)) {
+            handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_VARIABLE_INITIALIZER,
+                variable->identifier);
+        }
+    }
 }
 
 void resolveStructure(Analyzer* analyzer, Structure* structure) {
@@ -719,11 +732,11 @@ Type* resolveEquality(Analyzer* analyzer, BinaryExpression* expression) {
         jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, 0);
         Type* rightType = resolveExpression(analyzer, (Context*)pair->m_right);
 
-        result = NULL;
         if (rightType != NULL) {
             if (result != rightType) {
                 handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_OPERAND_TYPES,
                     (Token*)pair->m_left);
+                result = NULL;
             }
             else {
                 result = &primitives.boolean;
@@ -980,7 +993,12 @@ Type* resolveToken(Analyzer* analyzer, Token* token) {
     switch (token->type) {
         case TOKEN_IDENTIFIER: {
             Context* context = resolveSymbol(analyzer->scope, token->text);
-            if (context->tag == CONTEXT_VARIABLE) {
+            if (context == NULL) {
+                handleSemanticError(handler, analyzer, ERROR_UNDECLARED_IDENTIFIER,
+                    token);
+                result = NULL;
+            }
+            else if (context->tag == CONTEXT_VARIABLE) {
                 result = ((Variable*)context)->type;
             }
             else if (context->tag == CONTEXT_FUNCTION_DECLARATION) {
