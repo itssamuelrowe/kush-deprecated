@@ -17,6 +17,8 @@
 #include <jtk/collection/array/Arrays.h>
 #include <kush/token-stream.h>
 
+static void initialize(TokenStream* stream);
+
 TokenStream* tokenStreamNew(Compiler* compiler,
                                    Lexer* lexer, TokenChannel channel) {
     jtk_Assert_assertObject(lexer, "The specified lexer is null.");
@@ -62,7 +64,7 @@ int32_t k_TokenStream_getSize(TokenStream* stream) {
     return jtk_ArrayList_getSize(stream->tokens);
 }
 
-void k_TokenStream_consume(TokenStream* stream) {
+void consumeToken(TokenStream* stream) {
     bool skip;
     if (stream->p >= 0) {
         if (stream->hitEndOfStream) {
@@ -83,26 +85,26 @@ void k_TokenStream_consume(TokenStream* stream) {
 
     jtk_Assert_assertFalse((!skip && (k_TokenStream_la(stream, 1) == TOKEN_END_OF_STREAM)), "...");
 
-    bool hasToken = k_TokenStream_synchronize(stream, stream->p + 1);
+    bool hasToken = synchronizeTokens(stream, stream->p + 1);
     if (hasToken) {
-        stream->p = k_TokenStream_getNextTokenOnChannel(stream, stream->p + 1, stream->channel);
+        stream->p = getNextTokenOnChannel(stream, stream->p + 1, stream->channel);
     }
 }
 
-bool k_TokenStream_synchronize(TokenStream* stream, int32_t i) {
+bool synchronizeTokens(TokenStream* stream, int32_t i) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
     jtk_Assert_assertTrue(i >= 0, "The specified index is invalid.");
 
     int32_t n = i - jtk_ArrayList_getSize(stream->tokens) + 1;
     bool result = true;
     if (n > 0) {
-        int32_t fetched = k_TokenStream_fetch(stream, n);
+        int32_t fetched = fetchTokens(stream, n);
         result = fetched >= n;
     }
     return result;
 }
 
-int32_t k_TokenStream_fetch(TokenStream* stream, int32_t n) {
+int32_t fetchTokens(TokenStream* stream, int32_t n) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     if (stream->hitEndOfStream) {
@@ -117,7 +119,7 @@ int32_t k_TokenStream_fetch(TokenStream* stream, int32_t n) {
         jtk_ArrayList_add(stream->tokens, token);
         jtk_ArrayList_add(stream->trash, token);
 
-        if (k_Token_getType(token) == TOKEN_END_OF_STREAM) {
+        if (token->type == TOKEN_END_OF_STREAM) {
             stream->hitEndOfStream = true;
             return i + 1;
         }
@@ -125,7 +127,7 @@ int32_t k_TokenStream_fetch(TokenStream* stream, int32_t n) {
     return n;
 }
 
-Token* k_TokenStream_getToken(TokenStream* stream, int32_t index) {
+Token* getToken(TokenStream* stream, int32_t index) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Index-out-of-range errors are checked by the
@@ -134,14 +136,14 @@ Token* k_TokenStream_getToken(TokenStream* stream, int32_t index) {
     return jtk_ArrayList_getValue(stream->tokens, index);
 }
 
-jtk_ArrayList_t* k_TokenStream_getTokens(TokenStream* stream,
+jtk_ArrayList_t* getTokens(TokenStream* stream,
         int32_t startIndex, int32_t stopIndex) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     int32_t size = jtk_ArrayList_getSize(stream->tokens);
     jtk_Arrays_checkRange(size, startIndex, stopIndex);
 
-    k_TokenStream_initialize(stream);
+    initialize(stream);
     jtk_ArrayList_t* result = jtk_ArrayList_new();
     int32_t i;
     for (i = startIndex; i < stopIndex; i++) {
@@ -161,7 +163,7 @@ TokenType k_TokenStream_la(TokenStream* stream, int32_t i) {
 Token* k_TokenStream_lt(TokenStream* stream, int32_t k) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
-    k_TokenStream_initialize(stream);
+    initialize(stream);
     Token* token = NULL;
     if (k != 0) {
         if (k < 0) {
@@ -181,9 +183,9 @@ Token* k_TokenStream_lt(TokenStream* stream, int32_t k) {
             int32_t i = stream->p;
             int32_t n = 1;
             while (n < k) {
-                bool hasToken = k_TokenStream_synchronize(stream, i + 1);
+                bool hasToken = synchronizeTokens(stream, i + 1);
                 if (hasToken) {
-                    i = k_TokenStream_getNextTokenOnChannel(stream, i + 1, stream->channel);
+                    i = getNextTokenOnChannel(stream, i + 1, stream->channel);
                 }
                 n++;
             }
@@ -193,12 +195,12 @@ Token* k_TokenStream_lt(TokenStream* stream, int32_t k) {
     return token;
 }
 
-void k_TokenStream_initialize(TokenStream* stream) {
+void initialize(TokenStream* stream) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     if (stream->p == -1) {
-        k_TokenStream_synchronize(stream, 0);
-        stream->p = k_TokenStream_getNextTokenOnChannel(stream, 0, stream->channel);
+        synchronizeTokens(stream, 0);
+        stream->p = getNextTokenOnChannel(stream, 0, stream->channel);
     }
 }
 
@@ -209,7 +211,7 @@ int32_t k_TokenStream_getPreviousTokenOnChannel(TokenStream* stream,
     /* Ensure that the token stream has buffered, at least,
      * tokens till the requested index.
      */
-    k_TokenStream_synchronize(stream, i);
+    synchronizeTokens(stream, i);
     int32_t size = jtk_ArrayList_getSize(stream->tokens);
     if (i >= size) {
         /* In case the synchronization failed to retrieve the
@@ -221,8 +223,7 @@ int32_t k_TokenStream_getPreviousTokenOnChannel(TokenStream* stream,
 
     while (i >= 0) {
         Token* token = (Token*)jtk_ArrayList_getValue(stream->tokens, i);
-        if ((k_Token_getType(token) == TOKEN_END_OF_STREAM) ||
-                (k_Token_getChannel(token) == channel)) {
+        if ((token->type == TOKEN_END_OF_STREAM) || (token->channel == channel)) {
             return i;
         }
         i--;
@@ -231,14 +232,14 @@ int32_t k_TokenStream_getPreviousTokenOnChannel(TokenStream* stream,
     return -1;
 }
 
-int32_t k_TokenStream_getNextTokenOnChannel(TokenStream* stream,
+int32_t getNextTokenOnChannel(TokenStream* stream,
         int32_t i, TokenChannel channel) {
     jtk_Assert_assertObject(stream, "The specified token source is null.");
 
     /* Ensure that the token stream has buffered, at least,
      * tokens till the requested index.
      */
-    k_TokenStream_synchronize(stream, i);
+    synchronizeTokens(stream, i);
     int32_t size = jtk_ArrayList_getSize(stream->tokens);
     if (i >= size) {
         /* In case the synchronization failed to retrieve the
@@ -249,11 +250,11 @@ int32_t k_TokenStream_getNextTokenOnChannel(TokenStream* stream,
     }
 
     Token* token = jtk_ArrayList_getValue(stream->tokens, i);
-    while (k_Token_getChannel(token) != channel) {
+    while (token->channel != channel) {
         /* In case the token stream has reached the end-of-stream,
          * return the index of the end-of-stream token.
          */
-        if (k_Token_getType(token) == TOKEN_END_OF_STREAM) {
+        if (token->type == TOKEN_END_OF_STREAM) {
             return i;
         }
 
@@ -265,7 +266,7 @@ int32_t k_TokenStream_getNextTokenOnChannel(TokenStream* stream,
         /* Ensure that the token stream has buffered, at least,
          * tokens till the new index.
          */
-        k_TokenStream_synchronize(stream, i);
+        synchronizeTokens(stream, i);
         /* Update the token variable for next iteration. */
         token = (Token*)jtk_ArrayList_getValue(stream->tokens, i);
     }
@@ -273,7 +274,7 @@ int32_t k_TokenStream_getNextTokenOnChannel(TokenStream* stream,
 }
 
 void fillTokenStream(TokenStream* stream) {
-    k_TokenStream_initialize(stream);
+    initialize(stream);
     /* The token stream tries to buffer a 1000 tokens
      * at each iteration. This is repeated until the token
      * stream fails to fetch the quota, which indicates
@@ -282,7 +283,7 @@ void fillTokenStream(TokenStream* stream) {
     int32_t blockSize = 1000;
     int32_t fetched;
     do {
-        fetched = k_TokenStream_fetch(stream, blockSize);
+        fetched = fetchTokens(stream, blockSize);
     } while (fetched == blockSize);
 }
 
@@ -300,7 +301,7 @@ int32_t k_TokenStream_getNumberOfTokens(TokenStream* stream,
     int32_t i;
     for (i = 0; i < size; i++) {
         Token* token = (Token*)jtk_ArrayList_getValue(stream->tokens, i);
-        if (k_Token_getChannel(token) == channel) {
+        if (token->channel == channel) {
             n++;
         }
     }

@@ -42,4 +42,11 @@ struct Analyzer {
 
 typedef struct Analyzer Analyzer;
 
+Analyzer* newAnalyzer();
+void deleteAnalyzer(Analyzer* self);
+void defineSymbols(Analyzer* analyzer, Module* module);
+void resetAnalyzer(Analyzer* analyzer);
+void defineSymbols(Analyzer* analyzer, Module* module);
+void resolveSymbols(Analyzer* analyzer, Module* module);
+
 #endif /* KUSH_ANALYZER_H */

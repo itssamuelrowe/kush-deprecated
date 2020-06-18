@@ -16,6 +16,7 @@
 
 // Sunday, June 07 2020
 
+#include <jtk/core/CString.h>
 #include <kush/context.h>
 
 /* Delete only what was allocated in the constructor. */
@@ -203,6 +204,7 @@ void deleteBinaryExpression(BinaryExpression* self) {
 ConditionalExpression* newConditionalExpression() {
     ConditionalExpression* result = allocate(ConditionalExpression, 1);
     result->tag = CONTEXT_CONDITIONAL_EXPRESSION;
+    result->hook = NULL;
     result->condition = NULL;
     result->then = NULL;
     result->otherwise = NULL;
@@ -346,35 +348,28 @@ void deleteBlock(Block* self) {
 }
 
 /*******************************************************************************
- * FunctionParameter                                                           *
- *******************************************************************************/
-
-// TODO: Include the type context.
-FunctionParameter* newFunctionParameter() {
-    FunctionParameter* result = allocate(FunctionParameter, 1);
-    result->type = NULL;
-    result->identifier = NULL;
-    return result;
-}
-
-void deleteFunctionParameter(FunctionParameter* self) {
-    deallocate(self);
-}
-
-/*******************************************************************************
  * Function                                                                    *
  *******************************************************************************/
 
-// Include type for returnType
-Function* newFunction() {
+Function* newFunction(const uint8_t* name, int32_t nameSize, Token* identifier,
+    jtk_ArrayList_t* parameters, Variable* variableParameter,
+    Block* body, VariableType* returnVariableType) {
     Function* result = allocate(Function, 1);
     result->tag = CONTEXT_FUNCTION_DECLARATION;
+    result->nameSize = nameSize;
+    result->name = jtk_CString_newEx(name, nameSize);
     result->identifier = NULL;
-    result->parameters = jtk_ArrayList_new();
-    result->variableParameter = NULL;
-    result->body = NULL;
+    result->parameters = parameters;
+    result->variableParameter = variableParameter;
+    result->body = body;
+    result->returnVariableType = returnVariableType;
     result->returnType = NULL;
+    result->type = newType(TYPE_FUNCTION, false, false, true, identifier);
     result->scope = NULL;
+
+    // TODO: Probably move this to newType(), or some overloaded version of it?
+    result->type->function = result;
+
     return result;
 }
 
@@ -387,19 +382,24 @@ void deleteFunction(Function* self) {
  * Structure                                                            *
  *******************************************************************************/
 
-Structure* newStructure() {
+Structure* newStructure(const uint8_t* name, int32_t nameSize,
+    Token* identifier, jtk_ArrayList_t* variables) {
     Structure* result = allocate(Structure, 1);
     result->tag = CONTEXT_STRUCTURE_DECLARATION;
+    result->nameSize = nameSize;
+    result->name = jtk_CString_newEx(name, nameSize);
     result->identifier = NULL;
-    result->variables = jtk_ArrayList_new();
-    result->type = NULL;
+    result->declarations = variables;
+    result->type = newType(TYPE_STRUCTURE, false, true, false, identifier);
     result->scope = NULL;
+
+    // TODO: Probably move this to newType(), or some overloaded version of it?
+    result->type->structure = result;
 
     return result;
 }
 
 void deleteStructure(Structure* self) {
-    jtk_ArrayList_delete(self->variables);
     deallocate(self);
 }
 
@@ -409,8 +409,10 @@ void deleteStructure(Structure* self) {
 
 IfClause* newIfClause() {
     IfClause* result = allocate(IfClause, 1);
+    // result->tag = ...;
     result->expression = NULL;
     result->body = NULL;
+    result->token = NULL;
     return result;
 }
 
@@ -424,6 +426,7 @@ void deleteIfClause(IfClause* self) {
 
 IfStatement* newIfStatement() {
     IfStatement* result = allocate(IfStatement, 1);
+    result->tag = CONTEXT_IF_STATEMENT;
     result->ifClause = NULL;
     result->elseIfClauses = jtk_ArrayList_new();
     result->elseClause = NULL;
@@ -443,7 +446,9 @@ IterativeStatement* newIterativeStatement() {
     IterativeStatement* result = allocate(IterativeStatement, 1);
     result->tag = CONTEXT_ITERATIVE_STATEMENT;
     result->label = NULL;
-    result->whileLoop = false;
+    result->name = NULL;
+    result->nameSize = 0;
+    result->keyword = NULL;
     result->parameter = NULL;
     result->expression = NULL;
     result->body = NULL;
@@ -488,21 +493,38 @@ void deleteCatchClause(CatchClause* self) {
     jtk_ArrayList_delete(self->captures);
     deallocate(self);
 }
+/*******************************************************************************
+ * VariableType                                                                *
+ *******************************************************************************/
+
+VariableType* newVariableType(Token* token, int32_t dimensions) {
+    VariableType* self = allocate(VariableType, 1);
+    self->token = token;
+    self->dimensions = dimensions;
+
+    return self;
+}
+
+void deleteVariableType(VariableType* self) {
+    deallocate(self);
+}
 
 /*******************************************************************************
  * Variable                                                                    *
  *******************************************************************************/
 
-// TODO: Update with Type
-Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
+Variable* newVariable(bool infer, bool constant, VariableType* variableType, Token* identifier,
     BinaryExpression* expression, Scope* parent) {
     Variable* result = allocate(Variable, 1);
-    result->infer = false;
-    result->constant = false;
+    result->tag = CONTEXT_VARIABLE;
+    result->nameSize = identifier->length;
+    result->name = jtk_CString_newEx(identifier->text, result->nameSize);
+    result->infer = infer;
+    result->constant = constant;
+    result->variableType = variableType;
     result->type = NULL;
-    result->identifier = NULL;
-    result->expression = NULL;
-    result->parent = NULL;
+    result->identifier = identifier;
+    result->expression = expression;
 
     return result;
 }

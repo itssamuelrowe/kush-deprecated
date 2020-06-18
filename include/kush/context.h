@@ -35,7 +35,8 @@
 #define TYPE_NULL 5
 #define TYPE_STRING 6
 #define TYPE_BOOLEAN 7
-#define TYPE_UNKONWN 8
+#define TYPE_FUNCTION 8
+#define TYPE_UNKONWN 9
 
 typedef struct Type Type;
 typedef struct Structure Structure;
@@ -59,6 +60,7 @@ struct Type {
             uint8_t size;
         } decimal;
         Structure* structure;
+        Function* function;
     };
 };
 
@@ -109,6 +111,8 @@ enum ContextType {
     CONTEXT_BLOCK,
 
     CONTEXT_VARIABLE_DECLARATION,
+
+    CONTEXT_VARIABLE,
 
     CONTEXT_BREAK_STATEMENT,
 
@@ -178,6 +182,16 @@ struct Context {
 typedef struct Context Context;
 
 /*******************************************************************************
+ * Symbol                                                                      *
+ *******************************************************************************/
+
+struct Symbol {
+    ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
+};
+
+/*******************************************************************************
  * Module                                                                      *
  *******************************************************************************/
 
@@ -221,7 +235,7 @@ struct BinaryExpression {
     jtk_ArrayList_t* others;
 };
 
-BinaryExpression* newBinaryExpression();
+BinaryExpression* newBinaryExpression(ContextType tag);
 void deleteBinaryExpression(BinaryExpression* self);
 
 /*******************************************************************************
@@ -232,6 +246,7 @@ typedef struct ConditionalExpression ConditionalExpression;
 
 struct ConditionalExpression {
     ContextType tag;
+    Token* hook;
     BinaryExpression* condition;
     BinaryExpression* then;
     ConditionalExpression* otherwise;
@@ -359,19 +374,43 @@ Block* newBlock();
 void deleteBlock(Block* self);
 
 /*******************************************************************************
- * FunctionParameter                                                           *
+ * VariableType                                                                *
  *******************************************************************************/
 
-struct FunctionParameter {
-    ContextType tag;
-    Type* type;
-    Token* identifier;
+struct VariableType {
+    Token* token;
+    int32_t dimensions;
 };
 
-typedef struct FunctionParameter FunctionParameter;
+typedef struct VariableType VariableType;
 
-FunctionParameter* newFunctionParameter();
-void deleteFunctionParameter(FunctionParameter* self);
+VariableType* newVariableType(Token* token, int32_t dimensions);
+void deleteVariableType(VariableType* self);
+
+/*******************************************************************************
+ * Variable                                                                    *
+ *******************************************************************************/
+
+/**
+ * Not part of the AST.
+ */
+struct Variable {
+    ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
+    bool infer;
+    bool constant;
+    VariableType* variableType;
+    Type* type;
+    Token* identifier;
+    BinaryExpression* expression;
+};
+
+typedef struct Variable Variable;
+
+Variable* newVariable(bool infer, bool constant, VariableType* variableType,
+    Token* identifier, BinaryExpression* expression, Scope* parent);
+void deleteVariable(Variable* variable);
 
 /*******************************************************************************
  * Function                                                                    *
@@ -379,17 +418,23 @@ void deleteFunctionParameter(FunctionParameter* self);
 
 struct Function {
     ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
     Token* identifier;
     jtk_ArrayList_t* parameters;
-    FunctionParameter* variableParameter;
+    Variable* variableParameter;
     Block* body;
+    VariableType* returnVariableType;
     Type* returnType;
+    Type* type;
     Scope* scope;
 };
 
 typedef struct Function Function;
 
-Function* newFunction();
+Function* newFunction(const uint8_t* name, int32_t nameSize, Token* identifier,
+    jtk_ArrayList_t* parameters, Variable* variableParameter,
+    Block* body, VariableType* returnVariableType);
 void deleteFunction(Function* self);
 
 /*******************************************************************************
@@ -398,15 +443,19 @@ void deleteFunction(Function* self);
 
 struct Structure {
     ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
     Token* identifier;
-    jtk_ArrayList_t* variables;
+    // TODO: Rename variables to declarations.
+    jtk_ArrayList_t* declarations;
     Type* type;
     Scope* scope;
 };
 
 typedef struct Structure Structure;
 
-Structure* newStructure();
+Structure* newStructure(const uint8_t* name, int32_t nameSize,
+    Token* identifier, jtk_ArrayList_t* variables);
 void deleteStructure(Structure* self);
 
 /*******************************************************************************
@@ -417,6 +466,7 @@ struct IfClause {
     ContextType tag;
     BinaryExpression* expression;
     Block* body;
+    Token* token;
 };
 
 typedef struct IfClause IfClause;
@@ -446,8 +496,10 @@ void deleteIfStatement(IfStatement* self);
 
 struct IterativeStatement {
     ContextType tag;
+    uint8_t* name;
+    int32_t nameSize;
     Token* label;
-    bool whileLoop;
+    Token* keyword;
     Token* parameter;
     BinaryExpression* expression;
     Block* body;
@@ -483,7 +535,7 @@ void deleteTryStatement(TryStatement* self);
  */
 struct CatchClause {
     jtk_ArrayList_t* captures;
-    Token* parameter;
+    Variable* parameter;
     Block* body;
 };
 
@@ -491,28 +543,6 @@ typedef struct CatchClause CatchClause;
 
 CatchClause* newCatchClause();
 void deleteCatchClause(CatchClause* self);
-
-/*******************************************************************************
- * Variable                                                                    *
- *******************************************************************************/
-
-/**
- * Not part of the AST.
- */
-struct Variable {
-    bool infer;
-    bool constant;
-    Type* type;
-    Token* identifier;
-    BinaryExpression* expression;
-    Scope* parent;
-};
-
-typedef struct Variable Variable;
-
-Variable* newVariable(bool infer, bool constant, Type* type, Token* identifier,
-    BinaryExpression* expression, Scope* parent);
-void deleteVariable(Variable* variable);
 
 /*******************************************************************************
  * VariableDeclaration                                                         *

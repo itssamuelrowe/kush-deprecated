@@ -39,6 +39,7 @@
 #include <kush/lexer.h>
 #include <kush/parser.h>
 #include <kush/error-handler.h>
+#include <kush/analyzer.h>
 
 // Error
 
@@ -46,13 +47,12 @@ void printErrors(Compiler* compiler);
 
 // Phase
 
-void initialize(Compiler* compiler);
-void buildAST(Compiler* compiler);
-void analyze(Compiler* compiler);
-void generate(Compiler* compiler);
-void k_Compiler_destroyScope(Scope* scope);
-void printToken(Token* token);
-void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
+static void initialize(Compiler* compiler);
+static void buildAST(Compiler* compiler);
+static void analyze(Compiler* compiler);
+static void generate(Compiler* compiler);
+static void printToken(Token* token);
+static void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
 
 // Token
 
@@ -61,7 +61,7 @@ void printToken(Token* token) {
         token->startColumn + 1, token->stopColumn + 1,
         token->channel == TOKEN_CHANNEL_DEFAULT? "default" : "hidden",
         tokenNames[(int32_t)token->type]);
-    TokenType type = k_Token_getType(token);
+    TokenType type = token->type;
     if ((type == TOKEN_IDENTIFIER) || (type == TOKEN_INTEGER_LITERAL) ||
         (type == TOKEN_STRING_LITERAL)) {
         printf(" %.*s", token->length, token->text);
@@ -157,7 +157,6 @@ const uint8_t* errorMessages[] = {
     "None",
 
     // Lexical Errors
-
     "Unterminated string literal",
     "Unterminated multi-line comment",
     "Malformed unicode character sequence; expected four hexadecimal digits",
@@ -167,40 +166,58 @@ const uint8_t* errorMessages[] = {
     "Expected digit after underscore in integer literal",
 
     // Syntactical Errors
-
     "Unexpected token",
-    "The try statement expects at least one catch or finally clause.",
+    "Try statement expects at least one catch or finally clause",
+    "Variable initializer expected",
 
     // Semantical Errors
 
-    "Undeclared class",
-    "Variable required on left-hand side of assignment",
-    "Name refers to a non-class symbol",
-    "No suitable constructor found",
+    // Errors related to binary expressions
+    "Cannot combine equality operators",
+    "Type does not support invoking",
+    "Type does not support indexing",
+    "Type does not support accessing",
+
+    // Errors related to unary expressions
+    "Invalid operand",
+
+    // Errors related to declaration
+    "Unknown module",
+    "Undeclared type",
+    "Undeclared member",
     "Undeclared identifier",
-    "Variable treated as function",
-    "Static initializer with parameters",
     "Redeclaration of symbol as function",
     "Redeclaration of symbol as parameter",
     "Redeclaration of symbol as variable parameter",
-    "Multiple function overloads with variable parameter",
-    "Duplicate function overload",
-    "Function declaration exceeds parameter threshold",
     "Redeclaration of symbol as variable",
     "Redeclaration of symbol as constant",
     "Redeclaration of symbol as label",
     "Redeclaration of symbol as loop parameter",
     "Redeclaration of symbol as catch parameter",
-    "Redeclaration of symbol as class",
-    "Unknown class",
+    "Redeclaration of symbol as structure",
     "Redeclaration of symbol previously imported",
-    "Cannot declare function and class in the same compilation unit",
-    "Function declaration causes another function to exceed parameter threshold",
+    "Invalid type",
+    "Incompatible variable initializer",
+
+    // Errors related to types
+    "Expected boolean expression",
+    "Expected boolean expression on left",
+    "Expected boolean expression on right",
+    "Expected integer expression on left",
+    "Expected integer expression on right",
+    "Invalid left operand",
+    "Invalid right operand",
+    "Incompatible operand types",
+    "Expected variable",
+
+    // General errors
+    "Corrupted module",
+    "Invalid module version",
 
     // General Errors
 
     "Corrupted binary entity",
-    "Binary entity encoded in unrecognizable FEB version"
+    "Invalid module version"
 };
 
 void printErrors(Compiler* compiler) {
@@ -234,6 +251,7 @@ void printErrors(Compiler* compiler) {
 
 void initialize(Compiler* compiler) {
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
+    compiler->modules = allocate(Module*, size);
     compiler->packages = allocate(uint8_t* , size);
     compiler->packageSizes = allocate(int32_t, size);
 }
@@ -278,7 +296,7 @@ void buildAST(Compiler* compiler) {
                 if (previousLexicalErrors == currentLexicalErrors) {
                     resetParser(parser, tokens);
                     Module* module = parse(parser);
-                    // compiler->modules[i] = module;
+                    compiler->modules[i] = module;
 
                     if (compiler->dumpNodes) {
                         // TODO
@@ -300,21 +318,24 @@ void buildAST(Compiler* compiler) {
 }
 
 void analyze(Compiler* compiler) {
+    Analyzer* analyzer = newAnalyzer();
+
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
         compiler->currentFileIndex = i;
         Module* module = compiler->modules[i];
-        // definition
+        defineSymbols(analyzer, module);
     }
 
     for (i = 0; i < size; i++) {
         compiler->currentFileIndex = i;
         Module* module = compiler->modules[i];
-        // resolution
+        resolveSymbols(analyzer, module);
     }
 
     printErrors(compiler);
+    deleteAnalyzer(analyzer);
 }
 
 void generate(Compiler* compiler) {
@@ -502,7 +523,7 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
             initialize(compiler);
             buildAST(compiler);
             if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
-                // analyze(compiler);
+                analyze(compiler);
 
                 // if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
                 //     generate(compiler);
