@@ -53,4 +53,6 @@
 
 void* allocate0(int32_t size);
 
+#define controlError() printf("[internal error] %s:%d: Control should not reach here.\n", __FILE__, __LINE__);
+
 #endif /* KUSH_CONFIGURATION_H */

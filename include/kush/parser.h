@@ -32,7 +32,7 @@
 struct Parser {
     Compiler* compiler;
     TokenStream* tokens;
-    TokenType* followSet;
+    int32_t* followSet;
     int32_t followSetSize;
     int32_t followSetCapacity;
     bool recovery;

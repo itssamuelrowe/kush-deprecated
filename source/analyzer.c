@@ -133,8 +133,6 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
 #define invalidate(analyzer) analyzer->scope = analyzer->scope->parent
 
-#define controlError() printf("[internal error] %s:%d: Control should not reach here.\n", __FILE__, __LINE__);
-
 // String:equals(x, y)
 // x.equals(y)
 // bool k_String_equals(k_Runtime_t* runtime, k_String_t* self, k_String_t* other) {

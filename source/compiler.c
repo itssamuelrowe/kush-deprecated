@@ -78,7 +78,7 @@ void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens) {
     int32_t i;
     for (i = 0; i < limit; i++) {
         Token* token = (Token* )jtk_ArrayList_getValue(tokens, i);
-        TokenChannel channel = k_Token_getChannel(token);
+        TokenChannel channel = token->channel;
         if (channel == TOKEN_CHANNEL_DEFAULT) {
             defaultChannel++;
         }
@@ -153,7 +153,7 @@ uint8_t* jtk_PathHelper_getParent(const uint8_t* path, int32_t size,
  * Compiler                                                                   *
  ******************************************************************************/
 
-const uint8_t* errorMessages[] = {
+const char* errorMessages[] = {
     "None",
 
     // Lexical Errors
@@ -278,7 +278,7 @@ void buildAST(Compiler* compiler) {
             uint8_t* package = jtk_PathHelper_getParent(path, -1, &packageSize);
             compiler->packages[i] = package;
             compiler->packageSizes[i] = packageSize;
-            jtk_Arrays_replace_b(package, packageSize, '/', '.');
+            jtk_Arrays_replace_b((int8_t*)package, packageSize, '/', '.');
 
             jtk_InputStream_t* stream = jtk_PathHelper_read(path);
             resetLexer(lexer, stream);
@@ -537,8 +537,9 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
         }
 
         if (compiler->footprint) {
-            int32_t footprint = k_Memory_getFootprint();
+            /* int32_t footprint = k_Memory_getFootprint();
             printf("Memory Footprint = %.2f KB\n", footprint / 1024.0f);
+            */
         }
 
         if ((vmArguments != NULL) && noErrors) {

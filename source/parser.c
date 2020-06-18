@@ -16,6 +16,7 @@
 
 #include <jtk/core/CString.h>
 #include <jtk/collection/Pair.h>
+#include <jtk/collection/array/Arrays.h>
 #include <kush/parser.h>
 
 /*
@@ -143,7 +144,7 @@ static InitializerExpression* parseInitializerExpression(Parser* parser);
 static jtk_Pair_t* parseInitializerEntry(Parser* parser);
 static ArrayExpression* parseArrayExpression(Parser* parser);
 
-static const char ruleNames[][50] = {
+static const char* ruleNames[] = {
     "module",
     "importDeclaration",
     "functionDeclaration",
@@ -201,7 +202,7 @@ void recover(Parser* parser) {
              */
             int32_t i;
             for (i = parser->followSetSize - 1; i >= 0; i--) {
-                if (lt1->type == parser->followSet[i]) {
+                if (lt1->type == (TokenType)parser->followSet[i]) {
                     /* A token from the follow set was encountered. The parser
                      * may have resynchronized with the input.
                      */
@@ -263,8 +264,8 @@ bool ensureFollowSetSpace(Parser* parser, int32_t capacity) {
              * reported.
              */
             if (newCapacity > 0) {
-                uint8_t* temporary = parser->followSet;
-                parser->followSet = (uint8_t*)jtk_Arrays_copyOfEx_b(
+                int32_t* temporary = parser->followSet;
+                parser->followSet = (int32_t*)jtk_Arrays_copyOfEx_i(
                     parser->followSet, parser->followSet, newCapacity, 0,
                     false);
                 parser->followSetCapacity = newCapacity;
@@ -281,7 +282,7 @@ void pushFollowToken(Parser* parser, TokenType type) {
     /* Make sure that the set is large enough to hold another token type. */
     ensureFollowSetSpace(parser, parser->followSetSize + 1);
     /* Insert the follow token to the set. */
-    parser->followSet[parser->followSetSize] = type;
+    parser->followSet[parser->followSetSize] = (int32_t)type;
     /* Increment the size of the follow set. */
     parser->followSetSize++;
 }
@@ -684,10 +685,13 @@ VariableType* parseTypeEx(Parser* parser, bool includeVoid) {
         TOKEN_KEYWORD_UI64,
         TOKEN_KEYWORD_F32,
         TOKEN_KEYWORD_F64,
+        TOKEN_KEYWORD_STRING,
         TOKEN_KEYWORD_VOID
     };
     int32_t index;
-    Token* token = matchAndYieldEx(parser, tokens, includeVoid? 13 : 12, &index);
+    int32_t size = sizeof (tokens) / sizeof (TokenType);
+    Token* token = matchAndYieldEx(parser, tokens, includeVoid? size : (size - 1),
+        &index);
     int32_t dimensions = 0;
     while (la(parser, 1) == TOKEN_LEFT_SQUARE_BRACKET) {
         consume(parser);
@@ -878,7 +882,8 @@ Block* parseBlock(Parser* parser) {
     (token == TOKEN_KEYWORD_UI32) || \
     (token == TOKEN_KEYWORD_UI64) || \
     (token == TOKEN_KEYWORD_F32) || \
-    (token == TOKEN_KEYWORD_F64)
+    (token == TOKEN_KEYWORD_F64) || \
+    (token == TOKEN_KEYWORD_STRING)
 
 /* The parser needs to look ahead 3 tokens to differentiate between variable
  * declarations and expressions, recognizing an LL(3) grammar.
@@ -958,7 +963,7 @@ Context* parseSimpleStatement(Parser* parser) {
             }
 
             default: {
-                printf("[internal error] Control should not reach here.\n");
+                controlError();
                 break;
             }
         }
@@ -1096,7 +1101,7 @@ Context* parseCompoundStatement(Parser* parser) {
 		}
 
 		default: {
-			printf("[internal error] Control should not reach here.\n");
+			controlError();
 			break;
 		}
 	}
@@ -1809,7 +1814,7 @@ void* parsePrimaryExpression(Parser* parser, bool* token) {
             }
 
             default: {
-                printf("[internal error] Control should not reach here.\n");
+                controlError();
                 break;
             }
         }
@@ -1896,7 +1901,7 @@ Parser* parserNew(Compiler* compiler, TokenStream* tokens) {
     Parser* parser = allocate(Parser, 1);
     parser->compiler = compiler;
     parser->tokens = tokens;
-    parser->followSet = allocate(TokenType, 128);
+    parser->followSet = allocate(int32_t, 16);
     parser->followSetSize = 0;
     parser->followSetCapacity = 16;
     parser->recovery = false;
