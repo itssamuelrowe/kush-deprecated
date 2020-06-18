@@ -28,6 +28,7 @@
 struct Generator {
     Compiler* compiler;
     Scope* scope;
+    FILE* source;
 };
 
 typedef struct Generator Generator;
