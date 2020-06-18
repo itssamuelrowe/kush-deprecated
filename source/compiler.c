@@ -186,6 +186,7 @@ const uint8_t* errorMessages[] = {
     "Undeclared type",
     "Undeclared member",
     "Undeclared identifier",
+    "Undeclared label",
     "Redeclaration of symbol as function",
     "Redeclaration of symbol as parameter",
     "Redeclaration of symbol as variable parameter",
@@ -209,6 +210,8 @@ const uint8_t* errorMessages[] = {
     "Invalid right operand",
     "Incompatible operand types",
     "Expected variable",
+    "Expected label",
+    "Incompatible return value",
 
     // General errors
     "Corrupted module",
@@ -328,10 +331,12 @@ void analyze(Compiler* compiler) {
         defineSymbols(analyzer, module);
     }
 
-    for (i = 0; i < size; i++) {
-        compiler->currentFileIndex = i;
-        Module* module = compiler->modules[i];
-        resolveSymbols(analyzer, module);
+    if (jtk_ArrayList_isEmpty(compiler->errorHandler->errors)) {
+        for (i = 0; i < size; i++) {
+            compiler->currentFileIndex = i;
+            Module* module = compiler->modules[i];
+            resolveSymbols(analyzer, module);
+        }
     }
 
     printErrors(compiler);

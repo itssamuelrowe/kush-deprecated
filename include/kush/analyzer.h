@@ -38,6 +38,7 @@ struct Analyzer {
     const uint8_t* package;
     int32_t packageSize;
     Scope* scope;
+    Function* function;
 };
 
 typedef struct Analyzer Analyzer;

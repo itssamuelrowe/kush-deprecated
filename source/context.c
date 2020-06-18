@@ -388,7 +388,7 @@ Structure* newStructure(const uint8_t* name, int32_t nameSize,
     result->tag = CONTEXT_STRUCTURE_DECLARATION;
     result->nameSize = nameSize;
     result->name = jtk_CString_newEx(name, nameSize);
-    result->identifier = NULL;
+    result->identifier = identifier;
     result->declarations = variables;
     result->type = newType(TYPE_STRUCTURE, false, true, false, identifier);
     result->scope = NULL;
@@ -572,6 +572,7 @@ ReturnStatement* newReturnStatement() {
     ReturnStatement* result = allocate(ReturnStatement, 1);
     result->tag = CONTEXT_RETURN_STATEMENT;
     result->expression = NULL;
+    result->keyword = NULL;
     return result;
 }
 

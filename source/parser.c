@@ -1050,7 +1050,7 @@ BreakStatement* parseBreakStatement(Parser* parser) {
  */
 ReturnStatement* parseReturnStatement(Parser* parser) {
     ReturnStatement* context = newReturnStatement();
-    match(parser, TOKEN_KEYWORD_RETURN);
+    context->keyword = matchAndYield(parser, TOKEN_KEYWORD_RETURN);
     context->expression = parseExpression(parser);
     return context;
 }
