@@ -230,6 +230,7 @@ void defineFunction(Analyzer* analyzer, Function* function) {
     invalidate(analyzer);
 }
 
+// TODO: Why are we returning from defineLocals()?
 // TODO: Should we assign variables their parent scopes?
 Scope* defineLocals(Analyzer* analyzer, Block* block) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
@@ -533,9 +534,11 @@ void resolveIterativeStatement(Analyzer* analyzer, IterativeStatement* statement
 void resolveIfStatement(Analyzer* analyzer, IfStatement* statement) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     Type* conditionType = resolveExpression(analyzer, (Context*)statement->ifClause->expression);
-    if (conditionType->tag != TYPE_BOOLEAN) {
-        handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
-            statement->ifClause->token);
+    if (conditionType != NULL) {
+        if (conditionType->tag != TYPE_BOOLEAN) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                statement->ifClause->token);
+        }
     }
     resolveLocals(analyzer, statement->ifClause->body);
 
@@ -544,10 +547,16 @@ void resolveIfStatement(Analyzer* analyzer, IfStatement* statement) {
     for (j = 0; j < count; j++) {
         IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
             statement->elseIfClauses, j);
-        handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
-            clause->token);
+        conditionType = resolveExpression(analyzer, (Context*)clause->expression);
+        if (conditionType != NULL) {
+            if (conditionType->tag != TYPE_BOOLEAN) {
+                handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                    clause->token);
+            }
+        }
         resolveLocals(analyzer, clause->body);
     }
+
     if (statement->elseClause != NULL) {
         resolveLocals(analyzer, statement->elseClause);
     }
@@ -669,6 +678,7 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
     invalidate(analyzer);
 }
 
+// TODO: Ensure that conditional expression does not evaluate to void.
 /* Return the type of the first expression, even if there are errors in the
  * right hand side.
  */

@@ -55,6 +55,7 @@ struct Type {
         } array;
         struct {
             uint8_t size;
+            bool fullWidth;
         } integer;
         struct {
             uint8_t size;

@@ -40,6 +40,7 @@
 #include <kush/parser.h>
 #include <kush/error-handler.h>
 #include <kush/analyzer.h>
+#include <kush/generator.h>
 
 // Error
 
@@ -344,26 +345,15 @@ void analyze(Compiler* compiler) {
 }
 
 void generate(Compiler* compiler) {
-    /*
+    Generator* generator = newGenerator(compiler);
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
         compiler->currentFileIndex = i;
-
-        jtk_Logger_info(compiler->logger, "Starting code generation phase...");
-
-        k_SymbolTable_t* symbolTable = compiler->symbolTables[i];
-        k_ASTAnnotations_t* scopes = compiler->scopes[i];
-        k_ASTNode_t* compilationUnit = compiler->modules[i];
-        k_BinaryEntityGenerator_reset(generator, symbolTable, scopes,
-            compilationUnit, compiler->packages[i], compiler->packageSizes[i],
-            NULL);
-
-        k_BinaryEntityGenerator_generate(generator);
-
-        jtk_Logger_info(compiler->logger, "The code generation phase is complete.");
+        Module* module = compiler->modules[i];
+        generateC(generator, module);
     }
-    */
+    deleteGenerator(generator);
 }
 
 jtk_ArrayList_t* k_CString_split_c(const uint8_t* sequence, int32_t size,
@@ -530,9 +520,9 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
             if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
                 analyze(compiler);
 
-                // if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
-                //     generate(compiler);
-                // }
+                if (jtk_ArrayList_isEmpty(compiler->errorHandler->errors)) {
+                    generate(compiler);
+                }
             }
         }
 

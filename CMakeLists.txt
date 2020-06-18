@@ -27,6 +27,7 @@ set (
     ${PROJECT_SOURCE_DIR}/source/configuration.c
     ${PROJECT_SOURCE_DIR}/source/context.c
     ${PROJECT_SOURCE_DIR}/source/error-handler.c
+    ${PROJECT_SOURCE_DIR}/source/generator.c
     ${PROJECT_SOURCE_DIR}/source/kush.c
     ${PROJECT_SOURCE_DIR}/source/lexer.c
     ${PROJECT_SOURCE_DIR}/source/parser.c
