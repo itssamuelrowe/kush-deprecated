@@ -55,6 +55,7 @@ struct Type {
         } array;
         struct {
             uint8_t size;
+            bool fullWidth;
         } integer;
         struct {
             uint8_t size;
@@ -579,6 +580,7 @@ void deleteThrowStatement(ThrowStatement* self);
 struct ReturnStatement {
     ContextType tag;
     BinaryExpression* expression;
+    Token* keyword;
 };
 
 typedef struct ReturnStatement ReturnStatement;

@@ -16,6 +16,7 @@
 
 #include <jtk/collection/Pair.h>
 #include <jtk/core/StringBuilder.h>
+#include <jtk/core/CString.h>
 
 #include <kush/analyzer.h>
 #include <kush/error-handler.h>
@@ -110,6 +111,10 @@ static uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size);
 static void resolveVariable(Analyzer* analyzer, Variable* variable);
 static void resolveStructure(Analyzer* analyzer, Structure* structure);
 static void resolveFunction(Analyzer* analyzer, Function* function);
+static void resolveIterativeStatement(Analyzer* analyzer, IterativeStatement* statement);
+static void resolveIfStatement(Analyzer* analyzer, IfStatement* statement);
+static void resolveTryStatement(Analyzer* analyzer, TryStatement* statement);
+static void resolveVariableDeclaration(Analyzer* analyzer, VariableDeclaration* declaration);
 static void resolveLocals(Analyzer* analyzer, Block* block);
 static Type* resolveAssignment(Analyzer* analyzer, BinaryExpression* expression);
 static Type* resolveConditional(Analyzer* analyzer, ConditionalExpression* expression);
@@ -128,8 +133,6 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
 #define invalidate(analyzer) analyzer->scope = analyzer->scope->parent
 
-#define controlError() printf("[internal error] %s:%d: Control should not reach here.\n", __FILE__, __LINE__);
-
 // String:equals(x, y)
 // x.equals(y)
 // bool k_String_equals(k_Runtime_t* runtime, k_String_t* self, k_String_t* other) {
@@ -143,7 +146,7 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
 bool import(Analyzer* analyzer, const char* name, int32_t size,
     bool wildcard) {
-    Module* module = NULL; // TODO
+    // Module* module = NULL; // TODO
 
     return true;
 }
@@ -162,33 +165,33 @@ void defineStructure(Analyzer* analyzer, Structure* structure) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
 
     if (isUndefined(analyzer->scope, structure->name)) {
-        defineSymbol(analyzer->scope, structure);
+        defineSymbol(analyzer->scope, (Symbol*)structure);
+
+        structure->scope = scopeForStructure(analyzer->scope, structure);
+
+        int32_t count = jtk_ArrayList_getSize(structure->declarations);
+        int32_t i;
+        for (i = 0; i < count; i++) {
+            VariableDeclaration* declaration =
+                (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+
+            int32_t limit = jtk_ArrayList_getSize(declaration->variables);
+            int32_t j;
+            for (j = 0; j < limit; j++) {
+                Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+                if (isUndefined(structure->scope, variable->name)) {
+                    defineSymbol(structure->scope, (Symbol*)variable);
+                }
+                else {
+                    handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_VARIABLE,
+                        variable->identifier);
+                }
+            }
+        }
     }
     else {
         handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_STRUCTURE,
             structure->identifier);
-    }
-
-    structure->scope = scopeForStructure(analyzer->scope, structure);
-
-    int32_t count = jtk_ArrayList_getSize(structure->declarations);
-    int32_t i;
-    for (i = 0; i < count; i++) {
-        VariableDeclaration* declaration =
-            (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
-
-        int32_t limit = jtk_ArrayList_getSize(declaration->variables);
-        int32_t j;
-        for (j = 0; j < limit; j++) {
-            Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
-            if (isUndefined(structure->scope, variable->name)) {
-                defineSymbol(structure->scope, variable);
-            }
-            else {
-                handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_VARIABLE,
-                    variable->identifier);
-            }
-        }
     }
 }
 
@@ -203,7 +206,7 @@ void defineFunction(Analyzer* analyzer, Function* function) {
     for (i = 0; i < parameterCount; i++) {
         Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
         if (isUndefined(function->scope, parameter->name)) {
-            defineSymbol(function->scope, parameter);
+            defineSymbol(function->scope, (Symbol*)parameter);
         }
         else {
             handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_PARAMETER,
@@ -214,7 +217,7 @@ void defineFunction(Analyzer* analyzer, Function* function) {
     if (function->variableParameter != NULL) {
         Variable* variableParameter = function->variableParameter;
         if (isUndefined(function->scope, variableParameter->name)) {
-            defineSymbol(function->scope, variableParameter);
+            defineSymbol(function->scope, (Symbol*)variableParameter);
         }
         else {
             handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_VARIABLE_PARAMETER,
@@ -227,7 +230,8 @@ void defineFunction(Analyzer* analyzer, Function* function) {
     invalidate(analyzer);
 }
 
-// TODO: Assign variables their parent scopes!
+// TODO: Why are we returning from defineLocals()?
+// TODO: Should we assign variables their parent scopes?
 Scope* defineLocals(Analyzer* analyzer, Block* block) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
 
@@ -245,7 +249,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
 
                 if (statement->name != NULL) {
                     if (isUndefined(analyzer->scope, statement->name)) {
-                        defineSymbol(analyzer->scope, statement);
+                        defineSymbol(analyzer->scope, (Symbol*)statement);
                     }
                     else {
                         handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_LABEL,
@@ -253,9 +257,10 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                     }
                 }
 
-                Scope* localScope = defineLocals(analyzer, statement->body);
+                /* Scope* localScope = */ defineLocals(analyzer, statement->body);
                 if (statement->parameter != NULL) {
-                    defineSymbol(localScope, statement->parameter);
+                    // TODO: Parameter should be a variable, not token.
+                    // defineSymbol(localScope, (Symbol*)statement->parameter);
                 }
 
                break;
@@ -290,7 +295,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                     Scope* localScope = defineLocals(analyzer, clause->body);
 
                     if (isUndefined(localScope, parameter->identifier->text)) {
-                        defineSymbol(localScope, parameter);
+                        defineSymbol(localScope, (Symbol*)parameter);
                     }
                     else {
                         handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_CATCH_PARAMETER,
@@ -313,7 +318,7 @@ Scope* defineLocals(Analyzer* analyzer, Block* block) {
                     Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
                     if (isUndefined(analyzer->scope, variable->name)) {
-                        defineSymbol(analyzer->scope, variable);
+                        defineSymbol(analyzer->scope, (Symbol*)variable);
                     }
                     else {
                         handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_VARIABLE,
@@ -398,7 +403,7 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
         }
 
         case TOKEN_IDENTIFIER: {
-            Context* context = resolveSymbol(analyzer->scope, token->text);
+            Context* context = (Context*)resolveSymbol(analyzer->scope, token->text);
             if (context == NULL) {
                 handleSemanticError(handler, analyzer, ERROR_UNDECLARED_TYPE,
                     token);
@@ -439,7 +444,7 @@ void resolveVariable(Analyzer* analyzer, Variable* variable) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     Type* initializerType = NULL;
     if (variable->expression != NULL) {
-        initializerType = resolveExpression(analyzer, variable->expression);
+        initializerType = resolveExpression(analyzer, (Context*)variable->expression);
     }
 
     if (variable->infer || variable->constant) {
@@ -510,8 +515,111 @@ uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
     return result;
 }
 
-void resolveLocals(Analyzer* analyzer, Block* block) {
+void resolveIterativeStatement(Analyzer* analyzer, IterativeStatement* statement) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
+    if (statement->keyword->type == TOKEN_KEYWORD_WHILE) {
+        Type* conditionType = resolveExpression(analyzer, (Context*)statement->expression);
+        if (conditionType->tag != TYPE_BOOLEAN) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                statement->keyword);
+        }
+    }
+    // TODO:
+    // if (statement->parameter != NULL) {
+    //     resolveVariable(analyzer, statement->parameter);
+    // }
+    resolveLocals(analyzer, statement->body);
+}
+
+void resolveIfStatement(Analyzer* analyzer, IfStatement* statement) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* conditionType = resolveExpression(analyzer, (Context*)statement->ifClause->expression);
+    if (conditionType != NULL) {
+        if (conditionType->tag != TYPE_BOOLEAN) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                statement->ifClause->token);
+        }
+    }
+    resolveLocals(analyzer, statement->ifClause->body);
+
+    int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
+    int32_t j;
+    for (j = 0; j < count; j++) {
+        IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
+            statement->elseIfClauses, j);
+        conditionType = resolveExpression(analyzer, (Context*)clause->expression);
+        if (conditionType != NULL) {
+            if (conditionType->tag != TYPE_BOOLEAN) {
+                handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
+                    clause->token);
+            }
+        }
+        resolveLocals(analyzer, clause->body);
+    }
+
+    if (statement->elseClause != NULL) {
+        resolveLocals(analyzer, statement->elseClause);
+    }
+}
+
+void resolveTryStatement(Analyzer* analyzer, TryStatement* statement) {
+    resolveLocals(analyzer, statement->tryClause);
+
+    int32_t count = jtk_ArrayList_getSize(statement->catchClauses);
+    int32_t j;
+    for (j = 0; j < count; j++) {
+        CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
+            statement->catchClauses, j);
+        resolveLocals(analyzer, clause->body);
+    }
+
+    if (statement->finallyClause != NULL) {
+        resolveLocals(analyzer, statement->finallyClause);
+    }
+}
+
+void resolveVariableDeclaration(Analyzer* analyzer, VariableDeclaration* declaration) {
+    int32_t count = jtk_ArrayList_getSize(declaration->variables);
+    int32_t j;
+    for (j = 0; j < count; j++) {
+        Variable* variable = (Variable*)jtk_ArrayList_getValue(
+            declaration->variables, j);
+        resolveVariable(analyzer, variable);
+    }
+}
+
+void resolveBreakStatement(Analyzer* analyzer, BreakStatement* statement) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Token* identifier = statement->identifier;
+    if (identifier != NULL) {
+        Symbol* symbol = resolveSymbol(analyzer->scope, identifier->text);
+        if (symbol == NULL) {
+            handleSemanticError(handler, analyzer, ERROR_UNDECLARED_LABEL,
+                identifier);
+        }
+        else if (symbol->tag != CONTEXT_ITERATIVE_STATEMENT) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_LABEL,
+                identifier);
+        }
+    }
+}
+
+void resolveReturnStatement(Analyzer* analyzer, ReturnStatement* statement) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* type = resolveExpression(analyzer, (Context*)statement->expression);
+    if (analyzer->function->returnType != type) {
+        handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_RETURN_VALUE,
+            statement->keyword);
+    }
+}
+
+void resolveThrowStatement(Analyzer* analyzer, ThrowStatement* statement) {
+    /* ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* type = */ resolveExpression(analyzer, (Context*)statement->expression);
+}
+
+void resolveLocals(Analyzer* analyzer, Block* block) {
+    // ErrorHandler* handler = analyzer->compiler->errorHandler;
     analyzer->scope = block->scope;
 
     int32_t limit = jtk_ArrayList_getSize(block->statements);
@@ -521,80 +629,42 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
             block->statements, i);
         switch (context->tag) {
             case CONTEXT_ITERATIVE_STATEMENT: {
-                IterativeStatement* statement = (IterativeStatement*)context;
-                if (statement->keyword->type == TOKEN_KEYWORD_WHILE) {
-                    Type* conditionType = resolveExpression(analyzer, statement->expression);
-                    if (conditionType->tag != TYPE_BOOLEAN) {
-                        handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
-                            statement->keyword);
-                    }
-                }
-                // TODO:
-                // if (statement->parameter != NULL) {
-                //     resolveVariable(analyzer, statement->parameter);
-                // }
-                resolveLocals(analyzer, statement->body);
-
+                resolveIterativeStatement(analyzer, (IterativeStatement*)context);
                 break;
             }
 
             case CONTEXT_IF_STATEMENT: {
-                IfStatement* statement = (IfStatement*)context;
-                Type* conditionType = resolveExpression(analyzer, statement->ifClause->expression);
-                if (conditionType->tag != TYPE_BOOLEAN) {
-                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
-                        statement->ifClause->token);
-                }
-                resolveLocals(analyzer, statement->ifClause->body);
-
-                int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
-                int32_t j;
-                for (j = 0; j < count; j++) {
-                    IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
-                        statement->elseIfClauses, j);
-                    handleSemanticError(handler, analyzer, ERROR_EXPECTED_BOOLEAN_EXPRESSION,
-                        clause->token);
-                    resolveLocals(analyzer, clause->body);
-                }
-                if (statement->elseClause != NULL) {
-                    resolveLocals(analyzer, statement->elseClause);
-                }
+                resolveIfStatement(analyzer, (IfStatement*)context);
                 break;
             }
 
             case CONTEXT_TRY_STATEMENT: {
-                TryStatement* statement = (TryStatement*)context;
-                resolveLocals(analyzer, statement->tryClause);
-
-                int32_t count = jtk_ArrayList_getSize(statement->catchClauses);
-                int32_t j;
-                for (j = 0; j < count; j++) {
-                    CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
-                        statement->catchClauses, j);
-                    resolveLocals(analyzer, clause->body);
-                }
-
-                if (statement->finallyClause != NULL) {
-                    resolveLocals(analyzer, statement->finallyClause);
-                }
-
+                resolveTryStatement(analyzer, (TryStatement*)context);
                 break;
             }
 
             case CONTEXT_VARIABLE_DECLARATION: {
-                VariableDeclaration* statement = (VariableDeclaration*)context;
-                int32_t count = jtk_ArrayList_getSize(statement->variables);
-                int32_t j;
-                for (j = 0; j < count; j++) {
-                    Variable* variable = (Variable*)jtk_ArrayList_getValue(
-                        statement->variables, j);
-                    resolveVariable(analyzer, variable);
-                }
+                resolveVariableDeclaration(analyzer, (VariableDeclaration*)context);
                 break;
             }
 
             case CONTEXT_ASSIGNMENT_EXPRESSION: {
                 resolveExpression(analyzer, context);
+                break;
+            }
+
+            case CONTEXT_BREAK_STATEMENT: {
+                resolveBreakStatement(analyzer, (BreakStatement*)context);
+                break;
+            }
+
+            case CONTEXT_RETURN_STATEMENT: {
+                resolveReturnStatement(analyzer, (ReturnStatement*)context);
+                break;
+            }
+
+            case CONTEXT_THROW_STATEMENT: {
+                resolveThrowStatement(analyzer, (ThrowStatement*)context);
                 break;
             }
 
@@ -608,12 +678,13 @@ void resolveLocals(Analyzer* analyzer, Block* block) {
     invalidate(analyzer);
 }
 
+// TODO: Ensure that conditional expression does not evaluate to void.
 /* Return the type of the first expression, even if there are errors in the
  * right hand side.
  */
 Type* resolveAssignment(Analyzer* analyzer, BinaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* result = resolveExpression(analyzer, expression->left);
+    Type* result = resolveExpression(analyzer, (Context*)expression->left);
 
     int32_t count = jtk_ArrayList_getSize(expression->others);
     if ((result != NULL) && (count > 0)) {
@@ -635,7 +706,7 @@ Type* resolveAssignment(Analyzer* analyzer, BinaryExpression* expression) {
 // TODO: `condition? object : null` should work
 Type* resolveConditional(Analyzer* analyzer, ConditionalExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* conditionType = resolveExpression(analyzer, expression->condition);
+    Type* conditionType = resolveExpression(analyzer, (Context*)expression->condition);
     Type* result = conditionType;
 
     if (expression->hook != NULL) {
@@ -645,8 +716,8 @@ Type* resolveConditional(Analyzer* analyzer, ConditionalExpression* expression) 
             result = NULL;
         }
 
-        Type* thenType = resolveExpression(analyzer, expression->then);
-        Type* elseType = resolveExpression(analyzer, expression->otherwise);
+        Type* thenType = resolveExpression(analyzer, (Context*)expression->then);
+        Type* elseType = resolveExpression(analyzer, (Context*)expression->otherwise);
 
         result = NULL;
         if ((thenType != NULL) && (elseType != NULL)) {
@@ -877,7 +948,7 @@ Type* resolveArithmetic(Analyzer* analyzer, BinaryExpression* expression) {
 
 Type* resolveUnary(Analyzer* analyzer, UnaryExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
-    Type* result = resolveExpression(analyzer, expression->expression);
+    Type* result = resolveExpression(analyzer, (Context*)expression->expression);
 
     Token* operator = expression->operator;
     if ((result != NULL) && (operator != NULL)) {
@@ -913,7 +984,7 @@ Type* resolveSubscript(Analyzer* analyzer, Subscript* subscript, Type* previous)
             subscript->bracket);
     }
     else {
-        Type* indexType = resolveExpression(analyzer, subscript->expression);
+        /* Type* indexType = */ resolveExpression(analyzer, (Context*)subscript->expression);
         // TODO: Check if the index type is integer.
         // TODO: Find the result of the subscript.
     }
@@ -934,9 +1005,9 @@ Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
             Function* function = previous->function;
             int32_t j;
             for (j = 0; j < arguments->expressions->m_size; j++) {
-                BinaryExpression* argument = (BinaryExpression*)jtk_ArrayList_getValue(
-                    arguments->expressions, j);
-                Type* argumentType = resolveExpression(analyzer, argument);
+                // BinaryExpression* argument = (BinaryExpression*)jtk_ArrayList_getValue(
+                //     arguments->expressions, j);
+                // Type* argumentType = resolveExpression(analyzer, (Context*)argument);
                 // ...
             }
             result = function->returnType;
@@ -959,7 +1030,7 @@ Type* resolveMemberAccess(Analyzer* analyzer, MemberAccess* access, Type* previo
         Token* identifier = access->identifier;
         if (previous->tag == TYPE_STRUCTURE) {
             Structure* structure = previous->structure;
-            Variable* variable = resolveMember(structure->scope, identifier->text);
+            Variable* variable = (Variable*)resolveMember(structure->scope, identifier->text);
 
             if (variable == NULL) {
                 handleSemanticError(handler, analyzer, ERROR_UNDECLARED_MEMBER,
@@ -977,10 +1048,10 @@ Type* resolveMemberAccess(Analyzer* analyzer, MemberAccess* access, Type* previo
 }
 
 Type* resolvePostfix(Analyzer* analyzer, PostfixExpression* expression) {
-    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    // ErrorHandler* handler = analyzer->compiler->errorHandler;
     Type* type = expression->token?
         resolveToken(analyzer, (Token*)expression->primary) :
-        resolveExpression(analyzer, expression->primary);
+        resolveExpression(analyzer, (Context*)expression->primary);
     Type* result = type;
 
     int32_t count = jtk_ArrayList_getSize(expression->postfixParts);
@@ -1012,7 +1083,7 @@ Type* resolveToken(Analyzer* analyzer, Token* token) {
     Type* result = NULL;
     switch (token->type) {
         case TOKEN_IDENTIFIER: {
-            Context* context = resolveSymbol(analyzer->scope, token->text);
+            Context* context = (Context*)resolveSymbol(analyzer->scope, token->text);
             if (context == NULL) {
                 handleSemanticError(handler, analyzer, ERROR_UNDECLARED_IDENTIFIER,
                     token);
@@ -1074,7 +1145,7 @@ Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
 }
 
 Type* resolveExpression(Analyzer* analyzer, Context* context) {
-    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    // ErrorHandler* handler = analyzer->compiler->errorHandler;
 
     Type* result = NULL;
     switch (context->tag) {
@@ -1158,6 +1229,7 @@ Analyzer* newAnalyzer(Compiler* compiler) {
     analyzer->compiler = compiler;
     analyzer->package = NULL;
     analyzer->packageSize = -1;
+    analyzer->function = NULL;
 
     return analyzer;
 }
@@ -1173,6 +1245,7 @@ void deleteAnalyzer(Analyzer* analyzer) {
 // Reset
 
 void resetAnalyzer(Analyzer* analyzer) {
+    analyzer->function = NULL;
 }
 
 // Define
@@ -1198,7 +1271,7 @@ void defineSymbols(Analyzer* analyzer, Module* module) {
             module->functions, i);
 
         if (isUndefined(analyzer->scope, function->name)) {
-            defineSymbol(analyzer->scope, function);
+            defineSymbol(analyzer->scope, (Symbol*)function);
         }
         else {
             handleSemanticError(handler, analyzer, ERROR_REDECLARATION_AS_FUNCTION,
@@ -1259,6 +1332,7 @@ void resolveSymbols(Analyzer* analyzer, Module* module) {
     for (i = 0; i < functionCount; i++) {
         Function* function = (Function*)jtk_ArrayList_getValue(
             module->functions, i);
+        analyzer->function = function;
         resolveFunction(analyzer, function);
     }
 

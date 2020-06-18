@@ -58,7 +58,8 @@ Primitives primitives = {
         .indexable = false,
         .accessible = false,
         .integer = {
-            .size = 1
+            .size = 1,
+            .fullWidth = false
         }
     },
 
@@ -68,7 +69,8 @@ Primitives primitives = {
         .accessible = false,
         .identifier = NULL,
         .integer = {
-            .size = 2
+            .size = 2,
+            .fullWidth = false
         }
     },
 
@@ -78,7 +80,8 @@ Primitives primitives = {
         .accessible = false,
         .identifier = NULL,
         .integer = {
-            .size = 4
+            .size = 4,
+            .fullWidth = false
         }
     },
 
@@ -88,9 +91,55 @@ Primitives primitives = {
         .accessible = false,
         .identifier = NULL,
         .integer = {
-            .size = 8
+            .size = 8,
+            .fullWidth = false
         }
     },
+
+    .ui8 = {
+        .tag = TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
+        .integer = {
+            .size = 1,
+            .fullWidth = true
+        }
+    },
+
+    .ui16 = {
+        .tag = TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL,
+        .integer = {
+            .size = 2,
+            .fullWidth = true
+        }
+    },
+
+    .ui32 = {
+        .tag = TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL,
+        .integer = {
+            .size = 4,
+            .fullWidth = true
+        }
+    },
+
+    .ui64 = {
+        .tag = TYPE_INTEGER,
+        .indexable = false,
+        .accessible = false,
+        .identifier = NULL,
+        .integer = {
+            .size = 8,
+            .fullWidth = true
+        }
+    },
+
+
 
     .f32 = {
         .tag = TYPE_DECIMAL,
@@ -388,7 +437,7 @@ Structure* newStructure(const uint8_t* name, int32_t nameSize,
     result->tag = CONTEXT_STRUCTURE_DECLARATION;
     result->nameSize = nameSize;
     result->name = jtk_CString_newEx(name, nameSize);
-    result->identifier = NULL;
+    result->identifier = identifier;
     result->declarations = variables;
     result->type = newType(TYPE_STRUCTURE, false, true, false, identifier);
     result->scope = NULL;
@@ -572,6 +621,7 @@ ReturnStatement* newReturnStatement() {
     ReturnStatement* result = allocate(ReturnStatement, 1);
     result->tag = CONTEXT_RETURN_STATEMENT;
     result->expression = NULL;
+    result->keyword = NULL;
     return result;
 }
 

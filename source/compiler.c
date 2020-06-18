@@ -40,6 +40,7 @@
 #include <kush/parser.h>
 #include <kush/error-handler.h>
 #include <kush/analyzer.h>
+#include <kush/generator.h>
 
 // Error
 
@@ -78,7 +79,7 @@ void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens) {
     int32_t i;
     for (i = 0; i < limit; i++) {
         Token* token = (Token* )jtk_ArrayList_getValue(tokens, i);
-        TokenChannel channel = k_Token_getChannel(token);
+        TokenChannel channel = token->channel;
         if (channel == TOKEN_CHANNEL_DEFAULT) {
             defaultChannel++;
         }
@@ -153,7 +154,7 @@ uint8_t* jtk_PathHelper_getParent(const uint8_t* path, int32_t size,
  * Compiler                                                                   *
  ******************************************************************************/
 
-const uint8_t* errorMessages[] = {
+const char* errorMessages[] = {
     "None",
 
     // Lexical Errors
@@ -186,6 +187,7 @@ const uint8_t* errorMessages[] = {
     "Undeclared type",
     "Undeclared member",
     "Undeclared identifier",
+    "Undeclared label",
     "Redeclaration of symbol as function",
     "Redeclaration of symbol as parameter",
     "Redeclaration of symbol as variable parameter",
@@ -209,6 +211,8 @@ const uint8_t* errorMessages[] = {
     "Invalid right operand",
     "Incompatible operand types",
     "Expected variable",
+    "Expected label",
+    "Incompatible return value",
 
     // General errors
     "Corrupted module",
@@ -275,7 +279,7 @@ void buildAST(Compiler* compiler) {
             uint8_t* package = jtk_PathHelper_getParent(path, -1, &packageSize);
             compiler->packages[i] = package;
             compiler->packageSizes[i] = packageSize;
-            jtk_Arrays_replace_b(package, packageSize, '/', '.');
+            jtk_Arrays_replace_b((int8_t*)package, packageSize, '/', '.');
 
             jtk_InputStream_t* stream = jtk_PathHelper_read(path);
             resetLexer(lexer, stream);
@@ -328,10 +332,12 @@ void analyze(Compiler* compiler) {
         defineSymbols(analyzer, module);
     }
 
-    for (i = 0; i < size; i++) {
-        compiler->currentFileIndex = i;
-        Module* module = compiler->modules[i];
-        resolveSymbols(analyzer, module);
+    if (jtk_ArrayList_isEmpty(compiler->errorHandler->errors)) {
+        for (i = 0; i < size; i++) {
+            compiler->currentFileIndex = i;
+            Module* module = compiler->modules[i];
+            resolveSymbols(analyzer, module);
+        }
     }
 
     printErrors(compiler);
@@ -339,26 +345,15 @@ void analyze(Compiler* compiler) {
 }
 
 void generate(Compiler* compiler) {
-    /*
+    Generator* generator = newGenerator(compiler);
     int32_t size = jtk_ArrayList_getSize(compiler->inputFiles);
     int32_t i;
     for (i = 0; i < size; i++) {
         compiler->currentFileIndex = i;
-
-        jtk_Logger_info(compiler->logger, "Starting code generation phase...");
-
-        k_SymbolTable_t* symbolTable = compiler->symbolTables[i];
-        k_ASTAnnotations_t* scopes = compiler->scopes[i];
-        k_ASTNode_t* compilationUnit = compiler->modules[i];
-        k_BinaryEntityGenerator_reset(generator, symbolTable, scopes,
-            compilationUnit, compiler->packages[i], compiler->packageSizes[i],
-            NULL);
-
-        k_BinaryEntityGenerator_generate(generator);
-
-        jtk_Logger_info(compiler->logger, "The code generation phase is complete.");
+        Module* module = compiler->modules[i];
+        generateC(generator, module);
     }
-    */
+    deleteGenerator(generator);
 }
 
 jtk_ArrayList_t* k_CString_split_c(const uint8_t* sequence, int32_t size,
@@ -525,15 +520,16 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
             if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
                 analyze(compiler);
 
-                // if (noErrors = (compiler->errorHandler->errors->m_size == 0)) {
-                //     generate(compiler);
-                // }
+                if (jtk_ArrayList_isEmpty(compiler->errorHandler->errors)) {
+                    generate(compiler);
+                }
             }
         }
 
         if (compiler->footprint) {
-            int32_t footprint = k_Memory_getFootprint();
+            /* int32_t footprint = k_Memory_getFootprint();
             printf("Memory Footprint = %.2f KB\n", footprint / 1024.0f);
+            */
         }
 
         if ((vmArguments != NULL) && noErrors) {
