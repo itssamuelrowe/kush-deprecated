@@ -395,7 +395,7 @@ void buildExecutable(Compiler* compiler) {
 }
 
 jtk_ArrayList_t* k_CString_split_c(const uint8_t* sequence, int32_t size,
-                                   uint8_t value, bool inclusive) {
+    uint8_t value, bool inclusive) {
     jtk_ArrayList_t* result = jtk_ArrayList_new();
     int32_t i;
     for (i = 0; i < size; i++) {

@@ -1429,10 +1429,27 @@ Structure* addSyntheticStructure(Analyzer* analyzer, const uint8_t* name,
 
 Variable* addSyntheticMember(Analyzer* analyzer, Structure* structure,
     bool constant, const uint8_t* name, int32_t nameSize, Type* type) {
-    Variable* variable = newVariable(false, constant, type, name, nameSize,
+    Variable* variable = newVariable(false, constant, NULL, name, nameSize,
         NULL, NULL, structure->scope);
+    variable->type = type;
     defineSymbol(structure->scope, variable);
 
+    return variable;
+}
+
+void addSyntheticFunction(Analyzer* analyzer, const uint8_t* name,
+    int32_t nameSize, jtk_ArrayList_t* parameters, Type* returnType)  {
+    Function* function = newFunction(name, nameSize, NULL,
+        parameters, NULL, NULL, NULL);
+    function->returnType = returnType;
+    defineSymbol(analyzer->scope, function);
+}
+
+Variable* makeParameter(Analyzer* analyzer, const uint8_t* name, int32_t nameSize,
+    Type* type) {
+    Variable* variable = newVariable(false, false, NULL, name,
+        nameSize, NULL, NULL, analyzer->scope);
+    variable->type = type;
     return variable;
 }
 
@@ -1446,6 +1463,16 @@ void defineBuiltins(Analyzer* analyzer) {
     addSyntheticMember(analyzer, string, true, "size", 4, &primitives.i32);
     Type* valueType = getArrayType(analyzer, &primitives.ui8, 1);
     addSyntheticMember(analyzer, string, true, "value", 5, valueType);
+
+    // print_i
+    jtk_ArrayList_t* parameters = jtk_ArrayList_new();
+    jtk_ArrayList_add(parameters, makeParameter(analyzer, "n", 1, &primitives.i32));
+    addSyntheticFunction(analyzer, "print_i", 7, parameters, &primitives.void_);
+
+    // print_s
+    parameters = jtk_ArrayList_new();
+    jtk_ArrayList_add(parameters, makeParameter(analyzer, "s", 1, &primitives.string));
+    addSyntheticFunction(analyzer, "print_s", 7, parameters, &primitives.void_);
 }
 
 void defineSymbols(Analyzer* analyzer, Module* module) {

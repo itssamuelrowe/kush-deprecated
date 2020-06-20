@@ -85,12 +85,19 @@ void generateType(Generator* generator, Type* type) {
         output = "void";
     }
     else if (type == &primitives.string) {
-        output = "String*";
+        output = "kush_String*";
+    }
+    if (output != NULL) {
+        fprintf(generator->output, "%s", output);
     }
     else {
-        fprintf(generator->output, "TODO: generateType()\n");
+        if (type->tag == TYPE_ARRAY) {
+            fprintf(generator->output, "kush_Array");
+        }
+        else if (type->tag == TYPE_STRUCTURE) {
+            fprintf(generator->output, "kush_%s", type->structure->name);
+        }
     }
-    fprintf(generator->output, "%s", output);
 }
 
 void generateForwardReferences(Generator* generator, Module* module) {
@@ -99,7 +106,7 @@ void generateForwardReferences(Generator* generator, Module* module) {
     for (j = 0; j < structureCount; j++) {
         Structure* structure = (Structure*)jtk_ArrayList_getValue(
             module->structures, j);
-        fprintf(generator->output, "typedef struct %s %s;\n", structure->name, structure->name);
+        fprintf(generator->output, "typedef struct kush_%s kush_%s;\n", structure->name, structure->name);
     }
     fprintf(generator->output, "\n");
 
@@ -109,7 +116,7 @@ void generateForwardReferences(Generator* generator, Module* module) {
         Function* function = (Function*)jtk_ArrayList_getValue(
             module->functions, i);
         generateType(generator, function->returnType);
-        fprintf(generator->output, " %s();\n", function->name);
+        fprintf(generator->output, " kush_%s();\n", function->name);
     }
     fprintf(generator->output, "\n");
 }
@@ -120,7 +127,7 @@ void generateStructures(Generator* generator, Module* module) {
     for (j = 0; j < structureCount; j++) {
         Structure* structure = (Structure*)jtk_ArrayList_getValue(
             module->structures, j);
-        fprintf(generator->output, "struct %s {\n", structure->name);
+        fprintf(generator->output, "struct kush_%s {\n", structure->name);
 
         int32_t declarationCount = jtk_ArrayList_getSize(structure->declarations);
         int32_t i;
@@ -240,9 +247,13 @@ void generatePostfix(Generator* generator, PostfixExpression* expression) {
 void generateToken(Generator* generator, Token* token) {
     switch (token->type) {
         case TOKEN_KEYWORD_TRUE:
-        case TOKEN_KEYWORD_FALSE:
-        case TOKEN_IDENTIFIER: {
+        case TOKEN_KEYWORD_FALSE: {
             fprintf(generator->output, "%s", token->text);
+            break;
+        }
+
+        case TOKEN_IDENTIFIER: {
+            fprintf(generator->output, "kush_%s", token->text);
             break;
         }
 
@@ -504,7 +515,7 @@ void generateFunction(Generator* generator, Function* function) {
     generator->scope = function->scope;
 
     generateType(generator, function->returnType);
-    fprintf(generator->output, " %s(", function->name);
+    fprintf(generator->output, " kush_%s(", function->name);
 
     int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
     int32_t i;
