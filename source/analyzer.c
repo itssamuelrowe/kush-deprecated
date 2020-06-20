@@ -144,9 +144,6 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 //     k_assertObject(self);
 // }
 
-// TODO: Add string keyword to the parser
-// Add new expression
-
 // Array Type
 
 Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) {
@@ -1440,11 +1437,11 @@ Variable* addSyntheticMember(Analyzer* analyzer, Structure* structure,
 }
 
 void defineBuiltins(Analyzer* analyzer) {
+    // $Array
     Structure* array = addSyntheticStructure(analyzer, "$Array", 6);
     addSyntheticMember(analyzer, array, true, "size", 4, &primitives.i32);
 
-    // String
-
+    // $String
     Structure* string = addSyntheticStructure(analyzer, "$String", 7);
     addSyntheticMember(analyzer, string, true, "size", 4, &primitives.i32);
     Type* valueType = getArrayType(analyzer, &primitives.ui8, 1);

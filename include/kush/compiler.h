@@ -53,6 +53,8 @@ struct Compiler {
     jtk_HashMap_t* repository;
     jtk_ArrayList_t* trash;
     bool coreApi;
+    uint8_t* output;
+    int32_t outputSize;
 };
 
 /**

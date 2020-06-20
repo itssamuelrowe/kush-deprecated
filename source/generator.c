@@ -44,7 +44,7 @@ static void generateIndentation(Generator* generator, int32_t depth);
 static void generateBlock(Generator* generator, Block* block, int32_t depth);
 static void generateFunction(Generator* generator, Function* function);
 static void generateFunctions(Generator* generator, Module* module);
-static void generateHead(Generator* generator);
+static void generateHeader(Generator* generator, Module* module);
 
 void generateType(Generator* generator, Type* type) {
     const char* output = NULL;
@@ -88,9 +88,9 @@ void generateType(Generator* generator, Type* type) {
         output = "String*";
     }
     else {
-        fprintf(generator->source, "TODO: generateType()\n");
+        fprintf(generator->output, "TODO: generateType()\n");
     }
-    fprintf(generator->source, "%s", output);
+    fprintf(generator->output, "%s", output);
 }
 
 void generateForwardReferences(Generator* generator, Module* module) {
@@ -99,9 +99,9 @@ void generateForwardReferences(Generator* generator, Module* module) {
     for (j = 0; j < structureCount; j++) {
         Structure* structure = (Structure*)jtk_ArrayList_getValue(
             module->structures, j);
-        fprintf(generator->source, "typedef struct %s %s;\n", structure->name, structure->name);
+        fprintf(generator->output, "typedef struct %s %s;\n", structure->name, structure->name);
     }
-    fprintf(generator->source, "\n");
+    fprintf(generator->output, "\n");
 
     int32_t functionCount = jtk_ArrayList_getSize(module->functions);
     int32_t i;
@@ -109,9 +109,9 @@ void generateForwardReferences(Generator* generator, Module* module) {
         Function* function = (Function*)jtk_ArrayList_getValue(
             module->functions, i);
         generateType(generator, function->returnType);
-        fprintf(generator->source, " %s();\n", function->name);
+        fprintf(generator->output, " %s();\n", function->name);
     }
-    fprintf(generator->source, "\n");
+    fprintf(generator->output, "\n");
 }
 
 void generateStructures(Generator* generator, Module* module) {
@@ -120,7 +120,7 @@ void generateStructures(Generator* generator, Module* module) {
     for (j = 0; j < structureCount; j++) {
         Structure* structure = (Structure*)jtk_ArrayList_getValue(
             module->structures, j);
-        fprintf(generator->source, "struct %s {\n", structure->name);
+        fprintf(generator->output, "struct %s {\n", structure->name);
 
         int32_t declarationCount = jtk_ArrayList_getSize(structure->declarations);
         int32_t i;
@@ -132,15 +132,15 @@ void generateStructures(Generator* generator, Module* module) {
             int32_t j;
             for (j = 0; j < limit; j++) {
                 Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
-                fprintf(generator->source, "    ");
+                fprintf(generator->output, "    ");
                 generateType(generator, variable->type);
-                fprintf(generator->source, " %s;\n", variable->name);
+                fprintf(generator->output, " %s;\n", variable->name);
             }
         }
 
-        fprintf(generator->source, "};\n");
+        fprintf(generator->output, "};\n");
     }
-    fprintf(generator->source, "\n");
+    fprintf(generator->output, "\n");
 }
 
 /* Return the type of the first expression, even if there are errors in the
@@ -154,7 +154,7 @@ void generateBinary(Generator* generator, BinaryExpression* expression) {
         int32_t i;
         for (i = 0; i < count; i++) {
             jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
-            fprintf(generator->source, " %s ", ((Token*)pair->m_left)->text);
+            fprintf(generator->output, " %s ", ((Token*)pair->m_left)->text);
             generateExpression(generator, (Context*)pair->m_right);
         }
     }
@@ -164,9 +164,9 @@ void generateConditional(Generator* generator, ConditionalExpression* expression
     generateExpression(generator, (Context*)expression->condition);
 
     if (expression->hook != NULL) {
-        fprintf(generator->source, "? ");
+        fprintf(generator->output, "? ");
         generateExpression(generator, (Context*)expression->then);
-        fprintf(generator->source, " : ");
+        fprintf(generator->output, " : ");
         generateExpression(generator, (Context*)expression->otherwise);
     }
 }
@@ -176,18 +176,18 @@ void generateUnary(Generator* generator, UnaryExpression* expression) {
 
     Token* operator = expression->operator;
     if (operator != NULL) {
-        fprintf(generator->source, "%s", operator->text);
+        fprintf(generator->output, "%s", operator->text);
     }
 }
 
 void generateSubscript(Generator* generator, Subscript* subscript) {
-    fprintf(generator->source, "[");
+    fprintf(generator->output, "[");
     generateExpression(generator, (Context*)subscript->expression);
-    fprintf(generator->source, "]");
+    fprintf(generator->output, "]");
 }
 
 void generateFunctionArguments(Generator* generator, FunctionArguments* arguments) {
-    fprintf(generator->source, "(");
+    fprintf(generator->output, "(");
     int32_t count = jtk_ArrayList_getSize(arguments->expressions);
     int32_t j;
     for (j = 0; j < count; j++) {
@@ -195,14 +195,14 @@ void generateFunctionArguments(Generator* generator, FunctionArguments* argument
         generateExpression(generator, context);
 
         if (j + 1 < count) {
-            fprintf(generator->source, ", ");
+            fprintf(generator->output, ", ");
         }
     }
-    fprintf(generator->source, ")");
+    fprintf(generator->output, ")");
 }
 
 void generateMemberAccess(Generator* generator, MemberAccess* access) {
-    fprintf(generator->source, "->%s", access->identifier->text);
+    fprintf(generator->output, "->%s", access->identifier->text);
 }
 
 void generatePostfix(Generator* generator, PostfixExpression* expression) {
@@ -210,9 +210,9 @@ void generatePostfix(Generator* generator, PostfixExpression* expression) {
         generateToken(generator, (Token*)expression->primary);
     }
     else {
-        fprintf(generator->source, "(");
+        fprintf(generator->output, "(");
         generateExpression(generator, (Context*)expression->primary);
-        fprintf(generator->source, ")");
+        fprintf(generator->output, ")");
     }
 
     int32_t count = jtk_ArrayList_getSize(expression->postfixParts);
@@ -242,33 +242,33 @@ void generateToken(Generator* generator, Token* token) {
         case TOKEN_KEYWORD_TRUE:
         case TOKEN_KEYWORD_FALSE:
         case TOKEN_IDENTIFIER: {
-            fprintf(generator->source, "%s", token->text);
+            fprintf(generator->output, "%s", token->text);
             break;
         }
 
         case TOKEN_INTEGER_LITERAL: {
             // TODO
-            fprintf(generator->source, "%s", token->text);
+            fprintf(generator->output, "%s", token->text);
             break;
         }
 
         case TOKEN_FLOATING_POINT_LITERAL: {
-            fprintf(generator->source, "%s", token->text);
+            fprintf(generator->output, "%s", token->text);
             break;
         }
 
         case TOKEN_STRING_LITERAL: {
-            fprintf(generator->source, "%.*s", token->length - 2, token->text + 1);
+            fprintf(generator->output, "makeString(\"%.*s\")", token->length - 2, token->text + 1);
             break;
         }
 
         case TOKEN_KEYWORD_NULL: {
-            fprintf(generator->source, "NULL");
+            fprintf(generator->output, "NULL");
             break;
         }
 
         default: {
-            fprintf(generator->source, "[internal error] Control should not reach here.\n");
+            fprintf(generator->output, "[internal error] Control should not reach here.\n");
         }
     }
 }
@@ -331,12 +331,12 @@ void generateExpression(Generator* generator, Context* context) {
 void generateIndentation(Generator* generator, int32_t depth) {
     int32_t i;
     for (i = 0; i < depth; i++) {
-        fprintf(generator->source, "    ");
+        fprintf(generator->output, "    ");
     }
 }
 
 void generateBlock(Generator* generator, Block* block, int32_t depth) {
-    fprintf(generator->source, "{\n");
+    fprintf(generator->output, "{\n");
 
     generator->scope = block->scope;
     int32_t limit = jtk_ArrayList_getSize(block->statements);
@@ -353,20 +353,20 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
                     IterativeStatement* statement = (IterativeStatement*)context;
 
                     if (statement->name != NULL) {
-                        fprintf(generator->source, "%s: ", statement->name);
+                        fprintf(generator->output, "%s: ", statement->name);
                     }
 
                     if (statement->keyword->type == TOKEN_KEYWORD_WHILE) {
-                        fprintf(generator->source, "while (");
+                        fprintf(generator->output, "while (");
                         generateExpression(generator, (Context*)statement->expression);
-                        fprintf(generator->source, ") ");
+                        fprintf(generator->output, ") ");
                     }
 
                     generateBlock(generator, statement->body, depth);
 
                     if (statement->name != NULL) {
                         generateIndentation(generator, depth);
-                        fprintf(generator->source, "__%sExit:\n", statement->name);
+                        fprintf(generator->output, "__%sExit:\n", statement->name);
                     }
 
                     break;
@@ -374,9 +374,9 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
 
                 case CONTEXT_IF_STATEMENT: {
                     IfStatement* statement = (IfStatement*)context;
-                    fprintf(generator->source, "if (");
+                    fprintf(generator->output, "if (");
                     generateExpression(generator, (Context*)statement->ifClause->expression);
-                    fprintf(generator->source, ") ");
+                    fprintf(generator->output, ") ");
                     generateBlock(generator, statement->ifClause->body, depth);
 
                     int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
@@ -385,15 +385,15 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
                         generateIndentation(generator, depth);
                         IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
                             statement->elseIfClauses, j);
-                        fprintf(generator->source, "else if (");
+                        fprintf(generator->output, "else if (");
                         generateExpression(generator, (Context*)clause->expression);
-                        fprintf(generator->source, ") ");
+                        fprintf(generator->output, ") ");
                         generateBlock(generator, clause->body, depth);
                     }
 
                     if (statement->elseClause != NULL) {
                         generateIndentation(generator, depth);
-                        fprintf(generator->source, "else ");
+                        fprintf(generator->output, "else ");
                         generateBlock(generator, statement->elseClause, depth);
                     }
 
@@ -437,29 +437,29 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
                         Variable* variable = (Variable*)jtk_ArrayList_getValue(
                             statement->variables, j);
                         generateType(generator, variable->type);
-                        fprintf(generator->source, " %s", variable->name);
+                        fprintf(generator->output, " %s", variable->name);
                         if (variable->expression != NULL) {
-                            fprintf(generator->source, " = ");
+                            fprintf(generator->output, " = ");
                             generateExpression(generator, (Context*)variable->expression);
                         }
-                        fprintf(generator->source, ";\n");
+                        fprintf(generator->output, ";\n");
                     }
                     break;
                 }
 
                 case CONTEXT_ASSIGNMENT_EXPRESSION: {
                     generateExpression(generator, context);
-                    fprintf(generator->source, ";\n");
+                    fprintf(generator->output, ";\n");
                     break;
                 }
 
                 case CONTEXT_BREAK_STATEMENT: {
                     BreakStatement* statement = (BreakStatement*)context;
                     if (statement->identifier != NULL) {
-                        fprintf(generator->source, "goto __%sExit;\n", statement->identifier->text);
+                        fprintf(generator->output, "goto __%sExit;\n", statement->identifier->text);
                     }
                     else {
-                        fprintf(generator->source, "break;\n");
+                        fprintf(generator->output, "break;\n");
                     }
                     break;
                 }
@@ -467,9 +467,9 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
 
                 case CONTEXT_RETURN_STATEMENT: {
                     ReturnStatement* statement = (ReturnStatement*)context;
-                    fprintf(generator->source, "return ");
+                    fprintf(generator->output, "return ");
                     generateExpression(generator, (Context*)statement->expression);
-                    fprintf(generator->source, ";\n");
+                    fprintf(generator->output, ";\n");
 
                     break;
                 }
@@ -496,7 +496,7 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
         generateIndentation(generator, depth);
     }
 
-    fprintf(generator->source, "}\n");
+    fprintf(generator->output, "}\n");
     invalidate(generator);
 }
 
@@ -504,25 +504,25 @@ void generateFunction(Generator* generator, Function* function) {
     generator->scope = function->scope;
 
     generateType(generator, function->returnType);
-    fprintf(generator->source, " %s(", function->name);
+    fprintf(generator->output, " %s(", function->name);
 
     int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
     int32_t i;
     for (i = 0; i < parameterCount; i++) {
         Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
         generateType(generator, parameter->type);
-        fprintf(generator->source, " %s", parameter->name);
+        fprintf(generator->output, " %s", parameter->name);
         if (i + 1 < parameterCount) {
-            fprintf(generator->source, ", ");
+            fprintf(generator->output, ", ");
         }
     }
 
     // TODO: Variable parameter
 
-    fprintf(generator->source, ") ");
+    fprintf(generator->output, ") ");
 
     generateBlock(generator, function->body, 0);
-    fprintf(generator->source, "\n");
+    fprintf(generator->output, "\n");
 
     invalidate(generator);
 }
@@ -537,36 +537,55 @@ void generateFunctions(Generator* generator, Module* module) {
     }
 }
 
-void generateHead(Generator* generator) {
-    fprintf(generator->source, "// Do not edit this file. It was automatically generated by the Kush compiler.\n\n");
-    fprintf(generator->source, "#include <stdio.h>\n");
-    fprintf(generator->source, "#include <stdint.h>\n");
-    fprintf(generator->source, "\n");
+void generateHeader(Generator* generator, Module* module) {
+    fprintf(generator->output, "// Do not edit this file.\n"
+        "// It was automatically generated by kush v%d.%d.\n\n",
+        KUSH_VERSION_MAJOR, KUSH_VERSION_MINOR);
+    fprintf(generator->output, "#pragma once\n\n");
+    fprintf(generator->output, "#include \"kush-native.h\"\n\n");
+
+    generateForwardReferences(generator, module);
+    generateStructures(generator, module);
+}
+
+void generateSource(Generator* generator, Module* module, const uint8_t* headerName) {
+    fprintf(generator->output, "// Do not edit this file.\n"
+        "// It was automatically generated by kush v%d.%d.\n\n",
+        KUSH_VERSION_MAJOR, KUSH_VERSION_MINOR);
+    fprintf(generator->output, "#include \"%s\"\n\n", headerName);
+
+    generateFunctions(generator, module);
 }
 
 void generateC(Generator* generator, Module* module) {
     Compiler* compiler = generator->compiler;
     const uint8_t* path = (const uint8_t*)jtk_ArrayList_getValue(compiler->inputFiles,
         compiler->currentFileIndex);
-    
+
     int pathSize = jtk_CString_getSize(path);
-    uint8_t* targetFileName = allocate(uint8_t, pathSize - 3);
-    
+    uint8_t* sourceName = allocate(uint8_t, pathSize - 3);
+    uint8_t* headerName = allocate(uint8_t, pathSize - 3);
+
     int32_t i;
     for (i = 0; i < pathSize - 4; i++) {
-        targetFileName[i] = path[i];
+        sourceName[i] = path[i];
+        headerName[i] = path[i];
     }
-    targetFileName[i] = 'c';
-    targetFileName[i + 1] = '\0';
-    
-    generator->source = fopen(targetFileName, "w+");
-    deallocate(targetFileName);
-    targetFileName = NULL;
-    generateHead(generator);
-    generateForwardReferences(generator, module);
-    generateStructures(generator, module);
-    generateFunctions(generator, module);
-    fclose(generator->source);
+    sourceName[i] = 'c';
+    sourceName[i + 1] = '\0';
+    headerName[i] = 'h';
+    headerName[i + 1] = '\0';
+
+    generator->output = fopen(sourceName, "w+");
+    generateSource(generator, module, headerName);
+    fclose(generator->output);
+
+    generator->output = fopen(headerName, "w+");
+    generateHeader(generator, module);
+    fclose(generator->output);
+
+    deallocate(sourceName);
+    deallocate(headerName);
 }
 
 Generator* newGenerator(Compiler* compiler) {
