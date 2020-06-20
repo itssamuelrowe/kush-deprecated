@@ -46,6 +46,7 @@ struct Type {
     bool indexable;
     bool accessible;
     bool callable;
+    bool allocatable;
     Token* identifier;
     jtk_ArrayList_t* arrayTypes;
     union {
@@ -83,7 +84,7 @@ struct Type {
 };
 
 Type* newType(uint8_t tag, bool indexable, bool accessible, bool callable,
-    Token* identifier);
+    bool allocatable, Token* identifier);
 void deleteType(Type* type);
 
 /*******************************************************************************
@@ -185,7 +186,7 @@ enum ContextType {
 
     CONTEXT_MEMBER_ACCESS,
 
-    CONTEXT_INITIALIZER_EXPRESSION,
+    CONTEXT_NEW_EXPRESSION,
 
     CONTEXT_ARRAY_EXPRESSION
 };
@@ -211,6 +212,20 @@ struct Symbol {
     uint8_t* name;
     int32_t nameSize;
 };
+
+/*******************************************************************************
+ * VariableType                                                                *
+ *******************************************************************************/
+
+struct VariableType {
+    Token* token;
+    int32_t dimensions;
+};
+
+typedef struct VariableType VariableType;
+
+VariableType* newVariableType(Token* token, int32_t dimensions);
+void deleteVariableType(VariableType* self);
 
 /*******************************************************************************
  * Module                                                                      *
@@ -322,18 +337,23 @@ MemberAccess* newMemberAccess();
 void deleteMemberAccess(MemberAccess* self);
 
 /*******************************************************************************
- * InitializerExpression                                                               *
+ * NewExpression                                                               *
  *******************************************************************************/
 
-struct InitializerExpression {
+struct NewExpression {
     ContextType tag;
-    jtk_ArrayList_t* entries; // Pair<Token, BinaryExpression>
+    VariableType* variableType;
+    Type* type;
+    union {
+        jtk_ArrayList_t* entries;
+        jtk_ArrayList_t* expressions;
+    };
 };
 
-typedef struct InitializerExpression InitializerExpression;
+typedef struct NewExpression NewExpression;
 
-InitializerExpression* newInitializerExpression();
-void deleteInitializerExpression(InitializerExpression* self);
+NewExpression* newNewExpression();
+void deleteNewExpression(NewExpression* self);
 
 /*******************************************************************************
  * ArrayExpression                                                              *
@@ -394,20 +414,6 @@ typedef struct Block Block;
 
 Block* newBlock();
 void deleteBlock(Block* self);
-
-/*******************************************************************************
- * VariableType                                                                *
- *******************************************************************************/
-
-struct VariableType {
-    Token* token;
-    int32_t dimensions;
-};
-
-typedef struct VariableType VariableType;
-
-VariableType* newVariableType(Token* token, int32_t dimensions);
-void deleteVariableType(VariableType* self);
 
 /*******************************************************************************
  * Variable                                                                    *

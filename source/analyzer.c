@@ -130,7 +130,7 @@ static Type* resolveArithmetic(Analyzer* analyzer, BinaryExpression* expression)
 static Type* resolveUnary(Analyzer* analyzer, UnaryExpression* expression);
 static Type* resolvePostfix(Analyzer* analyzer, PostfixExpression* expression);
 static Type* resolveToken(Analyzer* analyzer, Token* token);
-static Type* resolveInitializer(Analyzer* analyzer, InitializerExpression* expression);
+static Type* resolveNew(Analyzer* analyzer, NewExpression* expression);
 static Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression);
 static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
@@ -156,7 +156,7 @@ Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) {
             (Type*)jtk_ArrayList_getValue(base->arrayTypes, maxDimensions - 1);
         int32_t dimension;
         for (dimension = maxDimensions + 1; dimension <= dimensions; dimension++) {
-            Type* type = newType(TYPE_ARRAY, true, true, false, NULL);
+            Type* type = newType(TYPE_ARRAY, true, true, false, true, NULL);
             type->array.array = NULL; // TODO
             type->array.base = base;
             type->array.component = previous;
@@ -377,6 +377,7 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     Token* token = variableType->token;
     Type* type = NULL;
+    bool error = false;
     switch (token->type) {
         case TOKEN_KEYWORD_BOOLEAN: {
            type = &primitives.boolean;
@@ -443,10 +444,12 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
             if (context == NULL) {
                 handleSemanticError(handler, analyzer, ERROR_UNDECLARED_TYPE,
                     token);
+                error = true;
             }
             else if (context->tag != CONTEXT_STRUCTURE_DECLARATION) {
                 handleSemanticError(handler, analyzer, ERROR_INVALID_TYPE,
                     token);
+                error = true;
             }
             else {
                 type = ((Structure*)context)->type;
@@ -465,7 +468,7 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
         }
     }
 
-    if (variableType->dimensions > 0) {
+    if ((variableType->dimensions > 0) && !error) {
         type = getArrayType(analyzer, type, variableType->dimensions);
     }
 
@@ -1193,8 +1196,67 @@ Type* resolveToken(Analyzer* analyzer, Token* token) {
     return result;
 }
 
-Type* resolveInitializer(Analyzer* analyzer, InitializerExpression* expression) {
-    return NULL;
+// TODO: Report var s = null;
+Type* resolveNew(Analyzer* analyzer, NewExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* result = NULL;
+    VariableType* variableType = expression->variableType;
+    Token* token = variableType->token;
+    if (variableType->dimensions == 0) {
+        Symbol* symbol = resolveSymbol(analyzer->scope, token->text);
+        if (symbol == NULL) {
+            handleSemanticError(handler, analyzer, ERROR_UNDECLARED_IDENTIFIER,
+                token);
+        }
+        else if (symbol->tag != CONTEXT_STRUCTURE_DECLARATION) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_STRUCTURE_NAME,
+                token);
+        }
+        else {
+            Structure* structure = (Structure*)symbol;
+            /* It does not matter if the object initializer has errors. */
+            result = structure->type;
+
+            int32_t limit = jtk_ArrayList_getSize(expression->entries);
+            int32_t i;
+            for (i = 0; i < limit; i++) {
+                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->entries, i);
+                Token* identifier = (Token*)pair->m_left;
+
+                Type* type = resolveExpression(analyzer, (Context*)pair->m_right);
+
+                Variable* member = (Variable*)resolveMember(structure->scope, identifier->text);
+                if (member == NULL) {
+                    handleSemanticError(handler, analyzer, ERROR_UNDECLARED_MEMBER,
+                        identifier);
+                }
+                else {
+                    if ((type != NULL) && (type != member->type)) {
+                        handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_VARIABLE_INITIALIZER,
+                            identifier);
+                    }
+                }
+            }
+        }
+    }
+    else {
+        result = resolveVariableType(analyzer, variableType);
+
+        /* It does not matter if there are errors within the square brackets. */
+        int32_t limit = jtk_ArrayList_getSize(expression->entries);
+        int32_t i;
+        for (i = 0; i < limit; i++) {
+            jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->entries, i);
+            Token* bracket = (Token*)pair->m_left;
+            Type* type = resolveExpression(analyzer, (Context*)pair->m_right);
+            if ((type != NULL) && (type != &primitives.i32)) {
+                handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION,
+                    bracket);
+            }
+        }
+    }
+
+    return result;
 }
 
 Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
@@ -1287,8 +1349,8 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
             break;
         }
 
-        case CONTEXT_INITIALIZER_EXPRESSION: {
-            result = resolveInitializer(analyzer, (InitializerExpression*)context);
+        case CONTEXT_NEW_EXPRESSION: {
+            result = resolveNew(analyzer, (NewExpression*)context);
            break;
         }
 

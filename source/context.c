@@ -26,12 +26,13 @@
  *******************************************************************************/
 
 Type* newType(uint8_t tag, bool indexable, bool accessible, bool callable,
-    Token* identifier) {
+    bool allocatable, Token* identifier) {
     Type* type = allocate(Type, 1);
     type->tag = tag;
     type->indexable = indexable;
     type->accessible = accessible;
     type->callable = callable;
+    type->allocatable = allocatable;
     type->identifier = identifier;
     type->arrayTypes = jtk_ArrayList_new();
 
@@ -51,6 +52,8 @@ Primitives primitives = {
         .tag = TYPE_BOOLEAN,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL
     },
@@ -59,6 +62,8 @@ Primitives primitives = {
         .tag = TYPE_INTEGER,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
         .integer = {
@@ -71,6 +76,8 @@ Primitives primitives = {
         .tag = TYPE_INTEGER,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
         .integer = {
@@ -83,6 +90,8 @@ Primitives primitives = {
         .tag = TYPE_INTEGER,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
         .integer = {
@@ -95,6 +104,8 @@ Primitives primitives = {
         .tag = TYPE_INTEGER,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
         .integer = {
@@ -107,6 +118,8 @@ Primitives primitives = {
         .tag = TYPE_INTEGER,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .arrayTypes = NULL,
         .integer = {
             .size = 1,
@@ -118,6 +131,8 @@ Primitives primitives = {
         .tag = TYPE_INTEGER,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
         .integer = {
@@ -130,6 +145,8 @@ Primitives primitives = {
         .tag = TYPE_INTEGER,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
         .integer = {
@@ -142,6 +159,8 @@ Primitives primitives = {
         .tag = TYPE_INTEGER,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
         .integer = {
@@ -156,6 +175,8 @@ Primitives primitives = {
         .tag = TYPE_DECIMAL,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
         .decimal = {
@@ -167,6 +188,8 @@ Primitives primitives = {
         .tag = TYPE_DECIMAL,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
         .decimal = {
@@ -178,6 +201,8 @@ Primitives primitives = {
         .tag = TYPE_VOID,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL
     },
@@ -186,6 +211,8 @@ Primitives primitives = {
         .tag = TYPE_NULL,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
     },
@@ -194,6 +221,8 @@ Primitives primitives = {
         .tag = TYPE_STRING,
         .indexable = true,
         .accessible = true,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
     },
@@ -202,6 +231,8 @@ Primitives primitives = {
         .tag = TYPE_UNKONWN,
         .indexable = false,
         .accessible = false,
+        .callable = false,
+        .allocatable = false,
         .identifier = NULL,
         .arrayTypes = NULL,
     }
@@ -362,17 +393,21 @@ void deleteMemberAccess(MemberAccess* self) {
 }
 
 /*******************************************************************************
- * InitializerExpression                                                               *
+ * NewExpression                                                               *
  *******************************************************************************/
 
-InitializerExpression* newInitializerExpression() {
-    InitializerExpression* result = allocate(InitializerExpression, 1);
-    result->tag = CONTEXT_INITIALIZER_EXPRESSION;
-    result->entries = jtk_ArrayList_new();
+NewExpression* newNewExpression() {
+    jtk_ArrayList_t* list = jtk_ArrayList_new();
+
+    NewExpression* result = allocate(NewExpression, 1);
+    result->tag = CONTEXT_NEW_EXPRESSION;
+    result->variableType = NULL;
+    result->type = NULL;
+    result->entries = list;
     return result;
 }
 
-void deleteInitializerExpression(InitializerExpression* self) {
+void deleteNewExpression(NewExpression* self) {
     jtk_ArrayList_delete(self->entries);
     deallocate(self);
 }
@@ -461,7 +496,7 @@ Function* newFunction(const uint8_t* name, int32_t nameSize, Token* identifier,
     result->body = body;
     result->returnVariableType = returnVariableType;
     result->returnType = NULL;
-    result->type = newType(TYPE_FUNCTION, false, false, true, identifier);
+    result->type = newType(TYPE_FUNCTION, false, false, true, false, identifier);
     result->scope = NULL;
 
     // TODO: Probably move this to newType(), or some overloaded version of it?
@@ -487,7 +522,7 @@ Structure* newStructure(const uint8_t* name, int32_t nameSize,
     result->name = jtk_CString_newEx(name, nameSize);
     result->identifier = identifier;
     result->declarations = variables;
-    result->type = newType(TYPE_STRUCTURE, false, true, false, identifier);
+    result->type = newType(TYPE_STRUCTURE, false, true, false, true, identifier);
     result->scope = NULL;
 
     // TODO: Probably move this to newType(), or some overloaded version of it?

@@ -217,6 +217,8 @@ const char* errorMessages[] = {
     "Incompatible argument type",
     "Array members should have same type",
     "Empty array initializer",
+    "Expected structure name",
+    "Expected integer expression",
 
     // General errors
     "Corrupted module",
