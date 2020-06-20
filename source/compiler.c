@@ -27,6 +27,7 @@
 
 #include <jtk/collection/list/ArrayList.h>
 #include <jtk/collection/array/Arrays.h>
+#include <jtk/collection/Pair.h>
 #include <jtk/fs/FileInputStream.h>
 #include <jtk/fs/Path.h>
 #include <jtk/io/BufferedInputStream.h>
@@ -54,6 +55,44 @@ static void analyze(Compiler* compiler);
 static void generate(Compiler* compiler);
 static void printToken(Token* token);
 static void printTokens(Compiler* compiler, jtk_ArrayList_t* tokens);
+static void printNodes(Compiler* compiler, Module* module);
+
+static const char* ruleNames[] = {
+    "Unknown",
+    "Module",
+    "ImportDeclaration",
+    "FunctionDeclaration",
+    "Block",
+    "VariableDeclaration",
+    "BreakStatement",
+    "ReturnStatement",
+    "ThrowStatement",
+    "IfStatement",
+    "IterativeStatement",
+    "TryStatement",
+    "CatchClause",
+    "StructureDeclaration",
+    "AssignmentExpression",
+    "ConditionalExpression",
+    "LogicalOrExpression",
+    "LogicalAndExpression",
+    "InclusiveOrExpression",
+    "ExclusiveOrExpression",
+    "AndExpression",
+    "EqualityExpression",
+    "RelationalExpression",
+    "ShiftExpression",
+    "AdditiveExpression",
+    "MultiplicativeExpression",
+    "UnaryExpression",
+    "PostfixExpression",
+    "Subscript",
+    "FunctionArguments",
+    "MemberAccess"
+    "NewExpression",
+    "ArrayExpression",
+};
+
 
 // Token
 
@@ -309,7 +348,7 @@ void buildAST(Compiler* compiler) {
                     compiler->modules[i] = module;
 
                     if (compiler->dumpNodes) {
-                        // TODO
+                        printNodes(compiler, module);
                     }
                 }
             }
@@ -634,3 +673,399 @@ void deleteCompiler(Compiler* compiler) {
     jtk_ArrayList_delete(compiler->inputFiles);
     deallocate(compiler);
 }
+
+/******************************************************************************
+ * Print Nodes                                                                *
+ ******************************************************************************/
+
+static void printType(Compiler* compiler, VariableType* type);
+static void printStructures(Compiler* compiler, Module* module);
+static void printBinary(Compiler* compiler, BinaryExpression* expression);
+static void printConditional(Compiler* compiler, ConditionalExpression* expression);
+static void printUnary(Compiler* compiler, UnaryExpression* expression);
+static void printSubscript(Compiler* compiler, Subscript* subscript);
+static void printFunctionArguments(Compiler* compiler, FunctionArguments* arguments);
+static void printMemberAccess(Compiler* compiler, MemberAccess* access);
+static void printPostfix(Compiler* compiler, PostfixExpression* expression);
+static void printNodeToken(Compiler* compiler, Token* token);
+static void printInitializer(Compiler* compiler, NewExpression* expression);
+static void printArray(Compiler* compiler, ArrayExpression* expression);
+static void printExpression(Compiler* compiler, Context* context);
+static void printIndentation(Compiler* compiler, int32_t depth);
+static void printBlock(Compiler* compiler, Block* block, int32_t depth);
+static void printFunction(Compiler* compiler, Function* function);
+static void printFunctions(Compiler* compiler, Module* module);
+
+void printType(Compiler* compiler, VariableType* type) {
+    const char* output = type->token->text;
+    printf("%s", output);
+}
+
+void printStructures(Compiler* compiler, Module* module) {
+    printf("%s ", ruleNames[(int32_t)module->tag]);
+    int32_t structureCount = jtk_ArrayList_getSize(module->structures);
+    int32_t j;
+    for (j = 0; j < structureCount; j++) {
+        Structure* structure = (Structure*)jtk_ArrayList_getValue(
+            module->structures, j);
+        printf("struct %s \n", structure->name);
+
+        int32_t declarationCount = jtk_ArrayList_getSize(structure->declarations);
+        int32_t i;
+        for (i = 0; i < declarationCount; i++) {
+            VariableDeclaration* declaration =
+                (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+
+            int32_t limit = jtk_ArrayList_getSize(declaration->variables);
+            int32_t j;
+            for (j = 0; j < limit; j++) {
+                Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+                printf("    ");
+                printType(compiler, variable->variableType);
+                printf(" %s\n", variable->name);
+            }
+        }
+    }
+    printf("\n");
+}
+
+void printBinary(Compiler* compiler, BinaryExpression* expression) {
+    printExpression(compiler, (Context*)expression->left);
+
+    int32_t count = jtk_ArrayList_getSize(expression->others);
+    if (count > 0) {
+        int32_t i;
+        for (i = 0; i < count; i++) {
+            jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
+            printf(" %s ", ((Token*)pair->m_left)->text);
+            printExpression(compiler, (Context*)pair->m_right);
+        }
+    }
+}
+
+void printConditional(Compiler* compiler, ConditionalExpression* expression) {
+    printExpression(compiler, (Context*)expression->condition);
+
+    if (expression->hook != NULL) {
+        printf("? ");
+        printExpression(compiler, (Context*)expression->then);
+        printf(" : ");
+        printExpression(compiler, (Context*)expression->otherwise);
+    }
+}
+
+void printUnary(Compiler* compiler, UnaryExpression* expression) {
+    
+    printExpression(compiler, (Context*)expression->expression);
+
+    Token* operator = expression->operator;
+    if (operator != NULL) {
+        printf("%s", operator->text);
+    }
+}
+
+void printSubscript(Compiler* compiler, Subscript* subscript) {
+    printf("[");
+    printExpression(compiler, (Context*)subscript->expression);
+    printf("]");
+}
+
+void printFunctionArguments(Compiler* compiler, FunctionArguments* arguments) {
+    printf("(");
+    int32_t count = jtk_ArrayList_getSize(arguments->expressions);
+    int32_t j;
+    for (j = 0; j < count; j++) {
+        Context* context = (Context*)jtk_ArrayList_getValue(arguments->expressions, j);
+        printExpression(compiler, context);
+
+        if (j + 1 < count) {
+            printf(", ");
+        }
+    }
+    printf(")");
+}
+
+void printMemberAccess(Compiler* compiler, MemberAccess* access) {
+    printf("->%s", access->identifier->text);
+}
+
+void printPostfix(Compiler* compiler, PostfixExpression* expression) {
+    if (expression->token) {
+        printNodeToken(compiler, (Token*)expression->primary);
+    }
+    else {
+        printf("(");
+        printExpression(compiler, (Context*)expression->primary);
+        printf(")");
+    }
+
+    int32_t count = jtk_ArrayList_getSize(expression->postfixParts);
+    int32_t i;
+    for (i = 0; i < count; i++) {
+        Context* postfix = (Context*)jtk_ArrayList_getValue(
+            expression->postfixParts, i);
+
+        if (postfix->tag == CONTEXT_SUBSCRIPT) {
+            printSubscript(compiler, (Subscript*)postfix);
+        }
+        else if (postfix->tag == CONTEXT_FUNCTION_ARGUMENTS) {
+            printFunctionArguments(compiler, (FunctionArguments*)postfix);
+        }
+        else if (postfix->tag == CONTEXT_MEMBER_ACCESS) {
+            printMemberAccess(compiler, (MemberAccess*)postfix);
+        }
+        else {
+            controlError();
+            break;
+        }
+    }
+}
+
+void printNodeToken(Compiler* compiler, Token* token) {
+    switch (token->type) {
+        case TOKEN_KEYWORD_TRUE:
+        case TOKEN_KEYWORD_FALSE:
+        case TOKEN_IDENTIFIER: {
+            printf("%s", token->text);
+            break;
+        }
+
+        case TOKEN_INTEGER_LITERAL: {
+            // TODO
+            printf("%s", token->text);
+            break;
+        }
+
+        case TOKEN_FLOATING_POINT_LITERAL: {
+            printf("%s", token->text);
+            break;
+        }
+
+        case TOKEN_STRING_LITERAL: {
+            printf("%.*s", token->length - 2, token->text + 1);
+            break;
+        }
+
+        case TOKEN_KEYWORD_NULL: {
+            printf("NULL");
+            break;
+        }
+    }
+}
+
+void printInitializer(Compiler* compiler, NewExpression* expression) {
+}
+
+void printArray(Compiler* compiler, ArrayExpression* expression) {
+}
+
+void printExpression(Compiler* compiler, Context* context) {
+    switch (context->tag) {
+        case CONTEXT_ASSIGNMENT_EXPRESSION:
+        case CONTEXT_LOGICAL_OR_EXPRESSION:
+        case CONTEXT_LOGICAL_AND_EXPRESSION:
+        case CONTEXT_INCLUSIVE_OR_EXPRESSION:
+        case CONTEXT_EXCLUSIVE_OR_EXPRESSION:
+        case CONTEXT_AND_EXPRESSION:
+        case CONTEXT_EQUALITY_EXPRESSION:
+        case CONTEXT_RELATIONAL_EXPRESSION:
+        case CONTEXT_SHIFT_EXPRESSION:
+        case CONTEXT_ADDITIVE_EXPRESSION:
+        case CONTEXT_MULTIPLICATIVE_EXPRESSION: {
+            printBinary(compiler, (BinaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_CONDITIONAL_EXPRESSION: {
+            printConditional(compiler, (ConditionalExpression*)context);
+            break;
+        }
+
+        case CONTEXT_UNARY_EXPRESSION: {
+            printUnary(compiler, (UnaryExpression*)context);
+            break;
+        }
+
+        case CONTEXT_POSTFIX_EXPRESSION: {
+            printPostfix(compiler, (PostfixExpression*)context);
+            break;
+        }
+
+        case CONTEXT_NEW_EXPRESSION: {
+            printInitializer(compiler, (NewExpression*)context);
+           break;
+        }
+
+        case CONTEXT_ARRAY_EXPRESSION: {
+            printArray(compiler, (ArrayExpression*)context);
+           break;
+        }
+
+        default: {
+            controlError();
+            break;
+        }
+    }
+}
+
+void printIndentation(Compiler* compiler, int32_t depth) {
+    int32_t i;
+    for (i = 0; i < depth; i++) {
+        printf("    ");
+    }
+}
+
+void printBlock(Compiler* compiler, Block* block, int32_t depth) {
+    printf("    %s\n", ruleNames[(int32_t)block->tag]);
+    int32_t limit = jtk_ArrayList_getSize(block->statements);
+    if (limit > 0) {
+        depth++;
+        printIndentation(compiler, depth);
+
+        int32_t i;
+        for (i = 0; i < limit; i++) {
+            Context* context = (Context*)jtk_ArrayList_getValue(
+                block->statements, i);
+            printf("%s ", ruleNames[(int32_t)context->tag]);
+            switch (context->tag) {
+                case CONTEXT_ITERATIVE_STATEMENT: {
+                    IterativeStatement* statement = (IterativeStatement*)context;
+
+                    if (statement->name != NULL) {
+                        printf("%s: ", statement->name);
+                    }
+
+                    if (statement->keyword->type == TOKEN_KEYWORD_WHILE) {
+                        printf("while (");
+                        printExpression(compiler, (Context*)statement->expression);
+                        printf(") ");
+                    }
+
+                    printBlock(compiler, statement->body, depth);
+
+                    if (statement->name != NULL) {
+                        printIndentation(compiler, depth);
+                        printf("__%sExit\n", statement->name);
+                    }
+
+                    break;
+                }
+
+                case CONTEXT_IF_STATEMENT: {
+                    IfStatement* statement = (IfStatement*)context;
+                    printf("if (");
+                    printExpression(compiler, (Context*)statement->ifClause->expression);
+                    printf(") ");
+                    printBlock(compiler, statement->ifClause->body, depth);
+
+                    int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
+                    int32_t j;
+                    for (j = 0; j < count; j++) {
+                        printIndentation(compiler, depth);
+                        IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
+                            statement->elseIfClauses, j);
+                        printf("else if (");
+                        printExpression(compiler, (Context*)clause->expression);
+                        printf(") ");
+                        printBlock(compiler, clause->body, depth);
+                    }
+
+                    if (statement->elseClause != NULL) {
+                        printIndentation(compiler, depth);
+                        printf("else ");
+                        printBlock(compiler, statement->elseClause, depth);
+                    }
+
+                    break;
+                }
+
+                case CONTEXT_VARIABLE_DECLARATION: {
+                    VariableDeclaration* statement = (VariableDeclaration*)context;
+                    int32_t count = jtk_ArrayList_getSize(statement->variables);
+                    int32_t j;
+                    for (j = 0; j < count; j++) {
+                        Variable* variable = (Variable*)jtk_ArrayList_getValue(
+                            statement->variables, j);
+                        printf("(type=");
+                        printType(compiler, variable->variableType);
+                        printf(" , identifier=%s)", variable->name);
+                        if (variable->expression != NULL) {
+                            printf(" = ");
+                            printExpression(compiler, (Context*)variable->expression);
+                        }
+                        printf("\n");
+                    }
+                    break;
+                }
+
+                case CONTEXT_ASSIGNMENT_EXPRESSION: {
+                    printExpression(compiler, context);
+                    printf("\n");
+                    break;
+                }
+
+                case CONTEXT_BREAK_STATEMENT: {
+                    BreakStatement* statement = (BreakStatement*)context;
+                    if (statement->identifier != NULL) {
+                        printf("goto __%sExit\n", statement->identifier->text);
+                    }
+                    else {
+                        printf("break\n");
+                    }
+                    break;
+                }
+
+
+                case CONTEXT_RETURN_STATEMENT: {
+                    ReturnStatement* statement = (ReturnStatement*)context;
+                    printf("return ");
+                    printExpression(compiler, (Context*)statement->expression);
+                    printf("\n");
+
+                    break;
+                }
+            }
+            if (i + 1 < limit) {
+                printIndentation(compiler, depth);
+            }
+        }
+    }
+}
+
+void printFunction(Compiler* compiler, Function* function) {
+    printf("%s ", ruleNames[(int32_t)function->tag]);
+    printf("(type=");
+    printType(compiler, function->returnVariableType);
+    printf(", identifier=%s, ", function->name);
+    printf(")\n");
+    int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
+    int32_t i;
+    for (i = 0; i < parameterCount; i++) {
+        printf("parameter=");
+        Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
+        printType(compiler, parameter->variableType);
+        printf(" %s", parameter->name);
+        if (i + 1 < parameterCount) {
+            printf(", ");
+        }
+    }
+    // TODO: Variable parameter
+    printBlock(compiler, function->body, 1);
+
+}
+
+void printFunctions(Compiler* compiler, Module* module) {
+    int32_t functionCount = jtk_ArrayList_getSize(module->functions);
+    int32_t i;
+    for (i = 0; i < functionCount; i++) {
+        Function* function = (Function*)jtk_ArrayList_getValue(
+            module->functions, i);
+        printFunction(compiler, function);
+    }
+}
+
+void printNodes(Compiler* compiler, Module* module) {
+    printStructures(compiler, module);
+    printFunctions(compiler, module);
+}
+
