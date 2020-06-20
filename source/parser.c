@@ -809,7 +809,8 @@ void parseFunctionParameters(Parser* parser,
             Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
             first = false;
 
-            Variable* parameter = newVariable(false, false, type, identifier, NULL, NULL);
+            Variable* parameter = newVariable(false, false, type, identifier->text,
+                identifier->length, identifier, NULL, NULL);
             if (variadic) {
                 *variableParameter = parameter;
                 break;
@@ -1026,7 +1027,8 @@ void parseVariableDeclarator(Parser* parser, bool infer, bool constant,
         expression = parseExpression(parser);
 	}
 
-    Variable* variable = newVariable(infer, constant, variableType, identifier, expression, NULL);
+    Variable* variable = newVariable(infer, constant, variableType,
+        identifier->text, identifier->length, identifier, expression, NULL);
     jtk_ArrayList_add(variables, variable);
 }
 
@@ -1304,8 +1306,8 @@ CatchClause* parseCatchClause(Parser* parser) {
 	}
 
     Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
-    context->parameter = newVariable(false, true, &primitives.string, identifier,
-        NULL, NULL);
+    context->parameter = newVariable(false, true, &primitives.string,
+        identifier->text, identifier->length, identifier, NULL, NULL);
     context->body = parseBlock(parser);
 
     return context;

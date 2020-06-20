@@ -54,7 +54,7 @@ struct Type {
             /**
              * Represents a structure that provides attributes for arrays.
              */
-            Type* array;
+            Structure* array;
 
             /* Represents the actual type, without taking dimensions into
              * consideration. For example, i32[][][], base always
@@ -437,7 +437,8 @@ struct Variable {
 typedef struct Variable Variable;
 
 Variable* newVariable(bool infer, bool constant, VariableType* variableType,
-    Token* identifier, BinaryExpression* expression, Scope* parent);
+    const uint8_t* name, int32_t nameSize, Token* identifier,
+    BinaryExpression* expression, Scope* parent);
 void deleteVariable(Variable* variable);
 
 /*******************************************************************************

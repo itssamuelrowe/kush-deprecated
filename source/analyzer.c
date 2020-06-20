@@ -160,7 +160,7 @@ Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) {
             int32_t dimension;
             for (dimension = maxDimensions + 1; dimension <= dimensions; dimension++) {
                 Type* type = newType(TYPE_ARRAY, true, true, false, true, NULL);
-                type->array.array = NULL; // TODO
+                type->array.array = (Structure*)resolveSymbol(analyzer->scope, "$Array");
                 type->array.base = base;
                 type->array.component = previous;
                 type->array.dimensions = dimension;
@@ -1088,6 +1088,21 @@ Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
     return result;
 }
 
+Type* resolveStructureMember(Analyzer* analyzer, Structure* structure, Token* identifier) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* result = NULL;
+    Variable* variable = (Variable*)resolveMember(structure->scope, identifier->text);
+
+    if (variable == NULL) {
+        handleSemanticError(handler, analyzer, ERROR_UNDECLARED_MEMBER,
+            identifier);
+    }
+    else {
+        result = variable->type;
+    }
+    return result;
+}
+
 Type* resolveMemberAccess(Analyzer* analyzer, MemberAccess* access, Type* previous) {
     Type* result = NULL;
     ErrorHandler* handler = analyzer->compiler->errorHandler;
@@ -1099,15 +1114,15 @@ Type* resolveMemberAccess(Analyzer* analyzer, MemberAccess* access, Type* previo
         Token* identifier = access->identifier;
         if (previous->tag == TYPE_STRUCTURE) {
             Structure* structure = previous->structure;
-            Variable* variable = (Variable*)resolveMember(structure->scope, identifier->text);
-
-            if (variable == NULL) {
-                handleSemanticError(handler, analyzer, ERROR_UNDECLARED_MEMBER,
-                    access->identifier);
-            }
-            else {
-                result = variable->type;
-            }
+            result = resolveStructureMember(analyzer, structure, identifier);
+        }
+        else if (previous->tag == TYPE_ARRAY) {
+            Structure* structure = previous->array.array;
+            result = resolveStructureMember(analyzer, structure, identifier);
+        }
+        else if (previous->tag == TYPE_STRING) {
+            Structure* structure = (Structure*)resolveSymbol(analyzer->scope, "$String");
+            result = resolveStructureMember(analyzer, structure, identifier);
         }
         else {
             printf("[internal error] This is a valid condition (for example, `array.length`). However, it is yet to be implemented.\n");
@@ -1405,11 +1420,44 @@ void resetAnalyzer(Analyzer* analyzer) {
 
 // Define
 
+Structure* addSyntheticStructure(Analyzer* analyzer, const uint8_t* name,
+    int32_t nameSize) {
+    Structure* structure = newStructure(name, nameSize, NULL, NULL);
+    structure->scope = scopeForStructure(NULL, structure);
+
+    defineSymbol(analyzer->scope, structure);
+
+    return structure;
+}
+
+Variable* addSyntheticMember(Analyzer* analyzer, Structure* structure,
+    bool constant, const uint8_t* name, int32_t nameSize, Type* type) {
+    Variable* variable = newVariable(false, constant, type, name, nameSize,
+        NULL, NULL, structure->scope);
+    defineSymbol(structure->scope, variable);
+
+    return variable;
+}
+
+void defineBuiltins(Analyzer* analyzer) {
+    Structure* array = addSyntheticStructure(analyzer, "$Array", 6);
+    addSyntheticMember(analyzer, array, true, "size", 4, &primitives.i32);
+
+    // String
+
+    Structure* string = addSyntheticStructure(analyzer, "$String", 7);
+    addSyntheticMember(analyzer, string, true, "size", 4, &primitives.i32);
+    Type* valueType = getArrayType(analyzer, &primitives.ui8, 1);
+    addSyntheticMember(analyzer, string, true, "value", 5, valueType);
+}
+
 void defineSymbols(Analyzer* analyzer, Module* module) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
 
     module->scope = scopeForModule(module);
     analyzer->scope = module->scope;
+
+    defineBuiltins(analyzer);
 
     int32_t structureCount = jtk_ArrayList_getSize(module->structures);
     int32_t j;
