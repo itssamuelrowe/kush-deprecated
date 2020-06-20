@@ -150,24 +150,29 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 // Array Type
 
 Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) {
-    int32_t maxDimensions = jtk_ArrayList_getSize(base->arrayTypes);
-    if (dimensions > maxDimensions) {
-        Type* previous = (maxDimensions == 0)? base :
-            (Type*)jtk_ArrayList_getValue(base->arrayTypes, maxDimensions - 1);
-        int32_t dimension;
-        for (dimension = maxDimensions + 1; dimension <= dimensions; dimension++) {
-            Type* type = newType(TYPE_ARRAY, true, true, false, true, NULL);
-            type->array.array = NULL; // TODO
-            type->array.base = base;
-            type->array.component = previous;
-            type->array.dimensions = dimension;
-            jtk_ArrayList_add(base->arrayTypes, type);
+    Type* result = base;
 
-            previous = type;
+    if (dimensions > 0) {
+        int32_t maxDimensions = jtk_ArrayList_getSize(base->arrayTypes);
+        if (dimensions > maxDimensions) {
+            Type* previous = (maxDimensions == 0)? base :
+                (Type*)jtk_ArrayList_getValue(base->arrayTypes, maxDimensions - 1);
+            int32_t dimension;
+            for (dimension = maxDimensions + 1; dimension <= dimensions; dimension++) {
+                Type* type = newType(TYPE_ARRAY, true, true, false, true, NULL);
+                type->array.array = NULL; // TODO
+                type->array.base = base;
+                type->array.component = previous;
+                type->array.dimensions = dimension;
+                jtk_ArrayList_add(base->arrayTypes, type);
+
+                previous = type;
+            }
         }
-    }
 
-    return (Type*)jtk_ArrayList_getValue(base->arrayTypes, dimensions - 1);
+        result = (Type*)jtk_ArrayList_getValue(base->arrayTypes, dimensions - 1);
+    }
+    return result;
 }
 
 // TODO: Should be able to infer types for empty arrays.
@@ -1020,9 +1025,13 @@ Type* resolveSubscript(Analyzer* analyzer, Subscript* subscript, Type* previous)
             subscript->bracket);
     }
     else {
-        /* Type* indexType = */ resolveExpression(analyzer, (Context*)subscript->expression);
-        // TODO: Check if the index type is integer.
-        // TODO: Find the result of the subscript.
+        Type* indexType = resolveExpression(analyzer, (Context*)subscript->expression);
+        if (indexType != &primitives.i32) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION,
+                subscript->bracket);
+        }
+
+        result = getArrayType(analyzer, previous->array.base, previous->array.dimensions - 1);
     }
     return result;
 }
