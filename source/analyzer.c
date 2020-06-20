@@ -100,6 +100,9 @@
  *   y   5
  */
 
+Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) ;
+Type* inferArrayType(Analyzer* analyzer, Type* component);
+
 static bool import(Analyzer* analyzer, const char* name, int32_t size,
     bool wildcard);
 static void importDefaults(Analyzer* analyzer);
@@ -133,6 +136,8 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
 #define invalidate(analyzer) analyzer->scope = analyzer->scope->parent
 
+#define isUndefined(scope, identifier) (resolveSymbol(scope, identifier) == NULL)
+
 // String:equals(x, y)
 // x.equals(y)
 // bool k_String_equals(k_Runtime_t* runtime, k_String_t* self, k_String_t* other) {
@@ -141,6 +146,41 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
 // TODO: Add string keyword to the parser
 // Add new expression
+
+// Array Type
+
+Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) {
+    int32_t maxDimensions = jtk_ArrayList_getSize(base->arrayTypes);
+    if (dimensions > maxDimensions) {
+        Type* previous = (maxDimensions == 0)? base :
+            (Type*)jtk_ArrayList_getValue(base->arrayTypes, maxDimensions - 1);
+        int32_t dimension;
+        for (dimension = maxDimensions + 1; dimension <= dimensions; dimension++) {
+            Type* type = newType(TYPE_ARRAY, true, true, false, NULL);
+            type->array.array = NULL; // TODO
+            type->array.base = base;
+            type->array.component = previous;
+            type->array.dimensions = dimension;
+            jtk_ArrayList_add(base->arrayTypes, type);
+
+            previous = type;
+        }
+    }
+
+    return (Type*)jtk_ArrayList_getValue(base->arrayTypes, dimensions - 1);
+}
+
+// TODO: Should be able to infer types for empty arrays.
+Type* inferArrayType(Analyzer* analyzer, Type* component) {
+    int32_t dimensions = 1;
+    Type* base = component;
+    if (component->tag == TYPE_ARRAY) {
+        dimensions += component->array.dimensions;
+        base = component->array.base;
+    }
+
+    return getArrayType(analyzer, base, dimensions);
+}
 
 // Import
 
@@ -156,10 +196,6 @@ void importDefaults(Analyzer* analyzer) {
 }
 
 // Define
-
-bool isUndefined(Scope* scope, const uint8_t* identifier) {
-    return resolveSymbol(scope, identifier) == NULL;
-}
 
 void defineStructure(Analyzer* analyzer, Structure* structure) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
@@ -430,10 +466,7 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
     }
 
     if (variableType->dimensions > 0) {
-        // TODO
-    }
-    else {
-
+        type = getArrayType(analyzer, type, variableType->dimensions);
     }
 
     return type;
@@ -1164,35 +1197,6 @@ Type* resolveInitializer(Analyzer* analyzer, InitializerExpression* expression) 
     return NULL;
 }
 
-// TODO: Should be able to infer types for empty arrays.
-Type* getArrayType(Analyzer* analyzer, Type* component) {
-    int32_t dimensions = 1;
-    Type* base = component;
-    if (component->tag == TYPE_ARRAY) {
-        dimensions += component->array.dimensions;
-        base = component->array.base;
-    }
-
-    int32_t maxDimensions = jtk_ArrayList_getSize(base->arrayTypes);
-    if (dimensions > maxDimensions) {
-        Type* previous = (maxDimensions == 0)? base :
-            (Type*)jtk_ArrayList_getValue(base->arrayTypes, maxDimensions - 1);
-        int32_t dimension;
-        for (dimension = maxDimensions + 1; dimension <= dimensions; dimension++) {
-            Type* type = newType(TYPE_ARRAY, true, true, false, NULL);
-            type->array.array = NULL; // TODO
-            type->array.base = base;
-            type->array.component = previous;
-            type->array.dimensions = dimension;
-            jtk_ArrayList_add(base->arrayTypes, type);
-
-            previous = type;
-        }
-    }
-
-    return (Type*)jtk_ArrayList_getValue(base->arrayTypes, dimensions - 1);
-}
-
 Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     bool error = false;
@@ -1221,7 +1225,7 @@ Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
         }
     }
 
-    return error? NULL : getArrayType(analyzer, firstType);
+    return error? NULL : inferArrayType(analyzer, firstType);
 }
 
 Type* resolveExpression(Analyzer* analyzer, Context* context) {
