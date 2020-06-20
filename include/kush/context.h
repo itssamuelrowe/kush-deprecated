@@ -112,6 +112,9 @@ typedef struct Primitives Primitives;
 
 extern Primitives primitives;
 
+void initializePrimitives();
+void destroyPrimitives();
+
 /*******************************************************************************
  * ContextType                                                                 *
  *******************************************************************************/
@@ -339,6 +342,7 @@ void deleteInitializerExpression(InitializerExpression* self);
 struct ArrayExpression {
     ContextType tag;
     jtk_ArrayList_t* expressions;
+    Token* token;
 };
 
 typedef struct ArrayExpression ArrayExpression;

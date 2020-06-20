@@ -1880,12 +1880,17 @@ jtk_Pair_t* parseInitializerEntry(Parser* parser) {
 ArrayExpression* parseArrayExpression(Parser* parser) {
     ArrayExpression* context = newArrayExpression();
 
-    match(parser, TOKEN_LEFT_SQUARE_BRACKET);
+    context->token = matchAndYield(parser, TOKEN_LEFT_SQUARE_BRACKET);
     if (isExpressionFollow(la(parser, 1))) {
         pushFollowToken(parser, TOKEN_RIGHT_SQUARE_BRACKET);
         // TODO: parseExpressions should accept ArrayList not return it.
         context->expressions = parseExpressions(parser);
         popFollowToken(parser);
+    }
+    else {
+        ErrorHandler* errorHandler = parser->compiler->errorHandler;
+        handleSyntaxError(errorHandler, parser,
+            ERROR_EMPTY_ARRAY_INITIALIZER, context->token, TOKEN_UNKNOWN);
     }
     match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
 

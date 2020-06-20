@@ -1011,6 +1011,7 @@ Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
              */
             result = function->returnType;
 
+            // TODO: Variable parameters!
             int32_t argumentCount = jtk_ArrayList_getSize(arguments->expressions);
             int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
             if (argumentCount != parameterCount) {
@@ -1163,8 +1164,64 @@ Type* resolveInitializer(Analyzer* analyzer, InitializerExpression* expression) 
     return NULL;
 }
 
+// TODO: Should be able to infer types for empty arrays.
+Type* getArrayType(Analyzer* analyzer, Type* component) {
+    int32_t dimensions = 1;
+    Type* base = component;
+    if (component->tag == TYPE_ARRAY) {
+        dimensions += component->array.dimensions;
+        base = component->array.base;
+    }
+
+    int32_t maxDimensions = jtk_ArrayList_getSize(base->arrayTypes);
+    if (dimensions > maxDimensions) {
+        Type* previous = (maxDimensions == 0)? base :
+            (Type*)jtk_ArrayList_getValue(base->arrayTypes, maxDimensions - 1);
+        int32_t dimension;
+        for (dimension = maxDimensions + 1; dimension <= dimensions; dimension++) {
+            Type* type = newType(TYPE_ARRAY, true, true, false, NULL);
+            type->array.array = NULL; // TODO
+            type->array.base = base;
+            type->array.component = previous;
+            type->array.dimensions = dimension;
+            jtk_ArrayList_add(base->arrayTypes, type);
+
+            previous = type;
+        }
+    }
+
+    return (Type*)jtk_ArrayList_getValue(base->arrayTypes, dimensions - 1);
+}
+
 Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
-    return NULL;
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    bool error = false;
+
+    Type* firstType = NULL;
+    int32_t limit = jtk_ArrayList_getSize(expression->expressions);
+    int32_t i;
+    for (i = 0; i < limit; i++) {
+        Context* context = (Context*)jtk_ArrayList_getValue(expression->expressions, i);
+        Type* type = resolveExpression(analyzer, context);
+        if ((type == NULL) && (firstType == NULL)) {
+            error = true;
+            break;
+        }
+        if (type != NULL) {
+            if (firstType == NULL) {
+                firstType = type;
+            }
+            else {
+                if (type != firstType) {
+                    handleSemanticError(handler, analyzer, ERROR_ARRAY_MEMBERS_SHOULD_HAVE_SAME_TYPE,
+                        expression->token);
+                    error = true;
+                }
+            }
+        }
+    }
+
+    return error? NULL : getArrayType(analyzer, firstType);
 }
 
 Type* resolveExpression(Analyzer* analyzer, Context* context) {
