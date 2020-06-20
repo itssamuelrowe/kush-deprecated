@@ -47,10 +47,27 @@ struct Type {
     bool accessible;
     bool callable;
     Token* identifier;
+    jtk_ArrayList_t* arrayTypes;
     union {
         struct {
+            /**
+             * Represents a structure that provides attributes for arrays.
+             */
             Type* array;
+
+            /* Represents the actual type, without taking dimensions into
+             * consideration. For example, i32[][][], base always
+             * represents i32.
+             */
             Type* base;
+
+            /* Represents the component type, that is, a dimension one lesser
+             * than the dimension of the current type. When the current dimenion
+             * is 1, component and base are equal.
+             */
+            Type* component;
+
+            /* The number of dimensions. */
             uint16_t dimensions;
         } array;
         struct {

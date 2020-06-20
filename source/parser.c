@@ -1727,7 +1727,7 @@ Subscript* parseSubscript(Parser* parser) {
 FunctionArguments* parseFunctionArguments(Parser* parser) {
     FunctionArguments* context = newFunctionArguments();
 
-    match(parser, TOKEN_LEFT_PARENTHESIS);
+    context->parenthesis = matchAndYield(parser, TOKEN_LEFT_PARENTHESIS);
 
     if (isExpressionFollow(la(parser, 1))) {
         pushFollowToken(parser, TOKEN_RIGHT_PARENTHESIS);

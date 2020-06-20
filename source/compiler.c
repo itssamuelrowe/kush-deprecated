@@ -213,6 +213,8 @@ const char* errorMessages[] = {
     "Expected variable",
     "Expected label",
     "Incompatible return value",
+    "Invalid argument count",
+    "Incompatible argument type",
 
     // General errors
     "Corrupted module",

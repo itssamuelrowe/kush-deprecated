@@ -991,7 +991,8 @@ Type* resolveSubscript(Analyzer* analyzer, Subscript* subscript, Type* previous)
     return result;
 }
 
-// TODO: Check if the argument type matches the parameter type.
+// TODO: The contexts should store the first token at which they start!
+// This way we can report better error locations.
 Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
     Type* previous) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
@@ -1004,13 +1005,35 @@ Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
         if (previous->tag == TYPE_FUNCTION) {
             Function* function = previous->function;
             int32_t j;
-            for (j = 0; j < arguments->expressions->m_size; j++) {
-                // BinaryExpression* argument = (BinaryExpression*)jtk_ArrayList_getValue(
-                //     arguments->expressions, j);
-                // Type* argumentType = resolveExpression(analyzer, (Context*)argument);
-                // ...
-            }
+
+            /* The return value of the function is considered even if the arguments
+             * are invalid.
+             */
             result = function->returnType;
+
+            int32_t argumentCount = jtk_ArrayList_getSize(arguments->expressions);
+            int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
+            if (argumentCount != parameterCount) {
+                handleSemanticError(handler, analyzer, ERROR_INVALID_ARGUMENT_COUNT,
+                    arguments->parenthesis);
+            }
+            else {
+                for (j = 0; j < argumentCount; j++) {
+                    BinaryExpression* argument = (BinaryExpression*)jtk_ArrayList_getValue(
+                        arguments->expressions, j);
+                    Type* argumentType = resolveExpression(analyzer, (Context*)argument);
+                    Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, j);
+                    if (argumentType != parameter->type) {
+                        handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_ARGUMENT_TYPE,
+                            arguments->parenthesis);
+                        /* Since the error message points to the parenthesis, there is
+                         * no point in reporting the same error message multiple times
+                         * even if there are other mismatches.
+                         */
+                        break;
+                    }
+                }
+            }
         }
         else {
             controlError();
