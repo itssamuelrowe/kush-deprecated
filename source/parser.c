@@ -85,7 +85,7 @@ static Token* consumeAndYield(Parser* parser);
 // Match
 
 static int32_t matchEx(Parser* parser, TokenType* types, int32_t count);
-static Token* matchAndYieldEx(Parser* parser, TokenType* types, int32_t count,
+static Token* matchAndYieldEx(Parser* parser, const TokenType* types, int32_t count,
     int32_t* index);
 static Token* matchAndYield(Parser* parser, TokenType type);
 
@@ -140,43 +140,43 @@ static FunctionArguments* parseFunctionArguments(Parser* parser);
 static Subscript* parseSubscript(Parser* parser);
 static MemberAccess* parseMemberAccess(Parser* parser);
 static void* parsePrimaryExpression(Parser* parser, bool* token);
-static InitializerExpression* parseInitializerExpression(Parser* parser);
+static NewExpression* parseNewExpression(Parser* parser);
 static jtk_Pair_t* parseInitializerEntry(Parser* parser);
 static ArrayExpression* parseArrayExpression(Parser* parser);
 
-static const char* ruleNames[] = {
-    "module",
-    "importDeclaration",
-    "functionDeclaration",
-    "block",
-    "variableDeclaration",
-    "breakStatement",
-    "returnStatement",
-    "throwStatement",
-    "ifStatement",
-    "iterativeStatement",
-    "tryStatement",
-    "structureDeclaration",
-    "assignmentExpression",
-    "conditionalExpression",
-    "logicalOrExpression",
-    "logicalAndExpression",
-    "inclusiveOrExpression",
-    "exclusiveOrExpression",
-    "andExpression",
-    "equalityExpression",
-    "relationalExpression",
-    "shiftExpression",
-    "additiveExpression",
-    "multiplicativeExpression",
-    "unaryExpression",
-    "postfixExpression",
-    "subscript",
-    "functionArguments",
-    "memberAccess"
-    "initializerExpression",
-    "arrayExpression"
-};
+// static const char* ruleNames[] = {
+//     "module",
+//     "importDeclaration",
+//     "functionDeclaration",
+//     "block",
+//     "variableDeclaration",
+//     "breakStatement",
+//     "returnStatement",
+//     "throwStatement",
+//     "ifStatement",
+//     "iterativeStatement",
+//     "tryStatement",
+//     "structureDeclaration",
+//     "assignmentExpression",
+//     "conditionalExpression",
+//     "logicalOrExpression",
+//     "logicalAndExpression",
+//     "inclusiveOrExpression",
+//     "exclusiveOrExpression",
+//     "andExpression",
+//     "equalityExpression",
+//     "relationalExpression",
+//     "shiftExpression",
+//     "additiveExpression",
+//     "multiplicativeExpression",
+//     "unaryExpression",
+//     "postfixExpression",
+//     "subscript",
+//     "functionArguments",
+//     "memberAccess"
+//     "newExpression",
+//     "arrayExpression"
+// };
 
 #define la(parser, count) k_TokenStream_la((parser)->tokens, (count))
 #define consume(parser) consumeToken((parser)->tokens)
@@ -201,14 +201,15 @@ void recover(Parser* parser) {
              * reverse fashion over the follow set.
              */
             int32_t i;
-            for (i = parser->followSetSize - 1; i >= 0; i--) {
-                if (lt1->type == (TokenType)parser->followSet[i]) {
+            // for (i = parser->followSetSize - 1; i >= 0; i--) {
+                // Look only for the latest follow token.
+                if (lt1->type == (TokenType)parser->followSet[parser->followSetSize - 1]) {
                     /* A token from the follow set was encountered. The parser
                      * may have resynchronized with the input.
                      */
                     goto afterDiscard;
                 }
-            }
+            // }
             /* Consume and discard the current token. */
             consume(parser);
             /* Update the lookahead token. */
@@ -266,7 +267,7 @@ bool ensureFollowSetSpace(Parser* parser, int32_t capacity) {
             if (newCapacity > 0) {
                 int32_t* temporary = parser->followSet;
                 parser->followSet = (int32_t*)jtk_Arrays_copyOfEx_i(
-                    parser->followSet, parser->followSet, newCapacity, 0,
+                    parser->followSet, parser->followSetSize, newCapacity, 0,
                     false);
                 parser->followSetCapacity = newCapacity;
                 deallocate(temporary);
@@ -304,15 +305,15 @@ Token* consumeAndYield(Parser* parser) {
 
 /* Match */
 
-int32_t matchEx(Parser* parser, TokenType* types, int32_t count) {
-    jtk_Assert_assertObject(parser, "The specified parser is null.");
+// int32_t matchEx(Parser* parser, TokenType* types, int32_t count) {
+//     jtk_Assert_assertObject(parser, "The specified parser is null.");
 
-    int32_t index;
-    matchAndYieldEx(parser, types, count, &index);
-    return index;
-}
+//     int32_t index;
+//     matchAndYieldEx(parser, types, count, &index);
+//     return index;
+// }
 
-Token* matchAndYieldEx(Parser* parser, TokenType* types, int32_t count,
+Token* matchAndYieldEx(Parser* parser, const TokenType* types, int32_t count,
     int32_t* index) {
     jtk_Assert_assertObject(parser, "The specified parser is null.");
     jtk_Assert_assertTrue(count > 0, "The specified count is invalid.");
@@ -408,7 +409,6 @@ Token* matchAndYield(Parser* parser, TokenType type) {
 
 // expressionStatement (includes IDENTIFIER, which may lead to variableDeclaration, too!)
 #define isSimpleStatementFollow(type) \
-    (type == TOKEN_SEMICOLON) || \
     (type == TOKEN_KEYWORD_VAR) || \
     (type == TOKEN_KEYWORD_LET) || \
     (type == TOKEN_KEYWORD_BREAK) || \
@@ -546,7 +546,7 @@ Token* matchAndYield(Parser* parser, TokenType type) {
     (type == TOKEN_KEYWORD_THIS) || \
     (type == TOKEN_IDENTIFIER) || \
     (type == TOKEN_LEFT_PARENTHESIS) || \
-    (type == TOKEN_LEFT_BRACE) || \
+    (type == TOKEN_KEYWORD_NEW) || \
     (type == TOKEN_LEFT_SQUARE_BRACKET) || \
     (type == TOKEN_LEFT_ANGLE_BRACKET) || \
     (type == TOKEN_KEYWORD_NEW)
@@ -809,7 +809,8 @@ void parseFunctionParameters(Parser* parser,
             Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
             first = false;
 
-            Variable* parameter = newVariable(false, false, type, identifier, NULL, NULL);
+            Variable* parameter = newVariable(false, false, type, identifier->text,
+                identifier->length, identifier, NULL, NULL);
             if (variadic) {
                 *variableParameter = parameter;
                 break;
@@ -943,10 +944,6 @@ Context* parseSimpleStatement(Parser* parser) {
     }
     else {
         switch (la1) {
-            case TOKEN_SEMICOLON: {
-                break;
-            }
-
             case TOKEN_KEYWORD_BREAK: {
                 result = parseBreakStatement(parser);
                 break;
@@ -1030,7 +1027,8 @@ void parseVariableDeclarator(Parser* parser, bool infer, bool constant,
         expression = parseExpression(parser);
 	}
 
-    Variable* variable = newVariable(infer, constant, variableType, identifier, expression, NULL);
+    Variable* variable = newVariable(infer, constant, variableType,
+        identifier->text, identifier->length, identifier, expression, NULL);
     jtk_ArrayList_add(variables, variable);
 }
 
@@ -1308,8 +1306,8 @@ CatchClause* parseCatchClause(Parser* parser) {
 	}
 
     Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
-    context->parameter = newVariable(false, true, &primitives.string, identifier,
-        NULL, NULL);
+    context->parameter = newVariable(false, true, &primitives.string,
+        identifier->text, identifier->length, identifier, NULL, NULL);
     context->body = parseBlock(parser);
 
     return context;
@@ -1611,12 +1609,12 @@ BinaryExpression* parseAdditiveExpression(Parser* parser) {
 BinaryExpression* parseMultiplicativeExpression(Parser* parser) {
     BinaryExpression* context = newBinaryExpression(CONTEXT_MULTIPLICATIVE_EXPRESSION);
 
-    context->left = parseUnaryExpression(parser);
+    context->left = (Context*)parseUnaryExpression(parser);
 
     while (isMultiplicativeOperator(la(parser, 1))) {
         jtk_Pair_t* pair = jtk_Pair_new();
-        pair->m_left = consumeAndYield(parser);
-        pair->m_right = parseUnaryExpression(parser);
+        pair->m_left = (void*)consumeAndYield(parser);
+        pair->m_right = (void*)parseUnaryExpression(parser);
         jtk_ArrayList_add(context->others, pair);
     }
 
@@ -1635,10 +1633,10 @@ UnaryExpression* parseUnaryExpression(Parser* parser) {
     TokenType la1 = la(parser, 1);
     if (isUnaryOperator(la1)) {
         context->operator = consumeAndYield(parser);
-        context->expression = parseUnaryExpression(parser);
+        context->expression = (Context*)parseUnaryExpression(parser);
     }
     else if (isPostfixExpressionFollow(la1)) {
-        context->expression = parsePostfixExpression(parser);
+        context->expression = (Context*)parsePostfixExpression(parser);
     }
     else {
         // Error: Expected unary operator or postfix expression follow
@@ -1727,7 +1725,7 @@ Subscript* parseSubscript(Parser* parser) {
 FunctionArguments* parseFunctionArguments(Parser* parser) {
     FunctionArguments* context = newFunctionArguments();
 
-    match(parser, TOKEN_LEFT_PARENTHESIS);
+    context->parenthesis = matchAndYield(parser, TOKEN_LEFT_PARENTHESIS);
 
     if (isExpressionFollow(la(parser, 1))) {
         pushFollowToken(parser, TOKEN_RIGHT_PARENTHESIS);
@@ -1761,7 +1759,7 @@ MemberAccess* parseMemberAccess(Parser* parser) {
  * :	IDENTIFIER
  * |	literal
  * |	'(' expression ')'
- * |	mapExpression
+ * |	newExpression
  * |	arrayExpression
  * ;
  *
@@ -1803,8 +1801,8 @@ void* parsePrimaryExpression(Parser* parser, bool* token) {
                 break;
             }
 
-            case TOKEN_LEFT_BRACE: {
-                result = parseInitializerExpression(parser);
+            case TOKEN_KEYWORD_NEW: {
+                result = parseNewExpression(parser);
                 break;
             }
 
@@ -1824,8 +1822,16 @@ void* parsePrimaryExpression(Parser* parser, bool* token) {
 }
 
 /*
- * initializerExpression
- * :	'{' initializerEntries? '}'
+ * newExpression
+ * :	'new' type (arrayDimensions | initializer)
+ * ;
+ *
+ * arrayDimensions
+ * :    ('[' expression ']')+
+ * ;
+ *
+ * initializer
+ * :    '{' initializerEntries? '}'
  * ;
  *
  * initializerEntries
@@ -1835,25 +1841,63 @@ void* parsePrimaryExpression(Parser* parser, bool* token) {
  * TODO: We can add an arbitary ',' in the end of a map, list, or an array.
  *		 Simply use the isExpressionFollow() function.
  */
-InitializerExpression* parseInitializerExpression(Parser* parser) {
-	InitializerExpression* context = newInitializerExpression();
+NewExpression* parseNewExpression(Parser* parser) {
+    match(parser, TOKEN_KEYWORD_NEW);
 
-    match(parser, TOKEN_LEFT_BRACE);
-    pushFollowToken(parser, TOKEN_RIGHT_BRACE);
+    static const TokenType tokens[] = {
+        TOKEN_IDENTIFIER,
+        TOKEN_KEYWORD_BOOLEAN,
+        TOKEN_KEYWORD_I8,
+        TOKEN_KEYWORD_I16,
+        TOKEN_KEYWORD_I32,
+        TOKEN_KEYWORD_I64,
+        TOKEN_KEYWORD_UI8,
+        TOKEN_KEYWORD_UI16,
+        TOKEN_KEYWORD_UI32,
+        TOKEN_KEYWORD_UI64,
+        TOKEN_KEYWORD_F32,
+        TOKEN_KEYWORD_F64,
+        TOKEN_KEYWORD_STRING
+    };
+    int32_t index;
+    int32_t size = sizeof (tokens) / sizeof (TokenType);
+    Token* token = matchAndYieldEx(parser, tokens, size, &index);
+    int32_t dimensions = 0;
 
-    if (la(parser, 1) == TOKEN_IDENTIFIER) {
-        jtk_Pair_t* entry = parseInitializerEntry(parser);
-        jtk_ArrayList_add(context->entries, entry);
+    NewExpression* context = newNewExpression();
+    if ((token->type == TOKEN_IDENTIFIER) && (la(parser, 1) == TOKEN_LEFT_BRACE)) {
+        consume(parser);
+        pushFollowToken(parser, TOKEN_RIGHT_BRACE);
 
-        while (la(parser, 1) == TOKEN_COMMA) {
-            consume(parser);
-            entry = parseInitializerEntry(parser);
+        if (la(parser, 1) == TOKEN_IDENTIFIER) {
+            jtk_Pair_t* entry = parseInitializerEntry(parser);
             jtk_ArrayList_add(context->entries, entry);
-        }
-    }
 
-    popFollowToken(parser);
-    match(parser, TOKEN_RIGHT_BRACE);
+            while (la(parser, 1) == TOKEN_COMMA) {
+                consume(parser);
+                entry = parseInitializerEntry(parser);
+                jtk_ArrayList_add(context->entries, entry);
+            }
+        }
+
+        popFollowToken(parser);
+        match(parser, TOKEN_RIGHT_BRACE);
+    }
+    else {
+        do {
+            match(parser, TOKEN_LEFT_SQUARE_BRACKET);
+            pushFollowToken(parser, TOKEN_RIGHT_SQUARE_BRACKET);
+            dimensions++;
+
+            BinaryExpression* expression = parseExpression(parser);
+            jtk_ArrayList_add(context->expressions, expression);
+
+            popFollowToken(parser);
+            match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
+        }
+        while (la(parser, 1) == TOKEN_LEFT_SQUARE_BRACKET);
+    }
+    context->variableType = newVariableType(token, dimensions);
 
     return context;
 }
@@ -1880,18 +1924,22 @@ jtk_Pair_t* parseInitializerEntry(Parser* parser) {
 ArrayExpression* parseArrayExpression(Parser* parser) {
     ArrayExpression* context = newArrayExpression();
 
-    match(parser, TOKEN_LEFT_SQUARE_BRACKET);
+    context->token = matchAndYield(parser, TOKEN_LEFT_SQUARE_BRACKET);
     if (isExpressionFollow(la(parser, 1))) {
         pushFollowToken(parser, TOKEN_RIGHT_SQUARE_BRACKET);
         // TODO: parseExpressions should accept ArrayList not return it.
         context->expressions = parseExpressions(parser);
         popFollowToken(parser);
     }
+    else {
+        ErrorHandler* errorHandler = parser->compiler->errorHandler;
+        handleSyntaxError(errorHandler, parser,
+            ERROR_EMPTY_ARRAY_INITIALIZER, context->token, TOKEN_UNKNOWN);
+    }
     match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
 
     return context;
 }
-
 
 // Constructor
 

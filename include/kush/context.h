@@ -46,11 +46,29 @@ struct Type {
     bool indexable;
     bool accessible;
     bool callable;
+    bool allocatable;
     Token* identifier;
+    jtk_ArrayList_t* arrayTypes;
     union {
         struct {
-            Type* array;
+            /**
+             * Represents a structure that provides attributes for arrays.
+             */
+            Structure* array;
+
+            /* Represents the actual type, without taking dimensions into
+             * consideration. For example, i32[][][], base always
+             * represents i32.
+             */
             Type* base;
+
+            /* Represents the component type, that is, a dimension one lesser
+             * than the dimension of the current type. When the current dimenion
+             * is 1, component and base are equal.
+             */
+            Type* component;
+
+            /* The number of dimensions. */
             uint16_t dimensions;
         } array;
         struct {
@@ -66,7 +84,7 @@ struct Type {
 };
 
 Type* newType(uint8_t tag, bool indexable, bool accessible, bool callable,
-    Token* identifier);
+    bool allocatable, Token* identifier);
 void deleteType(Type* type);
 
 /*******************************************************************************
@@ -94,6 +112,9 @@ struct Primitives {
 typedef struct Primitives Primitives;
 
 extern Primitives primitives;
+
+void initializePrimitives();
+void destroyPrimitives();
 
 /*******************************************************************************
  * ContextType                                                                 *
@@ -165,7 +186,7 @@ enum ContextType {
 
     CONTEXT_MEMBER_ACCESS,
 
-    CONTEXT_INITIALIZER_EXPRESSION,
+    CONTEXT_NEW_EXPRESSION,
 
     CONTEXT_ARRAY_EXPRESSION
 };
@@ -191,6 +212,20 @@ struct Symbol {
     uint8_t* name;
     int32_t nameSize;
 };
+
+/*******************************************************************************
+ * VariableType                                                                *
+ *******************************************************************************/
+
+struct VariableType {
+    Token* token;
+    int32_t dimensions;
+};
+
+typedef struct VariableType VariableType;
+
+VariableType* newVariableType(Token* token, int32_t dimensions);
+void deleteVariableType(VariableType* self);
 
 /*******************************************************************************
  * Module                                                                      *
@@ -302,18 +337,23 @@ MemberAccess* newMemberAccess();
 void deleteMemberAccess(MemberAccess* self);
 
 /*******************************************************************************
- * InitializerExpression                                                               *
+ * NewExpression                                                               *
  *******************************************************************************/
 
-struct InitializerExpression {
+struct NewExpression {
     ContextType tag;
-    jtk_ArrayList_t* entries; // Pair<Token, BinaryExpression>
+    VariableType* variableType;
+    Type* type;
+    union {
+        jtk_ArrayList_t* entries;
+        jtk_ArrayList_t* expressions;
+    };
 };
 
-typedef struct InitializerExpression InitializerExpression;
+typedef struct NewExpression NewExpression;
 
-InitializerExpression* newInitializerExpression();
-void deleteInitializerExpression(InitializerExpression* self);
+NewExpression* newNewExpression();
+void deleteNewExpression(NewExpression* self);
 
 /*******************************************************************************
  * ArrayExpression                                                              *
@@ -322,6 +362,7 @@ void deleteInitializerExpression(InitializerExpression* self);
 struct ArrayExpression {
     ContextType tag;
     jtk_ArrayList_t* expressions;
+    Token* token;
 };
 
 typedef struct ArrayExpression ArrayExpression;
@@ -375,20 +416,6 @@ Block* newBlock();
 void deleteBlock(Block* self);
 
 /*******************************************************************************
- * VariableType                                                                *
- *******************************************************************************/
-
-struct VariableType {
-    Token* token;
-    int32_t dimensions;
-};
-
-typedef struct VariableType VariableType;
-
-VariableType* newVariableType(Token* token, int32_t dimensions);
-void deleteVariableType(VariableType* self);
-
-/*******************************************************************************
  * Variable                                                                    *
  *******************************************************************************/
 
@@ -410,7 +437,8 @@ struct Variable {
 typedef struct Variable Variable;
 
 Variable* newVariable(bool infer, bool constant, VariableType* variableType,
-    Token* identifier, BinaryExpression* expression, Scope* parent);
+    const uint8_t* name, int32_t nameSize, Token* identifier,
+    BinaryExpression* expression, Scope* parent);
 void deleteVariable(Variable* variable);
 
 /*******************************************************************************

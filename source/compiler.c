@@ -213,6 +213,12 @@ const char* errorMessages[] = {
     "Expected variable",
     "Expected label",
     "Incompatible return value",
+    "Invalid argument count",
+    "Incompatible argument type",
+    "Array members should have same type",
+    "Empty array initializer",
+    "Expected structure name",
+    "Expected integer expression",
 
     // General errors
     "Corrupted module",
@@ -515,6 +521,7 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
             fprintf(stderr, "[error] Please specify input files.\n");
         }
         else {
+            initializePrimitives();
             initialize(compiler);
             buildAST(compiler);
             if (!compiler->dumpTokens && (noErrors = (compiler->errorHandler->errors->m_size == 0))) {
@@ -524,6 +531,7 @@ bool compileEx(Compiler* compiler, char** arguments, int32_t length) {
                     generate(compiler);
                 }
             }
+            destroyPrimitives();
         }
 
         if (compiler->footprint) {

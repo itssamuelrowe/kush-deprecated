@@ -100,6 +100,9 @@
  *   y   5
  */
 
+Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) ;
+Type* inferArrayType(Analyzer* analyzer, Type* component);
+
 static bool import(Analyzer* analyzer, const char* name, int32_t size,
     bool wildcard);
 static void importDefaults(Analyzer* analyzer);
@@ -127,11 +130,13 @@ static Type* resolveArithmetic(Analyzer* analyzer, BinaryExpression* expression)
 static Type* resolveUnary(Analyzer* analyzer, UnaryExpression* expression);
 static Type* resolvePostfix(Analyzer* analyzer, PostfixExpression* expression);
 static Type* resolveToken(Analyzer* analyzer, Token* token);
-static Type* resolveInitializer(Analyzer* analyzer, InitializerExpression* expression);
+static Type* resolveNew(Analyzer* analyzer, NewExpression* expression);
 static Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression);
 static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
 #define invalidate(analyzer) analyzer->scope = analyzer->scope->parent
+
+#define isUndefined(scope, identifier) (resolveSymbol(scope, identifier) == NULL)
 
 // String:equals(x, y)
 // x.equals(y)
@@ -141,6 +146,46 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 
 // TODO: Add string keyword to the parser
 // Add new expression
+
+// Array Type
+
+Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) {
+    Type* result = base;
+
+    if (dimensions > 0) {
+        int32_t maxDimensions = jtk_ArrayList_getSize(base->arrayTypes);
+        if (dimensions > maxDimensions) {
+            Type* previous = (maxDimensions == 0)? base :
+                (Type*)jtk_ArrayList_getValue(base->arrayTypes, maxDimensions - 1);
+            int32_t dimension;
+            for (dimension = maxDimensions + 1; dimension <= dimensions; dimension++) {
+                Type* type = newType(TYPE_ARRAY, true, true, false, true, NULL);
+                type->array.array = (Structure*)resolveSymbol(analyzer->scope, "$Array");
+                type->array.base = base;
+                type->array.component = previous;
+                type->array.dimensions = dimension;
+                jtk_ArrayList_add(base->arrayTypes, type);
+
+                previous = type;
+            }
+        }
+
+        result = (Type*)jtk_ArrayList_getValue(base->arrayTypes, dimensions - 1);
+    }
+    return result;
+}
+
+// TODO: Should be able to infer types for empty arrays.
+Type* inferArrayType(Analyzer* analyzer, Type* component) {
+    int32_t dimensions = 1;
+    Type* base = component;
+    if (component->tag == TYPE_ARRAY) {
+        dimensions += component->array.dimensions;
+        base = component->array.base;
+    }
+
+    return getArrayType(analyzer, base, dimensions);
+}
 
 // Import
 
@@ -156,10 +201,6 @@ void importDefaults(Analyzer* analyzer) {
 }
 
 // Define
-
-bool isUndefined(Scope* scope, const uint8_t* identifier) {
-    return resolveSymbol(scope, identifier) == NULL;
-}
 
 void defineStructure(Analyzer* analyzer, Structure* structure) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
@@ -341,6 +382,7 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     Token* token = variableType->token;
     Type* type = NULL;
+    bool error = false;
     switch (token->type) {
         case TOKEN_KEYWORD_BOOLEAN: {
            type = &primitives.boolean;
@@ -407,10 +449,12 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
             if (context == NULL) {
                 handleSemanticError(handler, analyzer, ERROR_UNDECLARED_TYPE,
                     token);
+                error = true;
             }
             else if (context->tag != CONTEXT_STRUCTURE_DECLARATION) {
                 handleSemanticError(handler, analyzer, ERROR_INVALID_TYPE,
                     token);
+                error = true;
             }
             else {
                 type = ((Structure*)context)->type;
@@ -429,11 +473,8 @@ Type* resolveVariableType(Analyzer* analyzer, VariableType* variableType) {
         }
     }
 
-    if (variableType->dimensions > 0) {
-        // TODO
-    }
-    else {
-
+    if ((variableType->dimensions > 0) && !error) {
+        type = getArrayType(analyzer, type, variableType->dimensions);
     }
 
     return type;
@@ -984,14 +1025,19 @@ Type* resolveSubscript(Analyzer* analyzer, Subscript* subscript, Type* previous)
             subscript->bracket);
     }
     else {
-        /* Type* indexType = */ resolveExpression(analyzer, (Context*)subscript->expression);
-        // TODO: Check if the index type is integer.
-        // TODO: Find the result of the subscript.
+        Type* indexType = resolveExpression(analyzer, (Context*)subscript->expression);
+        if (indexType != &primitives.i32) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION,
+                subscript->bracket);
+        }
+
+        result = getArrayType(analyzer, previous->array.base, previous->array.dimensions - 1);
     }
     return result;
 }
 
-// TODO: Check if the argument type matches the parameter type.
+// TODO: The contexts should store the first token at which they start!
+// This way we can report better error locations.
 Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
     Type* previous) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
@@ -1004,17 +1050,55 @@ Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
         if (previous->tag == TYPE_FUNCTION) {
             Function* function = previous->function;
             int32_t j;
-            for (j = 0; j < arguments->expressions->m_size; j++) {
-                // BinaryExpression* argument = (BinaryExpression*)jtk_ArrayList_getValue(
-                //     arguments->expressions, j);
-                // Type* argumentType = resolveExpression(analyzer, (Context*)argument);
-                // ...
-            }
+
+            /* The return value of the function is considered even if the arguments
+             * are invalid.
+             */
             result = function->returnType;
+
+            // TODO: Variable parameters!
+            int32_t argumentCount = jtk_ArrayList_getSize(arguments->expressions);
+            int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
+            if (argumentCount != parameterCount) {
+                handleSemanticError(handler, analyzer, ERROR_INVALID_ARGUMENT_COUNT,
+                    arguments->parenthesis);
+            }
+            else {
+                for (j = 0; j < argumentCount; j++) {
+                    BinaryExpression* argument = (BinaryExpression*)jtk_ArrayList_getValue(
+                        arguments->expressions, j);
+                    Type* argumentType = resolveExpression(analyzer, (Context*)argument);
+                    Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, j);
+                    if (argumentType != parameter->type) {
+                        handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_ARGUMENT_TYPE,
+                            arguments->parenthesis);
+                        /* Since the error message points to the parenthesis, there is
+                         * no point in reporting the same error message multiple times
+                         * even if there are other mismatches.
+                         */
+                        break;
+                    }
+                }
+            }
         }
         else {
             controlError();
         }
+    }
+    return result;
+}
+
+Type* resolveStructureMember(Analyzer* analyzer, Structure* structure, Token* identifier) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* result = NULL;
+    Variable* variable = (Variable*)resolveMember(structure->scope, identifier->text);
+
+    if (variable == NULL) {
+        handleSemanticError(handler, analyzer, ERROR_UNDECLARED_MEMBER,
+            identifier);
+    }
+    else {
+        result = variable->type;
     }
     return result;
 }
@@ -1030,15 +1114,15 @@ Type* resolveMemberAccess(Analyzer* analyzer, MemberAccess* access, Type* previo
         Token* identifier = access->identifier;
         if (previous->tag == TYPE_STRUCTURE) {
             Structure* structure = previous->structure;
-            Variable* variable = (Variable*)resolveMember(structure->scope, identifier->text);
-
-            if (variable == NULL) {
-                handleSemanticError(handler, analyzer, ERROR_UNDECLARED_MEMBER,
-                    access->identifier);
-            }
-            else {
-                result = variable->type;
-            }
+            result = resolveStructureMember(analyzer, structure, identifier);
+        }
+        else if (previous->tag == TYPE_ARRAY) {
+            Structure* structure = previous->array.array;
+            result = resolveStructureMember(analyzer, structure, identifier);
+        }
+        else if (previous->tag == TYPE_STRING) {
+            Structure* structure = (Structure*)resolveSymbol(analyzer->scope, "$String");
+            result = resolveStructureMember(analyzer, structure, identifier);
         }
         else {
             printf("[internal error] This is a valid condition (for example, `array.length`). However, it is yet to be implemented.\n");
@@ -1136,12 +1220,98 @@ Type* resolveToken(Analyzer* analyzer, Token* token) {
     return result;
 }
 
-Type* resolveInitializer(Analyzer* analyzer, InitializerExpression* expression) {
-    return NULL;
+// TODO: Report var s = null;
+Type* resolveNew(Analyzer* analyzer, NewExpression* expression) {
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    Type* result = NULL;
+    VariableType* variableType = expression->variableType;
+    Token* token = variableType->token;
+    if (variableType->dimensions == 0) {
+        Symbol* symbol = resolveSymbol(analyzer->scope, token->text);
+        if (symbol == NULL) {
+            handleSemanticError(handler, analyzer, ERROR_UNDECLARED_IDENTIFIER,
+                token);
+        }
+        else if (symbol->tag != CONTEXT_STRUCTURE_DECLARATION) {
+            handleSemanticError(handler, analyzer, ERROR_EXPECTED_STRUCTURE_NAME,
+                token);
+        }
+        else {
+            Structure* structure = (Structure*)symbol;
+            /* It does not matter if the object initializer has errors. */
+            result = structure->type;
+
+            int32_t limit = jtk_ArrayList_getSize(expression->entries);
+            int32_t i;
+            for (i = 0; i < limit; i++) {
+                jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->entries, i);
+                Token* identifier = (Token*)pair->m_left;
+
+                Type* type = resolveExpression(analyzer, (Context*)pair->m_right);
+
+                Variable* member = (Variable*)resolveMember(structure->scope, identifier->text);
+                if (member == NULL) {
+                    handleSemanticError(handler, analyzer, ERROR_UNDECLARED_MEMBER,
+                        identifier);
+                }
+                else {
+                    if ((type != NULL) && (type != member->type)) {
+                        handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_VARIABLE_INITIALIZER,
+                            identifier);
+                    }
+                }
+            }
+        }
+    }
+    else {
+        result = resolveVariableType(analyzer, variableType);
+
+        /* It does not matter if there are errors within the square brackets. */
+        int32_t limit = jtk_ArrayList_getSize(expression->entries);
+        int32_t i;
+        for (i = 0; i < limit; i++) {
+            jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->entries, i);
+            Token* bracket = (Token*)pair->m_left;
+            Type* type = resolveExpression(analyzer, (Context*)pair->m_right);
+            if ((type != NULL) && (type != &primitives.i32)) {
+                handleSemanticError(handler, analyzer, ERROR_EXPECTED_INTEGER_EXPRESSION,
+                    bracket);
+            }
+        }
+    }
+
+    return result;
 }
 
 Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
-    return NULL;
+    ErrorHandler* handler = analyzer->compiler->errorHandler;
+    bool error = false;
+
+    Type* firstType = NULL;
+    int32_t limit = jtk_ArrayList_getSize(expression->expressions);
+    int32_t i;
+    for (i = 0; i < limit; i++) {
+        Context* context = (Context*)jtk_ArrayList_getValue(expression->expressions, i);
+        Type* type = resolveExpression(analyzer, context);
+        if ((type == NULL) && (firstType == NULL)) {
+            error = true;
+            break;
+        }
+        if (type != NULL) {
+            if (firstType == NULL) {
+                firstType = type;
+            }
+            else {
+                if (type != firstType) {
+                    handleSemanticError(handler, analyzer, ERROR_ARRAY_MEMBERS_SHOULD_HAVE_SAME_TYPE,
+                        expression->token);
+                    error = true;
+                }
+            }
+        }
+    }
+
+    return error? NULL : inferArrayType(analyzer, firstType);
 }
 
 Type* resolveExpression(Analyzer* analyzer, Context* context) {
@@ -1203,8 +1373,8 @@ Type* resolveExpression(Analyzer* analyzer, Context* context) {
             break;
         }
 
-        case CONTEXT_INITIALIZER_EXPRESSION: {
-            result = resolveInitializer(analyzer, (InitializerExpression*)context);
+        case CONTEXT_NEW_EXPRESSION: {
+            result = resolveNew(analyzer, (NewExpression*)context);
            break;
         }
 
@@ -1250,11 +1420,44 @@ void resetAnalyzer(Analyzer* analyzer) {
 
 // Define
 
+Structure* addSyntheticStructure(Analyzer* analyzer, const uint8_t* name,
+    int32_t nameSize) {
+    Structure* structure = newStructure(name, nameSize, NULL, NULL);
+    structure->scope = scopeForStructure(NULL, structure);
+
+    defineSymbol(analyzer->scope, structure);
+
+    return structure;
+}
+
+Variable* addSyntheticMember(Analyzer* analyzer, Structure* structure,
+    bool constant, const uint8_t* name, int32_t nameSize, Type* type) {
+    Variable* variable = newVariable(false, constant, type, name, nameSize,
+        NULL, NULL, structure->scope);
+    defineSymbol(structure->scope, variable);
+
+    return variable;
+}
+
+void defineBuiltins(Analyzer* analyzer) {
+    Structure* array = addSyntheticStructure(analyzer, "$Array", 6);
+    addSyntheticMember(analyzer, array, true, "size", 4, &primitives.i32);
+
+    // String
+
+    Structure* string = addSyntheticStructure(analyzer, "$String", 7);
+    addSyntheticMember(analyzer, string, true, "size", 4, &primitives.i32);
+    Type* valueType = getArrayType(analyzer, &primitives.ui8, 1);
+    addSyntheticMember(analyzer, string, true, "value", 5, valueType);
+}
+
 void defineSymbols(Analyzer* analyzer, Module* module) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
 
     module->scope = scopeForModule(module);
     analyzer->scope = module->scope;
+
+    defineBuiltins(analyzer);
 
     int32_t structureCount = jtk_ArrayList_getSize(module->structures);
     int32_t j;

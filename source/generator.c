@@ -37,7 +37,7 @@ static void generateFunctionArguments(Generator* generator, FunctionArguments* a
 static void generateMemberAccess(Generator* generator, MemberAccess* access);
 static void generatePostfix(Generator* generator, PostfixExpression* expression);
 static void generateToken(Generator* generator, Token* token);
-static void generateInitializer(Generator* generator, InitializerExpression* expression);
+static void generateInitializer(Generator* generator, NewExpression* expression);
 static void generateArray(Generator* generator, ArrayExpression* expression);
 static void generateExpression(Generator* generator, Context* context);
 static void generateIndentation(Generator* generator, int32_t depth);
@@ -273,7 +273,7 @@ void generateToken(Generator* generator, Token* token) {
     }
 }
 
-void generateInitializer(Generator* generator, InitializerExpression* expression) {
+void generateInitializer(Generator* generator, NewExpression* expression) {
 }
 
 void generateArray(Generator* generator, ArrayExpression* expression) {
@@ -311,8 +311,8 @@ void generateExpression(Generator* generator, Context* context) {
             break;
         }
 
-        case CONTEXT_INITIALIZER_EXPRESSION: {
-            generateInitializer(generator, (InitializerExpression*)context);
+        case CONTEXT_NEW_EXPRESSION: {
+            generateInitializer(generator, (NewExpression*)context);
            break;
         }
 
