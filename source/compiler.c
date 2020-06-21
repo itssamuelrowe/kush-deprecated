@@ -384,7 +384,7 @@ void buildExecutable(Compiler* compiler) {
         outputSize = compiler->outputSize;
     }
 
-    jtk_StringBuilder_appendEx_z(builder, "kush-native.c -o ", 17);
+    jtk_StringBuilder_appendEx_z(builder, "../runtime/kush-runtime.c -I../runtime -g -o ", 45);
     jtk_StringBuilder_appendEx_z(builder, output, outputSize);
     int32_t commandSize = -1;
     uint8_t* command = jtk_StringBuilder_toCString(builder, &commandSize);

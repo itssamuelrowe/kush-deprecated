@@ -29,6 +29,7 @@ struct Generator {
     Compiler* compiler;
     Scope* scope;
     FILE* output;
+    int32_t index;
 };
 
 typedef struct Generator Generator;

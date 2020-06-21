@@ -39,6 +39,7 @@ struct Analyzer {
     int32_t packageSize;
     Scope* scope;
     Function* function;
+    int32_t index;
 };
 
 typedef struct Analyzer Analyzer;

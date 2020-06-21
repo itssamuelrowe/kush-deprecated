@@ -494,6 +494,11 @@ void resolveVariable(Analyzer* analyzer, Variable* variable) {
             handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_VARIABLE_INITIALIZER,
                 variable->identifier);
         }
+        else {
+            if (variable->type->reference) {
+                variable->index = analyzer->index++;
+            }
+        }
     }
 }
 
@@ -518,6 +523,7 @@ void resolveStructure(Analyzer* analyzer, Structure* structure) {
 
 void resolveFunction(Analyzer* analyzer, Function* function) {
     function->returnType = resolveVariableType(analyzer, function->returnVariableType);
+    analyzer->index = 0;
 
     int32_t count = jtk_ArrayList_getSize(function->parameters);
     int32_t i;
@@ -533,6 +539,8 @@ void resolveFunction(Analyzer* analyzer, Function* function) {
     analyzer->scope = function->scope;
     resolveLocals(analyzer, function->body);
     invalidate(analyzer);
+
+    function->totalReferences = analyzer->index;
 }
 
 uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
@@ -1397,6 +1405,7 @@ Analyzer* newAnalyzer(Compiler* compiler) {
     analyzer->package = NULL;
     analyzer->packageSize = -1;
     analyzer->function = NULL;
+    analyzer->index = 0;
 
     return analyzer;
 }
@@ -1413,6 +1422,7 @@ void deleteAnalyzer(Analyzer* analyzer) {
 
 void resetAnalyzer(Analyzer* analyzer) {
     analyzer->function = NULL;
+    analyzer->index = 0;
 }
 
 // Define
@@ -1473,6 +1483,18 @@ void defineBuiltins(Analyzer* analyzer) {
     parameters = jtk_ArrayList_new();
     jtk_ArrayList_add(parameters, makeParameter(analyzer, "s", 1, &primitives.string));
     addSyntheticFunction(analyzer, "print_s", 7, parameters, &primitives.void_);
+
+    // GC_printStats()
+    parameters = jtk_ArrayList_new();
+    addSyntheticFunction(analyzer, "GC_printStats", 13, parameters, &primitives.void_);
+
+    // printStackTrace()
+    parameters = jtk_ArrayList_new();
+    addSyntheticFunction(analyzer, "printStackTrace", 16, parameters, &primitives.void_);
+
+    // collect()
+    parameters = jtk_ArrayList_new();
+    addSyntheticFunction(analyzer, "collect", 7, parameters, &primitives.void_);
 }
 
 void defineSymbols(Analyzer* analyzer, Module* module) {
