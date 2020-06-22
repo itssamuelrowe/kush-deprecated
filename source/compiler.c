@@ -165,6 +165,7 @@ const char* errorMessages[] = {
     "Unknown character",
     "Invalid prefix in integer literal",
     "Expected digit after underscore in integer literal",
+    "Expected letter after colon in identifier",
 
     // Syntactical Errors
     "Unexpected token",
