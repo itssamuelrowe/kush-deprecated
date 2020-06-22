@@ -1572,12 +1572,32 @@ Token* nextToken(Lexer* lexer) {
                 if (isIdentifierStart(lexer->la1)) {
                     /* Consume and discard the first letter. */
                     consume(lexer);
+                    
 
                     while (isIdentifierPart(lexer->la1)) {
                         /* Consume and discard the consecutive letter
                          * or digit character.
                          */
                         consume(lexer);
+                    }
+                    
+                    if (lexer->la1 == ':') {
+                        /* Consume and discard the ':' */
+                        consume(lexer);
+                        
+                         if (isIdentifierStart(lexer->la1)) {
+                            /* Consume and discard the first letter. */
+                            consume(lexer);
+                    
+
+                            while (isIdentifierPart(lexer->la1)) {
+                                /* Consume and discard the consecutive letter
+                                 * or digit character.
+                                 */
+                                consume(lexer);
+                            }
+                        }
+                        
                     }
 
                     uint8_t* text = lexer->text->m_value; // jtk_StringBuilder_toCString(lexer->text);
