@@ -144,40 +144,6 @@ static NewExpression* parseNewExpression(Parser* parser);
 static jtk_Pair_t* parseInitializerEntry(Parser* parser);
 static ArrayExpression* parseArrayExpression(Parser* parser);
 
-// static const char* ruleNames[] = {
-//     "module",
-//     "importDeclaration",
-//     "functionDeclaration",
-//     "block",
-//     "variableDeclaration",
-//     "breakStatement",
-//     "returnStatement",
-//     "throwStatement",
-//     "ifStatement",
-//     "iterativeStatement",
-//     "tryStatement",
-//     "structureDeclaration",
-//     "assignmentExpression",
-//     "conditionalExpression",
-//     "logicalOrExpression",
-//     "logicalAndExpression",
-//     "inclusiveOrExpression",
-//     "exclusiveOrExpression",
-//     "andExpression",
-//     "equalityExpression",
-//     "relationalExpression",
-//     "shiftExpression",
-//     "additiveExpression",
-//     "multiplicativeExpression",
-//     "unaryExpression",
-//     "postfixExpression",
-//     "subscript",
-//     "functionArguments",
-//     "memberAccess"
-//     "newExpression",
-//     "arrayExpression"
-// };
-
 #define la(parser, count) k_TokenStream_la((parser)->tokens, (count))
 #define consume(parser) consumeToken((parser)->tokens)
 #define match(parser, type) matchAndYield((parser), type)
