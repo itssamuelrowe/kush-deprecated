@@ -550,7 +550,7 @@ void generateC(Generator* generator, Module* module) {
         compiler->currentFileIndex);
     
     int pathSize = jtk_CString_getSize(path);
-    uint8_t* targetFileName = allocate(unint8_t, pathSize - 3);
+    uint8_t* targetFileName = allocate(uint8_t, pathSize - 3);
     
     int32_t i;
     for (i = 0; i < pathSize - 4; i++) {
