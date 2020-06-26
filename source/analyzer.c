@@ -1245,6 +1245,7 @@ Type* resolveNew(Analyzer* analyzer, NewExpression* expression) {
             Structure* structure = (Structure*)symbol;
             /* It does not matter if the object initializer has errors. */
             result = structure->type;
+            expression->type = structure->type;
 
             int32_t limit = jtk_ArrayList_getSize(expression->entries);
             int32_t i;

@@ -397,6 +397,67 @@ void generateArraySuffix(Generator* generator, Type* base) {
     fprintf(generator->output, "%s", output);
 }
 
+// TODO: Remove declarations and keep only variables?
+void generateObjectExpression(Generator* generator, NewExpression* expression) {
+    Type* type = expression->type;
+    Structure* structure = type->structure;
+
+    int32_t count = 0;
+    int32_t declarationCount = jtk_ArrayList_getSize(structure->declarations);
+    int32_t i;
+    for (i = 0; i < declarationCount; i++) {
+        VariableDeclaration* declaration =
+            (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+        count += jtk_ArrayList_getSize(declaration->variables);
+    }
+
+    Context** arguments = (Context**)malloc(sizeof (Context*) * count);
+    for (i = 0; i < count; i++) {
+        arguments[i] = NULL;
+    }
+
+    int32_t limit = jtk_ArrayList_getSize(expression->entries);
+    for (i = 0; i < limit; i++) {
+        jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->entries, i);
+        Token* identifier = (Token*)pair->m_left;
+        Context* expression = (Context*)pair->m_right;
+        int32_t index = -1;
+        int32_t j;
+        int32_t m = 0;
+        for (j = 0; j < declarationCount; j++) {
+            VariableDeclaration* declaration =
+                (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, j);
+            int32_t variableCount = jtk_ArrayList_getSize(declaration->variables);
+            int32_t k;
+            for (k = 0; k < variableCount; k++) {
+                Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, k);
+                if (jtk_CString_equals(variable->name, variable->nameSize,
+                    identifier->text, identifier->length)) {
+                    index = m;
+                    break;
+                }
+                m++;
+            }
+        }
+
+        if (index != -1) {
+            arguments[index] = expression;
+        }
+    }
+
+    fprintf(generator->output, "$%s_new(runtime", structure->name);
+    for (i = 0; i < count; i++) {
+        fprintf(generator->output, ", ");
+        if (arguments[i] != NULL) {
+            generateExpression(generator, arguments[i]);
+        }
+        else {
+            fprintf(generator->output, "0");
+        }
+    }
+    fprintf(generator->output, ")");
+}
+
 void generateNewExpression(Generator* generator, NewExpression* expression) {
     Type* type = expression->type;
     if (type->tag == TYPE_ARRAY) {
@@ -411,6 +472,9 @@ void generateNewExpression(Generator* generator, NewExpression* expression) {
             generateExpression(generator, context);
         }
         fprintf(generator->output, ")");
+    }
+    else {
+        generateObjectExpression(generator, expression);
     }
 }
 
