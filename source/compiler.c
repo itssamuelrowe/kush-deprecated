@@ -171,6 +171,7 @@ const char* errorMessages[] = {
     "Unexpected token",
     "Try statement expects at least one catch or finally clause",
     "Variable initializer expected",
+    "Invalid lvalue",
 
     // Semantical Errors
 

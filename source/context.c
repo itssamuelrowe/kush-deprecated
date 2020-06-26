@@ -421,6 +421,7 @@ ArrayExpression* newArrayExpression() {
     result->tag = CONTEXT_ARRAY_EXPRESSION;
     result->expressions = jtk_ArrayList_new();
     result->token = NULL;
+    result->type = NULL;
     return result;
 }
 

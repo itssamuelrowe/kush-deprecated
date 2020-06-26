@@ -1582,17 +1582,13 @@ Token* nextToken(Lexer* lexer) {
                     }
 
                     if (lexer->la1 == ':') {
-                        /* Consume and discard the ':' */
                         consume(lexer);
 
                         if (isIdentifierStart(lexer->la1)) {
-                            /* Consume and discard the first letter. */
-                            consume(lexer);
-
-
-                            while (isIdentifierPart(lexer->la1)) {
+                            do {
                                 consume(lexer);
                             }
+                            while (isIdentifierPart(lexer->la1));
                         }
                         else {
                             lexer->errorCode = ERROR_EXPECTED_LETTER_AFTER_COLON;

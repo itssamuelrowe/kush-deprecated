@@ -494,11 +494,10 @@ void resolveVariable(Analyzer* analyzer, Variable* variable) {
             handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_VARIABLE_INITIALIZER,
                 variable->identifier);
         }
-        else {
-            if (variable->type->reference) {
-                variable->index = analyzer->index++;
-            }
-        }
+    }
+
+    if ((variable->type != NULL) && variable->type->reference) {
+        variable->index = analyzer->index++;
     }
 }
 
@@ -1022,6 +1021,7 @@ Type* resolveUnary(Analyzer* analyzer, UnaryExpression* expression) {
     return result;
 }
 
+// TODO: Prevent subscripting more dimensions than what the type allows.
 Type* resolveSubscript(Analyzer* analyzer, Subscript* subscript, Type* previous) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     Type* result = NULL;
@@ -1270,7 +1270,9 @@ Type* resolveNew(Analyzer* analyzer, NewExpression* expression) {
     }
     else {
         result = resolveVariableType(analyzer, variableType);
-
+        if (result != NULL) {
+            expression->type = result;
+        }
         /* It does not matter if there are errors within the square brackets. */
         int32_t limit = jtk_ArrayList_getSize(expression->entries);
         int32_t i;
@@ -1316,7 +1318,13 @@ Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
         }
     }
 
-    return error? NULL : inferArrayType(analyzer, firstType);
+    Type* result = NULL;
+    if (!error) {
+        result = inferArrayType(analyzer, firstType);
+        expression->type = result;
+    }
+
+    return result;
 }
 
 Type* resolveExpression(Analyzer* analyzer, Context* context) {
@@ -1470,7 +1478,7 @@ void defineBuiltins(Analyzer* analyzer) {
 
     // $String
     Structure* string = addSyntheticStructure(analyzer, "$String", 7);
-    addSyntheticMember(analyzer, string, true, "size", 4, &primitives.i32);
+    // addSyntheticMember(analyzer, string, true, "size", 4, &primitives.i32);
     Type* valueType = getArrayType(analyzer, &primitives.ui8, 1);
     addSyntheticMember(analyzer, string, true, "value", 5, valueType);
 

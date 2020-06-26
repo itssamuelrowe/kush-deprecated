@@ -6,7 +6,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-
+#define kush_return(expression) \
+    k_Runtime_popStackFrame(runtime); \
+    return expression;
 
 
 
@@ -42,7 +44,7 @@ typedef struct k_String_t k_String_t;
 struct k_StackFrame_t {
     void** pointers;
     int32_t pointerCount;
-    k_String_t* functionName;
+    uint8_t* functionName;
     k_StackFrame_t* next;
 };
 
@@ -73,8 +75,15 @@ typedef struct k_Object_t k_Object_t;
 
 typedef struct k_ObjectHeader_t k_ObjectHeader_t;
 
+#define K_OBJECT_REFERENCE_ARRAY 1
+#define K_OBJECT_PRIMITIVE_ARRAY 2
+#define K_OBJECT_STRUCTURE_INSTANCE 3
+#define K_OBJECT_STRING 4
+#define K_OBJECT_RUNTIME 5
+
 struct k_ObjectHeader_t {
     bool marked;
+    uint8_t type;
     k_Object_t* next;
 };
 
@@ -82,14 +91,63 @@ struct k_Object_t {
     k_ObjectHeader_t header;
 };
 
+#define K_TYPE_I8
+
+struct k_Array_t {
+    k_ObjectHeader_t header;
+    int32_t size;
+    void** value;
+};
+
+typedef struct k_Array_t k_Array_t;
+
+struct k_IntegerArray_t {
+    k_ObjectHeader_t header;
+    int32_t size;
+    int32_t* value;
+};
+
+typedef struct k_IntegerArray_t k_IntegerArray_t;
+
+k_Array_t* newPrimitiveArray(k_Runtime_t* runtime, int32_t width, int32_t size);
+k_Array_t* newArray_boolean(k_Runtime_t* runtime, int32_t size);
+k_Array_t* newArray_i8(k_Runtime_t* runtime, int32_t size);
+k_Array_t* newArray_i16(k_Runtime_t* runtime, int32_t size);
+k_Array_t* newArray_i32(k_Runtime_t* runtime, int32_t size);
+k_Array_t* newArray_i64(k_Runtime_t* runtime, int32_t size);
+k_Array_t* newArray_f32(k_Runtime_t* runtime, int32_t size);
+k_Array_t* newArray_f64(k_Runtime_t* runtime, int32_t size);
+k_Array_t* newReferenceArray(k_Runtime_t* runtime, int32_t size);
+
+k_Array_t* makeArray_boolean(k_Runtime_t* runtime, int32_t dimensions, ...);
+k_Array_t* makeArray_i8(k_Runtime_t* runtime, int32_t dimensions, ...);
+k_Array_t* makeArray_i16(k_Runtime_t* runtime, int32_t dimensions, ...);
+k_Array_t* makeArray_i32(k_Runtime_t* runtime, int32_t dimensions, ...);
+k_Array_t* makeArray_i64(k_Runtime_t* runtime, int32_t dimensions, ...);
+k_Array_t* makeArray_f32(k_Runtime_t* runtime, int32_t dimensions, ...);
+k_Array_t* makeArray_f64(k_Runtime_t* runtime, int32_t dimensions, ...);
+k_Array_t* makeArray_ref(k_Runtime_t* runtime, int32_t dimensions, ...);
+
+k_Array_t* makeArrayEx_i32(k_Runtime_t* runtime, int32_t dimensions, int32_t* sizes,
+    int32_t current, int32_t defaultValue);
+
+k_IntegerArray_t* arrayLiteral_i32(k_Runtime_t* runtime, int32_t size, ...);
+k_Array_t* arrayLiteral_ref(k_Runtime_t* runtime, int32_t size, ...);
+
 /*******************************************************************************
  * String                                                                      *
  *******************************************************************************/
 
-struct k_String_t {
-    k_ObjectHeader_t header;
+struct k_ArrayUi8_t {
     int32_t size;
     uint8_t* value;
+};
+
+typedef struct k_ArrayUi8_t k_ArrayUi8_t;
+
+struct k_String_t {
+    k_ObjectHeader_t header;
+    k_ArrayUi8_t* value;
 };
 
 typedef struct k_String_t k_String_t;

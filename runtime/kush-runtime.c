@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "kush-runtime.h"
 
@@ -53,7 +54,7 @@ bool isSorted(k_Allocator_t* allocator) {
 void coalesce(k_Allocator_t* allocator) {
     k_FreeList_t* current = allocator->freeList;
     while (current != NULL) {
-        if ((void*)current + current->size == (void*)current->next) {
+        if ((uint8_t*)current + current->size == (uint8_t*)current->next) {
             current->size = current->size + current->next->size;
             current->next = current->next->next;
         }
@@ -151,7 +152,7 @@ k_FreeList_t* findChunk(k_Allocator_t* allocator, size_t size) {
         size_t excessAmount = bestChunk->size - size;
         if (excessAmount > sizeof(k_FreeList_t*) + sizeof(size_t)) {
             bestChunk->size = size;
-            void* nextFreeAddress = (void*)bestChunk + size;
+            uint8_t* nextFreeAddress = (uint8_t*)bestChunk + size;
             k_FreeList_t* excess = (k_FreeList_t*)nextFreeAddress;
             excess->size = excessAmount;
             excess->next = NULL;
@@ -169,30 +170,30 @@ size_t divide(size_t a, size_t b) {
     return result;
 }
 
+#define OBJECT_HEADER_SIZE sizeof (size_t)
+
 void* allocateLarge(k_Allocator_t* allocator, size_t size) {
     int pageCount = divide(size, K_PAGE_SIZE);
 
     /* Map enough pages for the large allocation. */
-    void* address = mmap(NULL, pageCount * K_PAGE_SIZE,
+    uint8_t* address = (uint8_t*)mmap(NULL, pageCount * K_PAGE_SIZE,
         PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
-    void* result = NULL;
+    uint8_t* result = NULL;
     if ((intptr_t)address == -1) {
         printf("[internal error] Failed to map a large page.\n");
     }
     else {
         k_FreeList_t* newChunk = (k_FreeList_t*)address;
         newChunk->size = pageCount * K_PAGE_SIZE;
-        newChunk->next = 0;
+        newChunk->next = NULL;
 
         allocator->statistics.pagesMapped += pageCount;
 
-        result = address + sizeof (size_t);
+        result = address + OBJECT_HEADER_SIZE;
     }
     return result;
 }
-
-#define OBJECT_HEADER_SIZE sizeof (size_t)
 
 void k_Allocator_initialize(k_Allocator_t* allocator) {
     allocator->freeList = NULL;
@@ -220,6 +221,7 @@ void* k_Allocator_allocate(k_Allocator_t* allocator, size_t size) {
 
         if (size > K_PAGE_SIZE) {
             result = allocateLarge(allocator, size);
+            printf("TODO: Came here!\n");
         }
         else {
             uint8_t* address = (uint8_t*)findChunk(allocator, size);
@@ -237,10 +239,12 @@ void* k_Allocator_allocate(k_Allocator_t* allocator, size_t size) {
     return result;
 }
 
+#include <errno.h>
+
 void k_Allocator_deallocate(k_Allocator_t* allocator, void* object) {
     if (object != NULL) {
         allocator->statistics.chunksFreed++;
-        k_FreeList_t* chunk = (k_FreeList_t*)(object - OBJECT_HEADER_SIZE);
+        k_FreeList_t* chunk = (k_FreeList_t*)((uint8_t*)object - OBJECT_HEADER_SIZE);
 
         chunk->next = NULL;
         if (chunk->size > K_PAGE_SIZE) {
@@ -248,6 +252,7 @@ void k_Allocator_deallocate(k_Allocator_t* allocator, void* object) {
             int result = munmap(chunk, chunk->size);
             if (result == -1) {
                 printf("[internal error] Failed to unmap large page.\n");
+                perror("system");
             }
             else {
                 allocator->statistics.pagesUnmapped += pages;
@@ -297,7 +302,7 @@ void kush_GC_printStats(k_Runtime_t* runtime) {
 void kush_print_i(k_Runtime_t* runtime, int32_t i) {
     k_Runtime_pushStackFrame(runtime, "print_i", 7, 0);
 
-    printf("%d", i);
+    printf("%d", (int32_t)i);
 
     k_Runtime_popStackFrame(runtime);
 }
@@ -305,7 +310,7 @@ void kush_print_i(k_Runtime_t* runtime, int32_t i) {
 void kush_print_s(k_Runtime_t* runtime, k_String_t* s) {
     k_Runtime_pushStackFrame(runtime, "print_s", 7, 0);
 
-    printf("%.*s", s->size, s->value);
+    printf("%.*s", s->value->size, s->value->value);
 
     k_Runtime_popStackFrame(runtime);
 }
@@ -316,7 +321,7 @@ void kush_printStackTrace(k_Runtime_t* runtime) {
     printf("[Stack Trace]\n");
     k_StackFrame_t* current = runtime->stackFrames;
     while (current != NULL) {
-        printf("    %.*s()\n", current->functionName->size, current->functionName->value);
+        printf("    %s()\n", current->functionName);
         current = current->next;
     }
 
@@ -352,7 +357,7 @@ k_StackFrame_t* k_Runtime_pushStackFrame(k_Runtime_t* runtime, const uint8_t* na
     k_StackFrame_t* stackFrame = malloc(sizeof (k_StackFrame_t));
     stackFrame->pointers = malloc(sizeof (void*) * pointerCount);
     stackFrame->pointerCount = pointerCount;
-    // stackFrame->functionName = makeString(runtime, name);
+    stackFrame->functionName = strdup(name);
     stackFrame->next = runtime->stackFrames;
 
     runtime->stackFrames = stackFrame;
@@ -373,17 +378,187 @@ void k_Runtime_popStackFrame(k_Runtime_t* runtime) {
     }
 }
 
+// TODO: Make sure we either mark array->value or allocate it with the "manual"
+// flag.
+k_Array_t* newPrimitiveArray(k_Runtime_t* runtime, int32_t width, int32_t size) {
+    // k_Object_t* internal = (k_Object_t*)k_Allocator_allocate(runtime->allocator,
+    //     (sizeof (uint8_t) * size * width) + sizeof (k_ObjectHeader_t));
+    // internal->header.type = K_OBJECT_RUNTIME;
+
+    k_Array_t* array = k_Allocator_allocate(runtime->allocator, sizeof (k_Array_t));
+    array->header.type = K_OBJECT_PRIMITIVE_ARRAY;
+    array->size = size;
+    array->value = malloc(sizeof (uint8_t) * width * size); //(void**)(((uint8_t*)internal) + sizeof (k_ObjectHeader_t));
+    return array;
+}
+
+// TODO: Move k_ObjectHeader_t to the allocator instead of "user space".
+k_Array_t* newReferenceArray(k_Runtime_t* runtime, int32_t size) {
+    k_Object_t* internal = (k_Object_t*)k_Allocator_allocate(runtime->allocator,
+        (sizeof (void*) * size) + sizeof (k_ObjectHeader_t));
+    internal->header.type = K_OBJECT_RUNTIME;
+
+    k_Array_t* array = k_Allocator_allocate(runtime->allocator, sizeof (k_Array_t));
+    array->header.type = K_OBJECT_REFERENCE_ARRAY;
+    array->size = size;
+    array->value = (void**)(((uint8_t*)internal) + sizeof (k_ObjectHeader_t));
+    return array;
+}
+
+// TODO: Should we allow `new i32[5, 5](10)`, where (10) is the default value?
+k_Array_t* makeArray_i32(k_Runtime_t* runtime, int32_t dimensions, ...) {
+    va_list list;
+    va_start(list, dimensions);
+
+    int32_t sizes[dimensions];
+    int32_t i;
+    for (i = 0; i < dimensions; i++) {
+        sizes[i] = va_arg(list, int32_t);
+    }
+
+    va_end(list);
+
+    return makeArrayEx_i32(runtime, dimensions, sizes, 1, 0);
+}
+
+k_Array_t* makeArrayEx_i32(k_Runtime_t* runtime, int32_t dimensions, int32_t* sizes,
+    int32_t current, int32_t defaultValue) {
+    k_Array_t* result = NULL;
+    int32_t currentSize = sizes[current - 1];
+    if (current == dimensions) {
+        result = newPrimitiveArray(runtime, sizeof (int32_t), currentSize);
+        int32_t* value = (int32_t*)result->value;
+        int32_t i;
+        for (i = 0; i < currentSize; i++) {
+            value[i] = defaultValue;
+        }
+    }
+    else {
+        result = newReferenceArray(runtime, currentSize);
+        void** value = (void**)result->value;
+        int32_t i;
+        for (i = 0; i < currentSize; i++) {
+            value[i] = makeArrayEx_i32(runtime, dimensions, sizes, current + 1,
+                defaultValue);
+        }
+    }
+    return result;
+}
+
+k_Array_t* makeArrayEx_ref(k_Runtime_t* runtime, int32_t dimensions, int32_t* sizes,
+    int32_t current, int32_t defaultValue);
+
+// TODO: Should we allow `new i32[5, 5](10)`, where (10) is the default value?
+k_Array_t* makeArray_ref(k_Runtime_t* runtime, int32_t dimensions, ...) {
+    va_list list;
+    va_start(list, dimensions);
+
+    int32_t sizes[dimensions];
+    int32_t i;
+    for (i = 0; i < dimensions; i++) {
+        sizes[i] = va_arg(list, int32_t);
+    }
+
+    va_end(list);
+
+    return makeArrayEx_ref(runtime, dimensions, sizes, 1, 0);
+}
+
+k_Array_t* makeArrayEx_ref(k_Runtime_t* runtime, int32_t dimensions, int32_t* sizes,
+    int32_t current, int32_t defaultValue) {
+    k_Array_t* result = NULL;
+    int32_t currentSize = sizes[current - 1];
+    if (current == dimensions) {
+        result = newReferenceArray(runtime, currentSize);
+        int32_t* value = (int32_t*)result->value;
+        int32_t i;
+        for (i = 0; i < currentSize; i++) {
+            value[i] = defaultValue;
+        }
+    }
+    else {
+        result = newReferenceArray(runtime, currentSize);
+        void** value = (void**)result->value;
+        int32_t i;
+        for (i = 0; i < currentSize; i++) {
+            value[i] = makeArrayEx_i32(runtime, dimensions, sizes, current + 1,
+                defaultValue);
+        }
+    }
+    return result;
+}
+
+k_IntegerArray_t* arrayLiteral_i32(k_Runtime_t* runtime, int32_t size, ...) {
+    va_list list;
+    va_start(list, size);
+
+    k_IntegerArray_t* array = k_Allocator_allocate(runtime->allocator, sizeof (k_IntegerArray_t));
+    array->header.type = K_OBJECT_PRIMITIVE_ARRAY;
+    array->size = size;
+    array->value = (int32_t*)malloc(sizeof (int32_t) * size); //(void**)(((uint8_t*)internal) + sizeof (k_ObjectHeader_t));
+
+    int32_t* value = (int32_t*)array->value;
+    int32_t i;
+    for (i = 0; i < size; i++) {
+        value[i] = va_arg(list, int32_t);
+    }
+
+    va_end(list);
+
+    return array;
+}
+
+k_Array_t* arrayLiteral_ref(k_Runtime_t* runtime, int32_t size, ...) {
+    va_list list;
+    va_start(list, size);
+
+    k_Array_t* result = newReferenceArray(runtime, size);
+    void** value = (void**)result->value;
+    int32_t i;
+    for (i = 0; i < size; i++) {
+        value[i] = va_arg(list, void*);
+    }
+
+    va_end(list);
+
+    return result;
+}
+
 k_String_t* makeString(k_Runtime_t* runtime, const char* sequence) {
     k_String_t* self = k_Allocator_allocate(runtime->allocator,
         sizeof (k_String_t));
-    self->size = strlen(sequence);
-    self->value = malloc(sizeof (uint8_t) * (self->size + 1));
+    self->header.type = K_OBJECT_STRING;
+    int32_t size = strlen(sequence);
+    k_ArrayUi8_t* value = malloc(sizeof(k_ArrayUi8_t));
+    value->value = malloc(sizeof (uint8_t) * (size + 1));
+    value->size = size;
+
+    self->value = value;
+
     int32_t i;
-    for (i = 0; i < self->size; i++) {
-        self->value[i] = sequence[i];
+    for (i = 0; i < size; i++) {
+        value->value[i] = sequence[i];
     }
-    self->value[i] = '\0';
+    value->value[i] = '\0';
     return self;
+}
+
+bool sense = true;
+
+// BUG: The internal buffer used by the array is not marked.
+void markObject(k_Runtime_t* runtime, k_Object_t* object) {
+    object->header.marked = sense;
+    switch (object->header.type) {
+        case K_OBJECT_PRIMITIVE_ARRAY: {
+            k_Array_t* array = (k_Array_t*)array;
+            int32_t i;
+            for (i = 0; i < array->size; i++) {
+                k_Object_t* element = (k_Object_t*)array->value[i];
+                markObject(runtime, element);
+            }
+            break;
+        }
+    }
 }
 
 void markCallStack(k_Runtime_t* runtime) {
@@ -393,12 +568,23 @@ void markCallStack(k_Runtime_t* runtime) {
         int32_t i;
         for (i = 0; i < current->pointerCount; i++) {
             k_Object_t* object = (k_Object_t*)current->pointers[i];
-            object->header.marked = true;
+            markObject(runtime, object);
             count++;
         }
         current = current->next;
     }
-    printf("Marked: %d\n", count);
+    printf("Roots: %d\n", count);
+}
+
+int32_t countObjects(k_Runtime_t* runtime) {
+    k_Object_t* object = runtime->allocator->firstObject;
+    int32_t count = 0;
+    while (object != NULL) {
+        object = object->header.next;
+        count++;
+    }
+    printf("Object count: %d\n", count);
+    return count;
 }
 
 void sweep(k_Runtime_t* runtime) {
@@ -407,7 +593,7 @@ void sweep(k_Runtime_t* runtime) {
     k_Object_t* previous = NULL;
     while (object != NULL) {
         k_Object_t* next = object->header.next;
-        if (!object->header.marked) {
+        if (!object->header.marked == sense) {
             if (runtime->allocator->firstObject == object) {
                 runtime->allocator->firstObject = next;
             }
@@ -420,15 +606,17 @@ void sweep(k_Runtime_t* runtime) {
             count++;
         }
         else {
-            object->header.marked = false;
             previous = object;
         }
         object = next;
     }
-    printf("Freed %d objects!\n", count);
+
+    printf("Freed: %d\n", count);
+    sense = !sense;
 }
 
 void collect(k_Runtime_t* runtime) {
+    printf("\n[Collector Statistics]\n");
     markCallStack(runtime);
     sweep(runtime);
 }

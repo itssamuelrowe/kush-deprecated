@@ -363,6 +363,7 @@ struct ArrayExpression {
     ContextType tag;
     jtk_ArrayList_t* expressions;
     Token* token;
+    Type* type;
 };
 
 typedef struct ArrayExpression ArrayExpression;

@@ -37,7 +37,7 @@ static void generateFunctionArguments(Generator* generator, FunctionArguments* a
 static void generateMemberAccess(Generator* generator, MemberAccess* access);
 static void generatePostfix(Generator* generator, PostfixExpression* expression);
 static void generateToken(Generator* generator, Token* token);
-static void generateInitializer(Generator* generator, NewExpression* expression);
+static void generateNewExpression(Generator* generator, NewExpression* expression);
 static void generateArray(Generator* generator, ArrayExpression* expression);
 static void generateExpression(Generator* generator, Context* context);
 static void generateIndentation(Generator* generator, int32_t depth);
@@ -92,10 +92,15 @@ void generateType(Generator* generator, Type* type) {
     }
     else {
         if (type->tag == TYPE_ARRAY) {
-            fprintf(generator->output, "kush_Array");
+            if (type->array.base == &primitives.i32) {
+                fprintf(generator->output, "k_IntegerArray_t*");
+            }
+            else {
+                fprintf(generator->output, "k_Array_t*");
+            }
         }
         else if (type->tag == TYPE_STRUCTURE) {
-            fprintf(generator->output, "kush_%s", type->structure->name);
+            fprintf(generator->output, "kush_%s*", type->structure->name);
         }
     }
 }
@@ -121,11 +126,13 @@ void generateForwardReferences(Generator* generator, Module* module) {
         int32_t i;
         for (i = 0; i < parameterCount; i++) {
             Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
+            fprintf(generator->output, ", ");
             generateType(generator, parameter->type);
-            fprintf(generator->output, ", %s", parameter->name);
+            fprintf(generator->output, " %s", parameter->name);
         }
         fprintf(generator->output, ");\n");
     }
+    fprintf(generator->output, "\n");
 }
 
 void generateStructures(Generator* generator, Module* module) {
@@ -155,6 +162,48 @@ void generateStructures(Generator* generator, Module* module) {
         fprintf(generator->output, "};\n");
     }
     fprintf(generator->output, "\n");
+
+    for (j = 0; j < structureCount; j++) {
+        Structure* structure = (Structure*)jtk_ArrayList_getValue(
+            module->structures, j);
+        fprintf(generator->output, "kush_%s* $%s_new(k_Runtime_t* runtime", structure->name, structure->name);
+
+        int32_t declarationCount = jtk_ArrayList_getSize(structure->declarations);
+        int32_t i;
+        for (i = 0; i < declarationCount; i++) {
+            VariableDeclaration* declaration =
+                (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+
+            int32_t limit = jtk_ArrayList_getSize(declaration->variables);
+            int32_t j;
+            for (j = 0; j < limit; j++) {
+                Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+                fprintf(generator->output, ", ");
+                generateType(generator, variable->type);
+                fprintf(generator->output, " %s", variable->name);
+            }
+        }
+
+        fprintf(generator->output, ");\n");
+    }
+    fprintf(generator->output, "\n");
+}
+
+/* Return the type of the first expression, even if there are errors in the
+ * right hand side.
+ */
+void generateAssignment(Generator* generator, BinaryExpression* expression) {
+    int32_t count = jtk_ArrayList_getSize(expression->others);
+    generateExpression(generator, (Context*)expression->left);
+
+    if (count > 0) {
+        int32_t i;
+        for (i = 0; i < count; i++) {
+            jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
+            fprintf(generator->output, " %s ", ((Token*)pair->m_left)->text);
+            generateExpression(generator, (Context*)pair->m_right);
+        }
+    }
 }
 
 /* Return the type of the first expression, even if there are errors in the
@@ -186,16 +235,18 @@ void generateConditional(Generator* generator, ConditionalExpression* expression
 }
 
 void generateUnary(Generator* generator, UnaryExpression* expression) {
-    generateExpression(generator, (Context*)expression->expression);
-
     Token* operator = expression->operator;
     if (operator != NULL) {
         fprintf(generator->output, "%s", operator->text);
+        generateExpression(generator, (Context*)expression->expression);
+    }
+    else {
+        generateExpression(generator, (Context*)expression->expression);
     }
 }
 
 void generateSubscript(Generator* generator, Subscript* subscript) {
-    fprintf(generator->output, "[");
+    fprintf(generator->output, "->value[");
     generateExpression(generator, (Context*)subscript->expression);
     fprintf(generator->output, "]");
 }
@@ -303,15 +354,87 @@ void generateToken(Generator* generator, Token* token) {
     }
 }
 
-void generateInitializer(Generator* generator, NewExpression* expression) {
+void generateArraySuffix(Generator* generator, Type* base) {
+    const char* output = NULL;
+    if (base == &primitives.boolean) {
+        output = "boolean";
+    }
+    else if (base == &primitives.i8) {
+        output = "i8";
+    }
+    else if (base == &primitives.i16) {
+        output = "i16";
+    }
+    else if (base == &primitives.i32) {
+        output = "i32";
+    }
+    else if (base == &primitives.i64) {
+        output = "i64";
+    }
+    else if (base == &primitives.ui8) {
+        output = "ui8";
+    }
+    else if (base == &primitives.ui16) {
+        output = "ui16";
+    }
+    else if (base == &primitives.ui32) {
+        output = "ui32";
+    }
+    else if (base == &primitives.ui64) {
+        output = "ui64";
+    }
+    else if (base == &primitives.f32) {
+        output = "f32";
+    }
+    else if (base == &primitives.f64) {
+        output = "f64";
+    }
+    else {
+        output = "ref";
+    }
+    fprintf(generator->output, "%s", output);
+}
+
+void generateNewExpression(Generator* generator, NewExpression* expression) {
+    Type* type = expression->type;
+    if (type->tag == TYPE_ARRAY) {
+        fprintf(generator->output, "makeArray_");
+        generateArraySuffix(generator, type->array.base);
+        fprintf(generator->output, "(runtime, %d", type->array.dimensions);
+        int32_t limit = jtk_ArrayList_getSize(expression->expressions);
+        int32_t i;
+        for (i = 0; i < limit; i++) {
+            fprintf(generator->output, ", ");
+            Context* context = (Context*)jtk_ArrayList_getValue(expression->expressions, i);
+            generateExpression(generator, context);
+        }
+        fprintf(generator->output, ")");
+    }
 }
 
 void generateArray(Generator* generator, ArrayExpression* expression) {
+    int32_t limit = jtk_ArrayList_getSize(expression->expressions);
+    fprintf(generator->output, "arrayLiteral_");
+    generateArraySuffix(generator, expression->type->array.base);
+    fprintf(generator->output, "(runtime, %d", limit);
+
+    int32_t i;
+    for (i = 0; i < limit; i++) {
+        fprintf(generator->output, ", ");
+        Context* argument = (Context*)jtk_ArrayList_getValue(expression->expressions, i);
+        generateExpression(generator, argument);
+    }
+
+    fprintf(generator->output, ")");
 }
 
 void generateExpression(Generator* generator, Context* context) {
     switch (context->tag) {
-        case CONTEXT_ASSIGNMENT_EXPRESSION:
+        case CONTEXT_ASSIGNMENT_EXPRESSION: {
+            generateAssignment(generator, (BinaryExpression*)context);
+            break;
+        }
+
         case CONTEXT_LOGICAL_OR_EXPRESSION:
         case CONTEXT_LOGICAL_AND_EXPRESSION:
         case CONTEXT_INCLUSIVE_OR_EXPRESSION:
@@ -342,7 +465,7 @@ void generateExpression(Generator* generator, Context* context) {
         }
 
         case CONTEXT_NEW_EXPRESSION: {
-            generateInitializer(generator, (NewExpression*)context);
+            generateNewExpression(generator, (NewExpression*)context);
            break;
         }
 
@@ -477,7 +600,7 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
                         }
                         else {
                             generateType(generator, variable->type);
-                            fprintf(generator->output, " %s", variable->name);
+                            fprintf(generator->output, " kush_%s", variable->name);
                             if (variable->expression != NULL) {
                                 fprintf(generator->output, " = ");
                                 generateExpression(generator, (Context*)variable->expression);
@@ -508,9 +631,9 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
 
                 case CONTEXT_RETURN_STATEMENT: {
                     ReturnStatement* statement = (ReturnStatement*)context;
-                    fprintf(generator->output, "return ");
+                    fprintf(generator->output, "kush_return(");
                     generateExpression(generator, (Context*)statement->expression);
-                    fprintf(generator->output, ";\n");
+                    fprintf(generator->output, ");\n");
 
                     break;
                 }
@@ -551,14 +674,10 @@ void generateFunction(Generator* generator, Function* function) {
     int32_t parameterCount = jtk_ArrayList_getSize(function->parameters);
     int32_t i;
     for (i = 0; i < parameterCount; i++) {
+        fprintf(generator->output, ", ");
         Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
         generateType(generator, parameter->type);
-        fprintf(generator->output, ", %s", parameter->name);
-
-        if (parameter->type->reference) {
-            fprintf(stdout, "    $stackFrame->pointers[%d] = %s;\n",
-                parameter->index, parameter->name);
-        }
+        fprintf(generator->output, " %s", parameter->name);
     }
 
     // TODO: Variable parameter
@@ -567,6 +686,15 @@ void generateFunction(Generator* generator, Function* function) {
 
     fprintf(generator->output, "    k_StackFrame_t* $stackFrame = k_Runtime_pushStackFrame(runtime, \"%s\", %d, %d);\n    ",
         function->name, function->nameSize, function->totalReferences);
+
+    for (i = 0; i < parameterCount; i++) {
+        Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
+
+        if (parameter->type->reference) {
+            fprintf(generator->output, "    $stackFrame->pointers[%d] = %s;\n",
+                parameter->index, parameter->name);
+        }
+    }
 
     generateBlock(generator, function->body, 1);
     fprintf(generator->output, "    k_Runtime_popStackFrame(runtime);\n}\n\n");
