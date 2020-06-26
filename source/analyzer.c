@@ -144,9 +144,6 @@ static Type* resolveExpression(Analyzer* analyzer, Context* context);
 //     k_assertObject(self);
 // }
 
-// TODO: Add string keyword to the parser
-// Add new expression
-
 // Array Type
 
 Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) {
@@ -498,6 +495,10 @@ void resolveVariable(Analyzer* analyzer, Variable* variable) {
                 variable->identifier);
         }
     }
+
+    if ((variable->type != NULL) && variable->type->reference) {
+        variable->index = analyzer->index++;
+    }
 }
 
 void resolveStructure(Analyzer* analyzer, Structure* structure) {
@@ -521,6 +522,7 @@ void resolveStructure(Analyzer* analyzer, Structure* structure) {
 
 void resolveFunction(Analyzer* analyzer, Function* function) {
     function->returnType = resolveVariableType(analyzer, function->returnVariableType);
+    analyzer->index = 0;
 
     int32_t count = jtk_ArrayList_getSize(function->parameters);
     int32_t i;
@@ -536,6 +538,8 @@ void resolveFunction(Analyzer* analyzer, Function* function) {
     analyzer->scope = function->scope;
     resolveLocals(analyzer, function->body);
     invalidate(analyzer);
+
+    function->totalReferences = analyzer->index;
 }
 
 uint8_t* getModuleName(jtk_ArrayList_t* identifiers, int32_t* size) {
@@ -1017,6 +1021,7 @@ Type* resolveUnary(Analyzer* analyzer, UnaryExpression* expression) {
     return result;
 }
 
+// TODO: Prevent subscripting more dimensions than what the type allows.
 Type* resolveSubscript(Analyzer* analyzer, Subscript* subscript, Type* previous) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     Type* result = NULL;
@@ -1240,6 +1245,7 @@ Type* resolveNew(Analyzer* analyzer, NewExpression* expression) {
             Structure* structure = (Structure*)symbol;
             /* It does not matter if the object initializer has errors. */
             result = structure->type;
+            expression->type = structure->type;
 
             int32_t limit = jtk_ArrayList_getSize(expression->entries);
             int32_t i;
@@ -1265,7 +1271,9 @@ Type* resolveNew(Analyzer* analyzer, NewExpression* expression) {
     }
     else {
         result = resolveVariableType(analyzer, variableType);
-
+        if (result != NULL) {
+            expression->type = result;
+        }
         /* It does not matter if there are errors within the square brackets. */
         int32_t limit = jtk_ArrayList_getSize(expression->entries);
         int32_t i;
@@ -1311,7 +1319,13 @@ Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
         }
     }
 
-    return error? NULL : inferArrayType(analyzer, firstType);
+    Type* result = NULL;
+    if (!error) {
+        result = inferArrayType(analyzer, firstType);
+        expression->type = result;
+    }
+
+    return result;
 }
 
 Type* resolveExpression(Analyzer* analyzer, Context* context) {
@@ -1400,6 +1414,7 @@ Analyzer* newAnalyzer(Compiler* compiler) {
     analyzer->package = NULL;
     analyzer->packageSize = -1;
     analyzer->function = NULL;
+    analyzer->index = 0;
 
     return analyzer;
 }
@@ -1416,6 +1431,7 @@ void deleteAnalyzer(Analyzer* analyzer) {
 
 void resetAnalyzer(Analyzer* analyzer) {
     analyzer->function = NULL;
+    analyzer->index = 0;
 }
 
 // Define
@@ -1432,23 +1448,62 @@ Structure* addSyntheticStructure(Analyzer* analyzer, const uint8_t* name,
 
 Variable* addSyntheticMember(Analyzer* analyzer, Structure* structure,
     bool constant, const uint8_t* name, int32_t nameSize, Type* type) {
-    Variable* variable = newVariable(false, constant, type, name, nameSize,
+    Variable* variable = newVariable(false, constant, NULL, name, nameSize,
         NULL, NULL, structure->scope);
+    variable->type = type;
     defineSymbol(structure->scope, variable);
 
     return variable;
 }
 
+void addSyntheticFunction(Analyzer* analyzer, const uint8_t* name,
+    int32_t nameSize, jtk_ArrayList_t* parameters, Type* returnType)  {
+    Function* function = newFunction(name, nameSize, NULL,
+        parameters, NULL, NULL, NULL);
+    function->returnType = returnType;
+    defineSymbol(analyzer->scope, function);
+}
+
+Variable* makeParameter(Analyzer* analyzer, const uint8_t* name, int32_t nameSize,
+    Type* type) {
+    Variable* variable = newVariable(false, false, NULL, name,
+        nameSize, NULL, NULL, analyzer->scope);
+    variable->type = type;
+    return variable;
+}
+
 void defineBuiltins(Analyzer* analyzer) {
+    // $Array
     Structure* array = addSyntheticStructure(analyzer, "$Array", 6);
     addSyntheticMember(analyzer, array, true, "size", 4, &primitives.i32);
 
-    // String
-
+    // $String
     Structure* string = addSyntheticStructure(analyzer, "$String", 7);
-    addSyntheticMember(analyzer, string, true, "size", 4, &primitives.i32);
+    // addSyntheticMember(analyzer, string, true, "size", 4, &primitives.i32);
     Type* valueType = getArrayType(analyzer, &primitives.ui8, 1);
     addSyntheticMember(analyzer, string, true, "value", 5, valueType);
+
+    // print_i
+    jtk_ArrayList_t* parameters = jtk_ArrayList_new();
+    jtk_ArrayList_add(parameters, makeParameter(analyzer, "n", 1, &primitives.i32));
+    addSyntheticFunction(analyzer, "print_i", 7, parameters, &primitives.void_);
+
+    // print_s
+    parameters = jtk_ArrayList_new();
+    jtk_ArrayList_add(parameters, makeParameter(analyzer, "s", 1, &primitives.string));
+    addSyntheticFunction(analyzer, "print_s", 7, parameters, &primitives.void_);
+
+    // GC_printStats()
+    parameters = jtk_ArrayList_new();
+    addSyntheticFunction(analyzer, "GC_printStats", 13, parameters, &primitives.void_);
+
+    // printStackTrace()
+    parameters = jtk_ArrayList_new();
+    addSyntheticFunction(analyzer, "printStackTrace", 16, parameters, &primitives.void_);
+
+    // collect()
+    parameters = jtk_ArrayList_new();
+    addSyntheticFunction(analyzer, "collect", 7, parameters, &primitives.void_);
 }
 
 void defineSymbols(Analyzer* analyzer, Module* module) {

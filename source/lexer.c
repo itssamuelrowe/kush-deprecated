@@ -1573,6 +1573,7 @@ Token* nextToken(Lexer* lexer) {
                     /* Consume and discard the first letter. */
                     consume(lexer);
 
+
                     while (isIdentifierPart(lexer->la1)) {
                         /* Consume and discard the consecutive letter
                          * or digit character.
@@ -1580,6 +1581,20 @@ Token* nextToken(Lexer* lexer) {
                         consume(lexer);
                     }
 
+                    if (lexer->la1 == ':') {
+                        consume(lexer);
+
+                        if (isIdentifierStart(lexer->la1)) {
+                            do {
+                                consume(lexer);
+                            }
+                            while (isIdentifierPart(lexer->la1));
+                        }
+                        else {
+                            lexer->errorCode = ERROR_EXPECTED_LETTER_AFTER_COLON;
+                            consume(lexer);
+                        }
+                    }
                     uint8_t* text = lexer->text->m_value; // jtk_StringBuilder_toCString(lexer->text);
                     int32_t length = lexer->text->m_size; // lexer->index - lexer->startIndex;
 
