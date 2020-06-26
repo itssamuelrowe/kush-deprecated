@@ -44,6 +44,7 @@ static void generateIndentation(Generator* generator, int32_t depth);
 static void generateBlock(Generator* generator, Block* block, int32_t depth);
 static void generateFunction(Generator* generator, Function* function);
 static void generateFunctions(Generator* generator, Module* module);
+static void generateConstructors(Generator* generator, Module* module);
 static void generateHeader(Generator* generator, Module* module);
 
 void generateType(Generator* generator, Type* type) {
@@ -142,6 +143,7 @@ void generateStructures(Generator* generator, Module* module) {
         Structure* structure = (Structure*)jtk_ArrayList_getValue(
             module->structures, j);
         fprintf(generator->output, "struct kush_%s {\n", structure->name);
+        fprintf(generator->output, "    k_ObjectHeader_t header;\n");
 
         int32_t declarationCount = jtk_ArrayList_getSize(structure->declarations);
         int32_t i;
@@ -712,6 +714,92 @@ void generateFunctions(Generator* generator, Module* module) {
     }
 }
 
+void generateConstructors(Generator* generator, Module* module) {
+    int32_t structureCount = jtk_ArrayList_getSize(module->structures);
+    int32_t j;
+    for (j = 0; j < structureCount; j++) {
+        Structure* structure = (Structure*)jtk_ArrayList_getValue(
+            module->structures, j);
+
+        fprintf(generator->output, "kush_%s* $%s_new(k_Runtime_t* runtime", structure->name, structure->name);
+
+        int32_t declarationCount = jtk_ArrayList_getSize(structure->declarations);
+        int32_t i;
+        for (i = 0; i < declarationCount; i++) {
+            VariableDeclaration* declaration =
+                (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+
+            int32_t limit = jtk_ArrayList_getSize(declaration->variables);
+            int32_t j;
+            for (j = 0; j < limit; j++) {
+                Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+                fprintf(generator->output, ", ");
+                generateType(generator, variable->type);
+                fprintf(generator->output, " %s", variable->name);
+            }
+        }
+
+        fprintf(generator->output, ") {\n");
+
+        int32_t references = 0;
+        for (i = 0; i < declarationCount; i++) {
+            VariableDeclaration* declaration =
+                (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+
+            int32_t limit = jtk_ArrayList_getSize(declaration->variables);
+            int32_t j;
+            for (j = 0; j < limit; j++) {
+                Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+                if (variable->type->reference) {
+                    references++;
+                }
+            }
+        }
+
+        fprintf(generator->output, "    k_StackFrame_t* $stackFrame = k_Runtime_pushStackFrame(runtime, \"$%s_new\", %d, %d);\n\n",
+            structure->name, structure->nameSize + 5, references + 1);
+        fprintf(generator->output, "    kush_%s* self = (kush_%s*)k_Allocator_allocate(runtime->allocator, sizeof (kush_%s));\n",
+            structure->name, structure->name, structure->name);
+        fprintf(generator->output, "    self->header.type = K_OBJECT_STRUCTURE_INSTANCE;\n\n");
+        fprintf(generator->output, "    $stackFrame->pointers[0] = self;\n");
+
+        int32_t index = 1;
+        for (i = 0; i < declarationCount; i++) {
+            VariableDeclaration* declaration =
+                (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+
+            int32_t limit = jtk_ArrayList_getSize(declaration->variables);
+            int32_t j;
+            for (j = 0; j < limit; j++) {
+                Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+                if (variable->type->reference) {
+                    fprintf(generator->output, "    $stackFrame->pointers[%d] = %s;\n",
+                        index, variable->name);
+                    index++;
+                }
+            }
+        }
+
+        fprintf(generator->output, "\n");
+        for (i = 0; i < declarationCount; i++) {
+            VariableDeclaration* declaration =
+                (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+
+            int32_t limit = jtk_ArrayList_getSize(declaration->variables);
+            int32_t j;
+            for (j = 0; j < limit; j++) {
+                Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+                fprintf(generator->output, "    self->%s = %s;\n", variable->name,
+                    variable->name);
+            }
+        }
+
+        fprintf(generator->output, "    kush_return(self);\n}");
+    }
+
+    fprintf(generator->output, "\n\n");
+}
+
 void generateHeader(Generator* generator, Module* module) {
     fprintf(generator->output, "// Do not edit this file.\n"
         "// It was automatically generated by kush v%d.%d.\n\n",
@@ -729,6 +817,7 @@ void generateSource(Generator* generator, Module* module, const uint8_t* headerN
         KUSH_VERSION_MAJOR, KUSH_VERSION_MINOR);
     fprintf(generator->output, "#include \"%s\"\n\n", headerName);
 
+    generateConstructors(generator, module);
     generateFunctions(generator, module);
 }
 
