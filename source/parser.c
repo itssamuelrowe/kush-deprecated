@@ -178,6 +178,8 @@ static ArrayExpression* parseArrayExpression(Parser* parser);
 //     "arrayExpression"
 // };
 
+
+// TODO: Replace matchAndYield with match and consumeAndYield with consume!
 #define la(parser, count) k_TokenStream_la((parser)->tokens, (count))
 #define consume(parser) consumeToken((parser)->tokens)
 #define match(parser, type) matchAndYield((parser), type)
@@ -1378,7 +1380,17 @@ jtk_ArrayList_t* parseExpressions(Parser* parser) {
  * ;
  */
 BinaryExpression* parseExpression(Parser* parser) {
-    return parseAssignmentExpression(parser);
+    /* Use the function stack to save the previous label. This is
+     * important in the case of nested assignment expressions. Consider
+     * the expression `x = (y = z)`, if the previous label is unsaved,
+     * the nested assignment expression can alter the label of the outer
+     * assignment expression.
+     */
+    bool previous = parser->placeholder;
+    BinaryExpression* result = parseAssignmentExpression(parser);
+    parser->placeholder = previous;
+
+    return result;
 }
 
 /*
@@ -1394,8 +1406,14 @@ BinaryExpression* parseAssignmentExpression(Parser* parser) {
     while (isAssignmentOperator(la(parser, 1))) {
         jtk_Pair_t* pair = jtk_Pair_new();
         jtk_ArrayList_add(context->others, pair);
-
         pair->m_left = consumeAndYield(parser);
+
+        if (!parser->placeholder) {
+            ErrorHandler* handler = parser->compiler->errorHandler;
+            handleSyntaxError(handler, parser, ERROR_INVALID_LVALUE,
+                (Token*)pair->m_left, TOKEN_UNKNOWN);
+        }
+
         pair->m_right = parseConditionalExpression(parser);
     }
 
@@ -1416,6 +1434,7 @@ ConditionalExpression* parseConditionalExpression(Parser* parser) {
         context->then = parseExpression(parser);
         match(parser, TOKEN_COLON);
         context->otherwise = parseConditionalExpression(parser);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1436,6 +1455,7 @@ BinaryExpression* parseLogicalOrExpression(Parser* parser) {
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseLogicalAndExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1456,6 +1476,7 @@ BinaryExpression* parseLogicalAndExpression(Parser* parser) {
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseInclusiveOrExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1476,6 +1497,7 @@ BinaryExpression* parseInclusiveOrExpression(Parser* parser) {
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseExclusiveOrExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1496,6 +1518,7 @@ BinaryExpression* parseExclusiveOrExpression(Parser* parser) {
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseAndExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1516,6 +1539,7 @@ BinaryExpression* parseAndExpression(Parser* parser) {
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseEqualityExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1536,6 +1560,7 @@ BinaryExpression* parseEqualityExpression(Parser* parser) {
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseRelationalExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1556,6 +1581,7 @@ BinaryExpression* parseRelationalExpression(Parser* parser) {
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseShiftExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1576,6 +1602,7 @@ BinaryExpression* parseShiftExpression(Parser* parser) {
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseAdditiveExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1596,6 +1623,7 @@ BinaryExpression* parseAdditiveExpression(Parser* parser) {
         pair->m_left = consumeAndYield(parser);
         pair->m_right = parseMultiplicativeExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1616,6 +1644,7 @@ BinaryExpression* parseMultiplicativeExpression(Parser* parser) {
         pair->m_left = (void*)consumeAndYield(parser);
         pair->m_right = (void*)parseUnaryExpression(parser);
         jtk_ArrayList_add(context->others, pair);
+        parser->placeholder = false;
     }
 
     return context;
@@ -1634,6 +1663,7 @@ UnaryExpression* parseUnaryExpression(Parser* parser) {
     if (isUnaryOperator(la1)) {
         context->operator = consumeAndYield(parser);
         context->expression = (Context*)parseUnaryExpression(parser);
+        parser->placeholder = false;
     }
     else if (isPostfixExpressionFollow(la1)) {
         context->expression = (Context*)parsePostfixExpression(parser);
@@ -1710,6 +1740,7 @@ Subscript* parseSubscript(Parser* parser) {
     context->expression = parseExpression(parser);
     popFollowToken(parser);
     match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
+    parser->placeholder = true;
 
     return context;
 }
@@ -1733,6 +1764,7 @@ FunctionArguments* parseFunctionArguments(Parser* parser) {
         popFollowToken(parser);
     }
     match(parser, TOKEN_RIGHT_PARENTHESIS);
+    parser->placeholder = false;
 
     return context;
 }
@@ -1749,6 +1781,7 @@ MemberAccess* parseMemberAccess(Parser* parser) {
     MemberAccess* context = newMemberAccess();
     match(parser, TOKEN_DOT);
     context->identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
+    parser->placeholder = false;
     return context;
 }
 
@@ -1789,6 +1822,7 @@ void* parsePrimaryExpression(Parser* parser, bool* token) {
             case TOKEN_IDENTIFIER: {
                 result = consumeAndYield(parser);
                 *token = true;
+                parser->placeholder = true;
                 break;
             }
 
@@ -1798,6 +1832,7 @@ void* parsePrimaryExpression(Parser* parser, bool* token) {
                 result = parseExpression(parser);
                 popFollowToken(parser);
                 match(parser, TOKEN_RIGHT_PARENTHESIS);
+                parser->placeholder = false;
                 break;
             }
 
@@ -1898,6 +1933,7 @@ NewExpression* parseNewExpression(Parser* parser) {
         while (la(parser, 1) == TOKEN_LEFT_SQUARE_BRACKET);
     }
     context->variableType = newVariableType(token, dimensions);
+    parser->placeholder = false;
 
     return context;
 }
@@ -1937,6 +1973,7 @@ ArrayExpression* parseArrayExpression(Parser* parser) {
             ERROR_EMPTY_ARRAY_INITIALIZER, context->token, TOKEN_UNKNOWN);
     }
     match(parser, TOKEN_RIGHT_SQUARE_BRACKET);
+    parser->placeholder = false;
 
     return context;
 }
@@ -1953,6 +1990,7 @@ Parser* parserNew(Compiler* compiler, TokenStream* tokens) {
     parser->followSetSize = 0;
     parser->followSetCapacity = 16;
     parser->recovery = false;
+    parser->placeholder = false;
 
     return parser;
 }

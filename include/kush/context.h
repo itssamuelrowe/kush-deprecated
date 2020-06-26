@@ -46,7 +46,7 @@ struct Type {
     bool indexable;
     bool accessible;
     bool callable;
-    bool allocatable;
+    bool reference;
     Token* identifier;
     jtk_ArrayList_t* arrayTypes;
     union {
@@ -363,6 +363,7 @@ struct ArrayExpression {
     ContextType tag;
     jtk_ArrayList_t* expressions;
     Token* token;
+    Type* type;
 };
 
 typedef struct ArrayExpression ArrayExpression;
@@ -432,6 +433,7 @@ struct Variable {
     Type* type;
     Token* identifier;
     BinaryExpression* expression;
+    int32_t index;
 };
 
 typedef struct Variable Variable;
@@ -457,6 +459,7 @@ struct Function {
     Type* returnType;
     Type* type;
     Scope* scope;
+    int32_t totalReferences;
 };
 
 typedef struct Function Function;

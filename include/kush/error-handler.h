@@ -51,6 +51,7 @@ enum ErrorCode {
     ERROR_UNEXPECTED_TOKEN,
     ERROR_TRY_STATEMENT_EXPECTS_CATCH_OR_FINALLY,
     ERROR_VARIABLE_INITIALIZER_EXPECTED,
+    ERROR_INVALID_LVALUE,
 
     // Semantic Errors
 
@@ -125,9 +126,6 @@ typedef struct Error Error;
 
 Error* errorNew(ErrorCode errorCode, Token* token);
 Error* errorNewEx(ErrorCode errorCode, Token* token, TokenType expected);
-
-// Destructor
-
 void errorDelete(Error* error);
 
 /*******************************************************************************

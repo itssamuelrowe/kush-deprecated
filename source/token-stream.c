@@ -115,7 +115,7 @@ int32_t fetchTokens(TokenStream* stream, int32_t n) {
     int32_t i;
     for (i = 0; i < n; i++) {
         Token* token = nextToken(stream->lexer);
-        k_Token_setIndex(token, oldSize + i);
+        token->index = oldSize + i;
         jtk_ArrayList_add(stream->tokens, token);
         jtk_ArrayList_add(stream->trash, token);
 

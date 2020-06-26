@@ -36,6 +36,7 @@ struct Parser {
     int32_t followSetSize;
     int32_t followSetCapacity;
     bool recovery;
+    bool placeholder;
 };
 
 typedef struct Parser Parser;
