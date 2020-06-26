@@ -1,6 +1,6 @@
 # Kush
 
-![Cover](https://github.com/itssamuelrowe/kush/blob/master/images/cover.jpg?raw=true)
+![Cover](https://github.com/itssamuelrowe/kush/blob/update-readme/images/cover.jpg?raw=true)
 
 Kush is a general purpose programming language designed to build simple, safe
 and efficient programs. It is heavily inspired by C.
