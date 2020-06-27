@@ -1,3 +1,5 @@
+// Feature unavailable
+
 void main() {
     print('Enter the hours: ');
     var hours = parseF64(readLine());

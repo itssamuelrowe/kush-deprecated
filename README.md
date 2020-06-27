@@ -10,35 +10,58 @@ and efficient programs. It is heavily inspired by C.
 The following example demonstrates the linear search algorithm in Kush.
 
 ```
-void main() {
-    var names = [
-        'Samuel Rowe',
-        'Joel E. Rego',
-        'Bill Gates',
-        'Linus Trovalds',
-        'Abraham Lincoln',
-        'Isaac Newton',
-        'Albert Einstein',
-        'Richard Feynman',
-        'Christopher Nolan',
-        'Benedict Cumberbatch'
-    ];
-    var key = 'Marshall Mathers';
-    var result = -1;
-    var i = 0;
-    while i < names.size {
-        if String:equals(key, names[i]) {
+boolean equals(string s1, string s2) {
+    boolean result = false;
+    if s1 == s2 {
+        result = true;
+    }
+    else if s1.value.size == s2.value.size {
+        result = true;
+        i32 i = 0;
+        while i < s1.value.size {
+            if (s1.value[i] != s2.value[i]) {
+                result = false;
+                break;
+            }
+            i += 1;
+        }
+    }
+    return result;
+}
+
+i32 search(string[] array, string key) {
+    i32 result = -1;
+    i32 i = 0;
+    while i < array.size {
+        if equals(array[i], key) {
             result = i;
             break;
         }
         i += 1;
     }
+    return result;
+}
 
+void main() {
+    var array = [
+        'Samuel Rowe',
+        'Joel Rego',
+        'Akshay',
+        'Arshad Ahmed',
+        'Sreem Chowdhary'
+    ];
+    string key = 'Kush';
+
+    i32 result = search(array, key);
     if result != -1 {
-        print('Found the key at index ' + result + '.');
+        print_s('Found the result at ');
+        print_i(result);
+        print_s('!\n');
     }
     else {
-        print('Could not find the key.');
+        print_s('Could not find \"');
+        print_s(key);
+        print_s('\" in the array.\n');
     }
 }
 ```
@@ -48,9 +71,7 @@ void main() {
 The following example demonstrates calculation of factorial in Kush.
 ```
 void main() {
-    print('Enter an integer: ');
-    var n = parseInteger(scan());
-
+    var n = 5;
     var result = 1;
     var i = 1;
     while i <= n {
@@ -58,19 +79,21 @@ void main() {
         i += 1;
     }
 
+    print_s('The factorial of 5 is ');
     print_i(result);
+    print_s('.\n');
 }
 ```
 
 ### Example 3: Counter
 
-The following example demonstrates closures in Kush.
+The following example demonstrates closures (currently unavailable) in Kush.
 
 ```
-i32 Counter();
+function Counter = i32 ();
 
 Counter makeCounter(i32 i) {
-	 return @ -> i += 1;
+    return @ -> i += 1;
 }
 
 void main() {
