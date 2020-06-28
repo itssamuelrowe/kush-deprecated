@@ -6,5 +6,5 @@ void main() {
         sum += numbers[i];
         i += 1;
     }
-    print(sum);
+    print_i(sum);
 }

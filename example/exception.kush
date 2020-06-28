@@ -1,3 +1,5 @@
+// Feature unavailable
+
 void f1(a, b) {
     print('Invoked f1!');
     throw 'SIMPLE_ERROR';
