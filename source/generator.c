@@ -743,7 +743,7 @@ void generateFunction(Generator* generator, Function* function) {
         fprintf(generator->output, ", ");
         Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
         generateType(generator, parameter->type);
-        fprintf(generator->output, " %s", parameter->name);
+        fprintf(generator->output, " kush_%s", parameter->name);
     }
 
     // TODO: Variable parameter
@@ -757,7 +757,7 @@ void generateFunction(Generator* generator, Function* function) {
         Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
 
         if (parameter->type->reference) {
-            fprintf(generator->output, "    $stackFrame->pointers[%d] = %s;\n",
+            fprintf(generator->output, "    $stackFrame->pointers[%d] = kush_%s;\n",
                 parameter->index, parameter->name);
         }
     }
