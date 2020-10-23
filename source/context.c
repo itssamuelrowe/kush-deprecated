@@ -55,7 +55,7 @@ Primitives primitives = {
         .callable = false,
         .reference = false,
         .identifier = NULL,
-        .arrayTypes = NULL
+        .arrayTypes = NULL,
     },
 
     .i8 = {
@@ -240,17 +240,41 @@ Primitives primitives = {
 
 void initializePrimitives() {
     primitives.boolean.arrayTypes = jtk_ArrayList_new();
+    primitives.boolean.llvmType = LLVMInt8Type();
+
     primitives.i8.arrayTypes = jtk_ArrayList_new();
+    primitives.i8.llvmType = LLVMInt8Type();
+
     primitives.i16.arrayTypes = jtk_ArrayList_new();
+    primitives.i16.llvmType = LLVMInt8Type();
+
     primitives.i32.arrayTypes = jtk_ArrayList_new();
+    primitives.i32.llvmType = LLVMInt8Type();
+
     primitives.i64.arrayTypes = jtk_ArrayList_new();
+    primitives.i64.llvmType = LLVMInt8Type();
+
     primitives.ui8.arrayTypes = jtk_ArrayList_new();
+    primitives.ui8.llvmType = LLVMInt8Type();
+
     primitives.ui16.arrayTypes = jtk_ArrayList_new();
+    primitives.ui16.llvmType = LLVMInt16Type();
+
     primitives.ui32.arrayTypes = jtk_ArrayList_new();
+    primitives.ui32.llvmType = LLVMInt32Type();
+
     primitives.ui64.arrayTypes = jtk_ArrayList_new();
+    primitives.ui64.llvmType = LLVMInt64Type();
+
     primitives.f32.arrayTypes = jtk_ArrayList_new();
+    primitives.f32.llvmType = LLVMFloatType();
+
     primitives.f64.arrayTypes = jtk_ArrayList_new();
+    primitives.f64.llvmType = LLVMDoubleType();
+
     primitives.string.arrayTypes = jtk_ArrayList_new();
+    // TODO
+    // primitives.string.llvmType = ();
 }
 
 void destroyPrimitives() {
