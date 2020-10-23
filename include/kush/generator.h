@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+#include <llvm-c/Core.h>
+#include <llvm-c/Analysis.h>
+#include <llvm-c/TargetMachine.h>
+
 #include <kush/configuration.h>
 #include <kush/context.h>
 #include <kush/compiler.h>
@@ -27,13 +31,16 @@
 
 struct Generator {
     Compiler* compiler;
-    Scope* scope;
     FILE* output;
-    int32_t index;
+    Scope* scope;
+	LLVMModuleRef module;
+	LLVMBuilderRef builder;
+	LLVMValueRef function;
+	LLVMBasicBlockRef endBlock;
 };
 
 typedef struct Generator Generator;
 
 Generator* newGenerator(Compiler* compiler);
 void deleteGenerator(Generator* generator);
-void generateC(Generator* generator, Module* module);
+void generateIR(Generator* generator, Module* module);
