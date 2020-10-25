@@ -704,35 +704,38 @@ void generateIf(Generator* generator, IfStatement* statement) {
     LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmExitBlock);
 }
 
-void generateBlock(Generator* generator, Block* block, int32_t depth) {
+void generateIterative(Generator* generator, IterativeStatement* statement) {
+    // assert (statement->keyword->type == TOKEN_KEYWORD_WHILE);
+    LLVMValueRef llvmFunction = generator->function->llvmValue;
+    LLVMBasicBlockRef llvmConditionBlock = LLVMAppendBasicBlock(llvmFunction, "");
+    LLVMBasicBlockRef llvmThenBlock = LLVMAppendBasicBlock(llvmFunction, "");
+    LLVMBasicBlockRef llvmElseBlock = LLVMAppendBasicBlock(llvmFunction, "");
+
+    /* Make sure that the current basic block has a terminator. */
+    LLVMBuildBr(generator->llvmBuilder, llvmConditionBlock);
+
+    LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmConditionBlock);
+    LLVMValueRef llvmCondition = generateExpression(generator, (Context*)statement->expression);
+    LLVMBuildCondBr(generator->llvmBuilder, llvmCondition, llvmThenBlock, llvmElseBlock);
+
+    LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmThenBlock);
+    generateBlock(generator, statement->body);
+    LLVMBuildBr(generator->llvmBuilder, llvmConditionBlock);
+
+    LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmElseBlock);
+}
+
+void generateBlock(Generator* generator, Block* block) {
     generator->scope = block->scope;
     int32_t statementCount = jtk_ArrayList_getSize(block->statements);
     for (int i = 0; i < statementCount; i++) {
         Context* context = (Context*)jtk_ArrayList_getValue(
             block->statements, i);
         switch (context->tag) {
-            // case CONTEXT_ITERATIVE_STATEMENT: {
-            //     IterativeStatement* statement = (IterativeStatement*)context;
-
-            //     if (statement->name != NULL) {
-            //         fprintf(generator->output, "%s: ", statement->name);
-            //     }
-
-            //     if (statement->keyword->type == TOKEN_KEYWORD_WHILE) {
-            //         fprintf(generator->output, "while (");
-            //         generateExpression(generator, (Context*)statement->expression);
-            //         fprintf(generator->output, ") ");
-            //     }
-
-            //     generateBlock(generator, statement->body, depth);
-
-            //     if (statement->name != NULL) {
-            //         generateIndentation(generator, depth);
-            //         fprintf(generator->output, "__%sExit:\n", statement->name);
-            //     }
-
-            //     break;
-            // }
+            case CONTEXT_ITERATIVE_STATEMENT: {
+                generateIterative(generator, (IterativeStatement*)context);
+                break;
+            }
 
             case CONTEXT_IF_STATEMENT: {
                 generateIf(generator, (IfStatement*)context);
@@ -854,7 +857,7 @@ void generateFunction(Generator* generator, Function* function) {
     generator->llvmBuilder = LLVMCreateBuilder();
     LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmBlock);
 
-    generateBlock(generator, function->body, 0);
+    generateBlock(generator, function->body);
 
     invalidate(generator);
     deallocate(llvmParameterTypes);
