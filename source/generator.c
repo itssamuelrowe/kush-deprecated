@@ -847,20 +847,22 @@ void generateFunction(Generator* generator, Function* function) {
     LLVMValueRef llvmFunction = LLVMAddFunction(generator->llvmModule, function->name, llvmFunctionType);
     function->llvmValue = llvmFunction;
 
-    for (int i = 0; i < parameterCount; i++) {
-        Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
-        parameter->llvmValue = LLVMGetParam(llvmFunction, i);
-        parameter->parameter = true;
+    if (function->body != NULL) {
+        for (int i = 0; i < parameterCount; i++) {
+            Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
+            parameter->llvmValue = LLVMGetParam(llvmFunction, i);
+            parameter->parameter = true;
+        }
+
+        LLVMBasicBlockRef llvmBlock = LLVMAppendBasicBlock(llvmFunction, "");
+        generator->llvmBuilder = LLVMCreateBuilder();
+        LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmBlock);
+
+        generateBlock(generator, function->body);
     }
 
-    LLVMBasicBlockRef llvmBlock = LLVMAppendBasicBlock(llvmFunction, "");
-    generator->llvmBuilder = LLVMCreateBuilder();
-    LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmBlock);
-
-    generateBlock(generator, function->body);
-
-    invalidate(generator);
     deallocate(llvmParameterTypes);
+    invalidate(generator);
 }
 
 void generateFunctions(Generator* generator, Module* module) {

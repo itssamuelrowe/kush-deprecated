@@ -272,6 +272,8 @@ void initializePrimitives() {
     primitives.f64.arrayTypes = jtk_ArrayList_new();
     primitives.f64.llvmType = LLVMDoubleType();
 
+    primitives.void_.llvmType = LLVMVoidType();
+
     primitives.string.arrayTypes = jtk_ArrayList_new();
     // TODO
     // primitives.string.llvmType = ();

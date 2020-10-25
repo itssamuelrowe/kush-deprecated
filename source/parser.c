@@ -755,9 +755,10 @@ Function* parseFunctionDeclaration(Parser* parser,
     popFollowToken(parser);
     popFollowToken(parser);
 
+    // TODO: native modifier
     Block* body = NULL;
-    if (false /*k_Modifier_hasNative(modifiers) */) {
-        match(parser, TOKEN_SEMICOLON);
+    if (la(parser, 1) == TOKEN_SEMICOLON) {
+        consume(parser);
     }
     else {
 	    body = parseBlock(parser);
