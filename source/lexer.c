@@ -618,6 +618,8 @@ void integerLiteral(Lexer* lexer) {
     }
 }
 
+#define isWhitespace(c) (c == ' ') || (c == '\t')
+
 /*
  * ALGORITHM
  * ---------
@@ -691,7 +693,6 @@ Token* nextToken(Lexer* lexer) {
             lexer->startColumn = lexer->column;
             lexer->errorCode = ERROR_NONE;
 
-
             switch (lexer->la1) {
             case KUSH_END_OF_STREAM : {
                 /* The data required for the creating the end-of-stream token.
@@ -701,12 +702,13 @@ Token* nextToken(Lexer* lexer) {
                 break;
             }
 
-            case ' '  : {
-                if (lexer->la1 == ' ') {
+            case ' ':
+            case '\t': {
+                if (isWhitespace(lexer->la1)) {
                     do {
                         consume(lexer);
                     }
-                    while (lexer->la1 == ' ');
+                    while (isWhitespace(lexer->la1));
 
                     /* This token belongs to the WHITESPACE rule. */
                     lexer->type = TOKEN_WHITESPACE;

@@ -65,7 +65,7 @@ LLVMValueRef generateAssignment(Generator* generator, BinaryExpression* expressi
         lhs = false;
         jtk_Pair_t* pairRight = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, count - 1);
         LLVMValueRef right = generateExpression(generator, (Context*)pairRight->m_right);
-        
+
         lhs = true;
         for (int i = count - 2; i >= 0; i++) {
             jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->others, i);
@@ -645,6 +645,65 @@ LLVMValueRef generateExpression(Generator* generator, Context* context) {
     return dummy;
 }
 
+void generateIfClause(Generator* generator, IfClause* clause,
+    LLVMBasicBlockRef llvmConditionBlock, LLVMBasicBlockRef llvmThenBlock,
+    LLVMBasicBlockRef llvmElseBlock, LLVMBasicBlockRef llvmExitBlock) {
+    if (llvmConditionBlock != NULL) {
+        LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmConditionBlock);
+    }    
+    LLVMValueRef llvmCondition = generateExpression(generator, (Context*)clause->expression);
+    LLVMBuildCondBr(generator->llvmBuilder, llvmCondition, llvmThenBlock, llvmElseBlock);
+
+    LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmThenBlock);
+    generateBlock(generator, clause->body);
+    LLVMBuildBr(generator->llvmBuilder, llvmExitBlock);
+}
+
+void generateIf(Generator* generator, IfStatement* statement) {
+    LLVMValueRef llvmFunction = generator->function->llvmValue;
+
+    int elseIfClauseCount = jtk_ArrayList_getSize(statement->elseIfClauses);
+    /* Break down:
+     *     - 1 block => if clause
+     *     - N * 2 blocks => else if clause blocks + condition blocks
+     *     - 0 or 1 block => else clause
+     *     - 1 block => outside if statement
+     */
+    int blockCount = 2 + elseIfClauseCount * 2 + (statement->elseClause != NULL? 1 : 0);
+    LLVMBasicBlockRef* llvmBlocks = allocate(LLVMBasicBlockRef, blockCount);
+    for (int i = 0; i < blockCount; i++) {
+        llvmBlocks[i] = LLVMAppendBasicBlock(llvmFunction, "");
+    }
+
+    /* 0 => If clause block
+     * 1 => Else clause block / Else if clause block / Exit block
+     */
+    LLVMBasicBlockRef llvmExitBlock = llvmBlocks[blockCount - 1];
+    generateIfClause(generator, statement->ifClause, NULL, llvmBlocks[0], llvmBlocks[1], llvmExitBlock);
+
+    for (int i = 0; i < elseIfClauseCount; i++) {
+        IfClause* clause = (IfClause*)jtk_ArrayList_getValue(statement->elseIfClauses, i);
+        /* base + 0 => Current condition block
+         * base + 1 => Current clause block
+         * base + 2 => Next clause block or exit block
+         */
+        int baseIndex = (i * 2) + 1;
+        generateIfClause(generator, clause, llvmBlocks[baseIndex], llvmBlocks[baseIndex + 1],
+            llvmBlocks[baseIndex + 2], llvmExitBlock);
+    }
+
+    if (statement->elseClause != NULL) {
+        /* blockCount - 2 => Else clause
+         * blockCount - 1 => Exit block
+         */
+        LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmBlocks[blockCount - 2]);
+        generateBlock(generator, statement->elseClause);
+        LLVMBuildBr(generator->llvmBuilder, llvmExitBlock);
+    }
+
+    LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmExitBlock);
+}
+
 void generateBlock(Generator* generator, Block* block, int32_t depth) {
     generator->scope = block->scope;
     int32_t statementCount = jtk_ArrayList_getSize(block->statements);
@@ -675,33 +734,10 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
             //     break;
             // }
 
-            // case CONTEXT_IF_STATEMENT: {
-            //     IfStatement* statement = (IfStatement*)context;
-            //     fprintf(generator->output, "if (");
-            //     generateExpression(generator, (Context*)statement->ifClause->expression);
-            //     fprintf(generator->output, ") ");
-            //     generateBlock(generator, statement->ifClause->body, depth);
-
-            //     int32_t count = jtk_ArrayList_getSize(statement->elseIfClauses);
-            //     int32_t j;
-            //     for (j = 0; j < count; j++) {
-            //         generateIndentation(generator, depth);
-            //         IfClause* clause = (IfClause*)jtk_ArrayList_getValue(
-            //             statement->elseIfClauses, j);
-            //         fprintf(generator->output, "else if (");
-            //         generateExpression(generator, (Context*)clause->expression);
-            //         fprintf(generator->output, ") ");
-            //         generateBlock(generator, clause->body, depth);
-            //     }
-
-            //     if (statement->elseClause != NULL) {
-            //         generateIndentation(generator, depth);
-            //         fprintf(generator->output, "else ");
-            //         generateBlock(generator, statement->elseClause, depth);
-            //     }
-
-            //     break;
-            // }
+            case CONTEXT_IF_STATEMENT: {
+                generateIf(generator, (IfStatement*)context);
+                break;
+            }
 
             
             // case CONTEXT_TRY_STATEMENT: {
@@ -739,17 +775,6 @@ void generateBlock(Generator* generator, Block* block, int32_t depth) {
                 for (j = 0; j < count; j++) {
                     Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
-
-                    // TODO: Capture parameters in pointers!
-                    // if (variable->type->reference) {
-                    //     if (variable->expression != NULL) {
-                    //         fprintf(generator->output, "$stackFrame->pointers[%d] = (void*)",
-                    //             variable->index);
-                    //         generateExpression(generator, (Context*)variable->expression);
-                    //     }
-                    // }
-                    // else {
-
                     variable->llvmValue = LLVMBuildAlloca(generator->llvmBuilder, variable->type->llvmType, "");
 
                     if (variable->expression != NULL) {
