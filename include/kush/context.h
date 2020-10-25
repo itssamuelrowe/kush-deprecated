@@ -436,11 +436,13 @@ struct Variable {
     Token* identifier;
     BinaryExpression* expression;
     int32_t index;
+    LLVMValueRef llvmValue;
+    bool parameter;
 };
 
 typedef struct Variable Variable;
 
-Variable* newVariable(bool infer, bool constant, VariableType* variableType,
+Variable* newVariable(bool infer, bool constant, bool parameter, VariableType* variableType,
     const uint8_t* name, int32_t nameSize, Token* identifier,
     BinaryExpression* expression, Scope* parent);
 void deleteVariable(Variable* variable);
@@ -462,6 +464,7 @@ struct Function {
     Type* type;
     Scope* scope;
     int32_t totalReferences;
+    LLVMValueRef llvmValue;
 };
 
 typedef struct Function Function;

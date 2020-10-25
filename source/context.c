@@ -240,19 +240,19 @@ Primitives primitives = {
 
 void initializePrimitives() {
     primitives.boolean.arrayTypes = jtk_ArrayList_new();
-    primitives.boolean.llvmType = LLVMInt8Type();
+    primitives.boolean.llvmType = LLVMInt1Type();
 
     primitives.i8.arrayTypes = jtk_ArrayList_new();
     primitives.i8.llvmType = LLVMInt8Type();
 
     primitives.i16.arrayTypes = jtk_ArrayList_new();
-    primitives.i16.llvmType = LLVMInt8Type();
+    primitives.i16.llvmType = LLVMInt16Type();
 
     primitives.i32.arrayTypes = jtk_ArrayList_new();
-    primitives.i32.llvmType = LLVMInt8Type();
+    primitives.i32.llvmType = LLVMInt32Type();
 
     primitives.i64.arrayTypes = jtk_ArrayList_new();
-    primitives.i64.llvmType = LLVMInt8Type();
+    primitives.i64.llvmType = LLVMInt64Type();
 
     primitives.ui8.arrayTypes = jtk_ArrayList_new();
     primitives.ui8.llvmType = LLVMInt8Type();
@@ -671,7 +671,7 @@ void deleteVariableType(VariableType* self) {
  * Variable                                                                    *
  *******************************************************************************/
 
-Variable* newVariable(bool infer, bool constant, VariableType* variableType,
+Variable* newVariable(bool infer, bool constant, bool parameter, VariableType* variableType,
     const uint8_t* name, int32_t nameSize, Token* identifier,
     BinaryExpression* expression, Scope* parent) {
     Variable* result = allocate(Variable, 1);
@@ -685,6 +685,7 @@ Variable* newVariable(bool infer, bool constant, VariableType* variableType,
     result->identifier = identifier;
     result->expression = expression;
     result->index = -1;
+    result->parameter = parameter;
 
     return result;
 }

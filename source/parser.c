@@ -531,7 +531,6 @@ Token* matchAndYield(Parser* parser, TokenType type) {
  * ;
  */
 #define isUnaryOperator(type) \
-    (type == TOKEN_PLUS) || \
     (type == TOKEN_DASH) || \
     (type == TOKEN_TILDE) || \
     (type == TOKEN_EXCLAMATION_MARK)
@@ -811,7 +810,7 @@ void parseFunctionParameters(Parser* parser,
             Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
             first = false;
 
-            Variable* parameter = newVariable(false, false, type, identifier->text,
+            Variable* parameter = newVariable(false, false, true, type, identifier->text,
                 identifier->length, identifier, NULL, NULL);
             if (variadic) {
                 *variableParameter = parameter;
@@ -1029,7 +1028,7 @@ void parseVariableDeclarator(Parser* parser, bool infer, bool constant,
         expression = parseExpression(parser);
 	}
 
-    Variable* variable = newVariable(infer, constant, variableType,
+    Variable* variable = newVariable(infer, constant, false, variableType,
         identifier->text, identifier->length, identifier, expression, NULL);
     jtk_ArrayList_add(variables, variable);
 }
@@ -1308,7 +1307,7 @@ CatchClause* parseCatchClause(Parser* parser) {
 	}
 
     Token* identifier = matchAndYield(parser, TOKEN_IDENTIFIER);
-    context->parameter = newVariable(false, true, &primitives.string,
+    context->parameter = newVariable(false, true, false, &primitives.string,
         identifier->text, identifier->length, identifier, NULL, NULL);
     context->body = parseBlock(parser);
 

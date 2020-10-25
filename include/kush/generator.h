@@ -33,11 +33,11 @@ struct Generator {
     Compiler* compiler;
     FILE* output;
     Scope* scope;
-	LLVMModuleRef module;
-	LLVMBuilderRef builder;
-	LLVMValueRef function;
-	LLVMBasicBlockRef endBlock;
-	LLVMContextRef context;
+    Function* function;
+	LLVMModuleRef llvmModule;
+	LLVMValueRef llvmFunction;
+	LLVMBasicBlockRef llvmEndBlock;
+	LLVMBuilderRef llvmBuilder;
 };
 
 typedef struct Generator Generator;
