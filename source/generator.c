@@ -82,7 +82,8 @@ void generateStructure(Generator* generator, Structure* structure) {
         int32_t variableCount = jtk_ArrayList_getSize(declaration->variables);
         for (int j = 0; j < variableCount; j++) {
             Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
-            llvmVariableTypes[k++] = getLLVMVariableType(variable->type);
+            variable->index = k++;
+            llvmVariableTypes[variable->index] = getLLVMVariableType(variable->type);
         }
     }
     
@@ -498,10 +499,6 @@ LLVMValueRef generateUnary(Generator* generator, UnaryExpression* expression) {
 //     fprintf(generator->output, "]");
 // }
 
-// void generateMemberAccess(Generator* generator, MemberAccess* access) {
-//     fprintf(generator->output, "->%s", access->identifier->text);
-// }
-
 LLVMValueRef generateFunctionCall(Generator* generator, Function* function, FunctionArguments* arguments) {
     int32_t count = jtk_ArrayList_getSize(arguments->expressions);
     LLVMValueRef* llvmArguments = allocate(LLVMValueRef, count);
@@ -525,7 +522,7 @@ LLVMValueRef generatePostfix(Generator* generator, PostfixExpression* expression
             symbol = resolveSymbol(generator->scope, token->text);
             if (symbol->tag == CONTEXT_VARIABLE) {
                 Variable* variable = (Variable*)symbol;
-                if (lhs) {
+                if (lhs || count > 0) {
                     result = variable->llvmValue;
                 }
                 else {
@@ -557,9 +554,13 @@ LLVMValueRef generatePostfix(Generator* generator, PostfixExpression* expression
             // assert(symbol->tag == CONTEXT_FUNCTION)
             result = generateFunctionCall(generator, (Function*)symbol, (FunctionArguments*)postfix);
         }
-        // else if (postfix->tag == CONTEXT_MEMBER_ACCESS) {
-        //     generateMemberAccess(generator, (MemberAccess*)postfix);
-        // }
+        else if (postfix->tag == CONTEXT_MEMBER_ACCESS) {
+            MemberAccess* access = (MemberAccess*)postfix;
+            Variable* variable = (Variable*)resolveSymbol(access->previous->structure->scope, access->identifier->text);
+            LLVMValueRef llvmStructurePtr = LLVMBuildLoad(generator->llvmBuilder, result, "");
+            LLVMValueRef llvmField = LLVMBuildStructGEP2(generator->llvmBuilder, access->previous->structure->type->llvmType, llvmStructurePtr, variable->index, "");
+            result = LLVMBuildLoad(generator->llvmBuilder, llvmField, "");
+        }
         else {
             controlError();
             break;

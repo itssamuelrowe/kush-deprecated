@@ -1114,6 +1114,8 @@ Type* resolveStructureMember(Analyzer* analyzer, Structure* structure, Token* id
 }
 
 Type* resolveMemberAccess(Analyzer* analyzer, MemberAccess* access, Type* previous) {
+    access->previous = previous;
+
     Type* result = NULL;
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     if (!previous->accessible) {
