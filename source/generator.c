@@ -774,6 +774,22 @@ void generateIterative(Generator* generator, IterativeStatement* statement) {
     LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmElseBlock);
 }
 
+void generateVariableDeclaration(Generator* generator, VariableDeclaration* statement) {
+    int count = jtk_ArrayList_getSize(statement->variables);
+    for (int j = 0; j < count; j++) {
+        Variable* variable = (Variable*)jtk_ArrayList_getValue(
+            statement->variables, j);
+        LLVMTypeRef llvmType = getLLVMVariableType(variable->type);
+        variable->llvmValue = LLVMBuildAlloca(generator->llvmBuilder, llvmType, "");
+
+        if (variable->expression != NULL) {
+            LLVMValueRef llvmInitializer = generateExpression(generator, (Context*)variable->expression);
+            LLVMBuildStore(generator->llvmBuilder, llvmInitializer, variable->llvmValue);
+        }
+        // TODO: Assign a default value.
+    }
+}
+
 void generateBlock(Generator* generator, Block* block) {
     generator->scope = block->scope;
     int32_t statementCount = jtk_ArrayList_getSize(block->statements);
@@ -791,50 +807,8 @@ void generateBlock(Generator* generator, Block* block) {
                 break;
             }
 
-            
-            // case CONTEXT_TRY_STATEMENT: {
-            //     TryStatement* statement = (TryStatement*)context;
-            //     defineLocals(generator, statement->tryClause);
-
-            //     int32_t count = jtk_ArrayList_getSize(statement->catchClauses);
-            //     int32_t j;
-            //     for (j = 0; j < count; j++) {
-            //         CatchClause* clause = (CatchClause*)jtk_ArrayList_getValue(
-            //             statement->catchClauses, j);
-            //         Variable* parameter = clause->parameter;
-            //         Scope* localScope = defineLocals(generator, clause->body);
-
-            //         if (isUndefined(localScope, parameter->identifier->text)) {
-            //             defineSymbol(localScope, (Symbol*)parameter);
-            //         }
-            //         else {
-            //             handleSemanticError(handler, generator, ERROR_REDECLARATION_AS_CATCH_PARAMETER,
-            //                 parameter->identifier);
-            //         }
-            //     }
-
-            //     if (statement->finallyClause != NULL) {
-            //         defineLocals(generator, statement->finallyClause);
-            //     }
-
-            // break;
-            // }
-
             case CONTEXT_VARIABLE_DECLARATION: {
-                VariableDeclaration* statement = (VariableDeclaration*)context;
-                int32_t count = jtk_ArrayList_getSize(statement->variables);
-                int32_t j;
-                for (j = 0; j < count; j++) {
-                    Variable* variable = (Variable*)jtk_ArrayList_getValue(
-                        statement->variables, j);
-                    LLVMTypeRef llvmType = getLLVMVariableType(variable->type);
-                    variable->llvmValue = LLVMBuildAlloca(generator->llvmBuilder, llvmType, "");
-
-                    if (variable->expression != NULL) {
-                        LLVMValueRef llvmInitializer = generateExpression(generator, (Context*)variable->expression);
-                        LLVMBuildStore(generator->llvmBuilder, llvmInitializer, variable->llvmValue);
-                    }
-                }
+                generateVariableDeclaration(generator, (VariableDeclaration*)context);
                 break;
             }
 
@@ -843,30 +817,12 @@ void generateBlock(Generator* generator, Block* block) {
                 break;
             }
 
-            // case CONTEXT_BREAK_STATEMENT: {
-            //     BreakStatement* statement = (BreakStatement*)context;
-            //     if (statement->identifier != NULL) {
-            //         fprintf(generator->output, "goto __%sExit;\n", statement->identifier->text);
-            //     }
-            //     else {
-            //         fprintf(generator->output, "break;\n");
-            //     }
-            //     break;
-            // }
-
             case CONTEXT_RETURN_STATEMENT: {
                 ReturnStatement* statement = (ReturnStatement*)context;
                 LLVMValueRef llvmValue = generateExpression(generator, (Context*)statement->expression);
                 LLVMBuildRet(generator->llvmBuilder, llvmValue);
                 break;
             }
-
-            /*
-            case CONTEXT_THROW_STATEMENT: {
-                generateThrowStatement(generator, (ThrowStatement*)context);
-                break;
-            }
-            */
 
             default: {
                 controlError();
