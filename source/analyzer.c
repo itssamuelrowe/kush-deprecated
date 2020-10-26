@@ -19,6 +19,7 @@
 #include <jtk/core/CString.h>
 
 #include <kush/analyzer.h>
+#include <kush/context.h>
 #include <kush/error-handler.h>
 
 #warning "TODO: Report invalid lvalue"
@@ -156,7 +157,7 @@ Type* getArrayType(Analyzer* analyzer, Type* base, int32_t dimensions) {
                 (Type*)jtk_ArrayList_getValue(base->arrayTypes, maxDimensions - 1);
             int32_t dimension;
             for (dimension = maxDimensions + 1; dimension <= dimensions; dimension++) {
-                Type* type = newType(TYPE_ARRAY, true, true, false, true, NULL);
+                Type* type = newType(TYPE_ARRAY, true, true, false, true, NULL, NULL, NULL);
                 type->array.array = (Structure*)resolveSymbol(analyzer->scope, "$Array");
                 type->array.base = base;
                 type->array.component = previous;

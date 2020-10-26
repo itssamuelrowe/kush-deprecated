@@ -36,6 +36,7 @@ void generateConstructor(Generator* generator, Structure* structure, LLVMTypeRef
     LLVMTypeRef llvmStructurePtr = LLVMPointerType(llvmStructure, 0);
     LLVMTypeRef llvmFunctionType = LLVMFunctionType(llvmStructurePtr, llvmParameterTypes, parameterCount, false);
     LLVMValueRef llvmFunction = LLVMAddFunction(generator->llvmModule, structure->name, llvmFunctionType);
+    structure->llvmConstructor = llvmFunction;
 
     LLVMValueRef llvmParameters[parameterCount];
     for (int j = 0; j < parameterCount; j++) {
@@ -86,6 +87,8 @@ void generateStructure(Generator* generator, Structure* structure) {
     }
     
     structure->type->llvmType = LLVMStructType(llvmVariableTypes, totalVariables, false);
+    structure->type->llvmDefaultValue = LLVMConstNull(LLVMPointerType(structure->type->llvmType, 0));
+
     generateConstructor(generator, structure, llvmVariableTypes, totalVariables);
 }
 
@@ -603,6 +606,89 @@ LLVMValueRef generateToken(Generator* generator, Token* token) {
     return result;
 }
 
+LLVMValueRef generateObjectExpression(Generator* generator, NewExpression* expression) {
+    Type* type = expression->type;
+    Structure* structure = type->structure;
+
+    int totalVariables = 0;
+    int declarationCount = jtk_ArrayList_getSize(structure->declarations);
+    for (int i = 0; i < declarationCount; i++) {
+        VariableDeclaration* declaration =
+            (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+        totalVariables += jtk_ArrayList_getSize(declaration->variables);
+    }
+
+    LLVMValueRef llvmArguments[totalVariables];
+    for (int i = 0; i < totalVariables; i++) {
+        llvmArguments[i] = NULL;
+    }
+
+    /* For each entry in the object intializer, we apply linear search on the declared variables
+     * to find the index of the field. A better solution would be to use a hash map.
+     */
+    int32_t entryCount = jtk_ArrayList_getSize(expression->entries);
+    for (int i = 0; i < entryCount; i++) {
+        jtk_Pair_t* pair = (jtk_Pair_t*)jtk_ArrayList_getValue(expression->entries, i);
+        Token* identifier = (Token*)pair->m_left;
+        
+        int index = 0;
+        for (int j = 0; j < declarationCount; j++) {
+            VariableDeclaration* declaration =
+                (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, j);
+            int variableCount = jtk_ArrayList_getSize(declaration->variables);
+            for (int k = 0; k < variableCount; k++) {
+                Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, k);
+                if (jtk_CString_equals(variable->name, variable->nameSize,
+                    identifier->text, identifier->length)) {
+                    goto found;
+                }
+                index++;
+            }
+        }
+        found:
+
+        if (index != totalVariables) {
+            llvmArguments[index] = generateExpression(generator, (Context*)pair->m_right);
+        }
+    }
+
+    int m = 0;
+    for (int i = 0; i < declarationCount; i++) {
+        VariableDeclaration* declaration =
+            (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
+        int variableCount = jtk_ArrayList_getSize(declaration->variables);
+        for (int j = 0; j < variableCount; j++) {
+            if (llvmArguments[m] == NULL) {
+                Variable* variable = jtk_ArrayList_getValue(declaration->variables, j);
+                llvmArguments[m] = variable->type->llvmDefaultValue;
+            }
+            m++;
+        }
+    }
+
+    return LLVMBuildCall(generator->llvmBuilder, structure->llvmConstructor, llvmArguments,
+        totalVariables, "");
+}
+
+LLVMValueRef generateNew(Generator* generator, NewExpression* expression) {
+    LLVMValueRef llvmResult;
+    Type* type = expression->type;
+    if (type->tag == TYPE_ARRAY) {
+        /*
+        int32_t limit = jtk_ArrayList_getSize(expression->expressions);
+        int32_t i;
+        for (i = 0; i < limit; i++) {
+            Context* context = (Context*)jtk_ArrayList_getValue(expression->expressions, i);
+            generateExpression(generator, context);
+        }
+        */
+    }
+    else {
+        llvmResult = generateObjectExpression(generator, expression);
+    }
+    return llvmResult;
+}
+
 LLVMValueRef generateExpression(Generator* generator, Context* context) {
     switch (context->tag) {
         case CONTEXT_ASSIGNMENT_EXPRESSION: {
@@ -674,12 +760,12 @@ LLVMValueRef generateExpression(Generator* generator, Context* context) {
             return generatePostfix(generator, (PostfixExpression*)context);
             break;
         }
-/*
-        case CONTEXT_NEW_EXPRESSION: {
-            return generateNewExpression(generator, (NewExpression*)context);
-           break;
-        }
 
+        case CONTEXT_NEW_EXPRESSION: {
+            return generateNew(generator, (NewExpression*)context);
+            break;
+        }
+/*
         case CONTEXT_ARRAY_EXPRESSION: {
             return generateArray(generator, (ArrayExpression*)context);
            break;
@@ -782,11 +868,9 @@ void generateVariableDeclaration(Generator* generator, VariableDeclaration* stat
         LLVMTypeRef llvmType = getLLVMVariableType(variable->type);
         variable->llvmValue = LLVMBuildAlloca(generator->llvmBuilder, llvmType, "");
 
-        if (variable->expression != NULL) {
-            LLVMValueRef llvmInitializer = generateExpression(generator, (Context*)variable->expression);
-            LLVMBuildStore(generator->llvmBuilder, llvmInitializer, variable->llvmValue);
-        }
-        // TODO: Assign a default value.
+        LLVMValueRef llvmInitializer = (variable->expression != NULL)?
+            generateExpression(generator, (Context*)variable->expression) : variable->type->llvmDefaultValue;
+        LLVMBuildStore(generator->llvmBuilder, llvmInitializer, variable->llvmValue);
     }
 }
 

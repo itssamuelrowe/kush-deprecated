@@ -51,6 +51,7 @@ struct Type {
     Token* identifier;
     jtk_ArrayList_t* arrayTypes;
     LLVMTypeRef llvmType;
+    LLVMValueRef llvmDefaultValue;
     union {
         struct {
             /**
@@ -86,7 +87,8 @@ struct Type {
 };
 
 Type* newType(uint8_t tag, bool indexable, bool accessible, bool callable,
-    bool allocatable, Token* identifier);
+    bool allocatable, Token* identifier, LLVMTypeRef llvmType,
+    LLVMValueRef llvmDefaultValue);
 void deleteType(Type* type);
 
 /*******************************************************************************
@@ -487,6 +489,7 @@ struct Structure {
     jtk_ArrayList_t* declarations;
     Type* type;
     Scope* scope;
+    LLVMValueRef llvmConstructor;
 };
 
 typedef struct Structure Structure;
