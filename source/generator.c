@@ -14,9 +14,56 @@ static LLVMValueRef generateNewExpression(Generator* generator, NewExpression* e
 static LLVMValueRef generateArray(Generator* generator, ArrayExpression* expression);
 static LLVMValueRef generateExpression(Generator* generator, Context* context);
 
-void generateStructure(Generator* generator, Structure* structure) {
-    structure->type->llvmType = LLVMStructCreateNamed(LLVMGetModuleContext(generator->llvmModule), structure->name);
+LLVMTypeRef getLLVMVariableType(Type* type) {
+    return (type->tag == TYPE_STRUCTURE)?
+        LLVMPointerType(type->llvmType, 0) : type->llvmType;
+}
 
+LLVMValueRef allocate_ref(Generator* generator) {
+    LLVMTypeRef llvmReturnType = LLVMPointerType(LLVMInt8Type(), 0);
+    LLVMTypeRef llvmParameterTypes[] = {
+        LLVMInt64Type()
+    };
+    LLVMTypeRef llvmFunctionType = LLVMFunctionType(llvmReturnType, llvmParameterTypes, 1, false);
+    LLVMValueRef llvmFunction = LLVMAddFunction(generator->llvmModule, "k_allocate", llvmFunctionType);
+    return llvmFunction;
+}
+
+void generateConstructor(Generator* generator, Structure* structure, LLVMTypeRef* llvmParameterTypes, int parameterCount) {
+    LLVMValueRef llvmAllocate = allocate_ref(generator);
+
+    LLVMTypeRef llvmStructure = structure->type->llvmType;
+    LLVMTypeRef llvmStructurePtr = LLVMPointerType(llvmStructure, 0);
+    LLVMTypeRef llvmFunctionType = LLVMFunctionType(llvmStructurePtr, llvmParameterTypes, parameterCount, false);
+    LLVMValueRef llvmFunction = LLVMAddFunction(generator->llvmModule, structure->name, llvmFunctionType);
+
+    LLVMValueRef llvmParameters[parameterCount];
+    for (int j = 0; j < parameterCount; j++) {
+        llvmParameters[j] = LLVMGetParam(llvmFunction, j);
+    }
+
+    LLVMBasicBlockRef llvmBlock = LLVMAppendBasicBlock(llvmFunction, "");
+    generator->llvmBuilder = LLVMCreateBuilder();
+    LLVMPositionBuilderAtEnd(generator->llvmBuilder, llvmBlock);
+
+    LLVMTargetDataRef llvmTargetData = LLVMGetModuleDataLayout(generator->llvmModule);
+    uint64_t size = LLVMABISizeOfType(llvmTargetData, llvmStructure);
+
+    LLVMValueRef llvmAllocateArguments[] = {
+        LLVMConstInt(LLVMInt64Type(), size, false)
+    };
+    LLVMValueRef llvmObject = LLVMBuildCall(generator->llvmBuilder, llvmAllocate, llvmAllocateArguments, 1, "");
+    LLVMValueRef llvmSelf = LLVMBuildPointerCast(generator->llvmBuilder, llvmObject, llvmStructurePtr, "");
+
+    for (int i = 0; i < parameterCount; i++) {
+        LLVMValueRef llvmField = LLVMBuildStructGEP2(generator->llvmBuilder, llvmStructure, llvmSelf, i, "");
+        LLVMBuildStore(generator->llvmBuilder, llvmParameters[i], llvmField);
+    }
+
+    LLVMBuildRet(generator->llvmBuilder, llvmSelf);
+}
+
+void generateStructure(Generator* generator, Structure* structure) {
     int32_t declarationCount = jtk_ArrayList_getSize(structure->declarations);
     int32_t totalVariables = 0;
     for (int i = 0; i < declarationCount; i++) {
@@ -25,19 +72,21 @@ void generateStructure(Generator* generator, Structure* structure) {
         totalVariables += jtk_ArrayList_getSize(declaration->variables);
     }
 
-    LLVMTypeRef* llvmVariableTypes = allocate(LLVMTypeRef, totalVariables);
+    LLVMTypeRef llvmVariableTypes[totalVariables];
+    int k = 0;
     for (int i = 0; i < declarationCount; i++) {
         VariableDeclaration* declaration =
             (VariableDeclaration*)jtk_ArrayList_getValue(structure->declarations, i);
 
         int32_t variableCount = jtk_ArrayList_getSize(declaration->variables);
-        int32_t m = 0;
-        for (int k = 0; k < variableCount; k++) {
-            Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, k);
-            llvmVariableTypes[m++] = variable->type->llvmType;
+        for (int j = 0; j < variableCount; j++) {
+            Variable* variable = (Variable*)jtk_ArrayList_getValue(declaration->variables, j);
+            llvmVariableTypes[k++] = getLLVMVariableType(variable->type);
         }
     }
-    LLVMStructSetBody(structure->type->llvmType, llvmVariableTypes, totalVariables, false);
+    
+    structure->type->llvmType = LLVMStructType(llvmVariableTypes, totalVariables, false);
+    generateConstructor(generator, structure, llvmVariableTypes, totalVariables);
 }
 
 void generateStructures(Generator* generator, Module* module) {
@@ -778,7 +827,8 @@ void generateBlock(Generator* generator, Block* block) {
                 for (j = 0; j < count; j++) {
                     Variable* variable = (Variable*)jtk_ArrayList_getValue(
                         statement->variables, j);
-                    variable->llvmValue = LLVMBuildAlloca(generator->llvmBuilder, variable->type->llvmType, "");
+                    LLVMTypeRef llvmType = getLLVMVariableType(variable->type);
+                    variable->llvmValue = LLVMBuildAlloca(generator->llvmBuilder, llvmType, "");
 
                     if (variable->expression != NULL) {
                         LLVMValueRef llvmInitializer = generateExpression(generator, (Context*)variable->expression);
@@ -837,7 +887,7 @@ void generateFunction(Generator* generator, Function* function) {
 
     for (int i = 0; i < parameterCount; i++) {
         Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, i);
-        llvmParameterTypes[i] = parameter->type->llvmType;
+        llvmParameterTypes[i] = getLLVMVariableType(parameter->type);
     }
 
     // TODO: Variable parameter
