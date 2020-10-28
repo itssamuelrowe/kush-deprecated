@@ -29,9 +29,9 @@ LLVMValueRef allocate_ref(Generator* generator) {
     return llvmFunction;
 }
 
-void generateConstructor(Generator* generator, Structure* structure, LLVMTypeRef* llvmParameterTypes, int parameterCount) {
-    LLVMValueRef llvmAllocate = allocate_ref(generator);
+LLVMValueRef llvmAllocate;
 
+void generateConstructor(Generator* generator, Structure* structure, LLVMTypeRef* llvmParameterTypes, int parameterCount) {
     LLVMTypeRef llvmStructure = structure->type->llvmType;
     LLVMTypeRef llvmStructurePtr = LLVMPointerType(llvmStructure, 0);
     LLVMTypeRef llvmFunctionType = LLVMFunctionType(llvmStructurePtr, llvmParameterTypes, parameterCount, false);
@@ -522,8 +522,11 @@ LLVMValueRef generatePostfix(Generator* generator, PostfixExpression* expression
             symbol = resolveSymbol(generator->scope, token->text);
             if (symbol->tag == CONTEXT_VARIABLE) {
                 Variable* variable = (Variable*)symbol;
-                if (lhs || count > 0) {
+                if (lhs) {
                     result = variable->llvmValue;
+                    if (count > 0) {
+                        result = LLVMBuildLoad(generator->llvmBuilder, result, "");
+                    }
                 }
                 else {
                     if (variable->parameter) {
@@ -557,9 +560,10 @@ LLVMValueRef generatePostfix(Generator* generator, PostfixExpression* expression
         else if (postfix->tag == CONTEXT_MEMBER_ACCESS) {
             MemberAccess* access = (MemberAccess*)postfix;
             Variable* variable = (Variable*)resolveSymbol(access->previous->structure->scope, access->identifier->text);
-            LLVMValueRef llvmStructurePtr = LLVMBuildLoad(generator->llvmBuilder, result, "");
-            LLVMValueRef llvmField = LLVMBuildStructGEP2(generator->llvmBuilder, access->previous->structure->type->llvmType, llvmStructurePtr, variable->index, "");
-            result = LLVMBuildLoad(generator->llvmBuilder, llvmField, "");
+            result = LLVMBuildStructGEP2(generator->llvmBuilder, access->previous->structure->type->llvmType, result, variable->index, "");
+            if ((i + 1 == count && !lhs) || (access->previous->tag == TYPE_STRUCTURE && i + 1 < count)) {
+                result = LLVMBuildLoad(generator->llvmBuilder, result, "");
+            }
         }
         else {
             controlError();
@@ -977,6 +981,8 @@ bool generateLLVM(Generator* generator, Module* module, const char* name) {
     generator->llvmModule = llvmModule;
     generator->llvmBuilder = LLVMCreateBuilder();
 
+    llvmAllocate = allocate_ref(generator);
+    
     generateStructures(generator, module);
     generateFunctions(generator, module);
 
