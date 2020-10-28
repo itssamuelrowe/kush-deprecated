@@ -598,10 +598,10 @@ LLVMValueRef generateToken(Generator* generator, Token* token) {
         //     break;
         // }
 
-        // case TOKEN_KEYWORD_NULL: {
-        //     fprintf(generator->output, "NULL");
-        //     break;
-        // }
+        case TOKEN_KEYWORD_NULL: {
+            result = LLVMConstNull(NULL);
+            break;
+        }
 
         default: {
             controlError();

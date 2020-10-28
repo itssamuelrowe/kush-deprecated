@@ -26,6 +26,12 @@
 #warning "TODO: Print the line where the error occurs"
 #warning "TODO: Report an error when no return statement is present."
 
+/**
+ * Albeit expected and actual are both instances of Type, the arguments cannot
+ * be interchanged.
+ */
+#define isTypeMatch(expected, actual) ((expected == actual) || (expected->reference && (actual->tag == TYPE_NULL)))
+
 /*
  * The following text describes a naive algorithm that I developed to analyze
  * if the left-value evaluates to a placeholder. I am not sure if the algorithm
@@ -493,7 +499,7 @@ void resolveVariable(Analyzer* analyzer, Variable* variable) {
     }
     else {
         variable->type = resolveVariableType(analyzer, variable->variableType);
-        if ((variable->expression != NULL) && (variable->type != initializerType)) {
+        if ((variable->expression != NULL) && !isTypeMatch(variable->type, initializerType)) {
             handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_VARIABLE_INITIALIZER,
                 variable->identifier);
         }
@@ -657,7 +663,7 @@ void resolveBreakStatement(Analyzer* analyzer, BreakStatement* statement) {
 void resolveReturnStatement(Analyzer* analyzer, ReturnStatement* statement) {
     ErrorHandler* handler = analyzer->compiler->errorHandler;
     Type* type = resolveExpression(analyzer, (Context*)statement->expression);
-    if (analyzer->function->returnType != type) {
+    if (!isTypeMatch(analyzer->function->returnType, type)) {
         handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_RETURN_VALUE,
             statement->keyword);
     }
@@ -1079,7 +1085,7 @@ Type* resolveFunctionArguments(Analyzer* analyzer, FunctionArguments* arguments,
                         arguments->expressions, j);
                     Type* argumentType = resolveExpression(analyzer, (Context*)argument);
                     Variable* parameter = (Variable*)jtk_ArrayList_getValue(function->parameters, j);
-                    if (argumentType != parameter->type) {
+                    if (!isTypeMatch(argumentType, parameter->type)) {
                         handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_ARGUMENT_TYPE,
                             arguments->parenthesis);
                         /* Since the error message points to the parenthesis, there is
@@ -1268,7 +1274,7 @@ Type* resolveNew(Analyzer* analyzer, NewExpression* expression) {
                         identifier);
                 }
                 else {
-                    if ((type != NULL) && (type != member->type)) {
+                    if ((type != NULL) && !isTypeMatch(member->type, type)) {
                         handleSemanticError(handler, analyzer, ERROR_INCOMPATIBLE_VARIABLE_INITIALIZER,
                             identifier);
                     }
@@ -1317,7 +1323,7 @@ Type* resolveArray(Analyzer* analyzer, ArrayExpression* expression) {
                 firstType = type;
             }
             else {
-                if (type != firstType) {
+                if (!isTypeMatch(firstType, type)) {
                     handleSemanticError(handler, analyzer, ERROR_ARRAY_MEMBERS_SHOULD_HAVE_SAME_TYPE,
                         expression->token);
                     error = true;
